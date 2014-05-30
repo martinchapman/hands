@@ -347,8 +347,8 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	/**
 	 * @param ef
 	 */
-	public HiddenObjectGraph(EdgeFactory<V, E> ef)
-    {
+	public HiddenObjectGraph(EdgeFactory<V, E> ef) {
+		
         super(ef);
         
         setup();
@@ -366,8 +366,8 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
      *
      * @param edgeClass class on which to base factory for edges
      */
-    public HiddenObjectGraph(Class<? extends E> edgeClass)
-    {
+    public HiddenObjectGraph(Class<? extends E> edgeClass) {
+    	
         super(new ClassBasedEdgeFactory<V, E>(edgeClass));
      
         setup();
@@ -453,11 +453,40 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
     
     /**
      * 
+     */
+    private int numberOfNodeTypes;
+    
+    /**
+     * @return
+     */
+    public int getNumberOfNodeTypes() {
+    	
+		return numberOfNodeTypes;
+	
+    }
+
+	/**
+     * @param nodeTypes
+     */
+    public void setNodeTypes(char[] nodeTypes) {
+    	
+    	numberOfNodeTypes = nodeTypes.length;
+    	
+    	for ( V vertex : vertexSet() ) {
+        	
+        	setNodeType(vertex, nodeTypes[(int)(Math.random() * nodeTypes.length)]);
+        	
+        }
+
+    }
+    
+    /**
+     * 
      * 
      * @param node
      * @param type
      */
-    public void setNodeType(V node, char type) {
+    private void setNodeType(V node, char type) {
     	
     	nodeTypes.put(node, type);
     	
@@ -466,9 +495,9 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
     /**
      * @param node
      */
-    public void getNodeType(V node) {
+    public char getNodeType(V node) {
     	
-    	nodeTypes.get(node);
+    	return nodeTypes.get(node);
     	
     }
 

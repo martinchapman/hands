@@ -156,13 +156,7 @@ public class Main {
 		
 		// Assign nodes types
 		
-		char[] nodeTypes = { 'A', 'B', 'C' };
-		
-		for ( StringVertex vertex : graph.vertexSet() ) {
-        	
-        	graph.setNodeType(vertex, nodeTypes[(int)(Math.random() * nodeTypes.length)]);
-        	
-        }
+		graph.setNodeTypes(new char[]{ 'A', 'B', 'C' });
 		
 		
 		// Set edge weights
