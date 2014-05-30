@@ -17,12 +17,12 @@ import HideAndSeek.graph.HiddenObjectGraph;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.Hider;
+import HideAndSeek.hider.nonhomo.NodeTypeRestrictedHider;
 import HideAndSeek.hider.singleshot.FixedDistanceHider;
 import HideAndSeek.hider.singleshot.LowEdgeCostFixedDistanceHider;
-import HideAndSeek.hider.singleshot.MinimumConnectivityHider;
 import HideAndSeek.hider.singleshot.VariableDistanceHider;
 import HideAndSeek.seeker.Seeker;
-import HideAndSeek.seeker.repeatgame.adaptive.AdaptiveVariableHighProbabilitySeeker;
+import HideAndSeek.seeker.nonhomo.NodeTypeSearcher;
 import HideAndSeek.seeker.singleshot.FixedStartDepthFirstSearch;
 import HideAndSeek.seeker.singleshot.FixedStartDepthFirstSearchLowCost;
 import HideAndSeek.seeker.singleshot.FixedStartGreedy;
@@ -271,7 +271,7 @@ public class Main {
 		 
 		ArrayList<Hider> allHidingAgents = new ArrayList<Hider>();
 		
-		allHidingAgents.add(new MinimumConnectivityHider(graph, numberOfHideLocations));
+		allHidingAgents.add(new NodeTypeRestrictedHider(graph, numberOfHideLocations));
 		
 		return allHidingAgents;
 		
@@ -291,7 +291,7 @@ public class Main {
 		
 		ArrayList<Seeker> allSeekingAgents = new ArrayList<Seeker>();
 		
-		allSeekingAgents.add(new AdaptiveVariableHighProbabilitySeeker(graph));
+		allSeekingAgents.add(new NodeTypeSearcher(graph));
 		
 		return allSeekingAgents;
 		

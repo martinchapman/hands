@@ -10,8 +10,15 @@ import HideAndSeek.graph.StringVertex;
 import HideAndSeek.seeker.Seeker;
 import Utility.Utils;
 
+/**
+ * @author Martin
+ *
+ */
 public class FixedStartDepthFirstSearch extends Seeker {
 
+	/**
+	 * @param graph
+	 */
 	public FixedStartDepthFirstSearch(
 			HiddenObjectGraph<StringVertex, StringEdge> graph) {
 
@@ -21,8 +28,14 @@ public class FixedStartDepthFirstSearch extends Seeker {
 
 	}
 
+	/**
+	 * 
+	 */
 	protected ArrayList<StringEdge> currentBranch;
 
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
+	 */
 	@Override
 	protected StringVertex nextNode(StringVertex currentNode) {
 
@@ -75,6 +88,9 @@ public class FixedStartDepthFirstSearch extends Seeker {
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraverser#startNode()
+	 */
 	@Override
 	protected StringVertex startNode() {
 
@@ -84,6 +100,9 @@ public class FixedStartDepthFirstSearch extends Seeker {
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see HideAndSeek.seeker.Seeker#endOfRound()
+	 */
 	@Override
 	public void endOfRound() {
 		// TODO Auto-generated method stub
