@@ -24,12 +24,17 @@ public class RandomHider extends Hider {
 		super(graph, numberOfHideLocations);
 	}
 
+	/**
+	 * 
+	 */
+	protected double HIDEPOTENTIAL = 0.5;
+	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.hider.Hider#hideHere(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
 	protected boolean hideHere(StringVertex vertex) {
-		if (Math.random() < 0.5) { return true; }
+		if (Math.random() < HIDEPOTENTIAL) { return true; }
 		else { return false; }
 	}
 

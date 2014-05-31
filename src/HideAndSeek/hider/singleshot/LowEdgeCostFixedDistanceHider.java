@@ -12,7 +12,7 @@ import HideAndSeek.graph.StringVertex;
  * @author Martin
  *
  */
-public class LowEdgeCostFixedDistanceHider extends FixedDistanceHider {
+public class LowEdgeCostFixedDistanceHider extends RandomFixedDistanceHider {
 
 	/**
 	 * @param graph

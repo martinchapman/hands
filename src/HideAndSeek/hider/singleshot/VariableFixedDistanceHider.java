@@ -14,12 +14,12 @@ import Utility.Utils;
  * @author Martin
  *
  */
-public class VariableDistanceHider extends FixedDistanceHider implements Runnable {
+public class VariableFixedDistanceHider extends RandomFixedDistanceHider implements Runnable {
 	
 	/**
 	 * @param graph
 	 */
-	public VariableDistanceHider(HiddenObjectGraph<StringVertex, StringEdge> graph, int numberOfHideLocations, int minHideDistance) {
+	public VariableFixedDistanceHider(HiddenObjectGraph<StringVertex, StringEdge> graph, int numberOfHideLocations, int minHideDistance) {
 	
 		super(graph, numberOfHideLocations);
 		

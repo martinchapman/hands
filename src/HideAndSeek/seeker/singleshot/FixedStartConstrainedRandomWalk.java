@@ -7,17 +7,15 @@ import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.seeker.Seeker;
 
-public class FixedStartRandomWalk extends Seeker {
+public class FixedStartConstrainedRandomWalk extends Seeker {
 
-	public FixedStartRandomWalk(
+	public FixedStartConstrainedRandomWalk(
 			HiddenObjectGraph<StringVertex, StringEdge> graph) {
 
 		super(graph);
 
 	}
 
-	protected boolean uniquelyVisitNodes = false;
-	
 	@Override
 	protected StringVertex nextNode(StringVertex currentNode) {
 

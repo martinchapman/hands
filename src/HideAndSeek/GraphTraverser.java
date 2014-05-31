@@ -114,7 +114,7 @@ public abstract class GraphTraverser {
 			
 					// Loop while not allowed to repeat nodes BUT
 		} while (   uniquelyVisitNodes == true && uniquelyVisitedNodes.contains( target ) &&
-				    // only if we haven't already tried all outgoing edges available
+				    // only if we haven't already tried all outgoing edges available (more a programmatic choice than a strategic one)
 				    selectedInThisSession.size() != connectedEdges.size()  );
 		
 		return target;

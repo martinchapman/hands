@@ -18,9 +18,9 @@ import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.Hider;
 import HideAndSeek.hider.nonhomo.NodeTypeRestrictedHider;
-import HideAndSeek.hider.singleshot.FixedDistanceHider;
+import HideAndSeek.hider.singleshot.RandomFixedDistanceHider;
 import HideAndSeek.hider.singleshot.LowEdgeCostFixedDistanceHider;
-import HideAndSeek.hider.singleshot.VariableDistanceHider;
+import HideAndSeek.hider.singleshot.VariableFixedDistanceHider;
 import HideAndSeek.seeker.Seeker;
 import HideAndSeek.seeker.nonhomo.NodeTypeSearcher;
 import HideAndSeek.seeker.singleshot.FixedStartDepthFirstSearch;
@@ -198,11 +198,11 @@ public class Main {
 			
 			if (seekerType.getElement0().equals("FixedDistanceHider")) {
 				
-				allHidingAgents.add(new FixedDistanceHider(graph, numberOfHideLocations));
+				allHidingAgents.add(new RandomFixedDistanceHider(graph, numberOfHideLocations));
 			
 			} else if (seekerType.getElement0().equals("VariableDistanceHider")) {
 				
-				allHidingAgents.add(new VariableDistanceHider(graph, numberOfHideLocations, gameNumber));
+				allHidingAgents.add(new VariableFixedDistanceHider(graph, numberOfHideLocations, gameNumber));
 				
 			} else if (seekerType.getElement0().equals("LowEdgeCostHider")) {
 				

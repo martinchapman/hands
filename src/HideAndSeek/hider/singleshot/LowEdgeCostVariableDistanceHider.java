@@ -13,7 +13,7 @@ import Utility.Utils;
  * @author Martin
  *
  */
-public class LowEdgeCostVariableDistanceHider extends FixedDistanceHider implements Runnable {
+public class LowEdgeCostVariableDistanceHider extends RandomFixedDistanceHider implements Runnable {
 	
 	/**
 	 * @param graph

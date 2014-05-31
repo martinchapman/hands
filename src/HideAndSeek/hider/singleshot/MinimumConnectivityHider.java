@@ -99,9 +99,11 @@ public class MinimumConnectivityHider extends Hider {
 	@Override
 	protected StringVertex startNode() {
 		
-		StringVertex[] vertices = new StringVertex[graph.vertexSet().size()];
+		//StringVertex[] vertices = new StringVertex[graph.vertexSet().size()];
 				
-		return graph.vertexSet().toArray(vertices)[0];
+		//return graph.vertexSet().toArray(vertices)[0];
+		
+		return randomNode();
 		
 	}
 

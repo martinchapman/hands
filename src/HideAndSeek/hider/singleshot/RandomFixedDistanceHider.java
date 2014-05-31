@@ -16,12 +16,12 @@ import Utility.Utils;
  * @author Martin
  *
  */
-public class FixedDistanceHider extends Hider implements Runnable {
+public class RandomFixedDistanceHider extends Hider implements Runnable {
 	
 	/**
 	 * @param graph
 	 */
-	public FixedDistanceHider(HiddenObjectGraph<StringVertex, StringEdge> graph, int numberOfHideLocations) {
+	public RandomFixedDistanceHider(HiddenObjectGraph<StringVertex, StringEdge> graph, int numberOfHideLocations) {
 	
 		super(graph, numberOfHideLocations);
 		
@@ -65,9 +65,11 @@ public class FixedDistanceHider extends Hider implements Runnable {
 	@Override
 	protected StringVertex startNode() {
 		
-		StringVertex[] vertices = new StringVertex[graph.vertexSet().size()];
+		// StringVertex[] vertices = new StringVertex[graph.vertexSet().size()];
 		
-		return graph.vertexSet().toArray(vertices)[0];
+		// return graph.vertexSet().toArray(vertices)[0];
+		
+		return randomNode();
 		
 	}
 	
