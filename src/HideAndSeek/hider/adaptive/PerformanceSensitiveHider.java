@@ -1,6 +1,6 @@
 package HideAndSeek.hider.adaptive;
 
-import HideAndSeek.graph.HiddenObjectGraph;
+import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.repeatgame.VariableBiasHider;
@@ -25,10 +25,10 @@ public class PerformanceSensitiveHider extends VariableBiasHider {
 	 * @param numberOfHideLocations
 	 */
 	public PerformanceSensitiveHider(
-			HiddenObjectGraph<StringVertex, StringEdge> graph,
+			GraphController <StringVertex, StringEdge> graphController,
 			int numberOfHideLocations) {
 	
-		super(graph, numberOfHideLocations, 1.0);
+		super(graphController, numberOfHideLocations, 1.0);
 	
 	}
 
@@ -54,7 +54,7 @@ public class PerformanceSensitiveHider extends VariableBiasHider {
 	 */
 	protected void adjustBias() {
 		
-		double seekerPerformanceChange = ( ( graph.requestAverageSeekerPerformance(roundsPassed) - graph.requestAverageSeekerPerformance(roundsPassed - 1) ) / graph.requestAverageSeekerPerformance(roundsPassed - 1) ) * 100;
+		double seekerPerformanceChange = ( ( graphController.requestAverageSeekerPerformance(roundsPassed) - graphController.requestAverageSeekerPerformance(roundsPassed - 1) ) / graphController.requestAverageSeekerPerformance(roundsPassed - 1) ) * 100;
         
 		Utils.talk(toString(), "Seeker performance change: " + seekerPerformanceChange);
 		

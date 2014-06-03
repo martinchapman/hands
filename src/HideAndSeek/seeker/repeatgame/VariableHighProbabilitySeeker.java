@@ -1,16 +1,8 @@
 package HideAndSeek.seeker.repeatgame;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.jgrapht.alg.DijkstraShortestPath;
-
-import HideAndSeek.graph.HiddenObjectGraph;
+import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.seeker.Seeker;
-import Utility.BehaviourPrediction;
-import Utility.Utils;
 
 /**
  * Extends the standard High Probability Seeker adding the capacity
@@ -23,8 +15,8 @@ import Utility.Utils;
 public class VariableHighProbabilitySeeker extends HighProbabilitySeeker {
 	
 	public VariableHighProbabilitySeeker(
-			HiddenObjectGraph<StringVertex, StringEdge> graph, int predictiveNodes) {
-		super(graph);
+			GraphController <StringVertex, StringEdge> graphController, int predictiveNodes) {
+		super(graphController);
 		
 		this.predictiveNodes = predictiveNodes;
 		

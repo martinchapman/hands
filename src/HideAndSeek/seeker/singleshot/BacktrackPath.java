@@ -5,31 +5,27 @@ import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.seeker.Seeker;
 
-public class FixedStartRandomWalk extends Seeker {
+/**
+ * @author Martin
+ *
+ */
+public class BacktrackPath extends Seeker {
 
 	/**
 	 * @param graph
 	 */
-	public FixedStartRandomWalk(
-			GraphController <StringVertex, StringEdge> graphController) {
-
-		super(graphController);
-
+	public BacktrackPath(GraphController <StringVertex, StringEdge> graphController) {
+		// TODO Auto-generated constructor stub
+		super(graphController);	
 	}
 
-	/**
-	 * 
-	 */
-	protected boolean uniquelyVisitNodes = false;
-	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
 	protected StringVertex nextNode(StringVertex currentNode) {
-
-		return connectedNode(currentNode);
-		
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -37,11 +33,8 @@ public class FixedStartRandomWalk extends Seeker {
 	 */
 	@Override
 	protected StringVertex startNode() {
-
-		StringVertex[] vertices = new StringVertex[graphController.vertexSet().size()];
-		
-		return graphController.vertexSet().toArray(vertices)[0];
-		
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

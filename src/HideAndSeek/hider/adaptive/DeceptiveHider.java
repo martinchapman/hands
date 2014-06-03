@@ -2,7 +2,7 @@ package HideAndSeek.hider.adaptive;
 
 import java.util.ArrayList;
 
-import HideAndSeek.graph.HiddenObjectGraph;
+import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.repeatgame.VariableBiasLocationsHider;
@@ -26,10 +26,10 @@ public class DeceptiveHider extends VariableBiasLocationsHider {
 	 * @param deceptionDuration
 	 */
 	public DeceptiveHider(
-			HiddenObjectGraph<StringVertex, StringEdge> graph,
+			GraphController <StringVertex, StringEdge> graphController,
 			int numberOfHideLocations, int numberOfBiasLocations, int deceptiveNodes, int deceptionDuration) {
 		
-		super(graph, numberOfHideLocations, numberOfBiasLocations);
+		super(graphController, numberOfHideLocations, numberOfBiasLocations);
 		
 		setDeceptiveNodes(deceptiveNodes);
 		

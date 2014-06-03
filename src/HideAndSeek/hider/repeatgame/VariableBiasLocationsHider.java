@@ -1,14 +1,8 @@
 package HideAndSeek.hider.repeatgame;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import HideAndSeek.graph.HiddenObjectGraph;
+import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.Hider;
-import Utility.Utils;
 
 /**
  * Agent exhibiting a partner property to Variable Bias hider:
@@ -32,9 +26,9 @@ public class VariableBiasLocationsHider extends VariableBiasHider {
 	 * @param bias
 	 */
 	public VariableBiasLocationsHider(
-			HiddenObjectGraph<StringVertex, StringEdge> graph,
+			GraphController <StringVertex, StringEdge> graphController,
 			int numberOfHideLocations, int numberOfBiasLocations) {
-		super(graph, numberOfHideLocations, 1.0);
+		super(graphController, numberOfHideLocations, 1.0);
 		
 		this.numberOfBiasLocations = numberOfBiasLocations;
 		

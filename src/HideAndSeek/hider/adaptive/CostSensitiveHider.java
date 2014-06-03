@@ -1,6 +1,6 @@
 package HideAndSeek.hider.adaptive;
 
-import HideAndSeek.graph.HiddenObjectGraph;
+import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.repeatgame.VariableBiasHider;
@@ -25,10 +25,10 @@ public class CostSensitiveHider extends VariableBiasHider {
 	 * @param numberOfHideLocations
 	 */
 	public CostSensitiveHider(
-			HiddenObjectGraph<StringVertex, StringEdge> graph,
+			GraphController <StringVertex, StringEdge> graphController,
 			int numberOfHideLocations) {
 	
-		super(graph, numberOfHideLocations, 0.0);
+		super(graphController, numberOfHideLocations, 0.0);
 	
 	}
 

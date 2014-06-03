@@ -1,10 +1,8 @@
 package HideAndSeek.hider.adaptive;
 
-import HideAndSeek.graph.HiddenObjectGraph;
+import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.repeatgame.VariableBiasHider;
-import Utility.Utils;
 
 /**
  * H&S is a multiple objective optimisation problem for the hider,
@@ -25,10 +23,10 @@ public class CostSensitiveHiderRandomPlacement extends CostSensitiveHider {
 	 * @param numberOfHideLocations
 	 */
 	public CostSensitiveHiderRandomPlacement(
-			HiddenObjectGraph<StringVertex, StringEdge> graph,
+			GraphController <StringVertex, StringEdge> graphController,
 			int numberOfHideLocations) {
 	
-		super(graph, numberOfHideLocations);
+		super(graphController, numberOfHideLocations);
 	
 	}
 

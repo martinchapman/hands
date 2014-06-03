@@ -2,27 +2,27 @@ package HideAndSeek.hider.singleshot;
 
 import java.util.List;
 
-import HideAndSeek.graph.HiddenObjectGraph;
+import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 
 /**
- * Orders edges according to lowest cost
- * 
  * @author Martin
  *
  */
-public class LowEdgeCostFixedDistanceHider extends RandomFixedDistanceHider {
-
+public class LowEdgeCostVariableDistance extends RandomFixedDistance implements Runnable {
+	
 	/**
 	 * @param graph
 	 */
-	public LowEdgeCostFixedDistanceHider(HiddenObjectGraph<StringVertex, StringEdge> graph, int numberOfHideLocations) {
+	public LowEdgeCostVariableDistance(GraphController <StringVertex, StringEdge> graphController, int numberOfHideLocations, int minHideDistance) {
+	
+		super(graphController, numberOfHideLocations);
 		
-		super(graph, numberOfHideLocations);
-		
-	}
+		this.minHideDistance = minHideDistance;
 
+	}
+	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#getConnectedNode(java.util.List)
 	 */
@@ -47,5 +47,5 @@ public class LowEdgeCostFixedDistanceHider extends RandomFixedDistanceHider {
 		return minimumEdge;
 		
 	}
-
+	
 }

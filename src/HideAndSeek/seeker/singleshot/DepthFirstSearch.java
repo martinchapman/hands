@@ -4,25 +4,28 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import HideAndSeek.graph.HiddenObjectGraph;
+import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.seeker.Seeker;
-import Utility.Utils;
 
 /**
+ * 
+ * Note: There may be more efficient library implementations of these algorithms,
+ * but these are tailored to the platform.
+ * 
  * @author Martin
  *
  */
-public class FixedStartDepthFirstSearch extends Seeker {
+public class DepthFirstSearch extends Seeker {
 
 	/**
 	 * @param graph
 	 */
-	public FixedStartDepthFirstSearch(
-			HiddenObjectGraph<StringVertex, StringEdge> graph) {
+	public DepthFirstSearch(
+			GraphController <StringVertex, StringEdge> graphController) {
 
-		super(graph);
+		super(graphController);
 		
 		currentBranch = new ArrayList<StringEdge>();
 
@@ -94,9 +97,11 @@ public class FixedStartDepthFirstSearch extends Seeker {
 	@Override
 	protected StringVertex startNode() {
 
-		StringVertex[] vertices = new StringVertex[graph.vertexSet().size()];
+		//StringVertex[] vertices = new StringVertex[graph.vertexSet().size()];
 		
-		return graph.vertexSet().toArray(vertices)[0];
+		//return graph.vertexSet().toArray(vertices)[0];
+		
+		return randomNode();
 		
 	}
 

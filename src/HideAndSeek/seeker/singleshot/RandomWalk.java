@@ -5,12 +5,16 @@ import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.seeker.Seeker;
 
-public class FixedStartRandomWalk extends Seeker {
+/**
+ * @author Martin
+ *
+ */
+public class RandomWalk extends Seeker {
 
 	/**
 	 * @param graph
 	 */
-	public FixedStartRandomWalk(
+	public RandomWalk(
 			GraphController <StringVertex, StringEdge> graphController) {
 
 		super(graphController);
@@ -38,9 +42,7 @@ public class FixedStartRandomWalk extends Seeker {
 	@Override
 	protected StringVertex startNode() {
 
-		StringVertex[] vertices = new StringVertex[graphController.vertexSet().size()];
-		
-		return graphController.vertexSet().toArray(vertices)[0];
+		return randomNode();
 		
 	}
 

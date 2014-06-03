@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import org.jgrapht.graph.DefaultEdge;
-
-import HideAndSeek.graph.HiddenObjectGraph;
+import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 
@@ -19,16 +17,16 @@ public abstract class GraphTraverser {
 	/**
 	 * 
 	 */
-	protected HiddenObjectGraph<StringVertex, StringEdge> graph;
+	protected GraphController<StringVertex, StringEdge> graphController;
 	
 	/**
 	 * @param graph
 	 */
-	public GraphTraverser(HiddenObjectGraph<StringVertex, StringEdge> graph) {
+	public GraphTraverser(GraphController<StringVertex, StringEdge> graphController) {
 		
-		this.graph = graph;
+		this.graphController = graphController;
 		
-		graph.registerTraversingAgent(this);
+		graphController.registerTraversingAgent(this);
 		
 		if ( uniquelyVisitNodes == true ) {
 		
@@ -43,9 +41,9 @@ public abstract class GraphTraverser {
 	 */
 	protected StringVertex randomNode() {
 		
-		StringVertex[] vertices = new StringVertex[graph.vertexSet().size()];
+		StringVertex[] vertices = new StringVertex[graphController.vertexSet().size()];
 		
-		graph.vertexSet().toArray(vertices);
+		graphController.vertexSet().toArray(vertices);
 		
 		return vertices[(int)(Math.random() * vertices.length)];
 		
@@ -82,7 +80,7 @@ public abstract class GraphTraverser {
 	 */
 	protected List<StringEdge> getConnectedEdges(StringVertex currentNode) {
 		
-		return new ArrayList<StringEdge>(graph.edgesOf(currentNode));
+		return new ArrayList<StringEdge>(graphController.edgesOf(currentNode));
 		
 	}
 	

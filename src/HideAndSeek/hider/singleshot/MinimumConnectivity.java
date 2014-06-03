@@ -2,13 +2,10 @@ package HideAndSeek.hider.singleshot;
 
 import java.util.HashSet;
 
-import org.jgrapht.alg.DijkstraShortestPath;
-
-import HideAndSeek.graph.HiddenObjectGraph;
+import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.Hider;
-import Utility.Utils;
 
 /**
  * Attempts to hide nodes with the least possible connectivity.
@@ -18,15 +15,15 @@ import Utility.Utils;
  * @author Martin
  *
  */
-public class MinimumConnectivityHider extends Hider {
+public class MinimumConnectivity extends Hider {
 
 	/**
 	 * @param graph
 	 * @param numberOfHideLocations
 	 */
-	public MinimumConnectivityHider(HiddenObjectGraph<StringVertex, StringEdge> graph,
+	public MinimumConnectivity(GraphController <StringVertex, StringEdge> graphController,
 			int numberOfHideLocations) {
-		super(graph, numberOfHideLocations);
+		super(graphController, numberOfHideLocations);
 		// TODO Auto-generated constructor stub
 		
 		triedNodes = new HashSet<StringVertex>();

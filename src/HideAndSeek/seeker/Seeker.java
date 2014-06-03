@@ -3,10 +3,9 @@ package HideAndSeek.seeker;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashSet;
 
 import HideAndSeek.GraphTraverser;
-import HideAndSeek.graph.HiddenObjectGraph;
+import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import Utility.Utils;
@@ -35,9 +34,9 @@ public abstract class Seeker extends GraphTraverser implements Runnable {
 	/**
 	 * @param graph
 	 */
-	public Seeker(HiddenObjectGraph<StringVertex, StringEdge> graph) {
+	public Seeker(GraphController <StringVertex, StringEdge> graphController) {
 		
-		super(graph);
+		super(graphController);
 		
 		// ID according to time of generation
 		ID = "" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime()) + Math.random() * 100;

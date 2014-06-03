@@ -1,8 +1,6 @@
 package HideAndSeek.seeker.repeatgame.adaptive;
 
-import java.util.ArrayList;
-
-import HideAndSeek.graph.HiddenObjectGraph;
+import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.seeker.repeatgame.VariableHighProbabilitySeeker;
@@ -21,9 +19,9 @@ import Utility.Utils;
 public class AdaptiveVariableHighProbabilitySeeker extends VariableHighProbabilitySeeker {
 	
 	public AdaptiveVariableHighProbabilitySeeker(
-			HiddenObjectGraph<StringVertex, StringEdge> graph) {
+			GraphController <StringVertex, StringEdge> graphController) {
 		
-		super(graph, Integer.MAX_VALUE);
+		super(graphController, Integer.MAX_VALUE);
 		
 	}
 	

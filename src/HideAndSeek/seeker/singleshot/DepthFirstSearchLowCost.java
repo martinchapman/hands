@@ -3,24 +3,25 @@ package HideAndSeek.seeker.singleshot;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
-import HideAndSeek.graph.HiddenObjectGraph;
+import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import Utility.Utils;
 
 /**
  * @author Martin
  *
  * Only modification to superclass is to order nodes by weight prior to DFS.
  */
-public class FixedStartDepthFirstSearchLowCost extends FixedStartDepthFirstSearch {
+public class DepthFirstSearchLowCost extends DepthFirstSearch {
 
-	public FixedStartDepthFirstSearchLowCost(
-			HiddenObjectGraph<StringVertex, StringEdge> graph) {
+	/**
+	 * @param graph
+	 */
+	public DepthFirstSearchLowCost(
+			GraphController <StringVertex, StringEdge> graphController) {
 
-		super(graph);
+		super(graphController);
 	
 	}
 
@@ -31,7 +32,7 @@ public class FixedStartDepthFirstSearchLowCost extends FixedStartDepthFirstSearc
 	 */
 	protected List<StringEdge> getConnectedEdges(StringVertex currentNode) {
 		
-		ArrayList<StringEdge> edges = new ArrayList<StringEdge>(graph.edgesOf(currentNode));
+		ArrayList<StringEdge> edges = new ArrayList<StringEdge>(graphController.edgesOf(currentNode));
 		
 		Collections.sort(edges);
 		

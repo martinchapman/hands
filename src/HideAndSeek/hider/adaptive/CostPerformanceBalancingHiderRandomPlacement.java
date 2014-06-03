@@ -1,10 +1,8 @@
 package HideAndSeek.hider.adaptive;
 
-import HideAndSeek.graph.HiddenObjectGraph;
+import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.repeatgame.VariableBiasHiderRandomPlacement;
-import Utility.Utils;
 
 /**
  * Same as namesake, although hides according to random placement
@@ -19,10 +17,10 @@ public class CostPerformanceBalancingHiderRandomPlacement extends CostPerformanc
 	 * @param numberOfHideLocations
 	 */
 	public CostPerformanceBalancingHiderRandomPlacement(
-			HiddenObjectGraph<StringVertex, StringEdge> graph,
+			GraphController <StringVertex, StringEdge> graphController,
 			int numberOfHideLocations) {
 	
-		super(graph, numberOfHideLocations);
+		super(graphController, numberOfHideLocations);
 	
 	}
 

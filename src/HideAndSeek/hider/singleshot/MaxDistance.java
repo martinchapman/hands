@@ -4,11 +4,10 @@ import java.util.HashSet;
 
 import org.jgrapht.alg.DijkstraShortestPath;
 
-import HideAndSeek.graph.HiddenObjectGraph;
+import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.Hider;
-import Utility.Utils;
 
 /**
  * Attempts to hide nodes with a maximum possible distance 
@@ -17,15 +16,15 @@ import Utility.Utils;
  * @author Martin
  *
  */
-public class MaxDistanceHider extends Hider {
+public class MaxDistance extends Hider {
 
 	/**
 	 * @param graph
 	 * @param numberOfHideLocations
 	 */
-	public MaxDistanceHider(HiddenObjectGraph<StringVertex, StringEdge> graph,
+	public MaxDistance(GraphController <StringVertex, StringEdge> graphController,
 			int numberOfHideLocations) {
-		super(graph, numberOfHideLocations);
+		super(graphController, numberOfHideLocations);
 		// TODO Auto-generated constructor stub
 		
 		triedNodes = new HashSet<StringVertex>();
@@ -57,7 +56,7 @@ public class MaxDistanceHider extends Hider {
 		
 		triedNodes.add(vertex);
 		
-		// First hide location is the starting vertex
+		// First hide location is the starting vertex (NB: won't ever try and hide here again, so ok)
 		if ( vertex.equals(startNode()) ) return true; 
 		
 		// If all nodes have been tried, cannot continue, so return true.

@@ -4,11 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import HideAndSeek.graph.HiddenObjectGraph;
+import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.Hider;
-import Utility.Utils;
 
 /**
  * A hider who's tendency to choose pre-explored nodes (cheaper)
@@ -27,9 +26,9 @@ public class VariableBiasHider extends Hider {
 	 * @param bias
 	 */
 	public VariableBiasHider(
-			HiddenObjectGraph<StringVertex, StringEdge> graph,
+			GraphController <StringVertex, StringEdge> graphController,
 			int numberOfHideLocations, double bias) {
-		super(graph, numberOfHideLocations);
+		super(graphController, numberOfHideLocations);
 		
 		setBias(bias);
 		

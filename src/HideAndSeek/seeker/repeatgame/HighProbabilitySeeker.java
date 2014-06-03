@@ -5,12 +5,11 @@ import java.util.List;
 
 import org.jgrapht.alg.DijkstraShortestPath;
 
-import HideAndSeek.graph.HiddenObjectGraph;
+import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.seeker.Seeker;
 import Utility.BehaviourPrediction;
-import Utility.Utils;
 
 /**
  * @author Martin
@@ -41,8 +40,8 @@ public class HighProbabilitySeeker extends Seeker {
 	 * @param graph
 	 */
 	public HighProbabilitySeeker(
-			HiddenObjectGraph<StringVertex, StringEdge> graph) {
-		super(graph);
+			GraphController <StringVertex, StringEdge> graphController) {
+		super(graphController);
 		
 		likelyNodes = new ArrayList<StringVertex>();
 		
@@ -68,7 +67,7 @@ public class HighProbabilitySeeker extends Seeker {
 			
 			StringVertex targetNode;
 			
-			DijkstraShortestPath<StringVertex, StringEdge> dsp = new DijkstraShortestPath<StringVertex, StringEdge>(graph, currentNode, likelyNodes.get(0));
+			DijkstraShortestPath<StringVertex, StringEdge> dsp = new DijkstraShortestPath<StringVertex, StringEdge>(graphController, currentNode, likelyNodes.get(0));
 	    	
 			List<StringEdge> DSP = new ArrayList<StringEdge>(dsp.getPathEdgeList());
 			

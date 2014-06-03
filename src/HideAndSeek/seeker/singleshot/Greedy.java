@@ -1,27 +1,43 @@
 package HideAndSeek.seeker.singleshot;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.seeker.Seeker;
 
-public class FixedStartRandomWalk extends Seeker {
+/**
+ * @author Martin
+ *
+ */
+public class Greedy extends Seeker {
 
 	/**
 	 * @param graph
 	 */
-	public FixedStartRandomWalk(
+	public Greedy(
 			GraphController <StringVertex, StringEdge> graphController) {
 
 		super(graphController);
 
 	}
 
-	/**
-	 * 
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraverser#getConnectedEdges(HideAndSeek.graph.StringVertex)
 	 */
-	protected boolean uniquelyVisitNodes = false;
-	
+	protected List<StringEdge> getConnectedEdges(StringVertex currentNode) {
+		
+		ArrayList<StringEdge> edges = new ArrayList<StringEdge>(graphController.edgesOf(currentNode));
+		
+		Collections.sort(edges);
+		
+		return edges;
+		
+	}
+
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
 	 */
@@ -29,7 +45,6 @@ public class FixedStartRandomWalk extends Seeker {
 	protected StringVertex nextNode(StringVertex currentNode) {
 
 		return connectedNode(currentNode);
-		
 	}
 
 	/* (non-Javadoc)
@@ -38,9 +53,7 @@ public class FixedStartRandomWalk extends Seeker {
 	@Override
 	protected StringVertex startNode() {
 
-		StringVertex[] vertices = new StringVertex[graphController.vertexSet().size()];
-		
-		return graphController.vertexSet().toArray(vertices)[0];
+		return randomNode();
 		
 	}
 

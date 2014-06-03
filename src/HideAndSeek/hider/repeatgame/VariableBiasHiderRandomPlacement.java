@@ -1,14 +1,8 @@
 package HideAndSeek.hider.repeatgame;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import HideAndSeek.graph.HiddenObjectGraph;
+import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.Hider;
-import Utility.Utils;
 
 /**
  * Same as parent class, except only plants items with 50% probability
@@ -23,9 +17,9 @@ public class VariableBiasHiderRandomPlacement extends VariableBiasHider {
 	 * @param bias
 	 */
 	public VariableBiasHiderRandomPlacement(
-			HiddenObjectGraph<StringVertex, StringEdge> graph,
+			GraphController <StringVertex, StringEdge> graphController,
 			int numberOfHideLocations, double bias) {
-		super(graph, numberOfHideLocations, bias);
+		super(graphController, numberOfHideLocations, bias);
 		
 	}
 

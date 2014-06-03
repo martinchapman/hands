@@ -1,13 +1,9 @@
 package HideAndSeek.hider.singleshot;
 
-import java.util.ArrayList;
-
-import HideAndSeek.GraphTraverser;
-import HideAndSeek.graph.HiddenObjectGraph;
+import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.Hider;
-import Utility.Utils;
 
 /**
  * 
@@ -16,14 +12,14 @@ import Utility.Utils;
  * @author Martin
  *
  */
-public class RandomFixedDistanceHider extends Hider implements Runnable {
+public class RandomFixedDistance extends Hider implements Runnable {
 	
 	/**
 	 * @param graph
 	 */
-	public RandomFixedDistanceHider(HiddenObjectGraph<StringVertex, StringEdge> graph, int numberOfHideLocations) {
+	public RandomFixedDistance(GraphController <StringVertex, StringEdge> graphController, int numberOfHideLocations) {
 	
-		super(graph, numberOfHideLocations);
+		super(graphController, numberOfHideLocations);
 		
 		minHideDistance = ((int)Math.random() * 10) + 1;
 

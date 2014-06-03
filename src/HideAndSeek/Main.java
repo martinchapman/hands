@@ -5,28 +5,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.jgrapht.VertexFactory;
-import org.jgrapht.alg.ConnectivityInspector;
-import org.jgrapht.generate.GraphGenerator;
-import org.jgrapht.generate.RandomGraphGenerator;
-import org.jgrapht.generate.RingGraphGenerator;
-import org.jgrapht.generate.ScaleFreeGraphGenerator;
-import org.jgrapht.graph.ClassBasedVertexFactory;
-
-import HideAndSeek.graph.HiddenObjectGraph;
+import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.Hider;
-import HideAndSeek.hider.nonhomo.NodeTypeRestrictedHider;
-import HideAndSeek.hider.singleshot.RandomFixedDistanceHider;
-import HideAndSeek.hider.singleshot.LowEdgeCostFixedDistanceHider;
-import HideAndSeek.hider.singleshot.VariableFixedDistanceHider;
+import HideAndSeek.hider.singleshot.LowEdgeCostFixedDistance;
+import HideAndSeek.hider.singleshot.Random;
+import HideAndSeek.hider.singleshot.RandomFixedDistance;
+import HideAndSeek.hider.singleshot.VariableFixedDistance;
 import HideAndSeek.seeker.Seeker;
-import HideAndSeek.seeker.nonhomo.NodeTypeSearcher;
-import HideAndSeek.seeker.singleshot.FixedStartDepthFirstSearch;
-import HideAndSeek.seeker.singleshot.FixedStartDepthFirstSearchLowCost;
-import HideAndSeek.seeker.singleshot.FixedStartGreedy;
-import HideAndSeek.seeker.singleshot.FixedStartRandomWalk;
+import HideAndSeek.seeker.singleshot.BreadthFirstSearch;
+import HideAndSeek.seeker.singleshot.DepthFirstSearch;
+import HideAndSeek.seeker.singleshot.DepthFirstSearchLowCost;
+import HideAndSeek.seeker.singleshot.Greedy;
+import HideAndSeek.seeker.singleshot.RandomWalk;
 import Utility.Pair;
 import Utility.Utils;
 
@@ -54,7 +46,7 @@ public class Main {
 	/**
 	 * Graph 
 	 */
-	private HiddenObjectGraph<StringVertex, StringEdge> graph;
+	private GraphController<StringVertex, StringEdge> graphController;
 	
 	/**
 	 * @param args
@@ -106,76 +98,7 @@ public class Main {
 	 */
 	private void initGraph(String topology, int numberOfVertices, String fixedOrUpperBound, double fixedOrUpperValue, int edgeTraversalDecrement) {
 		
-		/**************************
-    	 * 
-    	 * Set up search graph
-    	 * 
-    	 * * * * * * * * * * * * */
-		
-		graph = new HiddenObjectGraph<StringVertex, StringEdge>(StringEdge.class);
-		
-		graph.setEdgeTraversalDecrement(edgeTraversalDecrement);
-		
-		GraphGenerator<StringVertex, StringEdge, StringVertex> generator = null;
-		
-		// Select generator
-		
-		if (	topology.equals("ring")	  ) {
-	    	
-	        generator = new RingGraphGenerator<StringVertex, StringEdge>(numberOfVertices);
-	        
-    	} else if (	   topology.equals("random")    ) {
-    		
-    		generator = new RandomGraphGenerator<StringVertex, StringEdge>(numberOfVertices, numberOfVertices * 3);
-    		
-    	} else if (    topology.equals("scalefree")    ) {
-    		
-    		generator = new ScaleFreeGraphGenerator<StringVertex, StringEdge>(numberOfVertices);
-    		
-    	}
-		
-		
-		// Generate graph
-		
-		Utils.talk("Main", "Generating graph.");
-		
-		VertexFactory<StringVertex> factory = new ClassBasedVertexFactory<StringVertex>(StringVertex.class);
-		
-		ConnectivityInspector<StringVertex, StringEdge> con = new ConnectivityInspector<StringVertex, StringEdge>(graph);
-		
-		do {
-			
-			generator.generateGraph(graph, factory, null);
-			
-			if (!con.isGraphConnected()) { graph.removeAllEdges(graph.edgeSet()); }
-			
-		} while ( !con.isGraphConnected() );
-		
-		Utils.talk("Main", "Graph generated. \n" + graph.edgeSet());
-		
-		
-		// Assign nodes types
-		
-		graph.setNodeTypes(new char[]{ 'A', 'B', 'C' });
-		
-		
-		// Set edge weights
-		
-		for ( StringEdge edge : graph.edgeSet() ) {
-			
-			if ( fixedOrUpperBound.equals("fixed") ) {
-				
-				graph.setEdgeWeight(edge, fixedOrUpperValue);
-				
-			} else if (fixedOrUpperBound.equals("upper")) {
-				
-				graph.setEdgeWeight(edge, Math.random() * fixedOrUpperValue);
-				
-			}
-			
-		}
-		
-		System.out.println(graph.edgeSet().size());
+		graphController = new GraphController<StringVertex, StringEdge>(topology, numberOfVertices, fixedOrUpperBound, fixedOrUpperValue, edgeTraversalDecrement);
 		
 	}
 	
@@ -198,15 +121,15 @@ public class Main {
 			
 			if (seekerType.getElement0().equals("FixedDistanceHider")) {
 				
-				allHidingAgents.add(new RandomFixedDistanceHider(graph, numberOfHideLocations));
+				allHidingAgents.add(new RandomFixedDistance(graphController, numberOfHideLocations));
 			
 			} else if (seekerType.getElement0().equals("VariableDistanceHider")) {
 				
-				allHidingAgents.add(new VariableFixedDistanceHider(graph, numberOfHideLocations, gameNumber));
+				allHidingAgents.add(new VariableFixedDistance(graphController, numberOfHideLocations, gameNumber));
 				
 			} else if (seekerType.getElement0().equals("LowEdgeCostHider")) {
 				
-				allHidingAgents.add(new LowEdgeCostFixedDistanceHider(graph, numberOfHideLocations));
+				allHidingAgents.add(new LowEdgeCostFixedDistance(graphController, numberOfHideLocations));
 				
 			}
 			
@@ -234,19 +157,19 @@ public class Main {
 			
 			if (seekerType.getElement0().equals("FixedStartRandomWalk")) {
 				
-				allSeekingAgents.add(new FixedStartRandomWalk(graph));
+				allSeekingAgents.add(new RandomWalk(graphController));
 				
 			} else if (seekerType.getElement0().equals("FixedStartDepthFirstSearch")) {
 				
-				allSeekingAgents.add(new FixedStartDepthFirstSearch(graph));
+				allSeekingAgents.add(new DepthFirstSearch(graphController));
 				
 			} else if (seekerType.getElement0().equals("FixedStartDepthFirstSearchLowCost")) {
 				
-				allSeekingAgents.add(new FixedStartDepthFirstSearchLowCost(graph));
+				allSeekingAgents.add(new DepthFirstSearchLowCost(graphController));
 				
 			} else if (seekerType.getElement0().equals("FixedStartGreedy")) {
 				
-				allSeekingAgents.add(new FixedStartGreedy(graph));
+				allSeekingAgents.add(new Greedy(graphController));
 				
 			}
 			
@@ -271,7 +194,7 @@ public class Main {
 		 
 		ArrayList<Hider> allHidingAgents = new ArrayList<Hider>();
 		
-		allHidingAgents.add(new NodeTypeRestrictedHider(graph, numberOfHideLocations));
+		allHidingAgents.add(new Random(graphController, numberOfHideLocations));
 		
 		return allHidingAgents;
 		
@@ -291,7 +214,7 @@ public class Main {
 		
 		ArrayList<Seeker> allSeekingAgents = new ArrayList<Seeker>();
 		
-		allSeekingAgents.add(new NodeTypeSearcher(graph));
+		allSeekingAgents.add(new BreadthFirstSearch(graphController));
 		
 		return allSeekingAgents;
 		
@@ -326,7 +249,7 @@ public class Main {
 		
 		}
 		
-		Utils.writeToFile(outputJavascript, "var graphNodes = \"" + graph.edgeSet() + "\"; \n var hidden = new Array(); \n var path = new Array(); \n");
+		Utils.writeToFile(outputJavascript, "var graphNodes = \"" + graphController.edgeSet() + "\"; \n var hidden = new Array(); \n var path = new Array(); \n");
 		
 		if (recordPerRound) {
     		
@@ -359,13 +282,13 @@ public class Main {
 					
 				}
 				
-				graph.clearHideLocations();
+				graphController.clearHideLocations(this);
 	    		
 	    		// Visualise first hider and first seeker, for novelty, mainly.
 	    		
 	    		Utils.writeToFile(outputJavascript, "hidden[" + i + "] = \"" + hiders.get(0).getHideLocations() + "\"; \n");
 	    		
-	    		Utils.writeToFile(outputJavascript, "path[" + i + "] = \"" + graph.latestRoundPaths(seekers.get(0)) + "\"; \n");
+	    		Utils.writeToFile(outputJavascript, "path[" + i + "] = \"" + graphController.latestRoundPaths(this, seekers.get(0)) + "\"; \n");
 	    		
 	    		//
 	    		
@@ -385,7 +308,7 @@ public class Main {
 	    			
 	        	}
 	    		
-	    		graph.notifyEndOfRound();
+	    		graphController.notifyEndOfRound(this);
 	    		
 	    		hider.endOfRound();
 	    		
@@ -395,7 +318,7 @@ public class Main {
 	    			
 	    		}
 	    		
-    			Utils.talk("Main", "Score: " + hider + " " + graph.latestHiderRoundScores(hider));
+    			Utils.talk("Main", "Score: " + hider + " " + graphController.latestHiderRoundScores(this, hider));
 	    			
 			}
 			
@@ -449,7 +372,7 @@ public class Main {
 			
 			if (recordPerRound) Utils.writeToFile(mainOutputWriter, "\n");
 			
-			graph.newGame();
+			graphController.newGame(this);
 			
 		} // End of hider loop
 		

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import HideAndSeek.GraphTraverser;
-import HideAndSeek.graph.HiddenObjectGraph;
+import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import Utility.Utils;
@@ -48,9 +48,9 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 	/**
 	 * @param graph
 	 */
-	public Hider(HiddenObjectGraph<StringVertex, StringEdge> graph, int numberOfHideLocations) {
+	public Hider(GraphController <StringVertex, StringEdge> graphController, int numberOfHideLocations) {
 	
-		super(graph);
+		super(graphController);
 		
 		this.numberOfHideLocations = numberOfHideLocations;
 		

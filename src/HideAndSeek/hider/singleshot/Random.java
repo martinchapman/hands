@@ -1,6 +1,6 @@
 package HideAndSeek.hider.singleshot;
 
-import HideAndSeek.graph.HiddenObjectGraph;
+import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.Hider;
@@ -13,15 +13,15 @@ import HideAndSeek.hider.Hider;
  * @author Martin
  *
  */
-public class RandomHider extends Hider {
+public class Random extends Hider {
 
 	/**
 	 * @param graph
 	 * @param numberOfHideLocations
 	 */
-	public RandomHider(HiddenObjectGraph<StringVertex, StringEdge> graph,
+	public Random(GraphController <StringVertex, StringEdge> graphController,
 			int numberOfHideLocations) {
-		super(graph, numberOfHideLocations);
+		super(graphController, numberOfHideLocations);
 	}
 
 	/**

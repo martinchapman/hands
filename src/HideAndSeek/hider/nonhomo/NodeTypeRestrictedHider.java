@@ -2,7 +2,7 @@ package HideAndSeek.hider.nonhomo;
 
 import java.util.HashSet;
 
-import HideAndSeek.graph.HiddenObjectGraph;
+import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.Hider;
@@ -18,9 +18,9 @@ public class NodeTypeRestrictedHider extends Hider {
 	 * @param numberOfHideLocations
 	 */
 	public NodeTypeRestrictedHider(
-			HiddenObjectGraph<StringVertex, StringEdge> graph,
+			GraphController <StringVertex, StringEdge> graphController,
 			int numberOfHideLocations) {
-		super(graph, numberOfHideLocations);
+		super(graphController, numberOfHideLocations);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -34,17 +34,17 @@ public class NodeTypeRestrictedHider extends Hider {
 		
 		/* Permit hide if node is connected to other nodes of all types
 		  (mimics connectivity constraints) */
-		for ( StringEdge edge : graph.edgesOf(vertex)) {
+		for ( StringEdge edge : graphController.edgesOf(vertex)) {
 			
-			if ( !types.contains(graph.getNodeType(edgeToTarget(edge, vertex))) ) {
+			if ( !types.contains(graphController.getNodeType(edgeToTarget(edge, vertex))) ) {
 				
-				types.add(graph.getNodeType(edgeToTarget(edge, vertex)));
+				types.add(graphController.getNodeType(edgeToTarget(edge, vertex)));
 				
 			}
 			
 		}
 		
-		if (types.size() == graph.getNumberOfNodeTypes()) return true;
+		if (types.size() == graphController.getNumberOfNodeTypes()) return true;
 		
 		return false;
 		
@@ -65,9 +65,9 @@ public class NodeTypeRestrictedHider extends Hider {
 	@Override
 	protected StringVertex startNode() {
 		
-		StringVertex[] vertices = new StringVertex[graph.vertexSet().size()];
+		StringVertex[] vertices = new StringVertex[graphController.vertexSet().size()];
 		
-		return graph.vertexSet().toArray(vertices)[0];
+		return graphController.vertexSet().toArray(vertices)[0];
 		
 	}
 
