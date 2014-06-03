@@ -8,14 +8,14 @@ import org.jgrapht.alg.DijkstraShortestPath;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.seeker.Seeker;
+import HideAndSeek.seeker.SeekerLocalGraph;
 import Utility.BehaviourPrediction;
 
 /**
  * @author Martin
  *
  */
-public class HighProbabilitySeeker extends Seeker {
+public class HighProbabilitySeeker extends SeekerLocalGraph {
 
 	/**
 	 * 
@@ -67,7 +67,7 @@ public class HighProbabilitySeeker extends Seeker {
 			
 			StringVertex targetNode;
 			
-			DijkstraShortestPath<StringVertex, StringEdge> dsp = new DijkstraShortestPath<StringVertex, StringEdge>(graphController, currentNode, likelyNodes.get(0));
+			DijkstraShortestPath<StringVertex, StringEdge> dsp = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, likelyNodes.get(0));
 	    	
 			List<StringEdge> DSP = new ArrayList<StringEdge>(dsp.getPathEdgeList());
 			
@@ -88,9 +88,7 @@ public class HighProbabilitySeeker extends Seeker {
 	@Override
 	protected StringVertex startNode() {
 		
-		StringVertex[] vertices = new StringVertex[graph.vertexSet().size()];
-		
-		return graph.vertexSet().toArray(vertices)[0];
+		return randomNode();
 		
 	}
 	

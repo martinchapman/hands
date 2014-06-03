@@ -7,7 +7,7 @@ import org.jgrapht.alg.DijkstraShortestPath;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.Hider;
+import HideAndSeek.hider.HiderLocalGraph;
 
 /**
  * Attempts to hide nodes with a maximum possible distance 
@@ -16,7 +16,7 @@ import HideAndSeek.hider.Hider;
  * @author Martin
  *
  */
-public class MaxDistance extends Hider {
+public class MaxDistance extends HiderLocalGraph {
 
 	/**
 	 * @param graph
@@ -60,7 +60,7 @@ public class MaxDistance extends Hider {
 		if ( vertex.equals(startNode()) ) return true; 
 		
 		// If all nodes have been tried, cannot continue, so return true.
-		if (triedNodes.size() == (graph.vertexSet().size() - hideLocations.size())) { 
+		if (triedNodes.size() == (graphController.vertexSet().size() - hideLocations.size())) { 
 			
 			triedNodes.clear();
 			
@@ -73,7 +73,7 @@ public class MaxDistance extends Hider {
 		// from all other hide locations, hide here.
 		for ( StringVertex location : hideLocations ) {
 			
-			DSP = new DijkstraShortestPath<StringVertex, StringEdge>(graph, vertex, location);
+			DSP = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, vertex, location);
 			
 			// Try to learn max distance in graph
 			if ( DSP.getPathEdgeList().size() > maxDistance ) maxDistance = DSP.getPathEdgeList().size();

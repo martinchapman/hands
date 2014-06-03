@@ -81,7 +81,7 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 		// Hider's local copy of where he has hidden
 		hideLocations.add(location); 
 		
-		graph.addHideLocation(location);
+		graphController.addHideLocation(this, location);
 		
 	}
 	
@@ -107,7 +107,7 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 		
 		StringVertex nextNode = null;
 		
-		while (graph.numberOfHideLocations() != numberOfHideLocations) {
+		while (graphController.numberOfHideLocations() != numberOfHideLocations) {
 			
 			exploredNodes.add(currentNode);
 			
@@ -117,13 +117,13 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 	        		
         		addHideLocation(currentNode);
 				
-				if (graph.numberOfHideLocations() == numberOfHideLocations) { break; }
+				if (graphController.numberOfHideLocations() == numberOfHideLocations) { break; }
 			
         	}
 			 
 			nextNode = nextNode(currentNode);
 			
-			if ( !graph.fromVertexToVertex(this, currentNode, nextNode) ) { 
+			if ( !graphController.fromVertexToVertex(this, currentNode, nextNode) ) { 
 				
 				Utils.talk(this.toString(), "Error traversing supplied path.");
 				
@@ -146,7 +146,7 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 	 */
 	public String printRoundStats() {
 		
-		Utils.talk(toString(), "" + graph.latestRoundPaths(this));
+		Utils.talk(toString(), "" + graphController.latestRoundPaths(this));
 		
 		return "";
 		

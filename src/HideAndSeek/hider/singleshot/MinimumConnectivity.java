@@ -54,7 +54,7 @@ public class MinimumConnectivity extends Hider {
 		triedNodes.add(vertex);
 		
 		// If all nodes have been tried, cannot continue, so return true.
-		if (triedNodes.size() == (graph.vertexSet().size() - hideLocations.size())) { 
+		if (triedNodes.size() == (graphController.vertexSet().size() - hideLocations.size())) { 
 			
 			// Increase max connections if none exist at pre-set maximum (e.g. we set out 
 			// to find connections of degree 1, but none of these exist).
@@ -66,9 +66,9 @@ public class MinimumConnectivity extends Hider {
 				
 		}
 		
-		if (graph.edgesOf(vertex).size() < minConnections) minConnections = graph.degreeOf(vertex);
+		if (graphController.edgesOf(vertex).size() < minConnections) minConnections = graphController.degreeOf(vertex);
 		
-		if (graph.edgesOf(vertex).size() == MAXCONNECTIONS) { 
+		if (graphController.edgesOf(vertex).size() == MAXCONNECTIONS) { 
 			
 			triedNodes.clear(); 
 			
@@ -95,11 +95,7 @@ public class MinimumConnectivity extends Hider {
 	 */
 	@Override
 	protected StringVertex startNode() {
-		
-		//StringVertex[] vertices = new StringVertex[graph.vertexSet().size()];
-				
-		//return graph.vertexSet().toArray(vertices)[0];
-		
+	
 		return randomNode();
 		
 	}

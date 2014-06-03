@@ -204,6 +204,9 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 		
 	}
 	
+	/**
+	 * 
+	 */
 	private void averageSeekerPerformance() {
 		
 		double performance = 0;
@@ -312,6 +315,26 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 		
 	}
     
+	/**
+	 * @param vertex
+	 */
+	public void addVertexIfNonExistent(V vertex) {
+		
+		if ( containsVertex(vertex)) addVertex(vertex);
+		
+	}
+	
+	/**
+	 * @param edge
+	 * @param sourceVertex
+	 * @param targetVertex
+	 */
+	public void addEdgeIfNonExistent(E edge, V sourceVertex, V targetVertex) {
+	
+		if ( this.containsEdge(edge) ) addEdge(sourceVertex, targetVertex);
+		
+	}
+	
 	/**
 	 * 
 	 */

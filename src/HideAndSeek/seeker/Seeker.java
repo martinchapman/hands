@@ -86,33 +86,31 @@ public abstract class Seeker extends GraphTraverser implements Runnable {
 	/**
 	 * @return
 	 */
-	private boolean search() {
+	protected void search() {
 		
 		StringVertex currentNode = startNode();
 		
 		StringVertex nextNode;
 		
-		while (hideLocations.size() != graph.numberOfHideLocations()) {
+		while ( hideLocations.size() != graphController.numberOfHideLocations() ) {
 	
 			exploredNodes.add(currentNode);
 			
 			uniquelyVisitedNodes.add(currentNode);
 			
-			 if ( graph.isHideLocation(currentNode) && !hideLocations.contains(currentNode) ) { 
+			 if ( graphController.isHideLocation(currentNode) && !hideLocations.contains(currentNode) ) { 
 	        		
         		addHideLocation(currentNode);
 				
-				if (hideLocations.size() == graph.numberOfHideLocations()) { break; }
+				if (hideLocations.size() == graphController.numberOfHideLocations()) { break; }
 			
         	}
 			 
 			nextNode = nextNode(currentNode);
 			
-			if ( !graph.fromVertexToVertex(this, currentNode, nextNode) ) { 
+			if ( !graphController.fromVertexToVertex(this, currentNode, nextNode) ) { 
 				
 				Utils.talk(this.toString(), "Error traversing supplied path.");
-				
-				return false; 
 				
 			} else {
 			
@@ -122,8 +120,6 @@ public abstract class Seeker extends GraphTraverser implements Runnable {
 			 
 		}
 		
-		return true;
-		
 	}
 	
 	/**
@@ -131,9 +127,9 @@ public abstract class Seeker extends GraphTraverser implements Runnable {
 	 */
 	public String printRoundStats() {
 		
-		Utils.talk(this.toString(), "" + graph.latestRoundPaths(this));
+		Utils.talk(this.toString(), "" + graphController.latestRoundPaths(this));
 		
-		return graph.latestRoundPaths(this).size() + "," + graph.edgeSet().size() + "," + ((graph.latestRoundPaths(this).size() / ((double)graph.edgeSet().size())) * 100) + ",";
+		return graphController.latestRoundPaths(this).size() + "," + graphController.edgeSetSize() + "," + ((graphController.latestRoundPaths(this).size() / ((double)graphController.edgeSetSize())) * 100) + ",";
 		
 	}
 	

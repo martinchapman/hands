@@ -119,7 +119,7 @@ public class VariableBiasHider extends Hider {
 		
 		for ( StringEdge edge : connectedEdges ) {
 			
-			if ( graph.traverserEdgeCost(this, edge.getSource(), edge.getTarget()) < ( graph.getEdgeWeight(edge) *  WELLTRAVERSEDPERCENTAGE ) ) {
+			if ( graphController.traverserEdgeCost(this, edge.getSource(), edge.getTarget()) < ( graphController.getEdgeWeight(edge) *  WELLTRAVERSEDPERCENTAGE ) ) {
 				
 				biasEdges.add(edge);
 				
@@ -188,9 +188,9 @@ public class VariableBiasHider extends Hider {
 	@Override
 	protected StringVertex startNode() {
 
-		StringVertex[] vertices = new StringVertex[graph.vertexSet().size()];
+		StringVertex[] vertices = new StringVertex[graphController.vertexSet().size()];
 		
-		return graph.vertexSet().toArray(vertices)[0];
+		return graphController.vertexSet().toArray(vertices)[0];
 		
 	}
 	
@@ -220,7 +220,7 @@ public class VariableBiasHider extends Hider {
 	@Override
 	public String printGameStats() {
 		// TODO Auto-generated method stub
-		return super.printGameStats() + graph.requestAverageHiderScore(this);
+		return super.printGameStats() + graphController.requestAverageHiderScore(this);
 	}
 
 }
