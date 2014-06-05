@@ -111,7 +111,7 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 			
 			exploredNodes.add(currentNode);
 			
-			uniquelyVisitedNodes.add(currentNode);
+			addUniquelyVisitedNode(currentNode);
 			
 		    if ( !hideLocations.contains(currentNode) && hideHere(currentNode) ) { 
 	        		

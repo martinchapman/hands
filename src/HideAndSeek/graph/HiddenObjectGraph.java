@@ -320,19 +320,18 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	 */
 	public void addVertexIfNonExistent(V vertex) {
 		
-		if ( containsVertex(vertex)) addVertex(vertex);
+		if ( !containsVertex(vertex) ) addVertex(vertex);
 		
 	}
 	
 	/**
-	 * @param edge
 	 * @param sourceVertex
 	 * @param targetVertex
 	 */
-	public void addEdgeIfNonExistent(E edge, V sourceVertex, V targetVertex) {
+	public void addEdgeIfNonExistent(V sourceVertex, V targetVertex) {
 	
-		if ( this.containsEdge(edge) ) addEdge(sourceVertex, targetVertex);
-		
+		if ( !this.containsEdge(sourceVertex, targetVertex) ) addEdge(sourceVertex, targetVertex);
+	
 	}
 	
 	/**
@@ -468,7 +467,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
      * @param currentNode
      * @return
      */
-    public boolean isHideLocation(StringVertex currentNode) {
+    public boolean isHideLocation(V currentNode) {
 		
 		return hideLocations.contains(currentNode);
 		
@@ -516,11 +515,11 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
     }
     
     /**
-     * @param node
+     * @param edgeToTarget
      */
-    public char getNodeType(V node) {
+    public char getNodeType(V edgeToTarget) {
     	
-    	return nodeTypes.get(node);
+    	return nodeTypes.get(edgeToTarget);
     	
     }
 

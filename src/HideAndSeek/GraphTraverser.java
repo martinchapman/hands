@@ -7,6 +7,7 @@ import java.util.List;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
+import Utility.Utils;
 
 /**
  * @author Martin
@@ -32,6 +33,8 @@ public abstract class GraphTraverser {
 		
 			uniquelyVisitedNodes = new HashSet<StringVertex>();
 		
+			uniquelyVisitedEdges = new HashSet<StringEdge>();
+			
 		}
 		
 	}
@@ -57,7 +60,58 @@ public abstract class GraphTraverser {
 	/**
 	 * 
 	 */
-	protected HashSet<StringVertex> uniquelyVisitedNodes; 
+	private HashSet<StringVertex> uniquelyVisitedNodes; 
+	
+	/**
+	 * @param node
+	 */
+	protected void addUniquelyVisitedNode(StringVertex node) {
+		
+		uniquelyVisitedNodes.add(node);
+		
+	}
+	
+	/**
+	 * @return
+	 */
+	final public HashSet<StringVertex> uniquelyVisitedNodes() {
+		
+		return uniquelyVisitedNodes;
+		
+	}
+	
+	/**
+	 * 
+	 */
+	private HashSet<StringEdge> uniquelyVisitedEdges;
+	
+	/**
+	 * @param node
+	 */
+	protected void addUniquelyVisitedEdge(StringEdge edge) {
+		
+		uniquelyVisitedEdges.add(edge);
+		
+	}
+	
+	/**
+	 * @return
+	 */
+	final public HashSet<StringEdge> uniquelyVisitedEdges() {
+		
+		return uniquelyVisitedEdges;
+		
+	}
+	
+	/**
+	 * @param edge
+	 * @return
+	 */
+	protected boolean visitedEdge(StringEdge edge) {
+		
+		return uniquelyVisitedEdges.contains(edge);
+		
+	}
 	
 	/**
 	 * Working with connectedNode in order to determine how nodes
@@ -103,17 +157,22 @@ public abstract class GraphTraverser {
 		HashSet<StringEdge> selectedInThisSession = new HashSet<StringEdge>();
 		
 		do {
-		
+			
 			connectedEdge = getConnectedEdge(currentNode, connectedEdges);
 			
 			target = edgeToTarget(connectedEdge, currentNode);
 			
 			selectedInThisSession.add(connectedEdge);
+
 			
 					// Loop while not allowed to repeat nodes BUT
 		} while (   uniquelyVisitNodes == true && uniquelyVisitedNodes.contains( target ) &&
 				    // only if we haven't already tried all outgoing edges available (more a programmatic choice than a strategic one)
 				    selectedInThisSession.size() != connectedEdges.size()  );
+		
+		addUniquelyVisitedNode(target);
+		
+		addUniquelyVisitedEdge(connectedEdge);
 		
 		return target;
 		

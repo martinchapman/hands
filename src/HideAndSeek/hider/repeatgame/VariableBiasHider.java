@@ -170,7 +170,7 @@ public class VariableBiasHider extends Hider {
 		
 		for ( StringEdge edge : edges ) {
 			
-			if ( !uniquelyVisitedNodes.contains(edgeToTarget(edge, currentNode)) ) {
+			if ( !uniquelyVisitedNodes().contains(edgeToTarget(edge, currentNode)) ) {
 				
 				return edgeToTarget(edge, currentNode);
 				

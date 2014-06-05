@@ -40,9 +40,13 @@ public abstract class SeekerLocalGraph extends Seeker {
 
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
+	 * 
+	 * ~MDC: Needs tidying.
 	 */
 	@Override
 	protected StringVertex nextNode(StringVertex currentNode) {
+		
+		addUniquelyVisitedNode(currentNode);
 		
 		// Update the local graph from the current node as the Seeker moves
 		for ( StringEdge edge : graphController.edgesOf(currentNode) ) {
@@ -51,11 +55,13 @@ public abstract class SeekerLocalGraph extends Seeker {
 			
 			localGraph.addVertexIfNonExistent(edge.getTarget());
 			
-			localGraph.addEdgeIfNonExistent(edge, edge.getSource(), edge.getTarget());
+			localGraph.addEdgeIfNonExistent(edge.getSource(), edge.getTarget());
+			
+			localGraph.setEdgeWeight(localGraph.getEdge(edge.getSource(), edge.getTarget()), graphController.getEdgeWeight(edge));
 			
 		}
 		
-		return connectedNode(currentNode);
+		return currentNode;
 		
 	}
 	

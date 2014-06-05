@@ -1,5 +1,6 @@
 package HideAndSeek.graph;
 
+import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
 public class StringEdge extends DefaultWeightedEdge implements Comparable<StringEdge> {
@@ -30,6 +31,13 @@ public class StringEdge extends DefaultWeightedEdge implements Comparable<String
 	public String toString() {
 		
 		return "(" + getSource() + " : " + getTarget() + ") " + getWeight();
+		
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		
+		return getSource().equals(((StringEdge) obj).getSource()) && getTarget().equals(((StringEdge) obj).getTarget());
 		
 	}
 

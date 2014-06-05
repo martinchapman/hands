@@ -1,11 +1,13 @@
 package HideAndSeek.graph;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.jgrapht.VertexFactory;
 import org.jgrapht.alg.ConnectivityInspector;
+import org.jgrapht.alg.DijkstraShortestPath;
 import org.jgrapht.generate.GraphGenerator;
 import org.jgrapht.generate.RandomGraphGenerator;
 import org.jgrapht.generate.RingGraphGenerator;
@@ -108,7 +110,7 @@ public class GraphController<V, E> {
 			
 		}
 		
-		Utils.talk("Graph Controller", "Graph generated. \n" + graph.edgeSet().size());
+		Utils.talk("Graph Controller", "Graph generated. Edges: " + graph.edgeSet().size());
 		
 	}
 
@@ -210,7 +212,7 @@ public class GraphController<V, E> {
 	 * @return
 	 */
 	public Set<? extends StringEdge> edgesOf(StringVertex currentNode) {
-		
+	
 		return graph.edgesOf(currentNode);
 		
 	}
@@ -362,9 +364,9 @@ public class GraphController<V, E> {
 	 * @param edgeToTarget
 	 * @return
 	 */
-	public char getNodeType(StringVertex edgeToTarget) {
+	public char getNodeType(StringVertex vertex) {
 		
-		return graph.getNodeType(edgeToTarget);
+		return graph.getNodeType(vertex);
 		
 	}
 
@@ -374,6 +376,17 @@ public class GraphController<V, E> {
 	public int getNumberOfNodeTypes() {
 		
 		return graph.getNumberOfNodeTypes();
+		
+	}
+
+	/**
+	 * @param currentNode
+	 * @param nextNode
+	 * @return
+	 */
+	public StringEdge getEdge(StringVertex currentNode, StringVertex nextNode) {
+		
+		return graph.getEdge(currentNode, nextNode);
 		
 	}
 

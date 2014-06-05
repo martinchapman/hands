@@ -96,7 +96,7 @@ public abstract class Seeker extends GraphTraverser implements Runnable {
 	
 			exploredNodes.add(currentNode);
 			
-			uniquelyVisitedNodes.add(currentNode);
+			addUniquelyVisitedNode(currentNode);
 			
 			 if ( graphController.isHideLocation(currentNode) && !hideLocations.contains(currentNode) ) { 
 	        		
@@ -107,6 +107,8 @@ public abstract class Seeker extends GraphTraverser implements Runnable {
         	}
 			 
 			nextNode = nextNode(currentNode);
+			
+			addUniquelyVisitedEdge(graphController.getEdge(currentNode, nextNode));
 			
 			if ( !graphController.fromVertexToVertex(this, currentNode, nextNode) ) { 
 				

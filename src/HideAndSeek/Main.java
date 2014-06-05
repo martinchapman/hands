@@ -14,7 +14,7 @@ import HideAndSeek.hider.singleshot.Random;
 import HideAndSeek.hider.singleshot.RandomFixedDistance;
 import HideAndSeek.hider.singleshot.VariableFixedDistance;
 import HideAndSeek.seeker.Seeker;
-import HideAndSeek.seeker.singleshot.BacktrackPath;
+import HideAndSeek.seeker.singleshot.BreadthFirstSearch;
 import HideAndSeek.seeker.singleshot.DepthFirstSearch;
 import HideAndSeek.seeker.singleshot.DepthFirstSearchLowCost;
 import HideAndSeek.seeker.singleshot.Greedy;
@@ -214,7 +214,7 @@ public class Main {
 		
 		ArrayList<Seeker> allSeekingAgents = new ArrayList<Seeker>();
 		
-		allSeekingAgents.add(new BacktrackPath(graphController));
+		allSeekingAgents.add(new BreadthFirstSearch(graphController));
 		
 		return allSeekingAgents;
 		

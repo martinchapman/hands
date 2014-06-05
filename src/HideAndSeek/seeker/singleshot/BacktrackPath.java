@@ -2,18 +2,25 @@ package HideAndSeek.seeker.singleshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.jgrapht.alg.DijkstraShortestPath;
 
 import HideAndSeek.graph.GraphController;
-import HideAndSeek.graph.HiddenObjectGraph;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.seeker.SeekerLocalGraph;
+import Utility.Utils;
 
 /**
+ * This seeker remembers paths that 'could have been' in the graph, such that if
+ * it comes to a point in the graph where all outgoing edges from a node have a
+ * weight which is greater than a previously encountered yet untraversed outgoing 
+ * edge, it backtracks to this edge and takes it next. 
+ * 
+ * This backtracking is subject to a maximum backtrack distance value.
+ * 
  * @author Martin
  *
  */
@@ -26,19 +33,26 @@ public class BacktrackPath extends SeekerLocalGraph {
 		
 		super(graphController);
 		
-		uniquelyVisitedEdges = new HashSet<StringEdge>();
+		pathInProgress = new ArrayList<StringEdge>();
+		
+		unvisitedEdges = new TreeSet<StringEdge>();
 		
 	}
-
-	/**
-	 * 
-	 */
-	protected HashSet<StringEdge> uniquelyVisitedEdges;
 	
 	/**
 	 * 
 	 */
+	protected int MAXBACKTRACKDISTANCE = Integer.MAX_VALUE;
+
+	/**
+	 * 
+	 */
 	protected List<StringEdge> pathInProgress;
+	
+	/**
+	 * 
+	 */
+	protected TreeSet<StringEdge> unvisitedEdges;
 	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
@@ -46,34 +60,42 @@ public class BacktrackPath extends SeekerLocalGraph {
 	@Override
 	protected StringVertex nextNode(StringVertex currentNode) {
 		
-		super.nextNode(currentNode);
+		// Call super to add relevant information to local graph
+		currentNode = super.nextNode(currentNode);
 		
-		// If we are currently on a path back to a cheaper node, do this first:
-		if ( pathInProgress.size() > 0) return edgeToTarget(pathInProgress.remove(0), currentNode);
-		
-		// Otherwise, get all outgoing edges from this node
+		// Get all outgoing edges from this node (ordered by weight)
 		List<StringEdge> connectedEdges = getConnectedEdges(currentNode);
 		
-		/* If there are any previously visited edges (logged in our local graph) that have
-		   less weight than ALL edges going out from our current node and have not been 
-		   visited, log them */
+		// Tentatively add these to the unvisited edges (no duplicates allowed)
+		unvisitedEdges.addAll(connectedEdges);
 		
+		// Remove those edges that we have already traversed
+		unvisitedEdges.removeAll(uniquelyVisitedEdges());
+		
+		// If we are currently on a path back to a cheaper node, do this first:
+		if ( pathInProgress.size() > 0 ) { 
+		
+			return edgeToTarget(pathInProgress.remove(0), currentNode);
+			
+		}
+		
+		/* If there are any previously visited edges that have less weight than
+		   ALL edges going out from our current node and have not been visited, log them */
+
 		ArrayList<StringEdge> cheaperUnvisitedEdges = new ArrayList<StringEdge>();
 		
-		Boolean cheaper = false;
-		
-		for ( StringEdge graphEdge : localGraph.edgeSet() ) {
+		outerloop:
+		for ( StringEdge unvisitedEdge : unvisitedEdges ) {
 			
 			// Test this edge against all current outgoing edges: is it smaller than all of them?
 			for ( StringEdge currentEdge : connectedEdges ) {
 			
-				// It is greater than one of them, so it is not smaller than all of them, continue
-				if ( graphController.getEdgeWeight(currentEdge) > localGraph.getEdgeWeight(graphEdge) ) continue;
+				// This edge is greater than one outgoing edge, so it is not smaller than all outgoing edges, continue
+				if ( graphController.getEdgeWeight(unvisitedEdge) >= graphController.getEdgeWeight(currentEdge) ) continue outerloop;
 				
 			}
 		
-			// Reached here, so must be smaller than all. Only add if not already visited
-			if ( uniquelyVisitedEdges.contains(graphEdge) ) cheaperUnvisitedEdges.add(graphEdge);
+			cheaperUnvisitedEdges.add(unvisitedEdge);
 			
 		}
 		
@@ -83,21 +105,74 @@ public class BacktrackPath extends SeekerLocalGraph {
 			// Sort the edges (if there are multiple, cheapest first)
 			Collections.sort(cheaperUnvisitedEdges);
 			
-			// Create a path to the target of the cheapest edge
-			DijkstraShortestPath<StringVertex, StringEdge> DSP = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, cheaperUnvisitedEdges.get(0).getTarget());
-		
-			pathInProgress = DSP.getPath().getEdgeList();
+			// Ensure we are always returning on edges we have previously used
+			if (uniquelyVisitedNodes().contains(cheaperUnvisitedEdges.get(0).getTarget())) {
+				
+				DijkstraShortestPath<StringVertex, StringEdge> DSP = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, cheaperUnvisitedEdges.get(0).getTarget());
+				
+				pathInProgress = DSP.getPath().getEdgeList();
+						
+			} else {
+				
+				DijkstraShortestPath<StringVertex, StringEdge> DSP = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, cheaperUnvisitedEdges.get(0).getSource());
+				
+				pathInProgress = DSP.getPath().getEdgeList();
+				
+			}
+			
+			// If the seeker is not permitted to backtrack this far, simply continue onwards
+			if (pathInProgress.size() > MAXBACKTRACKDISTANCE) { 
+				
+				// Clear, otherwise next iteration will continue down non-permitted path
+				pathInProgress.clear();
+				
+				return connectedNode(currentNode);
+			
+			}
 			
 			return edgeToTarget(pathInProgress.remove(0), currentNode);
 			
 		// Otherwise, the cheapest edge is connected to this node
 		} else {
 			
-			Collections.sort(connectedEdges);
-			
-			return edgeToTarget(connectedEdges.get(0), currentNode);
+			return connectedNode(currentNode);
 			
 		}
+			
+	}
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.seeker.FixedStartDepthFirstSearch#getConnectedEdges(HideAndSeek.graph.StringVertex)
+	 * 
+	 *
+	 */
+	protected List<StringEdge> getConnectedEdges(StringVertex currentNode) {
+		
+		ArrayList<StringEdge> edges = new ArrayList<StringEdge>(graphController.edgesOf(currentNode));
+		
+		Collections.sort(edges);
+
+		return edges;
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraverser#getConnectedEdge(HideAndSeek.graph.StringVertex, java.util.List)
+	 * 
+	 * Ensure only unvisited edges are returned according to ordering, otherwise return random
+	 * 
+	 */
+	protected StringEdge getConnectedEdge(StringVertex currentNode, List<StringEdge> connectedEdges) {
+		
+		for (StringEdge edge : connectedEdges ) {
+
+			if ( uniquelyVisitedNodes().contains(edgeToTarget(edge, currentNode)) ) continue;
+			
+			return edge;
+			
+		}
+		
+		return connectedEdges.get((int)(Math.random() * connectedEdges.size()));
 		
 	}
 
@@ -107,7 +182,10 @@ public class BacktrackPath extends SeekerLocalGraph {
 	@Override
 	protected StringVertex startNode() {
 		
-		return randomNode();
+		StringVertex startNode = randomNode();
+		
+		return startNode;
+	
 	}
 
 }

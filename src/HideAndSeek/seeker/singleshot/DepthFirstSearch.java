@@ -56,7 +56,7 @@ public class DepthFirstSearch extends Seeker {
 			for ( StringEdge edge : connectedEdges ) {
 				
 				// Check if it leads to a node which has already been visited
-				if ( !uniquelyVisitedNodes.contains( edgeToTarget( edge, currentNode ) ) ) {
+				if ( !uniquelyVisitedNodes().contains( edgeToTarget( edge, currentNode ) ) ) {
 					
 					connectedEdge = edge;
 					
@@ -81,7 +81,7 @@ public class DepthFirstSearch extends Seeker {
 			}
 			
 					// Loop while not allowed to repeat nodes BUT
-		} while (   uniquelyVisitNodes == true && uniquelyVisitedNodes.contains( target ) &&
+		} while (   uniquelyVisitNodes == true && uniquelyVisitedNodes().contains( target ) &&
 				    // only if we haven't already tried all outgoing edges available
 				    selectedInThisSession.size() != connectedEdges.size()  );
 		
@@ -96,10 +96,6 @@ public class DepthFirstSearch extends Seeker {
 	 */
 	@Override
 	protected StringVertex startNode() {
-
-		//StringVertex[] vertices = new StringVertex[graph.vertexSet().size()];
-		
-		//return graph.vertexSet().toArray(vertices)[0];
 		
 		return randomNode();
 		

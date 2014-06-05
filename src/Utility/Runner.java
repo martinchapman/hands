@@ -82,8 +82,8 @@ public class Runner {
 					 "100", // Number of nodes in graph
 					 "5", // Number of hide locations
 					 "120", // rounds
-					 "10.0", // cost of traversing an edge
-					 "fixed", // whether cost supplied is static value or the upper bound of a distribution
+					 "100.0", // cost of traversing an edge
+					 "upper", // whether cost supplied is static value or the upper bound of a distribution
 					 "0"// % discount gained by an agent for having traversed an edge before (1.0 = no discount; < 1.0 = discount)
 			  		  };
 				
