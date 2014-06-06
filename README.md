@@ -9,4 +9,6 @@ Due to their simplicity, games such as these serve as useful abstractions for ma
 
 This platform extends the JGraphT library to introduce the ability to run such games in realtime. Taking a number of different strategies for both hiding and seeker, as well as a number of different environmental parameters (topology, number of hidden objects, etc.), the platform runs strategies against one another and records their performance, for an insight into their relative merits in various scenarios.
 
+The platform is designed to eventually be evolved into a distributed game, in which participants can submit strategies to a central controller that runs them and evaluates their performance.
+
 An introduction to Search Games, and in particular, Hide-and-Seek from a simulation perspective, is available here: http://www.dcs.kcl.ac.uk/pg/chapm/papers/acyse2014.pdf
