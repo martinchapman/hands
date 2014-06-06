@@ -1,4 +1,4 @@
-SearchGames
+Search Games
 ===========
 
 A plugin for the JGraphT library facilitating the running of Search Game simulations 
