@@ -8,6 +8,7 @@ import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.HiderLocalGraph;
+import Utility.Utils;
 
 /**
  * Attempts to hide nodes with a maximum possible distance 
@@ -29,6 +30,13 @@ public class MaxDistance extends HiderLocalGraph {
 		
 		triedNodes = new HashSet<StringVertex>();
 		
+		/* Try and set the minimum distance between two hide locations to be 
+		 * the diameter of the graph. */
+		
+		MINDISTANCE = graphController.requestGraphDiameter();
+		
+		Utils.talk(toString(), "Diameter " + MINDISTANCE);
+		
 	}
 
 	/**
@@ -39,14 +47,17 @@ public class MaxDistance extends HiderLocalGraph {
 	/**
 	 * 
 	 */
-	private static int MINDISTANCE = 5;
+	private static double MINDISTANCE;
 	
 	/**
 	 * 
 	 */
 	private HashSet<StringVertex> triedNodes;
 	
-	/* (non-Javadoc)
+	/* 
+	 * Guarantees that at least two items will be hidden at max distance from one another?
+	 * 
+	 * (non-Javadoc)
 	 * @see HideAndSeek.hider.Hider#hideHere(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
@@ -59,13 +70,15 @@ public class MaxDistance extends HiderLocalGraph {
 		// First hide location is the starting vertex (NB: won't ever try and hide here again, so ok)
 		if ( vertex.equals(startNode()) ) return true; 
 		
-		// If all nodes have been tried, cannot continue, so return true.
+		// If all nodes have been tried, cannot hide at min distance, so reduce it
 		if (triedNodes.size() == (graphController.vertexSet().size() - hideLocations.size())) { 
 			
 			triedNodes.clear();
 			
 			// Potentially reduce min distance based on the best longest distance found in the graph;
 			MINDISTANCE = maxDistance;
+			
+			Utils.talk(toString(), "Reducing distance. Now " + MINDISTANCE);
 			
 		}
 		
@@ -94,6 +107,8 @@ public class MaxDistance extends HiderLocalGraph {
 	@Override
 	protected StringVertex nextNode(StringVertex currentNode) {
 		
+		super.nextNode(currentNode);
+		
 		return connectedNode(currentNode);
 		
 	}
@@ -105,10 +120,6 @@ public class MaxDistance extends HiderLocalGraph {
 	protected StringVertex startNode() {
 		
 		return randomNode();
-		
-		//StringVertex[] vertices = new StringVertex[graph.vertexSet().size()];
-				
-		//return graph.vertexSet().toArray(vertices)[0];
 		
 	}
 

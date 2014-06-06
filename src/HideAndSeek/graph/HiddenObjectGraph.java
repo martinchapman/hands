@@ -731,5 +731,18 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 		return totalEdgeCost;
 		
 	}
+
+	/**
+	 * @param target
+	 * @param source
+	 * @param fixedOrUpperValue
+	 */
+	public void addEdgeWithWeight(V source, V target, double weight) {
+		
+		this.addEdge(source, target);
+		
+		this.setEdgeWeight(this.getEdge(source, target), weight);
+		
+	}
 	
 }
