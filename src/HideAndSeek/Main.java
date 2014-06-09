@@ -10,7 +10,7 @@ import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.Hider;
 import HideAndSeek.hider.singleshot.LowEdgeCostFixedDistance;
-import HideAndSeek.hider.singleshot.Random;
+import HideAndSeek.hider.singleshot.MinimumConnectivity;
 import HideAndSeek.hider.singleshot.RandomFixedDistance;
 import HideAndSeek.hider.singleshot.VariableFixedDistance;
 import HideAndSeek.seeker.Seeker;
@@ -32,7 +32,7 @@ public class Main {
 	/**
 	 * Data
 	 */
-	private final static String FILEPREFIX = "/Users/Martin/Dropbox/University/PhD/2013/33. 12th August - 16th August/Simulations/";
+	private final static String FILEPREFIX = "Output/";
 	
 	/**
 	 * 
@@ -195,7 +195,7 @@ public class Main {
 		 
 		ArrayList<Hider> allHidingAgents = new ArrayList<Hider>();
 		
-		allHidingAgents.add(new Random(graphController, numberOfHideLocations));
+		allHidingAgents.add(new MinimumConnectivity(graphController, numberOfHideLocations));
 		
 		return allHidingAgents;
 		
@@ -215,9 +215,9 @@ public class Main {
 		
 		ArrayList<Seeker> allSeekingAgents = new ArrayList<Seeker>();
 		
-		allSeekingAgents.add(new ConstrainedRandomWalk(graphController));
-		
 		allSeekingAgents.add(new LeastConnectedFirst(graphController));
+		
+		allSeekingAgents.add(new ConstrainedRandomWalk(graphController));
 		
 		return allSeekingAgents;
 		
@@ -335,7 +335,7 @@ public class Main {
 	    		
 	    	}
 	    			
-			ArrayList<String> firstHalfHTMLTemplate = Utils.readFromFile(FILEPREFIX + "Data/vis-template-1.html");
+			ArrayList<String> firstHalfHTMLTemplate = Utils.readFromFile(FILEPREFIX + "Data/Template/vis-template-1.html");
 			
 			for (String line : firstHalfHTMLTemplate) {
 			
@@ -345,7 +345,7 @@ public class Main {
 			
 			Utils.writeToFile(outputHTML, "<script type=\"text/javascript\" src=\"js/Data/" + currentSimulationIdentifier + "-vis.js\"></script>");
 	    	
-			ArrayList<String> secondHalfHTMLTemplate = Utils.readFromFile(FILEPREFIX + "Data/vis-template-2.html");
+			ArrayList<String> secondHalfHTMLTemplate = Utils.readFromFile(FILEPREFIX + "Data/Template/vis-template-2.html");
 			
 			for (String line : secondHalfHTMLTemplate) {
 				

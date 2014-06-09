@@ -11,6 +11,10 @@ import java.util.regex.Pattern;
 
 public class Utils {
 
+	/**
+	 * @param url
+	 * @return
+	 */
 	public static ArrayList<String> readFromFile(String url) {
 		
 		ArrayList<String> lines = new ArrayList<String>();
@@ -49,6 +53,10 @@ public class Utils {
   		
 	}
 	
+	/**
+	 * @param url
+	 * @param content
+	 */
 	public static void writeToFile(String url, String content) {
 		
 		FileWriter writer = null;
@@ -77,6 +85,10 @@ public class Utils {
 		
 	}
 	
+	/**
+	 * @param writer
+	 * @param content
+	 */
 	public static void writeToFile(FileWriter writer, String content) {
 		
 		try {
@@ -93,6 +105,11 @@ public class Utils {
 		
 	}
 	
+	/**
+	 * @param stringArrayFormat
+	 * @param regexpStr
+	 * @return
+	 */
 	public static ArrayList<Pair<String, String>> stringToArray(String stringArrayFormat, String regexpStr) {
     	
     	ArrayList<Pair<String, String>> seekers = new ArrayList<Pair<String, String>>();
@@ -116,14 +133,26 @@ public class Utils {
     	
     }
 	
-	public static boolean DEBUG = true;
-	
+	/**
+	 * 
+	 */
+	public static boolean DEBUG = false;
+
+	/**
+	 * @param speaker
+	 * @param message
+	 */
 	public static void talk(String speaker, String message) {
 		
 		if (DEBUG) System.out.println(speaker + ": " + message);
 		
 	}
 	
+	/**
+	 * @param inputStr
+	 * @param patternStr
+	 * @return
+	 */
 	public static int startIndexOf(CharSequence inputStr, String patternStr) {
 		
 	    Pattern pattern = Pattern.compile(patternStr);
@@ -140,6 +169,11 @@ public class Utils {
 		
 	}
 	
+	/**
+	 * @param inputStr
+	 * @param patternStr
+	 * @return
+	 */
 	public static int endIndexOf(CharSequence inputStr, String patternStr) {
 		
 	    Pattern pattern = Pattern.compile(patternStr);

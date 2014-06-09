@@ -19,7 +19,7 @@ public class Runner {
 	/**
 	 * 
 	 */
-	final static String FILEPREFIX = "/Users/Martin/Dropbox/University/PhD/2013/33. 12th August - 16th August/Simulations/";
+	final static String FILEPREFIX = "Output/";
 	
 	/**
 	 * @param args
@@ -62,6 +62,8 @@ public class Runner {
 			Utils.writeToFile(FILEPREFIX + "simRecordID.txt", currentSimulationIdentifier);
 			
 			Utils.writeToFile(FILEPREFIX + "/Data/" + currentSimulationIdentifier + ".csv", "");
+			
+			Utils.writeToFile(FILEPREFIX + "/Data/" + currentSimulationIdentifier + ".csv", Arrays.toString(simulationParameters) + "\n");
 				
 			/***********/
 			

@@ -148,9 +148,7 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 	 */
 	public String printRoundStats() {
 		
-		Utils.talk(toString(), "" + graphController.latestRoundPaths(this));
-		
-		return "";
+		return "" + graphController.latestRoundCosts(this);
 		
 	}
 	
@@ -160,9 +158,10 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 	 */
 	public String printGameStats() {
 		
-		return "";
+		return "" + graphController.requestAverageGameCosts(this);
 		
 	}
+	
 	
 	/**
 	 * Record of the number of rounds passed 
