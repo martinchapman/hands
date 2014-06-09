@@ -543,8 +543,10 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 			
 			double actualCost = this.getEdgeWeight(traversedEdge);
 		    
+			// The unique cost to the traverser, based upon their traversals so far
 			double uniqueCost = traverserEdgeCosts.get( traverser ).get( traversedEdge );
 			
+			// The new cost, based upon the edge that is currently being traversed
 		    double newCost = uniqueCost * edgeTraversalDecrement;
 		    
 			// Update round costs

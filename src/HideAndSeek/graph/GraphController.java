@@ -431,4 +431,24 @@ public class GraphController<V, E> {
 		
 	}
 
+	/**
+	 * @param seeker
+	 * @return
+	 */
+	public double latestRoundCosts(GraphTraverser traverser) {
+		
+		return graph.latestRoundCosts(traverser);
+		
+	}
+
+	/**
+	 * @param traverser
+	 * @return
+	 */
+	public double requestAverageGameCosts(GraphTraverser traverser) {
+		
+		return graph.requestAverageGameCosts(traverser);
+		
+	}
+
 }

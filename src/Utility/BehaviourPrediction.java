@@ -189,12 +189,19 @@ public class BehaviourPrediction  {
 		
 	}
 	
+	/**
+	 * @param vertex
+	 * @return
+	 */
 	public double getProbability(StringVertex vertex) {
 		
 		return hideProbabilities().get(vertex);
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString() {
 		
 		String returner = "";

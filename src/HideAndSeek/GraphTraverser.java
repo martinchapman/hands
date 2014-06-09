@@ -115,7 +115,7 @@ public abstract class GraphTraverser {
 	
 	/**
 	 * Working with connectedNode in order to determine how nodes
-	 * from a set are selected
+	 * from a set are selected. Default is random.
 	 * 
 	 * @param connectedEdges
 	 * @return
@@ -127,7 +127,8 @@ public abstract class GraphTraverser {
 	}
 	
 	/**
-	 * Return the edges linked to the specified node
+	 * Return the edges linked to the specified node. Default is
+	 * all connected nodes.
 	 * 
 	 * @param currentNode
 	 * @return
@@ -139,7 +140,9 @@ public abstract class GraphTraverser {
 	}
 	
 	/**
-	 * Select a connected node according to the functionality of getConnectedEdge
+	 * Select a connected node according to how edges are sorted, and how
+	 * edges are selected from this set.
+	 * 
 	 * A wrapper method, of sorts, to enforce additional constraints such a
 	 * no backtracking.
 	 * 
@@ -158,17 +161,23 @@ public abstract class GraphTraverser {
 		
 		do {
 			
+			// If we have tried all outgoing edges available (more a programmatic choice than a strategic one), return random.
+			if (selectedInThisSession.size() == connectedEdges.size()) {
+				
+				target = edgeToTarget(connectedEdges.get((int)(Math.random() * connectedEdges.size())), currentNode);
+				
+				break;
+				
+			}
+			
 			connectedEdge = getConnectedEdge(currentNode, connectedEdges);
 			
 			target = edgeToTarget(connectedEdge, currentNode);
 			
 			selectedInThisSession.add(connectedEdge);
-
 			
-					// Loop while not allowed to repeat nodes BUT
-		} while (   uniquelyVisitNodes == true && uniquelyVisitedNodes.contains( target ) &&
-				    // only if we haven't already tried all outgoing edges available (more a programmatic choice than a strategic one)
-				    selectedInThisSession.size() != connectedEdges.size()  );
+					// Otherwise, loop while not allowed to repeat nodes
+		} while (   uniquelyVisitNodes == true && uniquelyVisitedNodes.contains( target ) );
 		
 		addUniquelyVisitedNode(target);
 		
@@ -178,6 +187,11 @@ public abstract class GraphTraverser {
 		
 	}
 	
+	/**
+	 * @param connectedEdge
+	 * @param currentNode
+	 * @return
+	 */
 	protected StringVertex edgeToTarget(StringEdge connectedEdge, StringVertex currentNode) {
 		
 		if (connectedEdge.getSource().equals(currentNode)) {
@@ -194,6 +208,9 @@ public abstract class GraphTraverser {
 		
 	}
 	
+	/**
+	 * 
+	 */
 	protected void endOfRound() { 
 		
 		if (uniquelyVisitedNodes != null) {

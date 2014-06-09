@@ -1,5 +1,7 @@
 package HideAndSeek.hider.singleshot;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import HideAndSeek.graph.GraphController;
@@ -24,27 +26,33 @@ public class LowEdgeCostFixedDistance extends RandomFixedDistance {
 	}
 
 	/* (non-Javadoc)
-	 * @see HideAndSeek.GraphTraverser#getConnectedNode(java.util.List)
+	 * @see HideAndSeek.GraphTraverser#getConnectedEdge(HideAndSeek.graph.StringVertex, java.util.List)
 	 */
 	@Override
 	protected StringEdge getConnectedEdge(StringVertex currentNode, List<StringEdge> connectedEdges) {
 		
-		StringEdge minimumEdge = null;
-		
-		double minimumEdgeCost = Double.MAX_VALUE;
-		
-		for ( StringEdge edge : connectedEdges ) {
+		for (StringEdge edge : connectedEdges ) {
+
+			if ( uniquelyVisitedNodes().contains(edgeToTarget(edge, currentNode)) ) continue;
 			
-			if ( edge.getWeight() < minimumEdgeCost ) {
-				
-				minimumEdge = edge;
-				minimumEdgeCost = edge.getWeight();
-				
-			}
+			return edge;
 			
 		}
 		
-		return minimumEdge;
+		return connectedEdges.get((int)(Math.random() * connectedEdges.size()));
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraverser#getConnectedEdges(HideAndSeek.graph.StringVertex)
+	 */
+	protected List<StringEdge> getConnectedEdges(StringVertex currentNode) {
+		
+		ArrayList<StringEdge> edges = new ArrayList<StringEdge>(graphController.edgesOf(currentNode));
+		
+		Collections.sort(edges);
+		
+		return edges;
 		
 	}
 

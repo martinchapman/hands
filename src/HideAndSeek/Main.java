@@ -10,13 +10,15 @@ import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.Hider;
 import HideAndSeek.hider.singleshot.LowEdgeCostFixedDistance;
-import HideAndSeek.hider.singleshot.MaxDistance;
+import HideAndSeek.hider.singleshot.Random;
 import HideAndSeek.hider.singleshot.RandomFixedDistance;
 import HideAndSeek.hider.singleshot.VariableFixedDistance;
 import HideAndSeek.seeker.Seeker;
+import HideAndSeek.seeker.singleshot.ConstrainedRandomWalk;
 import HideAndSeek.seeker.singleshot.DepthFirstSearch;
 import HideAndSeek.seeker.singleshot.DepthFirstSearchLowCost;
-import HideAndSeek.seeker.singleshot.Greedy;
+import HideAndSeek.seeker.singleshot.LeastConnectedFirst;
+import HideAndSeek.seeker.singleshot.LowEdgeCost;
 import HideAndSeek.seeker.singleshot.RandomWalk;
 import Utility.Pair;
 import Utility.Utils;
@@ -168,7 +170,7 @@ public class Main {
 				
 			} else if (seekerType.getElement0().equals("FixedStartGreedy")) {
 				
-				allSeekingAgents.add(new Greedy(graphController));
+				allSeekingAgents.add(new LowEdgeCost(graphController));
 				
 			}
 			
@@ -193,7 +195,7 @@ public class Main {
 		 
 		ArrayList<Hider> allHidingAgents = new ArrayList<Hider>();
 		
-		allHidingAgents.add(new MaxDistance(graphController, numberOfHideLocations));
+		allHidingAgents.add(new Random(graphController, numberOfHideLocations));
 		
 		return allHidingAgents;
 		
@@ -213,7 +215,9 @@ public class Main {
 		
 		ArrayList<Seeker> allSeekingAgents = new ArrayList<Seeker>();
 		
-		allSeekingAgents.add(new RandomWalk(graphController));
+		allSeekingAgents.add(new ConstrainedRandomWalk(graphController));
+		
+		allSeekingAgents.add(new LeastConnectedFirst(graphController));
 		
 		return allSeekingAgents;
 		

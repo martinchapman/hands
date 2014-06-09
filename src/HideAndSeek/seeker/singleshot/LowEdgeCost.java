@@ -13,16 +13,33 @@ import HideAndSeek.seeker.Seeker;
  * @author Martin
  *
  */
-public class Greedy extends Seeker {
+public class LowEdgeCost extends Seeker {
 
 	/**
 	 * @param graph
 	 */
-	public Greedy(
-			GraphController <StringVertex, StringEdge> graphController) {
+	public LowEdgeCost(GraphController <StringVertex, StringEdge> graphController) {
 
 		super(graphController);
 
+	}
+
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraverser#getConnectedEdge(HideAndSeek.graph.StringVertex, java.util.List)
+	 */
+	@Override
+	protected StringEdge getConnectedEdge(StringVertex currentNode, List<StringEdge> connectedEdges) {
+		
+		for (StringEdge edge : connectedEdges ) {
+
+			if ( uniquelyVisitedNodes().contains(edgeToTarget(edge, currentNode)) ) continue;
+			
+			return edge;
+			
+		}
+		
+		return connectedEdges.get((int)(Math.random() * connectedEdges.size()));
+		
 	}
 
 	/* (non-Javadoc)
@@ -45,6 +62,7 @@ public class Greedy extends Seeker {
 	protected StringVertex nextNode(StringVertex currentNode) {
 
 		return connectedNode(currentNode);
+		
 	}
 
 	/* (non-Javadoc)

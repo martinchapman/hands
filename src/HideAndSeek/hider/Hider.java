@@ -123,6 +123,8 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 			 
 			nextNode = nextNode(currentNode);
 			
+			addUniquelyVisitedEdge(graphController.getEdge(currentNode, nextNode));
+			
 			if ( !graphController.fromVertexToVertex(this, currentNode, nextNode) ) { 
 				
 				Utils.talk(this.toString(), "Error traversing supplied path.");

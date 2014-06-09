@@ -50,41 +50,34 @@ public class DepthFirstSearch extends Seeker {
 		
 		HashSet<StringEdge> selectedInThisSession = new HashSet<StringEdge>();
 		
-		do {
+		// For each possible outgoing edge:
+		for ( StringEdge edge : connectedEdges ) {
 			
-			// For each possible outgoing edge:
-			for ( StringEdge edge : connectedEdges ) {
+			// Check if it leads to a node which has already been visited
+			if ( !uniquelyVisitedNodes().contains( edgeToTarget( edge, currentNode ) ) ) {
 				
-				// Check if it leads to a node which has already been visited
-				if ( !uniquelyVisitedNodes().contains( edgeToTarget( edge, currentNode ) ) ) {
-					
-					connectedEdge = edge;
-					
-					// Edge found, break from loop.
-					break;
-					
-				}
+				connectedEdge = edge;
+				
+				// Edge found, break from loop.
+				break;
 				
 			}
 			
-			if ( connectedEdge == null ) {
-				
-				// If all edges have been traversed, move upwards through the current branch
-				return edgeToTarget( currentBranch.remove(currentBranch.size() - 1), currentNode );
-			
-			} else {
-				
-				target = edgeToTarget(connectedEdge, currentNode);
-				
-				selectedInThisSession.add(connectedEdge);
-				
-			}
-			
-					// Loop while not allowed to repeat nodes BUT
-		} while (   uniquelyVisitNodes == true && uniquelyVisitedNodes().contains( target ) &&
-				    // only if we haven't already tried all outgoing edges available
-				    selectedInThisSession.size() != connectedEdges.size()  );
+		}
 		
+		if ( connectedEdge == null ) {
+			
+			// If all edges have been traversed, move upwards through the current branch
+			return edgeToTarget( currentBranch.remove(currentBranch.size() - 1), currentNode );
+		
+		} else {
+			
+			target = edgeToTarget(connectedEdge, currentNode);
+			
+			selectedInThisSession.add(connectedEdge);
+			
+		}
+			
 		currentBranch.add(connectedEdge);
 		
 		return target;

@@ -6,6 +6,10 @@ import HideAndSeek.graph.StringVertex;
 import HideAndSeek.seeker.Seeker;
 
 /**
+ * 
+ * Truly random walk that picks an outgoing node at random
+ * from each vertex is comes across.
+ * 
  * @author Martin
  *
  */
