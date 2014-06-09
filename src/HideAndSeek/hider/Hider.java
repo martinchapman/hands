@@ -67,7 +67,7 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 	 */
 	public String toString() {
 		
-		return this.getClass().toString().substring(this.getClass().toString().lastIndexOf('.') + 1, this.getClass().toString().length());
+		return "h" + this.getClass().toString().substring(this.getClass().toString().lastIndexOf('.') + 1, this.getClass().toString().length());
 		
 	}
 	
@@ -148,7 +148,7 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 	 */
 	public String printRoundStats() {
 		
-		return "" + graphController.latestRoundCosts(this);
+		return "Cost, " + graphController.latestRoundCosts(this);
 		
 	}
 	
@@ -158,7 +158,7 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 	 */
 	public String printGameStats() {
 		
-		return "" + graphController.requestAverageGameCosts(this);
+		return "Cost," + graphController.requestAverageGameCosts(this);
 		
 	}
 	

@@ -75,7 +75,7 @@ public class Runner {
 	  				  "Rounds", // rounds 
 	  				  "EdgeWeight", // cost of traversing an edge
 	  				  "FixedOrUpperWeight", // whether cost supplied is static value or the upper bound of a distribution
-	  				  "EdgeTraversalDecrement" // % discount gained by an agent for having traversed an edge before (1.0 = no discount; < 1.0 = discount)
+	  				  "EdgeTraversalDecrement" // % discount gained by an agent for having traversed an edge before (100 = no discount; < 100 = discount)
 	  				  };
 	  				  
 			String[] defaultParameters = { simulationParameters[1],

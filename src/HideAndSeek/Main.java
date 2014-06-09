@@ -11,6 +11,7 @@ import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.Hider;
 import HideAndSeek.hider.singleshot.LowEdgeCostFixedDistance;
 import HideAndSeek.hider.singleshot.MinimumConnectivity;
+import HideAndSeek.hider.singleshot.Random;
 import HideAndSeek.hider.singleshot.RandomFixedDistance;
 import HideAndSeek.hider.singleshot.VariableFixedDistance;
 import HideAndSeek.seeker.Seeker;
@@ -195,6 +196,8 @@ public class Main {
 		 
 		ArrayList<Hider> allHidingAgents = new ArrayList<Hider>();
 		
+		allHidingAgents.add(new Random(graphController, numberOfHideLocations));
+		
 		allHidingAgents.add(new MinimumConnectivity(graphController, numberOfHideLocations));
 		
 		return allHidingAgents;
@@ -377,9 +380,9 @@ public class Main {
 			
 			graphController.newGame(this);
 			
+			Utils.writeToFile(mainOutputWriter, "\n");
+			
 		} // End of hider loop
-		
-		Utils.writeToFile(mainOutputWriter, "\n");
 		
 		try {
 			

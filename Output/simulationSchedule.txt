@@ -70,5 +70,5 @@
 // 100 [EO,1][S,1] ring 100 1 100 normal 0 true 0 true 0 1 1
 // 100 [AN,1][HPFwindow,1] random 100 50 120 normal 100 true 0 true 0 i -1
 // 100 [HPFwindow,1] {NumberOfHighProbabilityNodesToSort,5} {NumberOfNodes,100} {HiderBias,80} {TypeOfStartSeeker,bias} {StartPositionBias,50}
-100 {Topology,random} {EdgeTraversalDecrement,10} {Rounds,120}
+20 {Topology,random} {EdgeTraversalDecrement,10} {Rounds,120}
 // 500 [HPFwindow,1] {NumberOfHighProbabilityNodesToSort,0} {NumberOfNodes,1000}

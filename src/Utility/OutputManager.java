@@ -9,7 +9,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * @author Martin
@@ -18,19 +22,199 @@ import java.util.Scanner;
 public class OutputManager {
 
 	/**
+	 * @author Martin
+	 *
+	 */
+	private class TraverserRecord {
+		
+		/**
+		 * 
+		 */
+		protected String traverser;
+		
+		protected int updates;
+		
+		/**
+		 * @param traverser
+		 */
+		public TraverserRecord(String traverser) {
+		
+			this.traverser = traverser;
+			
+			attributeToValue = new Hashtable<String, Double>();
+			
+			updates = 0;
+			
+		}
+			
+		/**
+		 * @return
+		 */
+		public String getTraverser() {
+			
+			return traverser;
+		
+		}
+			
+		/**
+		 * 
+		 */
+		protected Hashtable<String, Double> attributeToValue;
+			
+		/**
+		 * @param attribute
+		 * @param value
+		 */
+		public void attribute(String attribute, double value) {
+		
+			updates++;
+			
+			if (attributeToValue.containsKey(attribute)) {
+			
+				attributeToValue.put(attribute, attributeToValue.get(attribute) + value);
+				
+			} else {
+			
+				attributeToValue.put(attribute, value);
+			
+			}
+			
+		}
+		
+		/**
+		 * 
+		 */
+		protected Hashtable<String, Double> calculateAverage() {
+			
+			Hashtable<String, Double> averageAttributeToValue = new Hashtable<String, Double>();
+			
+			for (Entry<String, Double> attribute : attributeToValue.entrySet()) {
+				
+				/* To find the number of times an individual attribute has been updated, 
+				 * divide the total updates by the number attributes */
+				averageAttributeToValue.put(attribute.getKey(), attribute.getValue() / (updates / attributeToValue.keySet().size()));
+				
+			}
+			
+			return averageAttributeToValue;
+			
+		}
+		
+		/* (non-Javadoc)
+		 * @see java.lang.Object#toString()
+		 */
+		public String toString() {
+		
+			return traverser + " " + calculateAverage();
+			
+		}
+		
+		/* (non-Javadoc)
+		 * @see java.lang.Object#equals(java.lang.Object)
+		 */
+		@Override
+		public boolean equals(Object obj) {
+			
+			return getTraverser().equals(((TraverserRecord) obj).getTraverser());
+			
+		}
+		
+			
+	}
+	
+	/**
+	 * @author Martin
+	 *
+	 */
+	private class HiderRecord extends TraverserRecord {
+		
+		/**
+		 * 
+		 */
+		private ArrayList<TraverserRecord> seekersAndAttributes;
+		
+		/**
+		 * @param hider
+		 */
+		public HiderRecord(String hider) {
+			
+			super(hider);
+			
+			seekersAndAttributes = new ArrayList<TraverserRecord>();
+		
+		}
+		
+		/**
+		 * @param seekerRecord
+		 */
+		public void addSeeker(TraverserRecord seekerRecord) {
+		
+			seekersAndAttributes.add(seekerRecord);
+			
+		}
+		
+
+		/**
+		 * @param seeker
+		 * @return
+		 */
+		public boolean containsSeeker(TraverserRecord seeker) {
+			
+			return seekersAndAttributes.contains(seeker);
+			
+		}
+		
+		/**
+		 * @param seeker
+		 * @return
+		 */
+		public TraverserRecord getSeeker(String seeker) {
+		
+			return seekersAndAttributes.get(seekersAndAttributes.indexOf(new TraverserRecord(seeker)));
+			
+		}
+		
+		/* (non-Javadoc)
+		 * @see Utility.OutputManager.TraverserRecord#toString()
+		 */
+		public String toString() {
+			
+			String returner = "";
+			
+			returner += traverser + " " + calculateAverage() + "\n";
+			
+			returner += seekersAndAttributes;
+			
+			return returner;
+			
+		}
+
+	}
+	
+	/**
 	 * 
 	 */
 	public OutputManager() {
 		
+		ArrayList<Path> files = listFilesForFolder(new File(FILEPREFIX + "/Data"));
+		
+		if (files.size() == 0) {
+			
+			System.out.println("No output files.");
+			
+			System.exit(0);
+			
+		}
+		
 		System.out.println("In the output folder: ");
 		
-		for ( Path path : listFilesForFolder(new File(FILEPREFIX + "/Data")) ) {
+		// For each file in the directory
+		for ( Path path : files ) {
 			
+			// If it is a .csv file (what we want):
 			if (path.toString().substring(path.toString().length() - 3, path.toString().length()).equals("csv")) {
 				
-				String titles = "\n";
-				
-				HashMap<Integer, Double> positionInCSVToData = new HashMap<Integer, Double>();
+				ArrayList<HiderRecord> hiderRecords = new ArrayList<HiderRecord>();
 				
 				ArrayList<String> lines = Utils.readFromFile(path.toString());
 				
@@ -38,32 +222,68 @@ public class OutputManager {
 				
 				for ( String line : lines ) {
 				
-					int position = 0;
+					String lastHider = "";
+					
+					String lastSeeker = "";
+					
+					String lastTraverser = "";
+					
+					String lastAttribute = "";
 					
 					for ( String word : line.split(",")) {
-						
-						position++;
 						
 						try {
 							
 							Double value = Double.parseDouble(word);
 							
-							if ( positionInCSVToData.containsKey(position)) {
+							if ( lastTraverser.equals("hider") ) {
+							
+								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).attribute(lastAttribute, value);
 								
-								positionInCSVToData.put(position, positionInCSVToData.get(position) + value);
-								
-							} else {
-								
-								positionInCSVToData.put(position, value);
+							} else if ( lastTraverser.equals("seeker") ) {
+							
+								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker(lastSeeker).attribute(lastAttribute, value);
 								
 							}
-							
+
 						} catch (NumberFormatException e) { 
 						
-							titles += word + "	 ";
+							// If we come across an entry for a Hider
+							if ( word.charAt(0) == 'h') {
 							
-							continue; 
+								// If we do not yet have a record for this hider
+								if (!hiderRecords.contains(new TraverserRecord(word))) {
+								
+									// Create it
+									hiderRecords.add(new HiderRecord(word));
+								
+								}
+								
+								lastHider = word;
+								
+								lastTraverser = "hider";
+								
+							// If we come across an entry for a Seeker
+							} else if ( word.charAt(0) == 's') {
 							
+								// If the last hider doesn't have a record of this seeker, add it
+								if (!hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).containsSeeker(new TraverserRecord(word))) {
+									
+									hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).addSeeker(new TraverserRecord(word));
+									
+								}
+								
+								lastSeeker = word;
+								
+								lastTraverser = "seeker";
+							
+							// If we come across an attribute entry
+							} else {
+							
+								lastAttribute = word;
+								
+							}
+						
 						}
 						
 					}
@@ -72,21 +292,39 @@ public class OutputManager {
 				
 				System.out.println(parameters);
 				
-				System.out.println(titles);
+				for ( HiderRecord hiderRecord : hiderRecords ) {
 				
-				for ( Double totalCosts : positionInCSVToData.values() ) {
-					
-					System.out.print( totalCosts / lines.size() + "  " );
+					System.out.println(hiderRecord);
 					
 				}
 				
 			}
 			
 		}
+		
+		//
+		
+		TimerTask task = new TimerTask() {
 			
+			public void run() {
+			
+				System.out.println( "Timed out. Exit..." );
+				
+				System.exit( 0 );
+			
+			}
+			
+		};
+		
+		Timer timer = new Timer();
+		
+		timer.schedule( task, 10*1000 );
+		
+		//
+		
 		Scanner in = new Scanner(System.in);
 		
-		System.out.println("\n REMOVE FILES?");
+		System.out.println("\nREMOVE FILES?");
 		
 		if (in.nextLine().equals("")) {
 		
@@ -97,6 +335,8 @@ public class OutputManager {
 		}
 		
 		in.close();
+		
+		System.exit(0);
 		
 	}
 	
@@ -159,5 +399,5 @@ public class OutputManager {
 		new OutputManager();
 
 	}
-
+	
 }
