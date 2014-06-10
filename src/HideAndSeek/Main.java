@@ -9,17 +9,11 @@ import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.Hider;
-import HideAndSeek.hider.singleshot.LowEdgeCostFixedDistance;
-import HideAndSeek.hider.singleshot.MinimumConnectivity;
+import HideAndSeek.hider.singleshot.MaxDistance;
 import HideAndSeek.hider.singleshot.Random;
-import HideAndSeek.hider.singleshot.RandomFixedDistance;
-import HideAndSeek.hider.singleshot.VariableFixedDistance;
 import HideAndSeek.seeker.Seeker;
 import HideAndSeek.seeker.singleshot.ConstrainedRandomWalk;
-import HideAndSeek.seeker.singleshot.DepthFirstSearch;
-import HideAndSeek.seeker.singleshot.DepthFirstSearchLowCost;
 import HideAndSeek.seeker.singleshot.LeastConnectedFirst;
-import HideAndSeek.seeker.singleshot.LowEdgeCost;
 import HideAndSeek.seeker.singleshot.RandomWalk;
 import Utility.Pair;
 import Utility.Utils;
@@ -89,9 +83,7 @@ public class Main {
 		
 		int numberOfHideLocations = Integer.parseInt(args[5]);
 		
-		//startRounds(initHiders(hiderList, numberOfHideLocations), initSeekers(seekerList), rounds, false);
-		
-		startRounds(initHiders(numberOfHideLocations), initSeekers(), rounds, false);
+		startRounds(initHiders(hiderList, numberOfHideLocations), initSeekers(seekerList), rounds, false);
 		
 	}
 	
@@ -119,21 +111,25 @@ public class Main {
 		 
 		ArrayList<Hider> allHidingAgents = new ArrayList<Hider>();
 		
-		for( Pair<String, String> seekerType : Utils.stringToArray(agentList, "(\\[([0-9a-zA-Z]+),([0-9]+)\\])") ) {
+		for( Pair<String, String> hiderType : Utils.stringToArray(agentList, "(\\[([0-9a-zA-Z]+),([0-9]+)\\])") ) {
 			
-			if (seekerType.getElement0().equals("FixedDistanceHider")) {
+			if (hiderType.getElement0().equals("Random")) {
 				
-				allHidingAgents.add(new RandomFixedDistance(graphController, numberOfHideLocations));
+				allHidingAgents.add(new Random(graphController, numberOfHideLocations));
 			
-			} else if (seekerType.getElement0().equals("VariableDistanceHider")) {
+			} 
+			
+			if (hiderType.getElement0().equals("MinimumConnectivity")) {
 				
-				allHidingAgents.add(new VariableFixedDistance(graphController, numberOfHideLocations, gameNumber));
+				allHidingAgents.add(new MaxDistance(graphController, numberOfHideLocations));
+			
+			} 
+
+			if (hiderType.getElement0().equals("MaxDistance")) {
 				
-			} else if (seekerType.getElement0().equals("LowEdgeCostHider")) {
-				
-				allHidingAgents.add(new LowEdgeCostFixedDistance(graphController, numberOfHideLocations));
-				
-			}
+				allHidingAgents.add(new MaxDistance(graphController, numberOfHideLocations));
+			
+			} 
 			
 		}
 		
@@ -157,70 +153,25 @@ public class Main {
 		 
 		for( Pair<String, String> seekerType : Utils.stringToArray(agentList, "(\\[([0-9a-zA-Z]+),([0-9]+)\\])") ) {
 			
-			if (seekerType.getElement0().equals("FixedStartRandomWalk")) {
+			if (seekerType.getElement0().equals("RandomWalk")) {
 				
 				allSeekingAgents.add(new RandomWalk(graphController));
 				
-			} else if (seekerType.getElement0().equals("FixedStartDepthFirstSearch")) {
+			}
+			
+			if (seekerType.getElement0().equals("ConstrainedRandomWalk")) {
 				
-				allSeekingAgents.add(new DepthFirstSearch(graphController));
+				allSeekingAgents.add(new ConstrainedRandomWalk(graphController));
 				
-			} else if (seekerType.getElement0().equals("FixedStartDepthFirstSearchLowCost")) {
+			}
+			
+			if (seekerType.getElement0().equals("LeastConnectedFirst")) {
 				
-				allSeekingAgents.add(new DepthFirstSearchLowCost(graphController));
-				
-			} else if (seekerType.getElement0().equals("FixedStartGreedy")) {
-				
-				allSeekingAgents.add(new LowEdgeCost(graphController));
+				allSeekingAgents.add(new LeastConnectedFirst(graphController));
 				
 			}
 			
 		}
-		
-		return allSeekingAgents;
-		
-	}
-	
-	/**
-	 * @param agentList
-	 * @param numberOfHideLocations
-	 * @return
-	 */
-	private ArrayList<Hider> initHiders(int numberOfHideLocations) {
-		
-		/**************************
-    	 * 
-    	 * Set up hiding agents
-    	 * 
-    	 * * * * * * * * * * * * */
-		 
-		ArrayList<Hider> allHidingAgents = new ArrayList<Hider>();
-		
-		allHidingAgents.add(new Random(graphController, numberOfHideLocations));
-		
-		allHidingAgents.add(new MinimumConnectivity(graphController, numberOfHideLocations));
-		
-		return allHidingAgents;
-		
-	}
-	
-	/**
-	 * @param agentList
-	 * @return
-	 */
-	private ArrayList<Seeker> initSeekers() {
-		
-		/**************************
-    	 * 
-    	 * Set up seeking agents
-    	 * 
-    	 * * * * * * * * * * * * */
-		
-		ArrayList<Seeker> allSeekingAgents = new ArrayList<Seeker>();
-		
-		allSeekingAgents.add(new LeastConnectedFirst(graphController));
-		
-		allSeekingAgents.add(new ConstrainedRandomWalk(graphController));
 		
 		return allSeekingAgents;
 		

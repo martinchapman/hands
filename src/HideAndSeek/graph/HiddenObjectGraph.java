@@ -145,7 +145,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
     
 		for ( GraphTraverser agent : traversers ) {
 			
-			double scoreAgainstEach = 0.5;
+			double scoreAgainstEach = 0.0;
 			
 			int opponents = 0;
 			
@@ -159,10 +159,14 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 						
 						opponents++;
 						
-						/* To balance, scores take into account the performance of the hider MINUS the 
-						   costs of the seeker. Thus, if costs are too high or a seeker's performance
+						/* To balance, scores take into account the performance of the seeker MINUS the 
+						   costs of the hider. Thus, if costs are too high or a seeker's performance
 						   is too good, score is likely to be lower. */
+										    // 
 						scoreAgainstEach += seekerPerformance((Seeker)seeker) - 
+										    /* The hiders cost on their hiding path as a portion of the full cost
+											   of this path i.e. their cost, lowered if they take pre-traversed roots
+											   as a portion of full cost path */
 											((latestRoundCosts(agent) / totalPathCost(latestRoundPaths(agent))) * 100);
 						
 					}
@@ -185,6 +189,8 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	 */
 	private double seekerPerformance(Seeker seeker) {
 		
+		// Higher is worse for seeker: represents steps taken as a portion of
+		// all possible steps in graph
 		return latestRoundPaths(seeker).size() / ((double)edgeSet().size()) * 100;
 		
 	}

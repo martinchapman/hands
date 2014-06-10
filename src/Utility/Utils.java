@@ -28,7 +28,9 @@ public class Utils {
   			br = new BufferedReader(new FileReader(url));
    
   			while ((sCurrentLine = br.readLine()) != null) {
+  				
   				lines.add(sCurrentLine);
+  				
   			}
    
   		} catch (IOException e) {

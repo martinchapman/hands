@@ -153,7 +153,6 @@ public class OutputManager {
 			
 		}
 		
-
 		/**
 		 * @param seeker
 		 * @return
@@ -324,7 +323,7 @@ public class OutputManager {
 		
 		Scanner in = new Scanner(System.in);
 		
-		System.out.println("\nREMOVE FILES?");
+		System.out.println("\nPRESS RETURN TO REMOVE FILES");
 		
 		if (in.nextLine().equals("")) {
 		
