@@ -57,7 +57,7 @@ public class CostPerformanceBalancingHider extends VariableBiasHider {
 		
 		double costChange = ( ( graphController.requestRoundCost(roundsPassed, this) - graphController.requestRoundCost(roundsPassed - 1, this) ) / graphController.requestRoundCost(roundsPassed - 1, this) )	* 100;
 		
-		double seekerPerformanceChange = ( ( graphController.requestAverageSeekerPerformance(roundsPassed) - graphController.requestAverageSeekerPerformance(roundsPassed - 1) ) / graphController.requestAverageSeekerPerformance(roundsPassed - 1) ) * 100;
+		double seekerPerformanceChange = ( ( graphController.requestAverageSeekersRoundPerformance(roundsPassed) - graphController.requestAverageSeekersRoundPerformance(roundsPassed - 1) ) / graphController.requestAverageSeekersRoundPerformance(roundsPassed - 1) ) * 100;
         
 		Utils.talk(toString(), "Cost change: " + costChange);
 		

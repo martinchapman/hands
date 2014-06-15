@@ -64,7 +64,7 @@ public abstract class Seeker extends GraphTraverser implements Runnable {
 	@Override
 	public void run() {
 		
-		System.out.println("Running " + ID + " " + this.getClass());
+		Utils.talk(toString(), "Running " + ID + " " + this.getClass());
 		
 		search();
 		
@@ -92,8 +92,6 @@ public abstract class Seeker extends GraphTraverser implements Runnable {
 		
 		StringVertex nextNode;
 		
-		Utils.talk(toString(), hideLocations.size() + " " + graphController.numberOfHideLocations());
-
 		while ( hideLocations.size() != graphController.numberOfHideLocations() ) {
 	
 			exploredNodes.add(currentNode);
@@ -141,7 +139,7 @@ public abstract class Seeker extends GraphTraverser implements Runnable {
 	 */
 	public String printGameStats() {
 		
-		return "Cost, " + graphController.requestAverageGameCosts(this);
+		return "Cost, " + graphController.requestAverageGameCosts(this)  + ", Score, " + graphController.requestAverageSeekerScore(this);
 		
 	}
 	

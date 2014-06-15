@@ -21,6 +21,12 @@ import HideAndSeek.hider.Hider;
 public class VariableBiasHider extends Hider {
 
 	/**
+	 * 
+	 * Hider in which the tendency to take pre-traversed edges
+	 * can be set.
+	 * 
+	 * Hides in first K locations.
+	 * 
 	 * @param graph
 	 * @param numberOfHideLocations
 	 * @param bias

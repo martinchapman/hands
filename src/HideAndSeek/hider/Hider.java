@@ -91,7 +91,9 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 	@Override
 	public void run() {
 		
-		System.out.println("Running " + ID + " " + this.getClass());
+		Utils.talk(toString(), "Running " + ID + " " + this.getClass());
+		
+		startPlaying();
 		
 		hide();
 		
@@ -158,7 +160,7 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 	 */
 	public String printGameStats() {
 		
-		return "Cost," + graphController.requestAverageGameCosts(this) + ", Score, " + graphController.requestAverageHiderScore(this);
+		return "Cost, " + graphController.requestAverageGameCosts(this) + ", Score, " + graphController.requestAverageHiderScore(this);
 		
 	}
 	

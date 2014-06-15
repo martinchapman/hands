@@ -46,42 +46,42 @@ public class GraphController<V, E> {
     	 * 
     	 * * * * * * * * * * * * */
 		
-		graph = new HiddenObjectGraph<StringVertex, StringEdge>(StringEdge.class);
-		
-		graph.setEdgeTraversalDecrement(edgeTraversalDecrement);
-		
-		GraphGenerator<StringVertex, StringEdge, StringVertex> generator = null;
-		
-		// Select generator
-		
-		if (	topology.equals("ring")	  ) {
-	    	
-	        generator = new RingGraphGenerator<StringVertex, StringEdge>(numberOfVertices);
-	        
-    	} else if (	   topology.equals("random")    ) {
-    		
-    		generator = new RandomGraphGenerator<StringVertex, StringEdge>(numberOfVertices, numberOfVertices * 3);
-    		
-    	} else if (    topology.equals("scalefree")    ) {
-    		
-    		generator = new ScaleFreeGraphGenerator<StringVertex, StringEdge>(numberOfVertices);
-    		
-    	}
-		
-		
-		// Generate graph
-		
-		Utils.talk("Graph Controller", "Generating graph.");
-		
-		VertexFactory<StringVertex> factory = new ClassBasedVertexFactory<StringVertex>(StringVertex.class);
-		
-		ConnectivityInspector<StringVertex, StringEdge> con = new ConnectivityInspector<StringVertex, StringEdge>(graph);
+		ConnectivityInspector<StringVertex, StringEdge> con;
 		
 		do {
 			
-			generator.generateGraph(graph, factory, null);
+			graph = new HiddenObjectGraph<StringVertex, StringEdge>(StringEdge.class);
 			
-			if (!con.isGraphConnected()) { graph.removeAllEdges(graph.edgeSet()); }
+			graph.setEdgeTraversalDecrement(edgeTraversalDecrement);
+			
+			GraphGenerator<StringVertex, StringEdge, StringVertex> generator = null;
+			
+			// Select generator
+			
+			if (	topology.equals("ring")	  ) {
+		    	
+		        generator = new RingGraphGenerator<StringVertex, StringEdge>(numberOfVertices);
+		        
+	    	} else if (	   topology.equals("random")    ) {
+	    		
+	    		generator = new RandomGraphGenerator<StringVertex, StringEdge>(numberOfVertices, numberOfVertices * 3);
+	    		
+	    	} else if (    topology.equals("scalefree")    ) {
+	    		
+	    		generator = new ScaleFreeGraphGenerator<StringVertex, StringEdge>(numberOfVertices);
+	    		
+	    	}
+			
+			
+			// Generate graph
+			
+			Utils.talk("Graph Controller", "Generating graph.");
+			
+			VertexFactory<StringVertex> factory = new ClassBasedVertexFactory<StringVertex>(StringVertex.class);
+			
+			con = new ConnectivityInspector<StringVertex, StringEdge>(graph);
+			
+			generator.generateGraph(graph, factory, null);
 			
 		} while ( !con.isGraphConnected() );
 		
@@ -276,14 +276,13 @@ public class GraphController<V, E> {
 	 * @param roundsPassed
 	 * @return
 	 */
-	public double requestAverageSeekerPerformance(int roundsPassed) {
+	public double requestAverageSeekersRoundPerformance(int round) {
 		
-		return graph.requestAverageSeekerPerformance(roundsPassed);
+		return graph.requestAverageSeekersRoundPerformance(round);
 		
 	}
 	
 	/**
-	 * 
 	 * Let players know the weight of edges
 	 * 
 	 * @param edge
@@ -448,6 +447,16 @@ public class GraphController<V, E> {
 	public double requestAverageGameCosts(GraphTraverser traverser) {
 		
 		return graph.requestAverageGameCosts(traverser);
+		
+	}
+
+	/**
+	 * @param seeker
+	 * @return
+	 */
+	public Double requestAverageSeekerScore(Seeker seeker) {
+		
+		return graph.requestAverageSeekerScore(seeker);
 		
 	}
 

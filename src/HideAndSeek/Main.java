@@ -9,11 +9,24 @@ import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.Hider;
+import HideAndSeek.hider.repeatgame.VariableBiasHider;
+import HideAndSeek.hider.singleshot.LowEdgeCostFixedDistance;
 import HideAndSeek.hider.singleshot.MaxDistance;
+import HideAndSeek.hider.singleshot.MinimumConnectivity;
 import HideAndSeek.hider.singleshot.Random;
+import HideAndSeek.hider.singleshot.RandomDirection;
+import HideAndSeek.hider.singleshot.RandomFixedDistance;
 import HideAndSeek.seeker.Seeker;
+import HideAndSeek.seeker.repeatgame.HighProbabilitySeeker;
+import HideAndSeek.seeker.singleshot.BacktrackPath;
+import HideAndSeek.seeker.singleshot.BreadthFirstSearch;
+import HideAndSeek.seeker.singleshot.BreadthFirstSearchLowCost;
 import HideAndSeek.seeker.singleshot.ConstrainedRandomWalk;
+import HideAndSeek.seeker.singleshot.DepthFirstSearch;
+import HideAndSeek.seeker.singleshot.DepthFirstSearchLowCost;
+import HideAndSeek.seeker.singleshot.FixedStartRandomWalk;
 import HideAndSeek.seeker.singleshot.LeastConnectedFirst;
+import HideAndSeek.seeker.singleshot.LowEdgeCost;
 import HideAndSeek.seeker.singleshot.RandomWalk;
 import Utility.Pair;
 import Utility.Utils;
@@ -113,6 +126,8 @@ public class Main {
 		
 		for( Pair<String, String> hiderType : Utils.stringToArray(agentList, "(\\[([0-9a-zA-Z]+),([0-9]+)\\])") ) {
 			
+			// Single-shot:
+			
 			if (hiderType.getElement0().equals("Random")) {
 				
 				allHidingAgents.add(new Random(graphController, numberOfHideLocations));
@@ -121,7 +136,7 @@ public class Main {
 			
 			if (hiderType.getElement0().equals("MinimumConnectivity")) {
 				
-				allHidingAgents.add(new MaxDistance(graphController, numberOfHideLocations));
+				allHidingAgents.add(new MinimumConnectivity(graphController, numberOfHideLocations));
 			
 			} 
 
@@ -130,6 +145,46 @@ public class Main {
 				allHidingAgents.add(new MaxDistance(graphController, numberOfHideLocations));
 			
 			} 
+			
+			if (hiderType.getElement0().equals("RandomDirection")) {
+				
+				allHidingAgents.add(new RandomDirection(graphController, numberOfHideLocations));
+			
+			} 
+			
+			if (hiderType.getElement0().equals("RandomFixedDistance")) {
+				
+				allHidingAgents.add(new RandomFixedDistance(graphController, numberOfHideLocations));
+			
+			} 
+			
+			if (hiderType.getElement0().equals("LowEdgeCostFixedDistance")) {
+				
+				allHidingAgents.add(new LowEdgeCostFixedDistance(graphController, numberOfHideLocations));
+			
+			} 
+			
+			// Repeat-game:
+			
+			if (hiderType.getElement0().equals("FullyBiasHider")) {
+				
+				allHidingAgents.add(new VariableBiasHider(graphController, numberOfHideLocations, 1.0));
+			
+			}
+			
+			if (hiderType.getElement0().equals("LooselyBiasHider")) {
+				
+				allHidingAgents.add(new VariableBiasHider(graphController, numberOfHideLocations, 1.0));
+			
+			} 
+			
+			if (hiderType.getElement0().equals("VariableBiasHider")) {
+				
+				allHidingAgents.add(new VariableBiasHider(graphController, numberOfHideLocations, gameNumber/10.0));
+			
+			} 
+			
+			
 			
 		}
 		
@@ -153,6 +208,8 @@ public class Main {
 		 
 		for( Pair<String, String> seekerType : Utils.stringToArray(agentList, "(\\[([0-9a-zA-Z]+),([0-9]+)\\])") ) {
 			
+			// Single-shot:
+			
 			if (seekerType.getElement0().equals("RandomWalk")) {
 				
 				allSeekingAgents.add(new RandomWalk(graphController));
@@ -170,6 +227,57 @@ public class Main {
 				allSeekingAgents.add(new LeastConnectedFirst(graphController));
 				
 			}
+			
+			if (seekerType.getElement0().equals("BacktrackPath")) {
+				
+				allSeekingAgents.add(new BacktrackPath(graphController));
+				
+			}
+			
+			if (seekerType.getElement0().equals("DepthFirstSearch")) {
+				
+				allSeekingAgents.add(new DepthFirstSearch(graphController));
+				
+			}
+			
+			if (seekerType.getElement0().equals("DepthFirstSearchLowCost")) {
+				
+				allSeekingAgents.add(new DepthFirstSearchLowCost(graphController));
+				
+			}
+			
+			if (seekerType.getElement0().equals("FixedStartRandomWalk")) {
+				
+				allSeekingAgents.add(new FixedStartRandomWalk(graphController));
+				
+			}
+			
+			if (seekerType.getElement0().equals("LowEdgeCost")) {
+				
+				allSeekingAgents.add(new LowEdgeCost(graphController));
+				
+			}
+			
+			if (seekerType.getElement0().equals("BreadthFirstSearch")) {
+				
+				allSeekingAgents.add(new BreadthFirstSearch(graphController));
+				
+			}
+			
+			if (seekerType.getElement0().equals("BreadthFirstSearchLowCost")) {
+				
+				allSeekingAgents.add(new BreadthFirstSearchLowCost(graphController));
+				
+			}
+			
+			// Repeat-game: 
+			
+			if (seekerType.getElement0().equals("HighProbabilitySeeker")) {
+				
+				allSeekingAgents.add(new HighProbabilitySeeker(graphController));
+				
+			}
+			
 			
 		}
 		
@@ -275,8 +383,6 @@ public class Main {
 	    			
 	    		}
 	    		
-    			Utils.talk("Main", "Score: " + hider + " " + graphController.latestHiderRoundScores(this, hider));
-	    			
 			}
 			
 			//
@@ -311,6 +417,8 @@ public class Main {
 			
 			Utils.talk("Main", "End of game \n------------------------------------------");
 			
+			hider.endOfGame();
+			
 			Utils.talk("Main", hider.toString() + "," + hider.printGameStats());
 			
 			Utils.writeToFile(mainOutputWriter, hider.toString() + "," + hider.printGameStats() + ",");
@@ -319,6 +427,8 @@ public class Main {
 		
 			for ( Seeker seeker : seekers ) {
 			
+				seeker.endOfGame();
+				
 				Utils.talk("Main", seeker.toString() + "," + seeker.printGameStats());
 				
 				// Average cost per round

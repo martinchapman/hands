@@ -26,61 +26,95 @@ public class BreadthFirstSearch extends SeekerLocalGraph {
 	public BreadthFirstSearch(GraphController <StringVertex, StringEdge> graphController) {
 
 		super(graphController);
-		
+
 		toBeVisited = new ArrayList<StringVertex>();
-		
+
 		pathInProgress = new ArrayList<StringEdge>();
-		
+
 	}
 
 	/**
 	 * 
 	 */
 	protected ArrayList<StringVertex> toBeVisited;
-	
+
 	/**
 	 * 
 	 */
 	protected List<StringEdge> pathInProgress;
-	
+
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
 	 */
 	protected StringVertex nextNode(StringVertex currentNode) {
+
+		super.nextNode(currentNode);
 		
-		currentNode = super.nextNode(currentNode);
-		
-		toBeVisited.removeAll(uniquelyVisitedNodes());
-		
+		//toBeVisited.removeAll(uniquelyVisitedNodes());
+
 		// If we are currently on a path back to a next breadth node, do this first:
 		if ( pathInProgress.size() > 1 ) { 
-		
+
 			return edgeToTarget(pathInProgress.remove(0), currentNode);
-			
+
 		}
-				
+
 		// Add all the children of the item on the top of the search list to the search list also
 		for ( StringEdge vertexEdge : getConnectedEdges(toBeVisited.get(0)) ) {
-			
+
 			StringVertex child = edgeToTarget(vertexEdge, toBeVisited.get(0));
-			
+
 			if (!toBeVisited.contains(child)) toBeVisited.add(child);
-			
+
 		}
-			
+
 		// If we cannot move directly to the next node (i.e. from sibling to sibling) we must find the path to our next node
 		if (!graphController.containsEdge(currentNode, toBeVisited.get(0))) {
-		
+
+			if (!localGraph.vertexSet().contains(toBeVisited.get(0))) return connectedNode(currentNode);
+			
 			DijkstraShortestPath<StringVertex, StringEdge> DSP = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, toBeVisited.get(0));
-			
+
 			pathInProgress = DSP.getPath().getEdgeList();
-			
+
 			return edgeToTarget(pathInProgress.remove(0), currentNode);
-		
+
 		}
-		
+
 		// Otherwise, freely move to the next thing to be visited
 		return toBeVisited.remove(0);
+
+	}
+	
+	private class NodeWrapper<V> {
+		
+		private V node;
+		private NodeWrapper<V> parent;
+		
+		NodeWrapper(V node, NodeWrapper<V> parent) {
+			
+			this.node = node;
+			this.parent = parent;
+			
+		}
+		
+		public V getNode() {
+			
+			return node;
+			
+		}
+		
+		public NodeWrapper<V> getParent() {
+			
+			return parent;
+			
+		}
+		
+		public String toString() {
+			
+			return "" + node;
+			
+		}
 		
 	}
 	
@@ -92,6 +126,7 @@ public class BreadthFirstSearch extends SeekerLocalGraph {
 		
 		StringVertex startNode = randomNode();
 		
+		// Add all children of start node
 		for ( StringEdge vertexEdge : graphController.edgesOf(startNode) ) {
 			
 			toBeVisited.add(edgeToTarget(vertexEdge, startNode));
@@ -110,9 +145,23 @@ public class BreadthFirstSearch extends SeekerLocalGraph {
 		// TODO Auto-generated method stub
 		super.endOfRound();
 		
+		toBeVisited.clear();
+		
+		pathInProgress.clear();
+		
 	}
 
-	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.seeker.Seeker#printRoundStats()
+	 */
+	public String printRoundStats() {
+		
+		Utils.talk(toString(), "Explored nodes: " + exploredNodes);
+		
+		return super.printRoundStats();
+		
+	}
+
 }
 
 

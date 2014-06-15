@@ -12,6 +12,8 @@ import HideAndSeek.graph.StringVertex;
 public class VariableBiasHiderRandomPlacement extends VariableBiasHider {
 
 	/**
+	 * As parent, except has percentage chance to hide in each location
+	 * 
 	 * @param graph
 	 * @param numberOfHideLocations
 	 * @param bias
@@ -23,13 +25,18 @@ public class VariableBiasHiderRandomPlacement extends VariableBiasHider {
 		
 	}
 
+	/**
+	 * 
+	 */
+	protected double HIDEPOTENTIAL = 0.5;
+	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.hider.Hider#hideHere(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
 	protected boolean hideHere(StringVertex vertex) {
 		
-		if (Math.random() > 0.5) { return true; }
+		if (Math.random() > HIDEPOTENTIAL) { return true; }
 		return false;
 		
 	}

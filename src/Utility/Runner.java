@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -24,9 +25,17 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import Utility.output.HiderRecord;
+import Utility.output.OutputManager;
+import Utility.output.TraverserRecord;
 
 /**
  * @author Martin
@@ -81,6 +90,13 @@ public class Runner extends JFrame {
 	
 	private JButton startQueue;
 	
+	private JButton startSelected;
+	private JList<String> queueList;
+	
+	/**
+	 * @author Martin
+	 *
+	 */
 	public interface PostDelete 
     {
 		
@@ -88,6 +104,11 @@ public class Runner extends JFrame {
 		
     }
 
+	/**
+	 * @param list
+	 * @param model
+	 * @param deleted
+	 */
 	private void deleteOnClick(final JList<String> list, final DefaultListModel<String> model, final PostDelete deleted) {
 		
 		list.addMouseListener(new MouseAdapter() {
@@ -122,13 +143,276 @@ public class Runner extends JFrame {
 		
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		
+		JTabbedPane tabbedPane = new JTabbedPane();
+		
+		add(tabbedPane);
+		
+		//
+		
+		simulationsTab(tabbedPane);
+		
+		outputTab(tabbedPane);
+		
+		//
+		
+		pack();
+		
+		setVisible(true);
+		
+	}
+	
+	/**
+	 * @param tabbedPane
+	 */
+	private void outputTab(JTabbedPane tabbedPane) {
+		
+		final OutputManager outputManager = new OutputManager();
+		
+		//////
+		
+		JPanel outputTab = new JPanel();
+		
+		outputTab.setLayout(new BorderLayout());
+		
+		tabbedPane.addTab("Output", outputTab);
+		
+		////
+		
+		JPanel northPane = new JPanel();
+		
+		northPane.setLayout(new FlowLayout(FlowLayout.LEFT));
+		
+		outputTab.add(northPane, BorderLayout.NORTH);
+		
+		//
+		
+		JButton collateOutput = new JButton("Process Output");
+		
+		northPane.add(collateOutput);
+		
+		final DefaultListModel<HiderRecord> outputFeedback = new DefaultListModel<HiderRecord>();
+
+		collateOutput.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				outputManager.processOutput();
+				
+				//System.out.println(outputManager.printAllStats());
+				
+				for (ArrayList<HiderRecord> fileHiderRecord : outputManager.getFileHiderRecords()) {
+					
+					for (HiderRecord hiderRecord : fileHiderRecord) {
+						
+						outputFeedback.addElement(hiderRecord);
+						
+					}
+					
+					// Mark end of Hiders in that game
+					
+					outputFeedback.addElement(new HiderRecord("") {
+						
+						public String toString() {
+							
+							return "-----";
+							
+						}
+						
+					});
+					
+				}
+				
+			}
+			
+		});
+		
+		//
+		
+		JButton deleteOutputFiles = new JButton("Delete output files");
+		
+		deleteOutputFiles.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				outputManager.removeAllOutputFiles();
+				
+			}
+			
+		});
+		
+		northPane.add(deleteOutputFiles);
+		
+		////
+		
+		JPanel centerPane = new JPanel();
+		
+		centerPane.setLayout(new BorderLayout());
+		
+		outputTab.add(centerPane, BorderLayout.CENTER);
+		
+		//
+		
+		final JList<HiderRecord> outputFeedbackList = new JList<HiderRecord>(outputFeedback);
+		
+		final JComboBox<String> measure = new JComboBox<String>();
+		
+		outputFeedbackList.addListSelectionListener(new ListSelectionListener() {
+
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				
+				if (e.getValueIsAdjusting()) return;
+				
+				if (outputFeedbackList.getSelectedIndex() == -1 || outputFeedbackList.getSelectedValue().toString().equals("-----")) return;
+				
+				for ( String attribute : outputFeedbackList.getSelectedValue().getSeekerAttributes() ) {
+					
+					measure.addItem(attribute);
+					
+				}
+				
+			}
+			
+		});
+		
+		centerPane.add(outputFeedbackList, BorderLayout.WEST);
+		
+		////
+		
+		JPanel centerPaneRight = new JPanel();
+		
+		centerPaneRight.setLayout(new BorderLayout());
+		
+		centerPane.add(centerPaneRight, BorderLayout.EAST);
+		
+		//
+		
+		JPanel centerPaneRightCenter = new JPanel(new GridLayout());
+		
+		centerPaneRight.add(centerPaneRightCenter, BorderLayout.CENTER);
+		
+		//
+		
+		final JRadioButton seekers = new JRadioButton("Seekers");
+		
+		centerPaneRightCenter.add(seekers);
+		
+		seekers.setSelected(true);
+		
+		final JRadioButton hiders = new JRadioButton("Hiders");
+		
+		centerPaneRightCenter.add(hiders);
+		
+		ButtonGroup hidersSeekers = new ButtonGroup();
+		
+		hidersSeekers.add(hiders);
+		
+		hidersSeekers.add(seekers);
+	    
+		//
+		
+		seekers.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				if (outputFeedbackList.getSelectedIndex() == -1 || outputFeedbackList.getSelectedValue().toString().equals("-----")) return;
+				
+				measure.removeAllItems();
+				
+				for ( String attribute : outputFeedbackList.getSelectedValue().getSeekerAttributes() ) {
+					
+					measure.addItem(attribute);
+					
+				}
+				
+			}
+			
+		});
+		
+		hiders.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				if (outputFeedbackList.getSelectedIndex() == -1 || outputFeedbackList.getSelectedValue().toString().equals("-----")) return;
+				
+				measure.removeAllItems();
+				
+				for ( String attribute : outputFeedbackList.getSelectedValue().getAttributes() ) {
+					
+					measure.addItem(attribute);
+					
+				}
+				
+			}
+			
+		});
+		
+		//
+		
+		centerPaneRightCenter.add(measure);
+		
+		//
+		
+		JButton generateGraph = new JButton("Generate graph");
+		
+		generateGraph.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				if (outputFeedbackList.getSelectedIndex() == -1 || outputFeedbackList.getSelectedValue().toString().equals("-----")) return;
+				
+				if (seekers.isSelected()) {
+				
+					// Only works for a single selected HiderRecord with a set of seekers
+					if (outputFeedbackList.getSelectedValuesList().size() > 1) return;
+					
+					outputManager.showSeekersLineGraphForAttribute(outputFeedbackList.getSelectedValue(), (String)measure.getSelectedItem());
+				
+				} else if (hiders.isSelected()) {
+					
+					// Hiders are selected in the GUI by selecting them as multiple items from the list
+					ArrayList<TraverserRecord> hiders = new ArrayList<TraverserRecord>();
+					
+					for ( TraverserRecord hider : outputFeedbackList.getSelectedValuesList()) {
+						
+						hiders.add(hider);
+						
+					}
+					
+					outputManager.showHidersLineGraphForAttribute(hiders, hiders.toString(), (String)measure.getSelectedItem());
+					
+				}
+				
+			}
+		
+		});
+		
+		centerPaneRight.add(generateGraph, BorderLayout.SOUTH);
+		
+	}
+	
+	private void simulationsTab(JTabbedPane tabbedPane) {
+		
+		//////
+		
+		JPanel simulationsTab = new JPanel();
+		
+		simulationsTab.setLayout(new BorderLayout());
+		
+		tabbedPane.addTab("Simulations", simulationsTab);
+		
 		////
 		
 		JPanel northPane = new JPanel();
 		
 		northPane.setLayout(new GridLayout(2, 2));
 		
-		add(northPane, BorderLayout.NORTH);
+		simulationsTab.add(northPane, BorderLayout.NORTH);
 		
 		////
 		
@@ -180,8 +464,8 @@ public class Runner extends JFrame {
 		
 		fixedOrRandom = new JComboBox<String>();
 		
-		fixedOrRandom.addItem("fixed");
 		fixedOrRandom.addItem("random");
+		fixedOrRandom.addItem("fixed");
 		
 		parameters.add(fixedOrRandom);
 		
@@ -189,7 +473,7 @@ public class Runner extends JFrame {
 		
 		parameters.add(new JLabel("Edge traversal decrement:"));
 		
-		edgeTraversalDecrement = new JTextField("10");
+		edgeTraversalDecrement = new JTextField("0");
 		
 		parameters.add(edgeTraversalDecrement);
 		
@@ -218,7 +502,17 @@ public class Runner extends JFrame {
 		final JComboBox<String> hiderList = new JComboBox<String>();
 		
 		hiderList.addItem("Random");
+		hiderList.addItem("RandomDirection");
+		hiderList.addItem("RandomFixedDistance");
+		hiderList.addItem("LowEdgeCostFixedDistance");
 		hiderList.addItem("MinimumConnectivity");
+		hiderList.addItem("MaxDistance");
+		
+		//
+		
+		hiderList.addItem("FullyBiasHider");
+		hiderList.addItem("LooselyBiasHider");
+		hiderList.addItem("VariableBiasHider");
 		
 		hiderListAndButton.add(hiderList);
 		
@@ -241,7 +535,13 @@ public class Runner extends JFrame {
 			@Override
 			public void postDelete(String deleted) {
 				
-				if (simulationHidersModel.toArray().length == 1) start.setEnabled(false);
+				if (simulationHidersModel.toArray().length == 1) { 
+					
+					start.setEnabled(false);
+					
+					queue.setEnabled(false);
+					
+				}
 				
 			}
 			
@@ -257,6 +557,8 @@ public class Runner extends JFrame {
 				if (!simulationHidersModel.contains(hiderList.getSelectedItem().toString())) simulationHidersModel.addElement(hiderList.getSelectedItem().toString());
 				
 				start.setEnabled(true);
+				
+				queue.setEnabled(true);
 				
 			}
 			
@@ -316,6 +618,18 @@ public class Runner extends JFrame {
 		
 		seekerList.addItem("ConstrainedRandomWalk");
 		seekerList.addItem("LeastConnectedFirst");
+		seekerList.addItem("BacktrackPath");
+		seekerList.addItem("BreadthFirstSearch");
+		seekerList.addItem("BreadthFirstSearchLowCost");
+		seekerList.addItem("FixedStartRandomWalk");
+		seekerList.addItem("LowEdgeCost");
+		seekerList.addItem("RandomWalk");
+		seekerList.addItem("DepthFirstSearch");
+		seekerList.addItem("DepthFirstSearchLowCost");
+		
+		// 
+		
+		seekerList.addItem("HighProbabilitySeeker");
 		
 		seekerListAndButton.add(seekerList);
 		
@@ -338,7 +652,13 @@ public class Runner extends JFrame {
 			@Override
 			public void postDelete(String deleted) {
 				
-				if (simulationSeekersModel.toArray().length == 1) start.setEnabled(false);
+				if (simulationSeekersModel.toArray().length == 1) { 
+					
+					start.setEnabled(false);
+					
+					queue.setEnabled(false);
+					
+				}
 				
 			}
 			
@@ -355,6 +675,8 @@ public class Runner extends JFrame {
 				
 				start.setEnabled(true);
 				
+				queue.setEnabled(true);
+				
 			}
 			
 		});
@@ -367,14 +689,33 @@ public class Runner extends JFrame {
 		
 		queueListModel = new DefaultListModel<String>();
 		
-		JList<String> queueList = new JList<String>(queueListModel);
+		queueList = new JList<String>(queueListModel);
+		
+		queueList.addListSelectionListener(new ListSelectionListener() {
+
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+			
+				updateUISettings(queueList.getSelectedValue());
+				
+				startSelected.setEnabled(true);
+				
+			}
+			
+		});
 		
 		deleteOnClick(queueList, queueListModel, new PostDelete() {
 
 			@Override
 			public void postDelete(String deleted) {
 				
-				if (queueListModel.toArray().length == 1) startQueue.setEnabled(false);
+				if (queueListModel.toArray().length == 1) { 
+					
+					startQueue.setEnabled(false);
+					
+					startSelected.setEnabled(false);
+					
+				}
 				
 				simulations.remove(deleted);
 				
@@ -405,7 +746,7 @@ public class Runner extends JFrame {
 			
 		});
 		
-		add(queueList, BorderLayout.CENTER);
+		simulationsTab.add(queueList, BorderLayout.CENTER);
 		
 		////////
 		
@@ -413,7 +754,13 @@ public class Runner extends JFrame {
 		
 		controls.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		
-		start = new JButton("Start simulation");
+		startSelected = new JButton("Start selected");
+		
+		startSelected.setEnabled(false);
+		
+		controls.add(startSelected);
+		
+		start = new JButton("Start setup");
 		
 		controls.add(start);
 		
@@ -429,14 +776,10 @@ public class Runner extends JFrame {
 		
 		//
 		
-		add(controls, BorderLayout.SOUTH);
+		simulationsTab.add(controls, BorderLayout.SOUTH);
 		
 		////
 
-		pack();
-		
-		setVisible(true);
-		
 	}
 	
 	private ArrayList<String> simulations;
@@ -478,6 +821,21 @@ public class Runner extends JFrame {
         
         //
         
+        startSelected.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				String[] simulation = queueList.getSelectedValue().split(",\\s");
+				
+	        	runSimulation(Integer.parseInt(simulation[0]), simulation);
+				
+			}
+        	
+        });
+        
+        //
+        
         queue.addActionListener(new ActionListener() {
 
 			@Override
@@ -489,7 +847,15 @@ public class Runner extends JFrame {
 				
 				}
 				
-				Utils.writeToFile(FILEPREFIX + "simulationSchedule.txt", Arrays.toString(getUISettings()).substring(1, Arrays.toString(getUISettings()).length() - 1) + "\n");
+				try {
+					Utils.writeToFile(new FileWriter(FILEPREFIX + "simulationSchedule.txt", true), Arrays.toString(getUISettings()).substring(1, Arrays.toString(getUISettings()).length() - 1) + "\n");
+				
+				} catch (IOException e1) {
+				
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				
+				}
 				
 				startQueue.setEnabled(true);
 				
@@ -512,6 +878,86 @@ public class Runner extends JFrame {
        
 	}
 	
+	private void updateUISettings(String settings) {
+		
+		if (settings == null) return;
+		
+		String[] simulationParameters = settings.split(",\\s");
+		
+		int arrayPosition = 0;
+		
+		simulationHidersModel.clear();
+		
+		simulationSeekersModel.clear();
+		
+		for (String param : simulationParameters) {
+      	  
+			if (param.indexOf('{') != -1) {
+				
+				Pair<String, String> paramPair = Utils.stringToArray(param, "(\\{([0-9a-zA-Z]+),([0-9a-zA-Z.]+)\\})").get(0);
+  
+				if (paramPair.getElement0().equals("Topology")) {
+		  
+					topologies.setSelectedItem(paramPair.getElement1());
+		  
+				} else if (paramPair.getElement0().equals("NumberOfNodes")) { 
+		  
+					numberOfNodes.setText(paramPair.getElement1());
+		  
+				} else if (paramPair.getElement0().equals("NumberOfHideLocations")) { 
+		  
+					numberOfHiddenItems.setText(paramPair.getElement1());
+		  
+				} else if (paramPair.getElement0().equals("Rounds")) { 
+		  
+					numberOfRounds.setText(paramPair.getElement1());
+		  
+				} else if (paramPair.getElement0().equals("EdgeWeight")) { 
+		  
+					costOfEdgeTraversal.setText(paramPair.getElement1());
+		  
+				} else if (paramPair.getElement0().equals("FixedOrUpperWeight")) { 
+		  
+					fixedOrRandom.setSelectedItem(paramPair.getElement1());
+		  
+				} else if (paramPair.getElement0().equals("EdgeTraversalDecrement")) { 
+			  
+					edgeTraversalDecrement.setText(paramPair.getElement1());
+			  
+				} 
+	  
+			} else if (param.indexOf('[') != -1) {
+  
+				ArrayList<Pair<String, String>> types = Utils.stringToArray(param, "(\\[([0-9a-zA-Z]+),([0-9]+)\\])");
+  
+				for (Pair<String, String> traverser : types) {
+	  
+					// Is Hider 
+					if (arrayPosition == 1)  {
+	  
+						simulationHidersModel.addElement(traverser.getElement0());
+	  
+					// Is Seeker  
+					} else {
+			  
+						simulationSeekersModel.addElement(traverser.getElement0());
+			  
+					}
+		  
+				}
+	  
+			} else {
+	  
+				numberOfGames.setText(param);
+	  
+			}
+  
+			arrayPosition++;
+			  
+		}
+		
+	}
+	
 	private String[] getUISettings() {
 		
 		String hiderParameter = "";
@@ -531,17 +977,28 @@ public class Runner extends JFrame {
 		}
 		
 		return new String[]{ 
-					 numberOfGames.getText(),
-				     hiderParameter,
-					 seekerParameter,
-					 "{Topology," + topologies.getSelectedItem().toString() + "}", // Topology
-					 "{NumberOfNodes," + numberOfNodes.getText() + "}", // Number of nodes in graph
-					 "{NumberOfHideLocations," + numberOfHiddenItems.getText() + "}", // Number of hide locations
-					 "{Rounds," + numberOfRounds.getText() + "}", // rounds
-					 "{EdgeWeight," + costOfEdgeTraversal.getText() + "}", // cost of traversing an edge
-					 "{FixedOrUpperWeight," + fixedOrRandom.getSelectedItem().toString() + "}", // whether cost supplied is static value or the upper bound of a distribution
-					 "{EdgeTraversalDecrement," + edgeTraversalDecrement.getText() + "}" // % discount gained by an agent for having traversed an edge before (1.0 = no discount; < 1.0 = discount)
-			  		 };  
+					 
+			numberOfGames.getText(),
+			
+			hiderParameter,
+			
+			seekerParameter,
+			
+			"{Topology," + topologies.getSelectedItem().toString() + "}", // Topology
+			
+			"{NumberOfNodes," + numberOfNodes.getText() + "}", // Number of nodes in graph
+			
+			"{NumberOfHideLocations," + numberOfHiddenItems.getText() + "}", // Number of hide locations
+			
+			"{Rounds," + numberOfRounds.getText() + "}", // rounds
+			
+			"{EdgeWeight," + costOfEdgeTraversal.getText() + "}", // cost of traversing an edge
+			
+			"{FixedOrUpperWeight," + fixedOrRandom.getSelectedItem().toString() + "}", // whether cost supplied is static value or the upper bound of a distribution
+			
+			"{EdgeTraversalDecrement," + edgeTraversalDecrement.getText() + "}" // % discount gained by an agent for having traversed an edge before (100 = no discount; < 100 = discount)
+		  		 
+		};  
 		
 	}
 	

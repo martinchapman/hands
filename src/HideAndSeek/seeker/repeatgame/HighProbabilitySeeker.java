@@ -10,6 +10,7 @@ import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.seeker.SeekerLocalGraph;
 import Utility.BehaviourPrediction;
+import Utility.Utils;
 
 /**
  * @author Martin
@@ -60,15 +61,20 @@ public class HighProbabilitySeeker extends SeekerLocalGraph {
 	@Override
 	protected StringVertex nextNode(StringVertex currentNode) {
 		
+		super.nextNode(currentNode);
+		
 		if ( likelyNodes.contains(currentNode) ) likelyNodes.remove(likelyNodes.indexOf(currentNode));
 		
-		// Use likely node information if available
-		if (likelyNodes.size() > 0) {
+		// Use likely node information if available, and if graph has sufficient information to use:
+		if ( likelyNodes.size() > 0 ) {
 			
 			StringVertex targetNode;
 			
 			DijkstraShortestPath<StringVertex, StringEdge> dsp = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, likelyNodes.get(0));
 	    	
+			// If no path available, return random connected node
+			if (dsp.getPathEdgeList() == null || dsp.getPathEdgeList().size() == 0) return connectedNode(currentNode);
+			
 			List<StringEdge> DSP = new ArrayList<StringEdge>(dsp.getPathEdgeList());
 			
 			return edgeToTarget(DSP.get(0), currentNode);
@@ -117,6 +123,8 @@ public class HighProbabilitySeeker extends SeekerLocalGraph {
 		/* Recreate list of likely vertices (currently assuming unknown value of K on part of seeker (until all objects are found), 
 		   so just get ALL likely locations) */
 		likelyNodes = behaviourPrediction.rankLikelyHideLocations(predictiveNodes);
+		
+		Utils.talk(toString(), "Likely nodes: " + likelyNodes);
 		
 	}
 

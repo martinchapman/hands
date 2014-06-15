@@ -222,6 +222,38 @@ public abstract class GraphTraverser {
 	}
 	
 	/**
+	 * 
+	 */
+	private boolean playing;
+	
+	/**
+	 * 
+	 */
+	protected void startPlaying() {
+		
+		playing = true;
+		
+	}
+	
+	/**
+	 * @return
+	 */
+	public boolean isPlaying() {
+		
+		return playing;
+		
+	}
+	
+	/**
+	 * 
+	 */
+	protected void endOfGame() {
+		
+		playing = false;
+		
+	}
+	
+	/**
 	 * How to derive the next node when traversing the graph
 	 * @param currentNode
 	 * @return

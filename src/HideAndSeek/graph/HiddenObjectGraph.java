@@ -72,7 +72,8 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 		
 		calculateHiderScores();
 		
-		averageSeekerPerformance();
+		// Calculate average seeker round performance for access by adaptive Hiders
+		averageSeekersRoundPerformance();
 		
 		roundNumber++;
 		
@@ -117,14 +118,14 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	}
 	
 	/**
-	 * 
+	 * Individual round scores for each hider
 	 */
 	private Hashtable<Integer, Hashtable<GraphTraverser, Double>> hiderRoundScores;
 	
 	/**
-	 * Cumulative score for each traverser
+	 * Individual round scores for each seeker
 	 */
-	private HashMap<GraphTraverser, Double> hiderScore;
+	private Hashtable<Integer, Hashtable<GraphTraverser, Double>> seekerRoundScores;
 	
 	/**
 	 * Hider scores are awarded in terms of two conflicting metrics: the cost of graph traversal
@@ -151,7 +152,8 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 			
 			if ( agent instanceof Hider ) {
 				
-				if ( latestRoundCosts(agent) == -1 ) { continue; }
+				// We do not play all registered Hiders at once, so not all will be scored
+				if ( !((Hider)agent).isPlaying() ) { continue; }
 				
 				for ( GraphTraverser seeker : traversers ) {
 					
@@ -163,7 +165,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 						   costs of the hider. Thus, if costs are too high or a seeker's performance
 						   is too good, score is likely to be lower. */
 										    // 
-						scoreAgainstEach += seekerPerformance((Seeker)seeker) - 
+						scoreAgainstEach += requestLatestSeekerRoundPerformance((Seeker)seeker) - 
 										    /* The hiders cost on their hiding path as a portion of the full cost
 											   of this path i.e. their cost, lowered if they take pre-traversed roots
 											   as a portion of full cost path */
@@ -175,7 +177,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 				
 				hiderRoundScores.get(hiderRoundScores.size() - 1).put(agent, (scoreAgainstEach / opponents));
 				
-				hiderScore.put(agent, hiderScore.get(agent) + (scoreAgainstEach / opponents));
+				calculateSeekerScores((Hider)agent);
 				
 			}
 			
@@ -184,10 +186,51 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	}
 	
 	/**
+	 * @param hider
+	 */
+	private void calculateSeekerScores(Hider hider) {
+		
+		seekerRoundScores.put(roundNumber, new Hashtable<GraphTraverser, Double>());
+		
+		for ( GraphTraverser traverser : traversers ) {
+			 
+			if ( traverser instanceof Seeker ) {
+				 
+				 /*
+				 * Set Seeker's round score: steps of hider - cost of traversal + designated measure of performance 
+				 * (as depicted by requestLatestSeekerRoundPerformance method)
+				 * 
+				 * i.e. Perfect seeker score should be 0 -> steps taken by hider - steps taken by seeker
+				 */
+				seekerRoundScores.get(roundNumber).put(traverser, 
+													  requestLatestHiderRoundPerformance(hider) -
+													  (latestRoundCosts(traverser) 
+													  + requestLatestSeekerRoundPerformance((Seeker)traverser)));
+				
+				
+			}
+			 
+		}
+		
+	}
+	
+	/**
+	 * @param hider
+	 * @return
+	 */
+	public double requestLatestHiderRoundPerformance(Hider hider) {
+		
+		return latestRoundPaths(hider).size() / ((double)edgeSet().size()) * 100;
+		
+	}
+	
+	/**
+	 * Designated metric for a Seeker's performance
+	 * 
 	 * @param seeeker
 	 * @return performance as percentage
 	 */
-	private double seekerPerformance(Seeker seeker) {
+	public double requestLatestSeekerRoundPerformance(Seeker seeker) {
 		
 		// Higher is worse for seeker: represents steps taken as a portion of
 		// all possible steps in graph
@@ -198,22 +241,12 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	/**
 	 * 
 	 */
-	ArrayList<Double> averageSeekerPerformance;
-	
-	/**
-	 * @return
-	 */
-	public double requestAverageSeekerPerformance(int round) {
-		 
-		 if (round < 0) { return 0.0; }
-		 return averageSeekerPerformance.get(round);
-		
-	}
+	ArrayList<Double> averageSeekersRoundPerformance;
 	
 	/**
 	 * 
 	 */
-	private void averageSeekerPerformance() {
+	private void averageSeekersRoundPerformance() {
 		
 		double performance = 0;
 		 
@@ -224,16 +257,28 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 			if ( traverser instanceof Seeker ) {
 				 
 				seekers++;
-				 
-				performance += seekerPerformance((Seeker)traverser);
+				
+				performance += requestLatestSeekerRoundPerformance((Seeker)traverser);
 				 
 			}
 			 
 		}
 		 
-		averageSeekerPerformance.add(performance / ((double)seekers));
+		averageSeekersRoundPerformance.add(performance / ((double)seekers));
 		 
 	}
+	
+	/**
+	 * @return
+	 */
+	public double requestAverageSeekersRoundPerformance(int round) {
+		 
+		 if (round < 0) { return 0.0; }
+		 
+		 return averageSeekersRoundPerformance.get(round);
+		
+	}
+	
 	
 	/**
 	 * @param latestRoundPaths
@@ -247,6 +292,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 		
 		for (int i = 1; i < latestRoundPath.size(); i++) {
 			
+			// Checks for direction of weighting
 			if ( getEdgeWeight(getEdge(latestRoundPath.get(i - 1), latestRoundPath.get(i))) == 1.0 ) {
 				
 				totalCost += getEdgeWeight(getEdge(latestRoundPath.get(i), latestRoundPath.get(i - 1)));
@@ -421,8 +467,6 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
     	
     	traverserPathLength = new HashMap<GraphTraverser, Integer>();
     	
-    	hiderScore = new HashMap<GraphTraverser, Double>();
-    	
     	//
     	
     	roundCosts = new Hashtable<Integer, Hashtable<GraphTraverser, Double>>();
@@ -435,7 +479,9 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
     	
     	hiderRoundScores = new Hashtable<Integer, Hashtable<GraphTraverser, Double>>();
     	
-    	averageSeekerPerformance = new ArrayList<Double>();
+    	seekerRoundScores = new Hashtable<Integer, Hashtable<GraphTraverser, Double>>();
+    	
+    	averageSeekersRoundPerformance = new ArrayList<Double>();
     	
     }
     
@@ -509,8 +555,6 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
     }
     
     /**
-     * 
-     * 
      * @param node
      * @param type
      */
@@ -530,8 +574,6 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
     }
 
 	/**
-	 * 
-	 * 
 	 * @param traverser
 	 * @param sourceVertex
 	 * @param targetVertex
@@ -672,12 +714,38 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	}
 	
 	/**
-	 * @param traverser
+	 * @param hider
 	 * @return
 	 */
-	public double requestAverageHiderScore(GraphTraverser traverser) {
+	public double requestAverageHiderScore(GraphTraverser hider) {
 		
-		return hiderScore.get(traverser) / roundNumber;
+		Double cumulativeScores = 0.0;
+		
+		for (Entry<Integer, Hashtable<GraphTraverser, Double>> entry : hiderRoundScores.entrySet()) {
+			
+			cumulativeScores += entry.getValue().get(hider);
+			
+		}
+		
+		return cumulativeScores / roundNumber;
+		
+	}
+	
+	/**
+	 * @param seeker
+	 * @return
+	 */
+	public double requestAverageSeekerScore(GraphTraverser seeker) {
+		
+		Double cumulativeScores = 0.0;
+		
+		for (Entry<Integer, Hashtable<GraphTraverser, Double>> entry : seekerRoundScores.entrySet()) {
+			
+			cumulativeScores += entry.getValue().get(seeker);
+			
+		}
+		
+		return cumulativeScores / roundNumber;
 		
 	}
 	
@@ -706,9 +774,6 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 		
 		// Set initial path lengths to 0
 		traverserPathLength.put(traverser, 0);
-		
-		// Set initial cumulative score to 0
-		hiderScore.put(traverser, 0.0);
 		
 		// Add a new unique edge cost mapping for this traverser
 		traverserEdgeCosts.put(traverser, new HashMap<E, Double>());
