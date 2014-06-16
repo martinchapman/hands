@@ -1,6 +1,6 @@
 package Utility.output;
 
-import java.util.ArrayList;
+import java.awt.event.WindowEvent;
 
 import org.jfree.ui.ApplicationFrame;
 
@@ -19,10 +19,21 @@ public abstract class TraverserGraph extends ApplicationFrame {
 		
 		super(title);
 		
+		
+		
+	}
+	
+	public void windowClosing(final WindowEvent evt){
+		
+		if ( evt.getWindow() == this ) {
+		
+			dispose();
+
+		}
+	
 	}
 	
 	public abstract void createChart(String title, String xlabel, String ylabel);
 
-	public abstract void addDataset(String title, ArrayList<Double> data);
 	
 }

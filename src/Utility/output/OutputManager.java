@@ -8,8 +8,6 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map.Entry;
 
@@ -155,9 +153,20 @@ public class OutputManager {
 		
 	}
 	
+	/**
+	 * @param hiders
+	 * @param title
+	 * @param attribute
+	 */
 	public void showHidersLineGraphForAttribute(ArrayList<TraverserRecord> hiders, String title, String attribute) {
 		
 		showGraphForAttribute(hiders, title, "Line", attribute);
+		
+	}
+	
+	public void showSeekersBarGraphForAttribute(HiderRecord hiderRecord, String attribute) {
+		
+		showGraphForAttribute(hiderRecord.getSeekersAndAttributes(), hiderRecord.getTraverser(), "Bar", attribute);
 		
 	}
 	
@@ -189,7 +198,7 @@ public class OutputManager {
 					
 				}
 				
-				graph.addDataset(traverser.getTraverser(), attributeToValues);
+				((LineGraph) graph).addDataset(traverser.getTraverser(), attributeToValues);
 				
 			}
 			
@@ -197,6 +206,18 @@ public class OutputManager {
 			
 			yLabel = attribute;
 		
+		} else if (graphType.equals("Bar")) {
+			
+			graph = new BarGraph(title);
+			
+			Hashtable<String, Double> traverserToAverageForAttribute = new Hashtable<String, Double>();
+			
+			for ( TraverserRecord traverser : traverserRecords ) {
+				
+				((BarGraph) graph).addBar(traverser.toString(), traverser.getAverageAttributeValue(attribute), attribute);
+			
+			}
+			
 		}
 		
 		graph.createChart(title, xLabel, yLabel);

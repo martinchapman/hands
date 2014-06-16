@@ -6,6 +6,10 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map.Entry;
 
+/**
+ * @author Martin
+ *
+ */
 public class TraverserRecord {
 	
 	/**
@@ -99,6 +103,8 @@ public class TraverserRecord {
 	
 	/**
 	 * 
+	 * Match each measure to an average value over all games
+	 * 
 	 */
 	protected Hashtable<String, Double> calculateAverage() {
 		
@@ -106,15 +112,15 @@ public class TraverserRecord {
 		
 		for (Entry<Integer, Hashtable<String, Double>> gameAttributeEntry : attributeToValue.entrySet()) {
 		
-			for (Entry<String, Double> attribute : gameAttributeEntry.getValue().entrySet()) {
+			for (Entry<String, Double> attributeToValue : gameAttributeEntry.getValue().entrySet()) {
 				
-				if (cumulativeAttributeToValue.containsKey(attribute.getKey())) {
+				if (cumulativeAttributeToValue.containsKey(attributeToValue.getKey())) {
 					
-					cumulativeAttributeToValue.put(attribute.getKey(), cumulativeAttributeToValue.get(attribute.getKey()) + attribute.getValue());
+					cumulativeAttributeToValue.put(attributeToValue.getKey(), cumulativeAttributeToValue.get(attributeToValue.getKey()) + attributeToValue.getValue());
 					
 				} else {
 					
-					cumulativeAttributeToValue.put(attribute.getKey(), attribute.getValue());
+					cumulativeAttributeToValue.put(attributeToValue.getKey(), attributeToValue.getValue());
 					
 				}
 				
@@ -131,6 +137,18 @@ public class TraverserRecord {
 		}
 		
 		return averageAttributeToValue;
+		
+	}
+	
+	/**
+	 * Using calculateAverage(), select a single passed measure
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public double getAverageAttributeValue(String attribute) {
+		
+		return calculateAverage().get(attribute);
 		
 	}
 	

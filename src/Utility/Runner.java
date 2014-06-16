@@ -192,6 +192,10 @@ public class Runner extends JFrame {
 		
 		final DefaultListModel<HiderRecord> outputFeedback = new DefaultListModel<HiderRecord>();
 
+		final JButton showTextStats = new JButton("Show text stats");
+		
+		showTextStats.setEnabled(false);
+		
 		collateOutput.addActionListener(new ActionListener() {
 
 			@Override
@@ -199,7 +203,7 @@ public class Runner extends JFrame {
 				
 				outputManager.processOutput();
 				
-				//System.out.println(outputManager.printAllStats());
+				outputFeedback.clear();
 				
 				for (ArrayList<HiderRecord> fileHiderRecord : outputManager.getFileHiderRecords()) {
 					
@@ -223,6 +227,8 @@ public class Runner extends JFrame {
 					
 				}
 				
+				showTextStats.setEnabled(true);
+				
 			}
 			
 		});
@@ -243,6 +249,23 @@ public class Runner extends JFrame {
 		});
 		
 		northPane.add(deleteOutputFiles);
+		
+		//
+		
+		
+		
+		showTextStats.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				System.out.println(outputManager.printAllStats());
+				
+			}
+			
+		});
+		
+		northPane.add(showTextStats);
 		
 		////
 		
@@ -289,11 +312,13 @@ public class Runner extends JFrame {
 		
 		//
 		
-		JPanel centerPaneRightCenter = new JPanel(new GridLayout());
+		JPanel centerPaneRightCenter = new JPanel(new GridLayout(10, 4));
 		
 		centerPaneRight.add(centerPaneRightCenter, BorderLayout.CENTER);
 		
 		//
+		
+		centerPaneRightCenter.add(new JLabel("Data for:"));
 		
 		final JRadioButton seekers = new JRadioButton("Seekers");
 		
@@ -353,7 +378,21 @@ public class Runner extends JFrame {
 		
 		//
 		
+		centerPaneRightCenter.add(new JLabel("Selected measure:"));
+		
 		centerPaneRightCenter.add(measure);
+		
+		//
+		
+		final JComboBox<String> graphTypes = new JComboBox<String>();
+		
+		graphTypes.addItem("Line");
+		
+		graphTypes.addItem("Bar");
+		
+		centerPaneRightCenter.add(new JLabel("Graph types:"));
+		
+		centerPaneRightCenter.add(graphTypes);
 		
 		//
 		
@@ -371,8 +410,16 @@ public class Runner extends JFrame {
 					// Only works for a single selected HiderRecord with a set of seekers
 					if (outputFeedbackList.getSelectedValuesList().size() > 1) return;
 					
-					outputManager.showSeekersLineGraphForAttribute(outputFeedbackList.getSelectedValue(), (String)measure.getSelectedItem());
+					if (graphTypes.getSelectedItem().equals("Line")) {
+						
+						outputManager.showSeekersLineGraphForAttribute(outputFeedbackList.getSelectedValue(), (String)measure.getSelectedItem());
 				
+					} else if (graphTypes.getSelectedItem().equals("Bar")) {
+						
+						outputManager.showSeekersBarGraphForAttribute(outputFeedbackList.getSelectedValue(), (String)measure.getSelectedItem());
+						
+					}
+					
 				} else if (hiders.isSelected()) {
 					
 					// Hiders are selected in the GUI by selecting them as multiple items from the list
