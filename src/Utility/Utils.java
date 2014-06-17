@@ -1,16 +1,25 @@
 package Utility;
 
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jfree.chart.JFreeChart;
+import org.jibble.epsgraphics.EpsGraphics2D;
+
 public class Utils {
 
+	public final static String FILEPREFIX = "Output/";
+	
 	/**
 	 * @param url
 	 * @return
@@ -88,6 +97,46 @@ public class Utils {
 	}
 	
 	/**
+	 * @param name
+	 * @param chart
+	 * @param x
+	 * @param y
+	 */
+	public static void exportAsEPS(String url, JFreeChart chart, int x, int y) {
+		
+        Graphics2D g = new EpsGraphics2D();
+        
+        chart.draw(g,new Rectangle(x,y));
+        
+        FileWriter writer = null;
+		
+		try {
+			
+			writer = new FileWriter(url, false);
+		
+		} catch (IOException e) { 
+			
+			e.printStackTrace();
+			
+		}
+		
+		try {
+	
+			writer.write(g.toString());
+	
+		    writer.flush();
+		    
+		    writer.close();
+		
+		} catch(IOException e) {
+			
+			System.err.println(e.getMessage());
+		
+		}
+	
+	}
+	
+	/**
 	 * @param writer
 	 * @param content
 	 */
@@ -138,7 +187,7 @@ public class Utils {
 	/**
 	 * 
 	 */
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 
 	/**
 	 * @param speaker
@@ -191,5 +240,7 @@ public class Utils {
 	    return -1;
 		
 	}
+	
+	
 
 }

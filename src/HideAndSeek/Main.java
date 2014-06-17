@@ -10,12 +10,15 @@ import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.Hider;
 import HideAndSeek.hider.repeatgame.VariableBiasHider;
-import HideAndSeek.hider.singleshot.LowEdgeCostFixedDistance;
+import HideAndSeek.hider.singleshot.LowEdgeCostRandomFixedDistance;
+import HideAndSeek.hider.singleshot.LowEdgeCostVariableFixedDistance;
 import HideAndSeek.hider.singleshot.MaxDistance;
 import HideAndSeek.hider.singleshot.MinimumConnectivity;
 import HideAndSeek.hider.singleshot.Random;
 import HideAndSeek.hider.singleshot.RandomDirection;
 import HideAndSeek.hider.singleshot.RandomFixedDistance;
+import HideAndSeek.hider.singleshot.RandomSet;
+import HideAndSeek.hider.singleshot.VariableFixedDistance;
 import HideAndSeek.seeker.Seeker;
 import HideAndSeek.seeker.repeatgame.HighProbabilitySeeker;
 import HideAndSeek.seeker.singleshot.BacktrackPath;
@@ -50,6 +53,11 @@ public class Main {
 	/**
 	 * 
 	 */
+	private int totalGames;
+	
+	/**
+	 * 
+	 */
 	private String currentSimulationIdentifier = "";
 	
 	/**
@@ -70,17 +78,19 @@ public class Main {
 		
 		gameNumber = Integer.parseInt(args[0]);
 		
+		totalGames = Integer.parseInt(args[1]);
+		
 		//
 		
-		String topology = args[3];
+		String topology = args[4];
 		
-		int numberOfVertices = Integer.parseInt(args[4]);
+		int numberOfVertices = Integer.parseInt(args[5]);
 		
-		String fixedOrUpperBound = args[8];
+		String fixedOrUpperBound = args[9];
 		
-		double fixedOrUpperValue = Double.parseDouble(args[7]);
+		double fixedOrUpperValue = Double.parseDouble(args[8]);
 		
-		int edgeTraversalDecrement = Integer.parseInt(args[9]);
+		int edgeTraversalDecrement = Integer.parseInt(args[10]);
 		
 		initGraph(topology, numberOfVertices, fixedOrUpperBound, fixedOrUpperValue, edgeTraversalDecrement);
 		
@@ -88,13 +98,13 @@ public class Main {
 		
 		String agentList;
 		
-		int rounds = Integer.parseInt(args[6]);
+		int rounds = Integer.parseInt(args[7]);
 		
-		String hiderList = args[1];
+		String hiderList = args[2];
 		
-		String seekerList = args[2];
+		String seekerList = args[3];
 		
-		int numberOfHideLocations = Integer.parseInt(args[5]);
+		int numberOfHideLocations = Integer.parseInt(args[6]);
 		
 		startRounds(initHiders(hiderList, numberOfHideLocations), initSeekers(seekerList), rounds, false);
 		
@@ -134,21 +144,15 @@ public class Main {
 			
 			} 
 			
-			if (hiderType.getElement0().equals("MinimumConnectivity")) {
-				
-				allHidingAgents.add(new MinimumConnectivity(graphController, numberOfHideLocations));
-			
-			} 
-
-			if (hiderType.getElement0().equals("MaxDistance")) {
-				
-				allHidingAgents.add(new MaxDistance(graphController, numberOfHideLocations));
-			
-			} 
-			
 			if (hiderType.getElement0().equals("RandomDirection")) {
 				
 				allHidingAgents.add(new RandomDirection(graphController, numberOfHideLocations));
+			
+			} 
+			
+			if (hiderType.getElement0().equals("RandomSet")) {
+				
+				allHidingAgents.add(new RandomSet(graphController, numberOfHideLocations));
 			
 			} 
 			
@@ -158,9 +162,33 @@ public class Main {
 			
 			} 
 			
-			if (hiderType.getElement0().equals("LowEdgeCostFixedDistance")) {
+			if (hiderType.getElement0().equals("LowEdgeCostRandomFixedDistance")) {
 				
-				allHidingAgents.add(new LowEdgeCostFixedDistance(graphController, numberOfHideLocations));
+				allHidingAgents.add(new LowEdgeCostRandomFixedDistance(graphController, numberOfHideLocations));
+			
+			} 
+			
+			if (hiderType.getElement0().equals("VariableFixedDistance")) {
+				
+				allHidingAgents.add(new VariableFixedDistance(graphController, numberOfHideLocations, gameNumber));
+			
+			} 
+			
+			if (hiderType.getElement0().equals("LowEdgeCostVariableFixedDistance")) {
+				
+				allHidingAgents.add(new LowEdgeCostVariableFixedDistance(graphController, numberOfHideLocations, gameNumber));
+			
+			} 
+			
+			if (hiderType.getElement0().equals("MinimumConnectivity")) {
+				
+				allHidingAgents.add(new MinimumConnectivity(graphController, numberOfHideLocations));
+			
+			} 
+
+			if (hiderType.getElement0().equals("MaxDistance")) {
+				
+				allHidingAgents.add(new MaxDistance(graphController, numberOfHideLocations));
 			
 			} 
 			
@@ -180,7 +208,7 @@ public class Main {
 			
 			if (hiderType.getElement0().equals("VariableBiasHider")) {
 				
-				allHidingAgents.add(new VariableBiasHider(graphController, numberOfHideLocations, gameNumber/10.0));
+				allHidingAgents.add(new VariableBiasHider(graphController, numberOfHideLocations, gameNumber/((float)totalGames)));
 			
 			} 
 			
@@ -222,15 +250,15 @@ public class Main {
 				
 			}
 			
-			if (seekerType.getElement0().equals("LeastConnectedFirst")) {
+			if (seekerType.getElement0().equals("FixedStartRandomWalk")) {
 				
-				allSeekingAgents.add(new LeastConnectedFirst(graphController));
+				allSeekingAgents.add(new FixedStartRandomWalk(graphController));
 				
 			}
 			
-			if (seekerType.getElement0().equals("BacktrackPath")) {
+			if (seekerType.getElement0().equals("LowEdgeCost")) {
 				
-				allSeekingAgents.add(new BacktrackPath(graphController));
+				allSeekingAgents.add(new LowEdgeCost(graphController));
 				
 			}
 			
@@ -246,18 +274,6 @@ public class Main {
 				
 			}
 			
-			if (seekerType.getElement0().equals("FixedStartRandomWalk")) {
-				
-				allSeekingAgents.add(new FixedStartRandomWalk(graphController));
-				
-			}
-			
-			if (seekerType.getElement0().equals("LowEdgeCost")) {
-				
-				allSeekingAgents.add(new LowEdgeCost(graphController));
-				
-			}
-			
 			if (seekerType.getElement0().equals("BreadthFirstSearch")) {
 				
 				allSeekingAgents.add(new BreadthFirstSearch(graphController));
@@ -267,6 +283,18 @@ public class Main {
 			if (seekerType.getElement0().equals("BreadthFirstSearchLowCost")) {
 				
 				allSeekingAgents.add(new BreadthFirstSearchLowCost(graphController));
+				
+			}
+			
+			if (seekerType.getElement0().equals("LeastConnectedFirst")) {
+				
+				allSeekingAgents.add(new LeastConnectedFirst(graphController));
+				
+			}
+			
+			if (seekerType.getElement0().equals("BacktrackPath")) {
+				
+				allSeekingAgents.add(new BacktrackPath(graphController));
 				
 			}
 			

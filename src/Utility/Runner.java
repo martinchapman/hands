@@ -26,6 +26,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
@@ -47,10 +48,6 @@ public class Runner extends JFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	/**
-	 * 
-	 */
-	final static String FILEPREFIX = "Output/";
 	
 	/**
 	 * @param args
@@ -91,6 +88,7 @@ public class Runner extends JFrame {
 	private JButton startQueue;
 	
 	private JButton startSelected;
+	
 	private JList<String> queueList;
 	
 	/**
@@ -137,7 +135,7 @@ public class Runner extends JFrame {
 	 */
 	private void generateGUI() {
 		
-		setSize(new Dimension(500, 800));
+		setPreferredSize(new Dimension(800, 1800));
 		
 		setLayout(new BorderLayout());
 		
@@ -244,6 +242,8 @@ public class Runner extends JFrame {
 				
 				outputManager.removeAllOutputFiles();
 				
+				outputFeedback.clear();
+				
 			}
 			
 		});
@@ -281,6 +281,8 @@ public class Runner extends JFrame {
 		
 		final JComboBox<String> measure = new JComboBox<String>();
 		
+		final JLabel simulationParameters = new JLabel();
+		
 		outputFeedbackList.addListSelectionListener(new ListSelectionListener() {
 
 			@Override
@@ -290,17 +292,23 @@ public class Runner extends JFrame {
 				
 				if (outputFeedbackList.getSelectedIndex() == -1 || outputFeedbackList.getSelectedValue().toString().equals("-----")) return;
 				
+				measure.removeAllItems();
+				
 				for ( String attribute : outputFeedbackList.getSelectedValue().getSeekerAttributes() ) {
 					
 					measure.addItem(attribute);
 					
 				}
 				
+				simulationParameters.setText("Simulation parameters: " + outputFeedbackList.getSelectedValue().getParameters());
+				
 			}
 			
 		});
 		
-		centerPane.add(outputFeedbackList, BorderLayout.WEST);
+		centerPane.add(simulationParameters, BorderLayout.NORTH);
+		
+		centerPane.add(outputFeedbackList, BorderLayout.CENTER);
 		
 		////
 		
@@ -405,33 +413,53 @@ public class Runner extends JFrame {
 				
 				if (outputFeedbackList.getSelectedIndex() == -1 || outputFeedbackList.getSelectedValue().toString().equals("-----")) return;
 				
-				if (seekers.isSelected()) {
+				// Allows for selection of multiple hiders or multiple seekers from list
+				ArrayList<TraverserRecord> selectedHiders = new ArrayList<TraverserRecord>();
 				
-					// Only works for a single selected HiderRecord with a set of seekers
-					if (outputFeedbackList.getSelectedValuesList().size() > 1) return;
+				ArrayList<TraverserRecord> selectedSeekers = new ArrayList<TraverserRecord>();
+				
+				String title = "";
+				
+				for ( HiderRecord hider : outputFeedbackList.getSelectedValuesList()) {
+					
+					selectedHiders.add(hider);
+					
+					title += hider.toString().replace(" ", "");
+					
+					for ( TraverserRecord hidersSeekers : hider.getSeekersAndAttributes() ) {
+						
+						hidersSeekers.setTraverser(hidersSeekers.getTraverser() + " (" + hider.getTraverser() + ")");
+						
+						selectedSeekers.add(hidersSeekers);
+						
+					}
+					
+				}
+				
+				if (seekers.isSelected()) {
 					
 					if (graphTypes.getSelectedItem().equals("Line")) {
 						
-						outputManager.showSeekersLineGraphForAttribute(outputFeedbackList.getSelectedValue(), (String)measure.getSelectedItem());
+						outputManager.showLineGraphForAttribute(selectedSeekers, title, (String)measure.getSelectedItem());
 				
 					} else if (graphTypes.getSelectedItem().equals("Bar")) {
 						
-						outputManager.showSeekersBarGraphForAttribute(outputFeedbackList.getSelectedValue(), (String)measure.getSelectedItem());
+						outputManager.showBarGraphForAttribute(selectedSeekers, title, (String)measure.getSelectedItem());
 						
 					}
 					
 				} else if (hiders.isSelected()) {
 					
-					// Hiders are selected in the GUI by selecting them as multiple items from the list
-					ArrayList<TraverserRecord> hiders = new ArrayList<TraverserRecord>();
-					
-					for ( TraverserRecord hider : outputFeedbackList.getSelectedValuesList()) {
+					if (graphTypes.getSelectedItem().equals("Line")) {
 						
-						hiders.add(hider);
+						outputManager.showLineGraphForAttribute(selectedHiders, title, (String)measure.getSelectedItem());
+						
+					} else if (graphTypes.getSelectedItem().equals("Bar")) {
+						
+						outputManager.showBarGraphForAttribute(selectedHiders, title, (String)measure.getSelectedItem());
 						
 					}
 					
-					outputManager.showHidersLineGraphForAttribute(hiders, hiders.toString(), (String)measure.getSelectedItem());
 					
 				}
 				
@@ -501,7 +529,7 @@ public class Runner extends JFrame {
 		
 		parameters.add(new JLabel("Cost of traversing an edge:"));
 		
-		costOfEdgeTraversal = new JTextField("100.0");
+		costOfEdgeTraversal = new JTextField("10.0");
 		
 		parameters.add(costOfEdgeTraversal);
 		
@@ -511,8 +539,8 @@ public class Runner extends JFrame {
 		
 		fixedOrRandom = new JComboBox<String>();
 		
-		fixedOrRandom.addItem("random");
 		fixedOrRandom.addItem("fixed");
+		fixedOrRandom.addItem("random");
 		
 		parameters.add(fixedOrRandom);
 		
@@ -550,7 +578,11 @@ public class Runner extends JFrame {
 		
 		hiderList.addItem("Random");
 		hiderList.addItem("RandomDirection");
+		hiderList.addItem("RandomSet");
 		hiderList.addItem("RandomFixedDistance");
+		hiderList.addItem("LowEdgeCostRandomFixedDistance");
+		hiderList.addItem("VariableFixedDistance");
+		hiderList.addItem("LowEdgeCostVariableFixedDistance");
 		hiderList.addItem("LowEdgeCostFixedDistance");
 		hiderList.addItem("MinimumConnectivity");
 		hiderList.addItem("MaxDistance");
@@ -577,6 +609,10 @@ public class Runner extends JFrame {
 		
 		JList<String> simulationHiders = new JList<String>(simulationHidersModel);
 		
+		JScrollPane simulationHidersPane = new JScrollPane(simulationHiders);
+		
+		simulationHidersPane.setPreferredSize(new Dimension(100, 100));
+		
 		deleteOnClick(simulationHiders, simulationHidersModel, new PostDelete() {
 
 			@Override
@@ -594,7 +630,7 @@ public class Runner extends JFrame {
 			
 		});
 		
-		hiders.add(simulationHiders);
+		hiders.add(simulationHidersPane);
 		
 		addHider.addActionListener(new ActionListener() {
 
@@ -694,6 +730,10 @@ public class Runner extends JFrame {
 		
 		JList<String> simulationSeekers = new JList<String>(simulationSeekersModel);
 		
+		JScrollPane simulationSeekersPane = new JScrollPane(simulationSeekers);
+		
+		simulationSeekersPane.setPreferredSize(new Dimension(100, 100));
+		
 		deleteOnClick(simulationSeekers, simulationSeekersModel, new PostDelete() {
 
 			@Override
@@ -711,7 +751,7 @@ public class Runner extends JFrame {
 			
 		});
 		
-		seekers.add(simulationSeekers);
+		seekers.add(simulationSeekersPane);
 		
 		addSeeker.addActionListener(new ActionListener() {
 
@@ -737,6 +777,10 @@ public class Runner extends JFrame {
 		queueListModel = new DefaultListModel<String>();
 		
 		queueList = new JList<String>(queueListModel);
+		
+		JScrollPane queueListScroll = new JScrollPane(queueList);
+		
+		queueListScroll.setPreferredSize(new Dimension(800, 200));
 		
 		queueList.addListSelectionListener(new ListSelectionListener() {
 
@@ -771,7 +815,7 @@ public class Runner extends JFrame {
 				
 				try {
 					
-					writer = new FileWriter(FILEPREFIX + "simulationSchedule.txt");
+					writer = new FileWriter(Utils.FILEPREFIX + "simulationSchedule.txt");
 					
 					writer.write("");
 					
@@ -793,7 +837,7 @@ public class Runner extends JFrame {
 			
 		});
 		
-		simulationsTab.add(queueList, BorderLayout.CENTER);
+		simulationsTab.add(queueListScroll, BorderLayout.CENTER);
 		
 		////////
 		
@@ -841,7 +885,7 @@ public class Runner extends JFrame {
 		generateGUI();
 		
 		// Collect list of simulations
-        simulations = Utils.readFromFile(FILEPREFIX + "simulationSchedule.txt");
+        simulations = Utils.readFromFile(Utils.FILEPREFIX + "simulationSchedule.txt");
         
         for (String simulation : simulations) { 
         	
@@ -895,7 +939,7 @@ public class Runner extends JFrame {
 				}
 				
 				try {
-					Utils.writeToFile(new FileWriter(FILEPREFIX + "simulationSchedule.txt", true), Arrays.toString(getUISettings()).substring(1, Arrays.toString(getUISettings()).length() - 1) + "\n");
+					Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "simulationSchedule.txt", true), Arrays.toString(getUISettings()).substring(1, Arrays.toString(getUISettings()).length() - 1) + "\n");
 				
 				} catch (IOException e1) {
 				
@@ -941,7 +985,7 @@ public class Runner extends JFrame {
       	  
 			if (param.indexOf('{') != -1) {
 				
-				Pair<String, String> paramPair = Utils.stringToArray(param, "(\\{([0-9a-zA-Z]+),([0-9a-zA-Z.]+)\\})").get(0);
+				Pair<String, String> paramPair = Utils.stringToArray(param, "(\\{([0-9a-zA-Z]+),([0-9a-zA-Z.+]+)\\})").get(0);
   
 				if (paramPair.getElement0().equals("Topology")) {
 		  
@@ -1075,11 +1119,11 @@ public class Runner extends JFrame {
 		
 		String currentSimulationIdentifier = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
 		
-		Utils.writeToFile(FILEPREFIX + "simRecordID.txt", currentSimulationIdentifier);
+		Utils.writeToFile(Utils.FILEPREFIX + "simRecordID.txt", currentSimulationIdentifier);
 		
-		Utils.writeToFile(FILEPREFIX + "/Data/" + currentSimulationIdentifier + ".csv", "");
+		Utils.writeToFile(Utils.FILEPREFIX + "/Data/" + currentSimulationIdentifier + ".csv", "");
 		
-		Utils.writeToFile(FILEPREFIX + "/Data/" + currentSimulationIdentifier + ".csv", Arrays.toString(simulationParameters) + "\n");
+		Utils.writeToFile(Utils.FILEPREFIX + "/Data/" + currentSimulationIdentifier + ".csv", Arrays.toString(simulationParameters) + "\n");
 		
 		/***********/
 		
@@ -1107,6 +1151,13 @@ public class Runner extends JFrame {
 			
 		/***********/
 		
+		/* As we are replacing variables in our simulation parameters with concrete values, 
+		 * we must retain the original variables for future games, or they will be lost
+		 * i.e. if we receive i+1 as a parameter, this will need to be changed to '1' for the
+		 * first game, but a copy of i+1 will need to be retained for the second, third games etc.
+		 */
+		String[] simulationParametersUnchanged = Arrays.copyOf(simulationParameters, simulationParameters.length);
+		
 		// Run 'games' of simulation by repeat running program
 		
 		System.out.println("-----------------------------------------------------------------");
@@ -1120,40 +1171,40 @@ public class Runner extends JFrame {
 			
 			for (int j = 0; j < simulationParameters.length; j++) {
 	    		  
-	    	    if (simulationParameters[j].contains("i*")) { 
+	    	    if (simulationParametersUnchanged[j].contains("i*")) { 
 	    	    	
 	    	    	simulationParameters[j] = 
 	    	    	
-	    	        simulationParameters[j].replaceAll("(i\\*([0-9]+))", 
+	    	        simulationParametersUnchanged[j].replaceAll("(i\\*([0-9]+))", 
 	    											   "" + (i * Integer.parseInt(
-														               simulationParameters[j].substring( 
-														            		   Utils.startIndexOf(simulationParameters[j], "(i\\*([0-9]+))") + 2, 
-														            		   Utils.endIndexOf(simulationParameters[j], "(i\\*([0-9]+))")
+	    													     simulationParametersUnchanged[j].substring( 
+														            		   Utils.startIndexOf(simulationParametersUnchanged[j], "(i\\*([0-9]+))") + 2, 
+														            		   Utils.endIndexOf(simulationParametersUnchanged[j], "(i\\*([0-9]+))")
 														            		   )
 	    													            		  
 	    													      		)
 	    													)
 	    	    									   );
 	    	    
-	    	    } else if (simulationParameters[j].contains("i+")) { 
+	    	    } else if (simulationParametersUnchanged[j].contains("i+")) { 
 	    	    	
 	    	    	simulationParameters[j] = 
 	    	    	
-	    	        simulationParameters[j].replaceAll("(i\\+([0-9]+))", 
+	    	        simulationParametersUnchanged[j].replaceAll("(i\\+([0-9]+))", 
 	    	        								   "" + (i + Integer.parseInt(
-	    	        										   			simulationParameters[j].substring(
-	    	        										   					Utils.startIndexOf(simulationParameters[j], "(i\\+([0-9]+))") + 2, 
-	    	        										   					Utils.endIndexOf(simulationParameters[j], "(i\\+([0-9]+))")
+	    	        										     simulationParametersUnchanged[j].substring(
+	    	        										   					Utils.startIndexOf(simulationParametersUnchanged[j], "(i\\+([0-9]+))") + 2, 
+	    	        										   					Utils.endIndexOf(simulationParametersUnchanged[j], "(i\\+([0-9]+))")
 	    	        										   			)
 	    	        										   	  )
 	    	        										)
 	    	        								   ); 
 	    	    
-	    	    } else if (simulationParameters[j].contains(",i")) { 
+	    	    } else if (simulationParametersUnchanged[j].contains(",i")) { 
 	    	  		
 	    	  		simulationParameters[j] = 
 	    	  				
-	    	  		simulationParameters[j].replaceAll("(\\,i)", "," + i); 
+	    	  		simulationParametersUnchanged[j].replaceAll("(\\,i)", "," + i); 
 	    	  		
 	    	  	}
     	   
@@ -1182,6 +1233,8 @@ public class Runner extends JFrame {
 				paramString += defaultParameters[k] + " ";
 				  
 			}
+			
+			System.out.println(paramString);
 		    
 			/***********/
 			
@@ -1189,7 +1242,7 @@ public class Runner extends JFrame {
 			
 			try {
 				
-				proc = Runtime.getRuntime().exec("java -classpath bin:/Users/Martin/Downloads/jgrapht-0.9.0/lib/jgrapht-core-0.9.0.jar HideAndSeek.Main " + i + " " + paramString);
+				proc = Runtime.getRuntime().exec("java -classpath bin:/Users/Martin/Downloads/jgrapht-0.9.0/lib/jgrapht-core-0.9.0.jar HideAndSeek.Main " + i + " " + GAMES + " " + paramString);
 			
 			} catch (IOException e1) {
 				

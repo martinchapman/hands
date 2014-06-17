@@ -50,7 +50,7 @@ public class LineGraph extends TraverserGraph {
     public void createChart(String title, String xlabel, String ylabel) {
 
     	 // create the chart...
-        final JFreeChart chart = ChartFactory.createXYLineChart(
+        chart = ChartFactory.createXYLineChart(
             title,      			  // chart title
             xlabel,                   // x axis label
             ylabel,                   // y axis label

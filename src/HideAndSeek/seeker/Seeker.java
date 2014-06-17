@@ -139,7 +139,9 @@ public abstract class Seeker extends GraphTraverser implements Runnable {
 	 */
 	public String printGameStats() {
 		
-		return "Cost, " + graphController.requestAverageGameCosts(this)  + ", Score, " + graphController.requestAverageSeekerScore(this);
+		return "Cost, " + graphController.requestAverageGameCosts(this)  + 
+			   ", Score, " + graphController.requestAverageSeekerScore(this) + 
+			   ", PathLength, " + graphController.requestAveragePathLength(this);
 		
 	}
 	

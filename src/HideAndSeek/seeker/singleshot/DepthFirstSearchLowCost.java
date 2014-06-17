@@ -36,5 +36,23 @@ public class DepthFirstSearchLowCost extends DepthFirstSearch {
 		return edges;
 		
 	}
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraverser#getConnectedEdge(HideAndSeek.graph.StringVertex, java.util.List)
+	 */
+	@Override
+	protected StringEdge getConnectedEdge(StringVertex currentNode, List<StringEdge> connectedEdges) {
+		
+		for (StringEdge edge : connectedEdges ) {
+
+			if ( uniquelyVisitedNodes().contains(edgeToTarget(edge, currentNode)) ) continue;
+			
+			return edge;
+			
+		}
+		
+		return connectedEdges.get((int)(Math.random() * connectedEdges.size()));
+		
+	}
 
 }

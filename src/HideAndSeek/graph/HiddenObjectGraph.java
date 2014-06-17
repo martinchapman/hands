@@ -91,7 +91,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	 */
 	public double latestRoundCosts(GraphTraverser traverser) {
 		
-		if (roundCosts.get(roundCosts.size() - 1).get(traverser) == null) { return -1; }
+		if (roundCosts.get(roundCosts.size() - 1).get(traverser) == null) { return 0.0; }
 		
 		return roundCosts.get(roundCosts.size() - 1).get(traverser);
 		
@@ -102,6 +102,8 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	 * @return
 	 */
 	public ArrayList<V> latestRoundPaths(GraphTraverser traverser) {
+		
+		if (roundPaths.get(roundPaths.size() - 1).get(traverser) == null) { return new ArrayList<V>(); }
 		
 		return roundPaths.get(roundPaths.size() - 1).get(traverser);
 		
@@ -165,11 +167,11 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 						   costs of the hider. Thus, if costs are too high or a seeker's performance
 						   is too good, score is likely to be lower. */
 										    // 
-						scoreAgainstEach += requestLatestSeekerRoundPerformance((Seeker)seeker) - 
+						scoreAgainstEach += requestLatestSeekerRoundPerformance((Seeker)seeker); //- 
 										    /* The hiders cost on their hiding path as a portion of the full cost
 											   of this path i.e. their cost, lowered if they take pre-traversed roots
 											   as a portion of full cost path */
-											((latestRoundCosts(agent) / totalPathCost(latestRoundPaths(agent))) * 100);
+											//((latestRoundCosts(agent) / totalPathCost(latestRoundPaths(agent))) * 100);
 						
 					}
 				
@@ -203,9 +205,10 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 				 * i.e. Perfect seeker score should be 0 -> steps taken by hider - steps taken by seeker
 				 */
 				seekerRoundScores.get(roundNumber).put(traverser, 
-													  requestLatestHiderRoundPerformance(hider) -
-													  (latestRoundCosts(traverser) 
-													  + requestLatestSeekerRoundPerformance((Seeker)traverser)));
+													  //requestLatestHiderRoundPerformance(hider) -
+													  (//latestRoundCosts(traverser) 
+													  //+ 
+													  requestLatestSeekerRoundPerformance((Seeker)traverser) * -1));
 				
 				
 			}
@@ -232,8 +235,8 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	 */
 	public double requestLatestSeekerRoundPerformance(Seeker seeker) {
 		
-		// Higher is worse for seeker: represents steps taken as a portion of
-		// all possible steps in graph
+		/* Higher is worse for seeker: represents steps taken as a portion of
+		   all possible steps in graph */
 		return latestRoundPaths(seeker).size() / ((double)edgeSet().size()) * 100;
 		
 	}

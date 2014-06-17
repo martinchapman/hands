@@ -48,12 +48,19 @@ public class HighProbabilitySeeker extends SeekerLocalGraph {
 		
 		behaviourPrediction = new BehaviourPrediction();
 		
+		currentPath = new ArrayList<StringEdge>();
+		
 	}
 
 	/**
 	 * 
 	 */
 	protected ArrayList<StringVertex> likelyNodes;
+	
+	/**
+	 * 
+	 */
+	protected List<StringEdge> currentPath;
 	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
@@ -63,7 +70,11 @@ public class HighProbabilitySeeker extends SeekerLocalGraph {
 		
 		super.nextNode(currentNode);
 		
+		// If we happen to pass by, or land upon, our likely node, it is no longer a target
 		if ( likelyNodes.contains(currentNode) ) likelyNodes.remove(likelyNodes.indexOf(currentNode));
+		
+		// If we're already on the DSP to a node, continue on it
+		if (currentPath.size() > 0) return edgeToTarget(currentPath.remove(0), currentNode);
 		
 		// Use likely node information if available, and if graph has sufficient information to use:
 		if ( likelyNodes.size() > 0 ) {
@@ -75,9 +86,9 @@ public class HighProbabilitySeeker extends SeekerLocalGraph {
 			// If no path available, return random connected node
 			if (dsp.getPathEdgeList() == null || dsp.getPathEdgeList().size() == 0) return connectedNode(currentNode);
 			
-			List<StringEdge> DSP = new ArrayList<StringEdge>(dsp.getPathEdgeList());
+			currentPath = new ArrayList<StringEdge>(dsp.getPathEdgeList());
 			
-			return edgeToTarget(DSP.get(0), currentNode);
+			return edgeToTarget(currentPath.remove(0), currentNode);
 		
 		// If not, search randomly
 		} else {

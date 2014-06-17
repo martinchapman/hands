@@ -454,9 +454,19 @@ public class GraphController<V, E> {
 	 * @param seeker
 	 * @return
 	 */
-	public Double requestAverageSeekerScore(Seeker seeker) {
+	public double requestAverageSeekerScore(Seeker seeker) {
 		
 		return graph.requestAverageSeekerScore(seeker);
+		
+	}
+
+	/**
+	 * @param traverser
+	 * @return
+	 */
+	public double requestAveragePathLength(GraphTraverser traverser) {
+		
+		return graph.requestAveragePathLength(traverser);
 		
 	}
 

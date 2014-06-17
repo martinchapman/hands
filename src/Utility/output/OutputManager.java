@@ -145,28 +145,24 @@ public class OutputManager {
 	}
 	
 	/**
-	 * Display the series for all seekers (for a hider) over a particular attribute
-	 */
-	public void showSeekersLineGraphForAttribute(HiderRecord hiderRecord, String attribute) {
-		
-		showGraphForAttribute(hiderRecord.getSeekersAndAttributes(), hiderRecord.getTraverser(), "Line", attribute);
-		
-	}
-	
-	/**
-	 * @param hiders
+	 * @param traversers
 	 * @param title
 	 * @param attribute
 	 */
-	public void showHidersLineGraphForAttribute(ArrayList<TraverserRecord> hiders, String title, String attribute) {
+	public void showLineGraphForAttribute(ArrayList<TraverserRecord> traversers, String title, String attribute) {
 		
-		showGraphForAttribute(hiders, title, "Line", attribute);
+		showGraphForAttribute(traversers, title, "Line", attribute);
 		
 	}
-	
-	public void showSeekersBarGraphForAttribute(HiderRecord hiderRecord, String attribute) {
+
+	/**
+	 * @param traversers
+	 * @param title
+	 * @param attribute
+	 */
+	public void showBarGraphForAttribute(ArrayList<TraverserRecord> traversers, String title, String attribute) {
 		
-		showGraphForAttribute(hiderRecord.getSeekersAndAttributes(), hiderRecord.getTraverser(), "Bar", attribute);
+		showGraphForAttribute(traversers, title, "Bar", attribute);
 		
 	}
 	
@@ -221,6 +217,8 @@ public class OutputManager {
 		}
 		
 		graph.createChart(title, xLabel, yLabel);
+		
+		graph.explortChartAsEPS(Utils.FILEPREFIX + "Data/charts/" + title + ".eps");
 		
 		graph.pack();
 		

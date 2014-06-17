@@ -18,6 +18,15 @@ public class TraverserRecord {
 	protected String traverser;
 	
 	/**
+	 * @param traverser
+	 */
+	public void setTraverser(String traverser) {
+		
+		this.traverser = traverser;
+	
+	}
+
+	/**
 	 * 
 	 */
 	protected int gameNumber;

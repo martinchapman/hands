@@ -9,5 +9,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/Users/Martin/Downloads/jfreechart-1.0.17/lib/jfreechart-1.0.17.jar" sourcepath="/Users/Martin/Downloads/jfreechart-1.0.17/source/"/>
 	<classpathentry kind="lib" path="/Users/Martin/Downloads/jfreechart-1.0.17/lib/jcommon-1.0.21.jar"/>
+	<classpathentry kind="lib" path="/Users/Martin/Downloads/epsgraphics.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

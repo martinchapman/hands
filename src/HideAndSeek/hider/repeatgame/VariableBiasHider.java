@@ -194,9 +194,11 @@ public class VariableBiasHider extends Hider {
 	@Override
 	protected StringVertex startNode() {
 
-		StringVertex[] vertices = new StringVertex[graphController.vertexSet().size()];
+		//StringVertex[] vertices = new StringVertex[graphController.vertexSet().size()];
 		
-		return graphController.vertexSet().toArray(vertices)[0];
+		//return graphController.vertexSet().toArray(vertices)[0];
+		
+		return randomNode();
 		
 	}
 	
