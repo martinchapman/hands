@@ -847,7 +847,7 @@ public class Runner extends JFrame {
 					
 					for (String simulation : simulations) { 
 						
-						writer.append(simulation);
+						writer.append(simulation + "\n");
 						
 					}
 					
@@ -1006,8 +1006,11 @@ public class Runner extends JFrame {
 				}
 				
 				try {
+					
 					Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "simulationSchedule.txt", true), Arrays.toString(getUISettings()).substring(1, Arrays.toString(getUISettings()).length() - 1) + "\n");
-				
+					
+					simulations = Utils.readFromFile(Utils.FILEPREFIX + "simulationSchedule.txt");
+					
 				} catch (IOException e1) {
 				
 					// TODO Auto-generated catch block
@@ -1188,9 +1191,9 @@ public class Runner extends JFrame {
 		
 		Utils.writeToFile(Utils.FILEPREFIX + "simRecordID.txt", currentSimulationIdentifier);
 		
-		Utils.writeToFile(Utils.FILEPREFIX + "/Data/" + currentSimulationIdentifier + ".csv", "");
+		Utils.writeToFile(Utils.FILEPREFIX + "/data/" + currentSimulationIdentifier + ".csv", "");
 		
-		Utils.writeToFile(Utils.FILEPREFIX + "/Data/" + currentSimulationIdentifier + ".csv", Arrays.toString(simulationParameters) + "\n");
+		Utils.writeToFile(Utils.FILEPREFIX + "/data/" + currentSimulationIdentifier + ".csv", Arrays.toString(simulationParameters) + "\n");
 		
 		/***********/
 		

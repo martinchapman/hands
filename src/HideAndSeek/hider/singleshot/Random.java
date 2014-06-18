@@ -34,8 +34,11 @@ public class Random extends Hider {
 	 */
 	@Override
 	protected boolean hideHere(StringVertex vertex) {
+		
 		if (Math.random() < HIDEPOTENTIAL) { return true; }
+		
 		else { return false; }
+		
 	}
 
 	/* (non-Javadoc)
@@ -43,7 +46,9 @@ public class Random extends Hider {
 	 */
 	@Override
 	protected StringVertex nextNode(StringVertex currentNode) {
+		
 		return connectedNode(currentNode);
+		
 	}
 
 	/* (non-Javadoc)
@@ -51,7 +56,9 @@ public class Random extends Hider {
 	 */
 	@Override
 	protected StringVertex startNode() {
+		
 		return randomNode();
+		
 	}
 
 }

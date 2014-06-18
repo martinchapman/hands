@@ -18,7 +18,7 @@ import org.jibble.epsgraphics.EpsGraphics2D;
 
 public class Utils {
 
-	public final static String FILEPREFIX = "Output/";
+	public final static String FILEPREFIX = "output/";
 	
 	/**
 	 * @param url
@@ -187,7 +187,7 @@ public class Utils {
 	/**
 	 * 
 	 */
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 
 	/**
 	 * @param speaker

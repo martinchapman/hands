@@ -130,6 +130,8 @@ public class BacktrackPath extends SeekerLocalGraph {
 				
 			}
 			
+			System.out.println(MAXBACKTRACKDISTANCE);
+			
 			// If the seeker is not permitted to backtrack this far, simply continue onwards
 			if (pathInProgress.size() > MAXBACKTRACKDISTANCE) { 
 				

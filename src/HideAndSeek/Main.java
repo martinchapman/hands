@@ -41,11 +41,6 @@ import Utility.Utils;
  *
  */
 public class Main {
-
-	/**
-	 * Data
-	 */
-	private final static String FILEPREFIX = "Output/";
 	
 	/**
 	 * 
@@ -72,7 +67,7 @@ public class Main {
 	 */
 	public Main(String[] args) {
 		
-		currentSimulationIdentifier = Utils.readFromFile(FILEPREFIX + "simRecordID.txt").get(0);
+		currentSimulationIdentifier = Utils.readFromFile(Utils.FILEPREFIX + "simRecordID.txt").get(0);
 		
 		System.out.println(currentSimulationIdentifier);
 		
@@ -210,7 +205,7 @@ public class Main {
 			
 			if (hiderType.getElement0().equals("LooselyBiasHider")) {
 				
-				allHidingAgents.add(new VariableBiasHider(graphController, numberOfHideLocations, 1.0));
+				allHidingAgents.add(new VariableBiasHider(graphController, numberOfHideLocations, 0.5));
 			
 			} 
 			
@@ -344,11 +339,11 @@ public class Main {
 		
 		try {
 			
-			mainOutputWriter = new FileWriter(FILEPREFIX + "/Data/" + currentSimulationIdentifier + ".csv", true);
+			mainOutputWriter = new FileWriter(Utils.FILEPREFIX + "/data/" + currentSimulationIdentifier + ".csv", true);
 		
-			outputJavascript = new FileWriter(FILEPREFIX + "/Data/js/Data/" + currentSimulationIdentifier + "-vis.js", true);
+			outputJavascript = new FileWriter(Utils.FILEPREFIX + "/data/js/data/" + currentSimulationIdentifier + "-vis.js", true);
 			
-			outputHTML = new FileWriter(FILEPREFIX + "/Data/" + currentSimulationIdentifier + "-vis.html", true);
+			outputHTML = new FileWriter(Utils.FILEPREFIX + "/data/" + currentSimulationIdentifier + "-vis.html", true);
         
 		} catch (IOException e) {
 		
@@ -429,7 +424,7 @@ public class Main {
 			
 			//
 	    		
-	    	ArrayList<String> javascriptOutputTemplate = Utils.readFromFile(FILEPREFIX + "Data/js/vis-template.js");
+	    	ArrayList<String> javascriptOutputTemplate = Utils.readFromFile(Utils.FILEPREFIX + "data/js/vis-template.js");
 	    	
 	    	for ( String line : javascriptOutputTemplate ) {
 	    		
@@ -437,7 +432,7 @@ public class Main {
 	    		
 	    	}
 	    			
-			ArrayList<String> firstHalfHTMLTemplate = Utils.readFromFile(FILEPREFIX + "Data/Template/vis-template-1.html");
+			ArrayList<String> firstHalfHTMLTemplate = Utils.readFromFile(Utils.FILEPREFIX + "data/template/vis-template-1.html");
 			
 			for (String line : firstHalfHTMLTemplate) {
 			
@@ -445,9 +440,9 @@ public class Main {
 				
 			}
 			
-			Utils.writeToFile(outputHTML, "<script type=\"text/javascript\" src=\"js/Data/" + currentSimulationIdentifier + "-vis.js\"></script>");
+			Utils.writeToFile(outputHTML, "<script type=\"text/javascript\" src=\"js/data/" + currentSimulationIdentifier + "-vis.js\"></script>");
 	    	
-			ArrayList<String> secondHalfHTMLTemplate = Utils.readFromFile(FILEPREFIX + "Data/Template/vis-template-2.html");
+			ArrayList<String> secondHalfHTMLTemplate = Utils.readFromFile(Utils.FILEPREFIX + "data/template/vis-template-2.html");
 			
 			for (String line : secondHalfHTMLTemplate) {
 				
