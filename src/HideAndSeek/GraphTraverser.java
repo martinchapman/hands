@@ -42,6 +42,17 @@ public abstract class GraphTraverser {
 	/**
 	 * @return
 	 */
+	protected StringVertex firstNode() {
+		
+		StringVertex[] vertices = new StringVertex[graphController.vertexSet().size()];
+		
+		return graphController.vertexSet().toArray(vertices)[0];
+				
+	}
+	
+	/**
+	 * @return
+	 */
 	protected StringVertex randomNode() {
 		
 		StringVertex[] vertices = new StringVertex[graphController.vertexSet().size()];
@@ -216,6 +227,12 @@ public abstract class GraphTraverser {
 		if (uniquelyVisitedNodes != null) {
 			
 			uniquelyVisitedNodes.clear();
+			
+		}
+		
+		if (uniquelyVisitedEdges != null) {
+			
+			uniquelyVisitedEdges.clear();
 			
 		}
 		

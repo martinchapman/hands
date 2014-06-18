@@ -4,6 +4,7 @@ import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.Hider;
+import Utility.Utils;
 
 /**
  * 
@@ -21,7 +22,7 @@ public class RandomFixedDistance extends Hider implements Runnable {
 	
 		super(graphController, numberOfHideLocations);
 		
-		minHideDistance = ((int)Math.random() * 10) + 1;
+		minHideDistance = ((int)(Math.random() * 10)) + 1;
 
 	}
 	
@@ -34,6 +35,8 @@ public class RandomFixedDistance extends Hider implements Runnable {
 	 * @see HideAndSeek.hider.Hider#hideHere(HideAndSeek.graph.StringVertex)
 	 */
 	protected boolean hideHere(StringVertex vertex) {
+		
+		Utils.talk(toString(), "exploredNodes.size() " + exploredNodes.size() + " minHideDistance: " + minHideDistance );
 		
 		if ( exploredNodes.size() > 0 && ( exploredNodes.size() % minHideDistance == 0 ) ) { 
 			

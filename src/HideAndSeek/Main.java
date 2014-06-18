@@ -18,6 +18,7 @@ import HideAndSeek.hider.singleshot.Random;
 import HideAndSeek.hider.singleshot.RandomDirection;
 import HideAndSeek.hider.singleshot.RandomFixedDistance;
 import HideAndSeek.hider.singleshot.RandomSet;
+import HideAndSeek.hider.singleshot.RandomVariableHidePotential;
 import HideAndSeek.hider.singleshot.VariableFixedDistance;
 import HideAndSeek.seeker.Seeker;
 import HideAndSeek.seeker.repeatgame.HighProbabilitySeeker;
@@ -31,6 +32,7 @@ import HideAndSeek.seeker.singleshot.FixedStartRandomWalk;
 import HideAndSeek.seeker.singleshot.LeastConnectedFirst;
 import HideAndSeek.seeker.singleshot.LowEdgeCost;
 import HideAndSeek.seeker.singleshot.RandomWalk;
+import HideAndSeek.seeker.singleshot.VariableBacktrackPath;
 import Utility.Pair;
 import Utility.Utils;
 
@@ -141,6 +143,12 @@ public class Main {
 			if (hiderType.getElement0().equals("Random")) {
 				
 				allHidingAgents.add(new Random(graphController, numberOfHideLocations));
+			
+			} 
+			
+			if (hiderType.getElement0().equals("RandomVariableHidePotential")) {
+				
+				allHidingAgents.add(new RandomVariableHidePotential(graphController, numberOfHideLocations, gameNumber / ((float)totalGames)));
 			
 			} 
 			
@@ -295,6 +303,12 @@ public class Main {
 			if (seekerType.getElement0().equals("BacktrackPath")) {
 				
 				allSeekingAgents.add(new BacktrackPath(graphController));
+				
+			}
+			
+			if (seekerType.getElement0().equals("VariableBacktrackPath")) {
+				
+				allSeekingAgents.add(new VariableBacktrackPath(graphController, gameNumber));
 				
 			}
 			

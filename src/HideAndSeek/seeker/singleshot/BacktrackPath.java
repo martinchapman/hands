@@ -61,7 +61,7 @@ public class BacktrackPath extends SeekerLocalGraph {
 	protected StringVertex nextNode(StringVertex currentNode) {
 		
 		// Call super to add relevant information to local graph
-		currentNode = super.nextNode(currentNode);
+		super.nextNode(currentNode);
 		
 		// Get all outgoing edges from this node (ordered by weight)
 		List<StringEdge> connectedEdges = getConnectedEdges(currentNode);
@@ -75,6 +75,12 @@ public class BacktrackPath extends SeekerLocalGraph {
 		// If we are currently on a path back to a cheaper node, do this first:
 		if ( pathInProgress.size() > 0 ) { 
 		
+			Utils.talk(toString(), "Backtracking");
+			
+			Utils.talk(toString(), "Current node: " + currentNode);
+			
+			Utils.talk(toString(), "Going to: " + pathInProgress.get(0) + " " + edgeToTarget(pathInProgress.get(0), currentNode));
+			
 			return edgeToTarget(pathInProgress.remove(0), currentNode);
 			
 		}
@@ -99,13 +105,17 @@ public class BacktrackPath extends SeekerLocalGraph {
 			
 		}
 		
+		Utils.talk(toString(), "Cheaper unvisited edges: " + cheaperUnvisitedEdges.size());
+		
 		// If a cheaper edge(s) is found
 		if (cheaperUnvisitedEdges.size() > 0) {
 		
 			// Sort the edges (if there are multiple, cheapest first)
 			Collections.sort(cheaperUnvisitedEdges);
 			
-			// Ensure we are always returning on edges we have previously used
+			/* Ensure we are always returning on edges we have previously used
+			 * (Will always have local knowledge in graph as have come from vertex)
+			 */
 			if (uniquelyVisitedNodes().contains(cheaperUnvisitedEdges.get(0).getTarget())) {
 				
 				DijkstraShortestPath<StringVertex, StringEdge> DSP = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, cheaperUnvisitedEdges.get(0).getTarget());
@@ -129,6 +139,8 @@ public class BacktrackPath extends SeekerLocalGraph {
 				return connectedNode(currentNode);
 			
 			}
+			
+			Utils.talk(toString(), "Path in progress: " + pathInProgress);
 			
 			return edgeToTarget(pathInProgress.remove(0), currentNode);
 			
@@ -188,4 +200,17 @@ public class BacktrackPath extends SeekerLocalGraph {
 	
 	}
 
+	/* (non-Javadoc)
+	 * @see HideAndSeek.seeker.Seeker#endOfRound()
+	 */
+	@Override
+	public void endOfRound() {
+		
+		// TODO Auto-generated method stub
+		super.endOfRound();
+		
+		pathInProgress.clear();
+		
+	}
+	
 }

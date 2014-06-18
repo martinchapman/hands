@@ -180,6 +180,8 @@ public class OutputManager {
 		
 		String yLabel = "";
 		
+		if (title.length() > 200) title = title.substring(0, 100);
+		
 		if (graphType.equals("Line")) {
 		
 			graph = new LineGraph(title);

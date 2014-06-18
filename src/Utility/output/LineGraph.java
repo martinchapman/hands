@@ -17,6 +17,8 @@ import org.jfree.ui.ApplicationFrame;
 
 
 /**
+ * Based on: http://www.java2s.com/Code/Java/Chart/JFreeChartLineChartDemo6.htm
+ * 
  * @author Martin
  *
  */

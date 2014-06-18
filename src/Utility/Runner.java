@@ -49,6 +49,51 @@ public class Runner extends JFrame {
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	private static String[] hiderTypes = 
+		{ 
+		  "Random",
+		  "RandomVariableHidePotential",
+		  "RandomDirection",
+		  "RandomSet",
+		  "RandomFixedDistance",
+		  "LowEdgeCostRandomFixedDistance",
+		  "VariableFixedDistance",
+		  "LowEdgeCostVariableFixedDistance",
+		  "LowEdgeCostFixedDistance",
+		  "MinimumConnectivity",
+		  "MaxDistance",
+		  
+		  "FullyBiasHider",
+		  "LooselyBiasHider",
+		  "VariableBiasHider" 
+		};
+	
+	private static String[] seekerTypes = 
+		{ 
+		  "RandomWalk",
+		  "ConstrainedRandomWalk",
+		  "LowEdgeCost",
+		  "DepthFirstSearch",
+          "DepthFirstSearchLowCost",
+	      "BreadthFirstSearch",
+	      "BreadthFirstSearchLowCost",
+	      "BacktrackPath",
+	      "VariableBacktrackPath",
+	      "LeastConnectedFirst", 
+	      
+          "HighProbabilitySeeker"
+		};
+	
+	private static String[] graphTypes = 
+		{
+		  "random",
+		  "ring",
+		  "scalefree",
+		  "complete"
+		};
+	
+	// 
+	
 	/**
 	 * @param args
 	 * @throws IOException
@@ -300,7 +345,7 @@ public class Runner extends JFrame {
 					
 				}
 				
-				simulationParameters.setText("Simulation parameters: " + outputFeedbackList.getSelectedValue().getParameters());
+				simulationParameters.setText("<html><body style='width: 100px;'>Simulation parameters: " + outputFeedbackList.getSelectedValue().getParameters() + "</body></html>");
 				
 			}
 			
@@ -503,9 +548,10 @@ public class Runner extends JFrame {
 		
 		topologies = new JComboBox<String>();
 		
-		topologies.addItem("random");
-		topologies.addItem("ring");
-		topologies.addItem("scalefree");
+		for ( String topology : graphTypes ) {
+			
+			topologies.addItem(topology);
+		}
 		
 		parameters.add(topologies);
 		
@@ -539,8 +585,8 @@ public class Runner extends JFrame {
 		
 		fixedOrRandom = new JComboBox<String>();
 		
-		fixedOrRandom.addItem("fixed");
 		fixedOrRandom.addItem("random");
+		fixedOrRandom.addItem("fixed");
 		
 		parameters.add(fixedOrRandom);
 		
@@ -576,22 +622,11 @@ public class Runner extends JFrame {
 		
 		final JComboBox<String> hiderList = new JComboBox<String>();
 		
-		hiderList.addItem("Random");
-		hiderList.addItem("RandomDirection");
-		hiderList.addItem("RandomSet");
-		hiderList.addItem("RandomFixedDistance");
-		hiderList.addItem("LowEdgeCostRandomFixedDistance");
-		hiderList.addItem("VariableFixedDistance");
-		hiderList.addItem("LowEdgeCostVariableFixedDistance");
-		hiderList.addItem("LowEdgeCostFixedDistance");
-		hiderList.addItem("MinimumConnectivity");
-		hiderList.addItem("MaxDistance");
-		
-		//
-		
-		hiderList.addItem("FullyBiasHider");
-		hiderList.addItem("LooselyBiasHider");
-		hiderList.addItem("VariableBiasHider");
+		for ( String hiderType : hiderTypes ) {
+			
+			hiderList.addItem(hiderType);
+			
+		}
 		
 		hiderListAndButton.add(hiderList);
 		
@@ -699,20 +734,11 @@ public class Runner extends JFrame {
 		
 		final JComboBox<String> seekerList = new JComboBox<String>();
 		
-		seekerList.addItem("ConstrainedRandomWalk");
-		seekerList.addItem("LeastConnectedFirst");
-		seekerList.addItem("BacktrackPath");
-		seekerList.addItem("BreadthFirstSearch");
-		seekerList.addItem("BreadthFirstSearchLowCost");
-		seekerList.addItem("FixedStartRandomWalk");
-		seekerList.addItem("LowEdgeCost");
-		seekerList.addItem("RandomWalk");
-		seekerList.addItem("DepthFirstSearch");
-		seekerList.addItem("DepthFirstSearchLowCost");
-		
-		// 
-		
-		seekerList.addItem("HighProbabilitySeeker");
+		for ( String seekerType : seekerTypes ) {
+			
+			seekerList.addItem(seekerType);
+			
+		}
 		
 		seekerListAndButton.add(seekerList);
 		
@@ -845,6 +871,43 @@ public class Runner extends JFrame {
 		
 		controls.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		
+		JButton resetUI = new JButton("Reset");
+		
+		resetUI.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				topologies.setSelectedIndex(0);
+				
+				numberOfNodes.setText("100");
+				
+				numberOfHiddenItems.setText("5");
+				
+				costOfEdgeTraversal.setText("10.0");
+				
+				fixedOrRandom.setSelectedIndex(0);
+				
+				edgeTraversalDecrement.setText("0.0");
+				
+				numberOfRounds.setText("1");
+				
+				numberOfGames.setText("1");
+				
+				simulationHidersModel.clear();
+				
+				simulationHidersModel.addElement("Random");
+				
+				simulationSeekersModel.clear();
+				
+				simulationSeekersModel.addElement("Random Walk");
+				
+			}
+			
+		});
+		
+		controls.add(resetUI);
+		
 		startSelected = new JButton("Start selected");
 		
 		startSelected.setEnabled(false);
@@ -917,9 +980,13 @@ public class Runner extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				
-				String[] simulation = queueList.getSelectedValue().split(",\\s");
+				for (String simulationFromList : queueList.getSelectedValuesList() ) {
 				
-	        	runSimulation(Integer.parseInt(simulation[0]), simulation);
+					String[] simulation = simulationFromList.split(",\\s");
+					
+		        	runSimulation(Integer.parseInt(simulation[0]), simulation);
+	        	
+				}
 				
 			}
         	
@@ -1242,7 +1309,7 @@ public class Runner extends JFrame {
 			
 			try {
 				
-				proc = Runtime.getRuntime().exec("java -classpath bin:/Users/Martin/Downloads/jgrapht-0.9.0/lib/jgrapht-core-0.9.0.jar HideAndSeek.Main " + i + " " + GAMES + " " + paramString);
+				proc = Runtime.getRuntime().exec("java -classpath bin:lib/jgrapht-core-0.9.0.jar:lib/epsgraphics.jar HideAndSeek.Main " + i + " " + GAMES + " " + paramString);
 			
 			} catch (IOException e1) {
 				

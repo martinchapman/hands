@@ -1,0 +1,10 @@
+[1, [Random,1][RandomDirection,1][RandomSet,1][RandomFixedDistance,1][LowEdgeCostRandomFixedDistance,1][VariableFixedDistance,1][LowEdgeCostVariableFixedDistance,1][LowEdgeCostFixedDistance,1][MinimumConnectivity,1][MaxDistance,1], [DepthFirstSearchLowCost,1], {Topology,random}, {NumberOfNodes,100}, {NumberOfHideLocations,5}, {Rounds,1000}, {EdgeWeight,10.0}, {FixedOrUpperWeight,random}, {EdgeTraversalDecrement,0}]
+hRandom,Cost, 44.90861285508321, Score, 31.996333333333325,sDepthFirstSearchLowCost,Cost, 285.04761314048613, Score, -31.996333333333325, PathLength, 94.0,
+hRandomDirection,Cost, 20.073341938392293, Score, 31.426666666666655,sDepthFirstSearchLowCost,Cost, 278.25219976980077, Score, -31.426666666666655, PathLength, 93.0,
+hRandomSet,Cost, 41.40807594650413, Score, 35.121,sDepthFirstSearchLowCost,Cost, 322.92668336324, Score, -35.121, PathLength, 104.0,
+hRandomFixedDistance,Cost, 221.2620494899113, Score, 32.95799999999999,sDepthFirstSearchLowCost,Cost, 295.5024642227167, Score, -32.95799999999999, PathLength, 97.0,
+hLowEdgeCostRandomFixedDistance,Cost, 90.88894290429351, Score, 24.044666666666682,sDepthFirstSearchLowCost,Cost, 188.78971168558118, Score, -24.044666666666682, PathLength, 71.0,
+hVariableFixedDistance,Cost, 247.43033724489197, Score, 33.484,sDepthFirstSearchLowCost,Cost, 302.7344341751277, Score, -33.484, PathLength, 99.0,
+hLowEdgeCostVariableFixedDistance,Cost, 16.271634408573174, Score, 18.334000000000003,sDepthFirstSearchLowCost,Cost, 137.78428396212277, Score, -18.334000000000003, PathLength, 54.0,
+hMinimumConnectivity,Cost, 15664.156866901727, Score, 59.759000000000086,sDepthFirstSearchLowCost,Cost, 587.6165748188916, Score, -59.759000000000086, PathLength, 178.0,
+hMaxDistance,Cost, 20.33858961579608, Score, 31.654999999999976,sDepthFirstSearchLowCost,Cost, 281.22636623204016, Score, -31.654999999999976, PathLength, 93.0,

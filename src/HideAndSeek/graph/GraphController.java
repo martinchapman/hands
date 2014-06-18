@@ -7,6 +7,7 @@ import org.jgrapht.GraphPath;
 import org.jgrapht.VertexFactory;
 import org.jgrapht.alg.ConnectivityInspector;
 import org.jgrapht.alg.FloydWarshallShortestPaths;
+import org.jgrapht.generate.CompleteGraphGenerator;
 import org.jgrapht.generate.GraphGenerator;
 import org.jgrapht.generate.RandomGraphGenerator;
 import org.jgrapht.generate.RingGraphGenerator;
@@ -70,6 +71,10 @@ public class GraphController<V, E> {
 	    		
 	    		generator = new ScaleFreeGraphGenerator<StringVertex, StringEdge>(numberOfVertices);
 	    		
+	    	} else if (    topology.equals("complete") ) {
+	    		
+	    		generator = new CompleteGraphGenerator<StringVertex, StringEdge>(numberOfVertices);
+	    		
 	    	}
 			
 			
@@ -104,7 +109,7 @@ public class GraphController<V, E> {
 				// Explicit bi-directionality needed for shortest path algorithm
 				graph.addEdgeWithWeight(edge.getTarget(), edge.getSource(), fixedOrUpperValue);
 				
-			} else if (fixedOrUpperBound.equals("upper")) {
+			} else if (fixedOrUpperBound.equals("random")) {
 				
 				Double value = Math.random() * fixedOrUpperValue;
 				
