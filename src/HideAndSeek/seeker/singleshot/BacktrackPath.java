@@ -54,6 +54,11 @@ public class BacktrackPath extends SeekerLocalGraph {
 	 */
 	protected TreeSet<StringEdge> unvisitedEdges;
 	
+	/**
+	 * 
+	 */
+	protected boolean BACKTRACKCOSTSENSITIVE = true;
+	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
 	 */
@@ -105,53 +110,95 @@ public class BacktrackPath extends SeekerLocalGraph {
 			
 		}
 		
-		Utils.talk(toString(), "Cheaper unvisited edges: " + cheaperUnvisitedEdges.size());
+		StringVertex nextNode = connectedNode(currentNode); 
 		
-		// If a cheaper edge(s) is found
+		// If any cheaper edges are found
 		if (cheaperUnvisitedEdges.size() > 0) {
 		
-			// Sort the edges (if there are multiple, cheapest first)
-			Collections.sort(cheaperUnvisitedEdges);
+			Utils.talk(toString(), "Cheaper unvisited edges: " + cheaperUnvisitedEdges);
 			
-			/* Ensure we are always returning on edges we have previously used
-			 * (Will always have local knowledge in graph as have come from vertex)
-			 */
-			if (uniquelyVisitedNodes().contains(cheaperUnvisitedEdges.get(0).getTarget())) {
+			// Return the first edge which satisfies various constaints
+			for ( StringEdge cheaperEdge : cheaperUnvisitedEdges ) {
 				
-				DijkstraShortestPath<StringVertex, StringEdge> DSP = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, cheaperUnvisitedEdges.get(0).getTarget());
+				// Sort the edges (if there are multiple, cheapest first)
+				Collections.sort(cheaperUnvisitedEdges);
 				
-				pathInProgress = DSP.getPath().getEdgeList();
+				//Utils.talk(toString(), "Cheaper edge: " + cheaperUnvisitedEdges.get(0));
+				
+				/* Ensure we are always returning on edges we have previously used
+				 * (Will always have local knowledge in graph as have come from vertex)
+				 */
+				if (uniquelyVisitedNodes().contains(cheaperUnvisitedEdges.get(0).getTarget())) {
+					
+					DijkstraShortestPath<StringVertex, StringEdge> DSP = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, cheaperUnvisitedEdges.get(0).getTarget());
+					
+					pathInProgress = DSP.getPath().getEdgeList();
+							
+				} else {
+					
+					DijkstraShortestPath<StringVertex, StringEdge> DSP = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, cheaperUnvisitedEdges.get(0).getSource());
+					
+					pathInProgress = DSP.getPath().getEdgeList();
+					
+				}
+				
+				double totalBacktrackPathCost = 0.0;
+				
+				//Utils.talk(toString(), "Path in progress: " + pathInProgress);
+				
+				// Work out the cost to backtrack
+				for ( StringEdge edge : pathInProgress ) {
+				
+					// Don't include the cost of actually traversing the next edge (if it happens to be in the path)
+					if (!edge.equals(cheaperUnvisitedEdges.get(0))) {
+					
+						totalBacktrackPathCost += graphController.getEdgeWeight(edge);
 						
-			} else {
+					}
+					
 				
-				DijkstraShortestPath<StringVertex, StringEdge> DSP = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, cheaperUnvisitedEdges.get(0).getSource());
+				}
 				
-				pathInProgress = DSP.getPath().getEdgeList();
+				Collections.sort(connectedEdges);
 				
-			}
-			
-			System.out.println(MAXBACKTRACKDISTANCE);
-			
-			// If the seeker is not permitted to backtrack this far, simply continue onwards
-			if (pathInProgress.size() > MAXBACKTRACKDISTANCE) { 
+				connectedEdges.remove(uniquelyVisitedEdges());
 				
-				// Clear, otherwise next iteration will continue down non-permitted path
-				pathInProgress.clear();
+				//Utils.talk(toString(), pathInProgress.size() + " " + 
+									   //( graphController.getEdgeWeight(connectedEdges.get(0)) - graphController.getEdgeWeight(cheaperUnvisitedEdges.get(0)) ) + " vs " +
+									   //totalBacktrackPathCost );
 				
-				return connectedNode(currentNode);
+				/* 
+				 * If the seeker is not permitted to backtrack this far, simply continue onwards
+				 */
+				if ( pathInProgress.size() > MAXBACKTRACKDISTANCE ) { 
+					
+					// Clear, otherwise next iteration will continue down non-permitted path
+					pathInProgress.clear();
+					
+					break;
+				
+				}
+				
+				/* (Depending on whether this strategy is backtrack cost sensitive) the difference
+				 * in cost between the cheaper unvisited edge and the cheapest unvisited outgoing edge
+				 * should be LESS than the cost of going back (informally, it isn't 'worth' going back). */
+				if ( BACKTRACKCOSTSENSITIVE && ( graphController.getEdgeWeight(connectedEdges.get(0)) - graphController.getEdgeWeight(cheaperUnvisitedEdges.get(0)) > totalBacktrackPathCost ) ) {
+					
+					nextNode = edgeToTarget(pathInProgress.remove(0), currentNode);
+					
+					break;
+					
+				}
+				
+				pathInProgress.clear(); 
+				
+			}  
 			
-			}
-			
-			Utils.talk(toString(), "Path in progress: " + pathInProgress);
-			
-			return edgeToTarget(pathInProgress.remove(0), currentNode);
-			
+		} 
+		
 		// Otherwise, the cheapest edge is connected to this node
-		} else {
-			
-			return connectedNode(currentNode);
-			
-		}
+		
+		return nextNode;
 			
 	}
 	

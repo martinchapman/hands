@@ -1,0 +1,2 @@
+[1, [Random,1], [BacktrackPath,1], {Topology,scalefree}, {NumberOfNodes,100}, {NumberOfHideLocations,5}, {Rounds,10}, {EdgeWeight,10.0}, {FixedOrUpperWeight,random}, {EdgeTraversalDecrement,0}]
+hRandom,Cost, 52.71767857010317, Score, 104.22818791946308,sBacktrackPath,Cost, 656.6988472256444, Score, -104.22818791946308, PathLength, 154.0,

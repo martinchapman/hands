@@ -187,7 +187,7 @@ public class Utils {
 	/**
 	 * 
 	 */
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 
 	/**
 	 * @param speaker
