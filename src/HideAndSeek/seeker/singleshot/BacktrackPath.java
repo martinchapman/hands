@@ -123,20 +123,20 @@ public class BacktrackPath extends SeekerLocalGraph {
 				// Sort the edges (if there are multiple, cheapest first)
 				Collections.sort(cheaperUnvisitedEdges);
 				
-				//Utils.talk(toString(), "Cheaper edge: " + cheaperUnvisitedEdges.get(0));
+				Utils.talk(toString(), "Cheaper edge: " + cheaperUnvisitedEdges.get(0));
 				
 				/* Ensure we are always returning on edges we have previously used
 				 * (Will always have local knowledge in graph as have come from vertex)
 				 */
 				if (uniquelyVisitedNodes().contains(cheaperUnvisitedEdges.get(0).getTarget())) {
 					
-					DijkstraShortestPath<StringVertex, StringEdge> DSP = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, cheaperUnvisitedEdges.get(0).getTarget());
+					DijkstraShortestPath<StringVertex, StringEdge> DSP = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, cheaperEdge.getTarget());
 					
 					pathInProgress = DSP.getPath().getEdgeList();
 							
 				} else {
 					
-					DijkstraShortestPath<StringVertex, StringEdge> DSP = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, cheaperUnvisitedEdges.get(0).getSource());
+					DijkstraShortestPath<StringVertex, StringEdge> DSP = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, cheaperEdge.getSource());
 					
 					pathInProgress = DSP.getPath().getEdgeList();
 					
