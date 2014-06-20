@@ -1,6 +1,7 @@
 package Utility;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -18,9 +19,11 @@ import java.util.Arrays;
 import java.util.Calendar;
 
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -79,6 +82,7 @@ public class Runner extends JFrame {
 	      "BreadthFirstSearchLowCost",
 	      "BacktrackPath",
 	      "VariableBacktrackPath",
+	      "OptimalBacktrackPath",
 	      "LeastConnectedFirst", 
 	      
           "HighProbabilitySeeker"
@@ -622,11 +626,21 @@ public class Runner extends JFrame {
 		
 		final JComboBox<String> hiderList = new JComboBox<String>();
 		
+		ComboboxToolTipRenderer hiderListRenderer = new ComboboxToolTipRenderer();
+		
+		hiderList.setRenderer(hiderListRenderer);
+		
+		ArrayList<String> hiderTooltips = new ArrayList<String>();
+		
 		for ( String hiderType : hiderTypes ) {
 			
 			hiderList.addItem(hiderType);
 			
+			hiderTooltips.add(" ");
+			
 		}
+		
+		hiderListRenderer.setTooltips(hiderTooltips);
 		
 		hiderListAndButton.add(hiderList);
 		
@@ -734,11 +748,21 @@ public class Runner extends JFrame {
 		
 		final JComboBox<String> seekerList = new JComboBox<String>();
 		
+		ComboboxToolTipRenderer seekerListRenderer = new ComboboxToolTipRenderer();
+		
+		seekerList.setRenderer(seekerListRenderer);
+		
+		ArrayList<String> seekerTooltips = new ArrayList<String>();
+		
 		for ( String seekerType : seekerTypes ) {
 			
 			seekerList.addItem(seekerType);
 			
+			seekerTooltips.add(" ");
+			
 		}
+		
+		seekerListRenderer.setTooltips(seekerTooltips);
 		
 		seekerListAndButton.add(seekerList);
 		
@@ -1367,6 +1391,48 @@ public class Runner extends JFrame {
 			
 	    } // End of game run loop
 		
+	}
+	
+	/**
+	 * From: http://stackoverflow.com/questions/480261/java-swing-mouseover-text-on-jcombobox-items
+	 * 
+	 * @author Martin
+	 */
+	private class ComboboxToolTipRenderer extends DefaultListCellRenderer {
+	    
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		
+		/**
+		 * 
+		 */
+		ArrayList<String> tooltips;
+
+	    /* (non-Javadoc)
+	     * @see javax.swing.DefaultListCellRenderer#getListCellRendererComponent(javax.swing.JList, java.lang.Object, int, boolean, boolean)
+	     */
+	    @Override
+	    public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+
+	        JComponent comp = (JComponent) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+
+	        if (-1 < index && null != value && null != tooltips) list.setToolTipText(tooltips.get(index));
+	          
+	        return comp;
+	        
+	    }
+
+	    /**
+	     * @param tooltips
+	     */
+	    public void setTooltips(ArrayList<String> tooltips) {
+	        
+	    	this.tooltips = tooltips;
+	        
+	    }
+	    
 	}
 	
 }

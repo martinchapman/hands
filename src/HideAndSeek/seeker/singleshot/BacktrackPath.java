@@ -80,11 +80,11 @@ public class BacktrackPath extends SeekerLocalGraph {
 		// If we are currently on a path back to a cheaper node, do this first:
 		if ( pathInProgress.size() > 0 ) { 
 		
-			Utils.talk(toString(), "Backtracking");
+			//Utils.talk(toString(), "Backtracking");
 			
-			Utils.talk(toString(), "Current node: " + currentNode);
+			//Utils.talk(toString(), "Current node: " + currentNode);
 			
-			Utils.talk(toString(), "Going to: " + pathInProgress.get(0) + " " + edgeToTarget(pathInProgress.get(0), currentNode));
+			//Utils.talk(toString(), "Going to: " + pathInProgress.get(0) + " " + edgeToTarget(pathInProgress.get(0), currentNode));
 			
 			return edgeToTarget(pathInProgress.remove(0), currentNode);
 			
@@ -115,15 +115,15 @@ public class BacktrackPath extends SeekerLocalGraph {
 		// If any cheaper edges are found
 		if (cheaperUnvisitedEdges.size() > 0) {
 		
-			Utils.talk(toString(), "Cheaper unvisited edges: " + cheaperUnvisitedEdges);
+			//Utils.talk(toString(), "Cheaper unvisited edges: " + cheaperUnvisitedEdges);
 			
-			// Return the first edge which satisfies various constaints
+			// Return the first edge which satisfies various constraints
 			for ( StringEdge cheaperEdge : cheaperUnvisitedEdges ) {
 				
 				// Sort the edges (if there are multiple, cheapest first)
 				Collections.sort(cheaperUnvisitedEdges);
 				
-				Utils.talk(toString(), "Cheaper edge: " + cheaperUnvisitedEdges.get(0));
+				//Utils.talk(toString(), "Cheaper edge: " + cheaperEdge);
 				
 				/* Ensure we are always returning on edges we have previously used
 				 * (Will always have local knowledge in graph as have come from vertex)
@@ -144,13 +144,13 @@ public class BacktrackPath extends SeekerLocalGraph {
 				
 				double totalBacktrackPathCost = 0.0;
 				
-				//Utils.talk(toString(), "Path in progress: " + pathInProgress);
+				//Utils.talk(toString(), "Path in progress: " + pathInProgress.size() + " " + pathInProgress);
 				
 				// Work out the cost to backtrack
 				for ( StringEdge edge : pathInProgress ) {
 				
 					// Don't include the cost of actually traversing the next edge (if it happens to be in the path)
-					if (!edge.equals(cheaperUnvisitedEdges.get(0))) {
+					if (!edge.equals(cheaperEdge)) {
 					
 						totalBacktrackPathCost += graphController.getEdgeWeight(edge);
 						
@@ -161,11 +161,15 @@ public class BacktrackPath extends SeekerLocalGraph {
 				
 				Collections.sort(connectedEdges);
 				
-				connectedEdges.remove(uniquelyVisitedEdges());
+				connectedEdges.removeAll(uniquelyVisitedEdges());
+				
+				//Utils.talk(toString(), "Current node edges: " + connectedEdges);
+				
+				//Utils.talk(toString(), "Original current node edges: " + graphController.edgesOf(currentNode));
 				
 				//Utils.talk(toString(), pathInProgress.size() + " " + 
-									   //( graphController.getEdgeWeight(connectedEdges.get(0)) - graphController.getEdgeWeight(cheaperUnvisitedEdges.get(0)) ) + " vs " +
-									   //totalBacktrackPathCost );
+									 // ( graphController.getEdgeWeight(connectedEdges.get(0)) - graphController.getEdgeWeight(cheaperEdge) ) + " vs " +
+									 // totalBacktrackPathCost );
 				
 				/* 
 				 * If the seeker is not permitted to backtrack this far, simply continue onwards
@@ -180,9 +184,9 @@ public class BacktrackPath extends SeekerLocalGraph {
 				}
 				
 				/* (Depending on whether this strategy is backtrack cost sensitive) the difference
-				 * in cost between the cheaper unvisited edge and the cheapest unvisited outgoing edge
-				 * should be LESS than the cost of going back (informally, it isn't 'worth' going back). */
-				if ( BACKTRACKCOSTSENSITIVE && ( graphController.getEdgeWeight(connectedEdges.get(0)) - graphController.getEdgeWeight(cheaperUnvisitedEdges.get(0)) > totalBacktrackPathCost ) ) {
+				 * in cost between the cheaper unvisited edge and the cheapest unvisited outgoing edge (cost saved)
+				 * should be GREATER than the cost of going back (informally, it isn't 'worth' going back). */
+				if ( connectedEdges.size() == 0 || ( BACKTRACKCOSTSENSITIVE && ( graphController.getEdgeWeight(connectedEdges.get(0)) - graphController.getEdgeWeight(cheaperEdge) > totalBacktrackPathCost ) ) ) {
 					
 					nextNode = edgeToTarget(pathInProgress.remove(0), currentNode);
 					
@@ -212,7 +216,7 @@ public class BacktrackPath extends SeekerLocalGraph {
 		ArrayList<StringEdge> edges = new ArrayList<StringEdge>(graphController.edgesOf(currentNode));
 		
 		Collections.sort(edges);
-
+		
 		return edges;
 		
 	}
@@ -229,11 +233,18 @@ public class BacktrackPath extends SeekerLocalGraph {
 
 			if ( uniquelyVisitedNodes().contains(edgeToTarget(edge, currentNode)) ) continue;
 			
+			//Utils.talk(toString(), "Low cost edge:" + edge);
+			
 			return edge;
 			
 		}
 		
-		return connectedEdges.get((int)(Math.random() * connectedEdges.size()));
+		StringEdge randomEdge = connectedEdges.get((int)(Math.random() * connectedEdges.size()));
+		
+		//Utils.talk(toString(), "Random edge: " + randomEdge);
+		
+		return randomEdge;
+		
 		
 	}
 
@@ -243,9 +254,7 @@ public class BacktrackPath extends SeekerLocalGraph {
 	@Override
 	protected StringVertex startNode() {
 		
-		StringVertex startNode = randomNode();
-		
-		return startNode;
+		return randomNode();
 	
 	}
 

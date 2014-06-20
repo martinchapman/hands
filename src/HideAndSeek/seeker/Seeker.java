@@ -93,7 +93,7 @@ public abstract class Seeker extends GraphTraverser implements Runnable {
 		StringVertex nextNode;
 		
 		while ( hideLocations.size() != graphController.numberOfHideLocations() ) {
-	
+			
 			exploredNodes.add(currentNode);
 			
 			addUniquelyVisitedNode(currentNode);

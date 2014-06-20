@@ -307,6 +307,13 @@ public class Main {
 				
 			}
 			
+			// Optimal backtrack path -- found by experimentation
+			if (seekerType.getElement0().equals("OptimalBacktrackPath")) {
+				
+				allSeekingAgents.add(new VariableBacktrackPath(graphController, 2));
+				
+			}
+
 			// Repeat-game: 
 			
 			if (seekerType.getElement0().equals("HighProbabilitySeeker")) {

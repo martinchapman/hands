@@ -1,14 +1,6 @@
-Search Games
+Seeker Strategies
 ===========
 
-A plugin for the JGraphT library facilitating the running of Search Game simulations 
+Search strategies effectively denote which outgoing edge a traverser chooses when leaving their current node. In their most basic form, such strategies select edges at random. Better strategies will consider scored game metrics such as cost, when selecting an edge.
 
-Search games are adversarial interactions between two competing agents, in which one agent attempts to obscure itself or some object(s) on a network, and the other attempts to find this agent or their hidden item(s). In their most basic form, search games are akin to the childhood game of hide and seek; objects are hidden, and remain so until a seeker locates them. To maximise her personal utility, a seeker will wish to locate all hidden items with lowest effort.
-
-Due to their simplicity, games such as these serve as useful abstractions for many real world problems. The challenges in a game of hide and seek, for example, are akin to (but certainly not limited to) those in search and rescue, counter terrorism and cyber security. Using the tools of abstraction, we are able to control closely which elements of these problems we include in our model of game, and it leaves us with highly generalisable solutions, free of low-level concerns.
-
-This platform extends the JGraphT library to introduce the ability to run such games in realtime. Taking a number of different strategies for both hiding and seeker, as well as a number of different environmental parameters (topology, number of hidden objects, etc.), the platform runs strategies against one another and records their performance, for an insight into their relative merits in various scenarios.
-
-The platform is designed to eventually be evolved into a distributed game, in which participants can submit strategies to a central controller that runs them and evaluates their performance.
-
-An introduction to Search Games, and in particular, Hide-and-Seek from a simulation perspective, is available here: http://www.dcs.kcl.ac.uk/pg/chapm/papers/acyse2014.pdf
+More complex strategies attempt to utilise some knowledge of the opponent, such as assumptions about their behaviour, and this will lead to a sequence of strategic edge choices. These strategies are likely to need more holistic knowledge of the search graph or topology, and although such information is not afforded to players, agents extending the SeekerLocalGraph class are able to construct information on the topology over continued games. 
