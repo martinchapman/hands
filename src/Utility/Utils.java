@@ -3,11 +3,13 @@ package Utility;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.io.BufferedReader;
-import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
@@ -20,6 +22,41 @@ public class Utils {
 
 	public final static String FILEPREFIX = "output/";
 	
+	public static void uploadToFTP(String filePath, String ftpUrl, String user, String pass, String host, String uploadPath) {
+		
+		ftpUrl = String.format(ftpUrl, user, pass, host, uploadPath);
+ 
+        try {
+        	
+            URL url = new URL(ftpUrl);
+            
+            URLConnection conn = url.openConnection();
+            
+            OutputStream outputStream = conn.getOutputStream();
+            
+            FileInputStream inputStream = new FileInputStream(filePath);
+ 
+            byte[] buffer = new byte[4096];
+            
+            int bytesRead = -1;
+            
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+            
+            	outputStream.write(buffer, 0, bytesRead);
+            
+            }
+ 
+            inputStream.close();
+            
+            outputStream.close();
+            
+        } catch (IOException ex) {
+            
+        	ex.printStackTrace();
+        
+        }
+        
+	}
 	/**
 	 * @param url
 	 * @return
@@ -187,7 +224,7 @@ public class Utils {
 	/**
 	 * 
 	 */
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 
 	/**
 	 * @param speaker

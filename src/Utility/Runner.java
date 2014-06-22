@@ -1257,10 +1257,22 @@ public class Runner extends JFrame {
 		System.out.println("-----------------------------------------------------------------");
 		
 	    for(int i = 0; i < GAMES; i++) {
-		    	
+		     	
 			System.out.println("Run: " + (i + 1));
 			System.out.println("-----------------------------------------------------------------");
 		    
+			try {
+			
+				Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "/upload/index.html", false), "<html>" + ((i / GAMES) * 100) + "</html>");
+			
+			} catch (IOException e2) {
+				
+				e2.printStackTrace();
+			
+			}
+			
+			Utils.uploadToFTP(Utils.FILEPREFIX + "/upload/index.html", "ftp://%s:%s@%s/%s;type=i", "martin@martin-chapman.co.uk", "wsTrXYn/.", "ftp.martin-chapman.co.uk", "/simulation/index.html");
+			
 			// Remove wildcards from param string and replace with values
 			
 			for (int j = 0; j < simulationParameters.length; j++) {
