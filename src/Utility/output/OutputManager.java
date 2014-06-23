@@ -220,7 +220,7 @@ public class OutputManager {
 		
 		graph.createChart(title, xLabel, yLabel);
 		
-		graph.explortChartAsEPS(Utils.FILEPREFIX + "Data/charts/" + title + ".eps");
+		graph.exportChartAsEPS(Utils.FILEPREFIX + "Data/charts/" + title + ".eps");
 		
 		graph.pack();
 		

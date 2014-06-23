@@ -83,7 +83,8 @@ public class Runner extends JFrame {
 	      "BacktrackPath",
 	      "VariableBacktrackPath",
 	      "OptimalBacktrackPath",
-	      "LeastConnectedFirst", 
+	      "LeastConnectedFirst",
+	      "MostConnectedFirst",
 	      
           "HighProbabilitySeeker"
 		};
@@ -1260,18 +1261,8 @@ public class Runner extends JFrame {
 		     	
 			System.out.println("Run: " + (i + 1));
 			System.out.println("-----------------------------------------------------------------");
-		    
-			try {
 			
-				Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "/upload/index.html", false), "<html>" + ((i / GAMES) * 100) + "</html>");
-			
-			} catch (IOException e2) {
-				
-				e2.printStackTrace();
-			
-			}
-			
-			Utils.uploadToFTP(Utils.FILEPREFIX + "/upload/index.html", "ftp://%s:%s@%s/%s;type=i", "martin@martin-chapman.co.uk", "wsTrXYn/.", "ftp.martin-chapman.co.uk", "/simulation/index.html");
+			System.out.println( ( ( i / ((float)GAMES) ) * 100 ) + "%" );
 			
 			// Remove wildcards from param string and replace with values
 			

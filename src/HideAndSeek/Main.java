@@ -31,6 +31,7 @@ import HideAndSeek.seeker.singleshot.DepthFirstSearchLowCost;
 import HideAndSeek.seeker.singleshot.FixedStartRandomWalk;
 import HideAndSeek.seeker.singleshot.LeastConnectedFirst;
 import HideAndSeek.seeker.singleshot.LowEdgeCost;
+import HideAndSeek.seeker.singleshot.MostConnectedFirst;
 import HideAndSeek.seeker.singleshot.RandomWalk;
 import HideAndSeek.seeker.singleshot.VariableBacktrackPath;
 import Utility.Pair;
@@ -295,6 +296,12 @@ public class Main {
 				
 			}
 			
+			if (seekerType.getElement0().equals("MostConnectedFirst")) {
+				
+				allSeekingAgents.add(new MostConnectedFirst(graphController));
+				
+			}
+			
 			if (seekerType.getElement0().equals("BacktrackPath")) {
 				
 				allSeekingAgents.add(new BacktrackPath(graphController));
@@ -378,6 +385,8 @@ public class Main {
 			for (int i = 0; i < rounds; i++) {
 	        	
 	        	Utils.talk("Main", "Game " + gameNumber + " Round " + i);
+	        	
+	        	System.out.println( "Game " + gameNumber + " Round " + i + ": " + ( ( i / ( ( (float) rounds * hiders.size() ) ) ) * 100 ) + "%" );
 	        	
 				hider.run();
 				

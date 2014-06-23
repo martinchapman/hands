@@ -25,17 +25,14 @@ public class RandomWalk extends Seeker {
 
 	}
 
-	/**
-	 * 
-	 */
-	protected boolean uniquelyVisitNodes = false;
-	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
 	protected StringVertex nextNode(StringVertex currentNode) {
-
+		
+		uniquelyVisitNodes = false;
+		
 		return connectedNode(currentNode);
 		
 	}

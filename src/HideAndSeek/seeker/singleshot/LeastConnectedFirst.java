@@ -69,6 +69,8 @@ public class LeastConnectedFirst extends Seeker {
 			
 		}
 		
+		Utils.talk(toString(), "" + nodeConnectivity);
+		
 		return connections;
 		
 	}

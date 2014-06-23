@@ -12,7 +12,7 @@ import HideAndSeek.seeker.SeekerLocalGraph;
 import Utility.Utils;
 
 /**
- * Standard BFS implementation tailored to returning to the parent once visiting a child
+ * Standard BFS implementation tailored to potentially return to a parent
  * as no assumptions can be made about connectivity between siblings.
  * 
  * @author Martin
@@ -59,6 +59,8 @@ public class BreadthFirstSearch extends SeekerLocalGraph {
 
 		}
 
+		Utils.talk(toString(), "" + getConnectedEdges(toBeVisited.get(0)));
+		
 		// Add all the children of the item on the top of the search list to the search list also
 		for ( StringEdge vertexEdge : getConnectedEdges(toBeVisited.get(0)) ) {
 
@@ -71,6 +73,9 @@ public class BreadthFirstSearch extends SeekerLocalGraph {
 		// If we cannot move directly to the next node (i.e. from sibling to sibling) we must find the path to our next node
 		if (!graphController.containsEdge(currentNode, toBeVisited.get(0))) {
 
+			/* This should rarely happen as there will be a path to the child via the parent,
+			 * which will be added to the local graph
+			 */
 			if (!localGraph.vertexSet().contains(toBeVisited.get(0))) return connectedNode(currentNode);
 			
 			DijkstraShortestPath<StringVertex, StringEdge> DSP = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, toBeVisited.get(0));
@@ -85,39 +90,7 @@ public class BreadthFirstSearch extends SeekerLocalGraph {
 		return toBeVisited.remove(0);
 
 	}
-	
-	private class NodeWrapper<V> {
-		
-		private V node;
-		private NodeWrapper<V> parent;
-		
-		NodeWrapper(V node, NodeWrapper<V> parent) {
-			
-			this.node = node;
-			this.parent = parent;
-			
-		}
-		
-		public V getNode() {
-			
-			return node;
-			
-		}
-		
-		public NodeWrapper<V> getParent() {
-			
-			return parent;
-			
-		}
-		
-		public String toString() {
-			
-			return "" + node;
-			
-		}
-		
-	}
-	
+
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#startNode()
 	 */

@@ -28,7 +28,7 @@ public abstract class TraverserGraph extends ApplicationFrame {
 	
 	protected JFreeChart chart;
 	
-	public void explortChartAsEPS(String filePath) {
+	public void exportChartAsEPS(String filePath) {
 		
 		Utils.exportAsEPS(filePath, chart, 1300, 1200);
 		
