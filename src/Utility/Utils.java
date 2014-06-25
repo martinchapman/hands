@@ -143,7 +143,7 @@ public class Utils {
 		
         Graphics2D g = new EpsGraphics2D();
         
-        chart.draw(g,new Rectangle(x,y));
+        chart.draw(g, new Rectangle(x,y));
         
         FileWriter writer = null;
 		

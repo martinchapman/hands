@@ -2,7 +2,7 @@ package Utility.output;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.GradientPaint;
+import java.awt.Paint;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -56,7 +56,7 @@ public class BarGraph extends TraverserGraph {
             ylabel,                  // range axis label
             dataset,                  // data
             PlotOrientation.VERTICAL, // orientation
-            true,                     // include legend
+            false,                     // include legend
             true,                     // tooltips?
             false                     // URLs?
         );
@@ -74,10 +74,6 @@ public class BarGraph extends TraverserGraph {
         final NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
 
         rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
-
-        final BarRenderer renderer = (BarRenderer) plot.getRenderer();
-
-        renderer.setDrawBarOutline(false);
        
         final CategoryAxis domainAxis = plot.getDomainAxis();
        
@@ -98,9 +94,9 @@ public class BarGraph extends TraverserGraph {
 	 * @param value
 	 * @param attribute
 	 */
-	public void addBar(String traverser, Double value, String attribute) {
+	public void addBar(Double value, String traverser, String attribute) {
 		
-		dataset.addValue(value, traverser, attribute);
+		dataset.addValue(value, attribute, traverser);
 			
 	}
 

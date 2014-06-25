@@ -4,6 +4,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
@@ -92,6 +94,10 @@ public class Main {
 		
 		initGraph(topology, numberOfVertices, fixedOrUpperBound, fixedOrUpperValue, edgeTraversalDecrement);
 		
+		boolean mixHiders = Boolean.parseBoolean(args[11]);
+		
+		boolean mixSeekers = Boolean.parseBoolean(args[12]);
+		
 		//
 		
 		String agentList;
@@ -104,7 +110,7 @@ public class Main {
 		
 		int numberOfHideLocations = Integer.parseInt(args[6]);
 		
-		startRounds(initHiders(hiderList, numberOfHideLocations), initSeekers(seekerList), rounds, false);
+		startRounds(initHiders(hiderList, numberOfHideLocations, mixHiders), initSeekers(seekerList, mixSeekers), rounds, false);
 		
 	}
 	
@@ -122,7 +128,7 @@ public class Main {
 	 * @param numberOfHideLocations
 	 * @return
 	 */
-	private ArrayList<Hider> initHiders(String agentList, int numberOfHideLocations) {
+	private List<Hider> initHiders(String agentList, int numberOfHideLocations, boolean mixHiders) {
 		
 		/**************************
     	 * 
@@ -130,7 +136,7 @@ public class Main {
     	 * 
     	 * * * * * * * * * * * * */
 		 
-		ArrayList<Hider> allHidingAgents = new ArrayList<Hider>();
+		List<Hider> allHidingAgents = new ArrayList<Hider>();
 		
 		for( Pair<String, String> hiderType : Utils.stringToArray(agentList, "(\\[([0-9a-zA-Z]+),([0-9]+)\\])") ) {
 			
@@ -220,6 +226,16 @@ public class Main {
 			
 		}
 		
+		if (mixHiders) {
+			
+			Collections.shuffle(allHidingAgents);
+			
+			allHidingAgents = allHidingAgents.subList(0, 1);
+			
+			System.out.println("Strat: " + allHidingAgents);
+			
+		}
+		
 		return allHidingAgents;
 		
 	}
@@ -228,7 +244,7 @@ public class Main {
 	 * @param agentList
 	 * @return
 	 */
-	private ArrayList<Seeker> initSeekers(String agentList) {
+	private List<Seeker> initSeekers(String agentList, boolean mixSeekers) {
 		
 		/**************************
     	 * 
@@ -236,7 +252,7 @@ public class Main {
     	 * 
     	 * * * * * * * * * * * * */
 		
-		ArrayList<Seeker> allSeekingAgents = new ArrayList<Seeker>();
+		List<Seeker> allSeekingAgents = new ArrayList<Seeker>();
 		 
 		for( Pair<String, String> seekerType : Utils.stringToArray(agentList, "(\\[([0-9a-zA-Z]+),([0-9]+)\\])") ) {
 			
@@ -332,6 +348,16 @@ public class Main {
 			
 		}
 		
+		if (mixSeekers) {
+			
+			Collections.shuffle(allSeekingAgents);
+			
+			allSeekingAgents = allSeekingAgents.subList(0, 1);
+			
+			System.out.println("Strat: " + allSeekingAgents);
+			
+		}
+
 		return allSeekingAgents;
 		
 	}
@@ -340,12 +366,12 @@ public class Main {
 	 * Rounds are designed to re-test the same parameter configurations (which may vary between games)
 	 * multiples times AND to allow for patterns or histories to develop
 	 * 
-	 * @param hiders
-	 * @param seekers
+	 * @param list2
+	 * @param list
 	 * @param rounds
 	 * @param recordPerRound
 	 */
-	private void startRounds(ArrayList<Hider> hiders, ArrayList<Seeker> seekers, int rounds, boolean recordPerRound) {
+	private void startRounds(List<Hider> hiders, List<Seeker> seekers, int rounds, boolean recordPerRound) {
 		
 		// Pre-round outputting
 		

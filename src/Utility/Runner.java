@@ -22,6 +22,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -140,6 +141,10 @@ public class Runner extends JFrame {
 	private JButton startSelected;
 	
 	private JList<String> queueList;
+
+	private JCheckBox mixSeekers;
+
+	private JCheckBox mixHiders;
 	
 	/**
 	 * @author Martin
@@ -301,8 +306,6 @@ public class Runner extends JFrame {
 		northPane.add(deleteOutputFiles);
 		
 		//
-		
-		
 		
 		showTextStats.addActionListener(new ActionListener() {
 
@@ -478,7 +481,7 @@ public class Runner extends JFrame {
 					
 					for ( TraverserRecord hidersSeekers : hider.getSeekersAndAttributes() ) {
 						
-						hidersSeekers.setTraverser(hidersSeekers.getTraverser() + " (" + hider.getTraverser() + ")");
+						if (selectedHiders.size() > 1) hidersSeekers.setTraverser(hidersSeekers.getTraverser() + " (" + hider.getTraverser() + ")");
 						
 						selectedSeekers.add(hidersSeekers);
 						
@@ -645,6 +648,14 @@ public class Runner extends JFrame {
 		
 		hiderListAndButton.add(hiderList);
 		
+		//
+		
+		mixHiders = new JCheckBox("Mix hiders");
+		
+		hiderListAndButton.add(mixHiders);
+		
+		//
+		
 		JButton addHider = new JButton("Add hider");
 		
 		hiderListAndButton.add(addHider);
@@ -766,6 +777,14 @@ public class Runner extends JFrame {
 		seekerListRenderer.setTooltips(seekerTooltips);
 		
 		seekerListAndButton.add(seekerList);
+		
+		//
+		
+		mixSeekers = new JCheckBox("Mix seekers");
+		
+		seekerListAndButton.add(mixSeekers);
+		
+		//
 		
 		JButton addSeeker = new JButton("Add seeker");
 		
@@ -1110,7 +1129,15 @@ public class Runner extends JFrame {
 			  
 					edgeTraversalDecrement.setText(paramPair.getElement1());
 			  
-				} 
+				} else if (paramPair.getElement0().equals("MixHiders")) {
+					
+					if ( Boolean.parseBoolean(paramPair.getElement1()) ) mixHiders.setSelected(true);
+					
+				} else if (paramPair.getElement0().equals("MixSeekers")) {
+					
+					if ( Boolean.parseBoolean(paramPair.getElement1()) ) mixSeekers.setSelected(true);
+					
+				}
 	  
 			} else if (param.indexOf('[') != -1) {
   
@@ -1182,8 +1209,12 @@ public class Runner extends JFrame {
 			
 			"{FixedOrUpperWeight," + fixedOrRandom.getSelectedItem().toString() + "}", // whether cost supplied is static value or the upper bound of a distribution
 			
-			"{EdgeTraversalDecrement," + edgeTraversalDecrement.getText() + "}" // % discount gained by an agent for having traversed an edge before (100 = no discount; < 100 = discount)
-		  		 
+			"{EdgeTraversalDecrement," + edgeTraversalDecrement.getText() + "}", // % discount gained by an agent for having traversed an edge before (100 = no discount; < 100 = discount)
+		  	
+			"{MixHiders," + mixHiders.isSelected() + "}",
+			
+			"{MixSeekers," + mixSeekers.isSelected() + "}"
+			
 		};  
 		
 	}
@@ -1230,8 +1261,10 @@ public class Runner extends JFrame {
   				  "Rounds", // rounds 
   				  "EdgeWeight", // cost of traversing an edge
   				  "FixedOrUpperWeight", // whether cost supplied is static value or the upper bound of a distribution
-  				  "EdgeTraversalDecrement" // % discount gained by an agent for having traversed an edge before (100 = no discount; < 100 = discount)
-  				  };
+  				  "EdgeTraversalDecrement", // % discount gained by an agent for having traversed an edge before (100 = no discount; < 100 = discount)
+  				  "MixHiders", // Mix equally between the hide strategies
+  				  "MixSeekers" // Mix equally between the search strategies
+				  };
   				  
 		String[] defaultParameters = { simulationParameters[1],
 				 simulationParameters[2],
@@ -1241,7 +1274,9 @@ public class Runner extends JFrame {
 				 "120", // rounds
 				 "100.0", // cost of traversing an edge
 				 "upper", // whether cost supplied is static value or the upper bound of a distribution
-				 "0"// % discount gained by an agent for having traversed an edge before (1.0 = no discount; < 1.0 = discount)
+				 "0",// % discount gained by an agent for having traversed an edge before (1.0 = no discount; < 1.0 = discount),
+				 "false", // Mix equally between the hide strategies
+				 "false" // Mix equally between the search strategies
 		  		  };
 			
 		/***********/

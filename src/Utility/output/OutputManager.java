@@ -212,7 +212,7 @@ public class OutputManager {
 			
 			for ( TraverserRecord traverser : traverserRecords ) {
 				
-				((BarGraph) graph).addBar(traverser.toString(), traverser.getAverageAttributeValue(attribute), attribute);
+				((BarGraph) graph).addBar(traverser.getAverageAttributeValue(attribute), traverser.toString(), attribute);
 			
 			}
 			
