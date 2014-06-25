@@ -95,22 +95,26 @@ public class OutputManager {
 							// If we come across an entry for a Hider
 							if ( word.charAt(0) == 'h') {
 							
-								// If we do not yet have a record for this hider
-								if (!hiderRecords.contains(new TraverserRecord(word))) {
-								
-									// Create it
-									hiderRecords.add(new HiderRecord(word));
+								if ( parameters.contains("{MixHiders,true}") && (hiderRecords.size() == 0) ) {
 									
-									hiderRecords.get(hiderRecords.size() - 1 ).setParameters(parameters);
+									// If we do not yet have a record for this hider (and we aren't mixing our strategies)
+									if (!hiderRecords.contains(new TraverserRecord(word))) {
+										
+										// Create it
+										hiderRecords.add(new HiderRecord(word));
+										
+										hiderRecords.get(hiderRecords.size() - 1 ).setParameters(parameters);
+										
+									}
+									
+									lastHider = word;
+									
+									lastTraverser = "hider";
 								
 								}
 								
-								lastHider = word;
-								
-								lastTraverser = "hider";
-								
 							// If we come across an entry for a Seeker
-							} else if ( word.charAt(0) == 's') {
+							} else if ( word.charAt(0) == 's' ) {
 							
 								// If the last hider doesn't have a record of this seeker, add it
 								if (!hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).containsSeeker(new TraverserRecord(word))) {
