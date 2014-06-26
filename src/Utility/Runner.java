@@ -1131,11 +1131,27 @@ public class Runner extends JFrame {
 			  
 				} else if (paramPair.getElement0().equals("MixHiders")) {
 					
-					if ( Boolean.parseBoolean(paramPair.getElement1()) ) mixHiders.setSelected(true);
+					if ( Boolean.parseBoolean(paramPair.getElement1()) ) { 
+						
+						mixHiders.setSelected(true); 
+						
+					} else { 
+						
+						mixHiders.setSelected(false); 
+					
+					} 
 					
 				} else if (paramPair.getElement0().equals("MixSeekers")) {
 					
-					if ( Boolean.parseBoolean(paramPair.getElement1()) ) mixSeekers.setSelected(true);
+					if ( Boolean.parseBoolean(paramPair.getElement1()) ) { 
+						
+						mixSeekers.setSelected(true); 
+						
+					} else { 
+						
+						mixSeekers.setSelected(false); 
+					
+					} 
 					
 				}
 	  

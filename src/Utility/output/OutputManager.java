@@ -95,9 +95,23 @@ public class OutputManager {
 							// If we come across an entry for a Hider
 							if ( word.charAt(0) == 'h') {
 							
-								if ( parameters.contains("{MixHiders,true}") && (hiderRecords.size() == 0) ) {
+								// Mixing, and first time round
+								if ( parameters.contains("{MixHiders,true}") ) {
 									
-									// If we do not yet have a record for this hider (and we aren't mixing our strategies)
+									// If mixing, only ever one hide record, for all hiders
+									if ( (hiderRecords.size() == 0) ) {
+									
+										hiderRecords.add(new HiderRecord("MixedStrats"));
+										
+										hiderRecords.get(hiderRecords.size() - 1 ).setParameters(parameters);
+									
+									}
+									
+									lastHider = hiderRecords.get(0).getTraverser();
+									
+								} else {
+									
+									// If we do not yet have a record for this hider
 									if (!hiderRecords.contains(new TraverserRecord(word))) {
 										
 										// Create it
@@ -109,13 +123,13 @@ public class OutputManager {
 									
 									lastHider = word;
 									
-									lastTraverser = "hider";
-								
 								}
+								
+								lastTraverser = "hider";
 								
 							// If we come across an entry for a Seeker
 							} else if ( word.charAt(0) == 's' ) {
-							
+								
 								// If the last hider doesn't have a record of this seeker, add it
 								if (!hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).containsSeeker(new TraverserRecord(word))) {
 									

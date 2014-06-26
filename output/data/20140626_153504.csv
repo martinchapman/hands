@@ -1,0 +1,2 @@
+[1, [MinimumConnectivity,1], [LeastConnectedFirst,1][DepthFirstSearchLowCost,1], {Topology,random}, {NumberOfNodes,100}, {NumberOfHideLocations,5}, {Rounds,1000}, {EdgeWeight,10.0}, {FixedOrUpperWeight,random}, {EdgeTraversalDecrement,0}, {MixHiders,false}, {MixSeekers,false}]
+hMinimumConnectivity,Cost, 9139.06827825921, Score, 27.810666666666638,sLeastConnectedFirst,Cost, 292.7133438819067, Score, -19.844999999999995, PathLength, 58.0,sDepthFirstSearchLowCost,Cost, 361.85138466234287, Score, -35.77633333333331, PathLength, 106.0,

@@ -73,8 +73,6 @@ public class BreadthFirstSearch extends SeekerLocalGraph {
 		// If we cannot move directly to the next node (i.e. from sibling to sibling) we must find the path to our next node
 		if (!graphController.containsEdge(currentNode, toBeVisited.get(0))) {
 
-			System.out.println(":)");
-			
 			/* This should rarely happen as there will be a path to the child via the parent,
 			 * which will be added to the local graph
 			 */
