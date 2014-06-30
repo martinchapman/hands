@@ -62,6 +62,20 @@ public class OutputManager {
 				
 				String parameters = lines.remove(0);
 				
+				String topology = "";
+				
+				for ( String parameter : parameters.split(" ") ) {
+					
+					String[] keyAndValue = parameter.split(",");
+					
+					if ( keyAndValue[0].replace("{", "").equals("Topology") ) {
+						
+						topology = keyAndValue[1].replace("}", "");
+						
+					}
+					
+				}
+				
 				for ( String line : lines ) {
 				
 					String lastHider = "";
@@ -103,6 +117,8 @@ public class OutputManager {
 									
 										hiderRecords.add(new HiderRecord("MixedStrats"));
 										
+										hiderRecords.get(hiderRecords.size() - 1 ).setTopology(topology);
+										
 										hiderRecords.get(hiderRecords.size() - 1 ).setParameters(parameters);
 									
 									}
@@ -116,6 +132,8 @@ public class OutputManager {
 										
 										// Create it
 										hiderRecords.add(new HiderRecord(word));
+										
+										hiderRecords.get(hiderRecords.size() - 1 ).setTopology(topology);
 										
 										hiderRecords.get(hiderRecords.size() - 1 ).setParameters(parameters);
 										
@@ -134,6 +152,8 @@ public class OutputManager {
 								if (!hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).containsSeeker(new TraverserRecord(word))) {
 									
 									hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).addSeeker(new TraverserRecord(word));
+									
+									hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker(word).setTopology(topology);
 									
 								}
 								
@@ -190,7 +210,7 @@ public class OutputManager {
 	 * @param graphType
 	 * @param attribute
 	 */
-	public void showGraphForAttribute(ArrayList<TraverserRecord> traverserRecords, String title, String graphType, String attribute) {
+	public void showGraphForAttribute(ArrayList<TraverserRecord> traverserRecords, String title, String graphType, String ytype) {
 		
 		TraverserGraph graph = null;
 		
@@ -210,7 +230,7 @@ public class OutputManager {
 				
 				for ( Entry<Integer, Hashtable<String,Double>> series : traverser.getSeries() ) {
 					
-					attributeToValues.add( series.getValue().get(attribute) );
+					attributeToValues.add( series.getValue().get(ytype) );
 					
 				}
 				
@@ -220,7 +240,7 @@ public class OutputManager {
 			
 			xLabel = "Game Number";
 			
-			yLabel = attribute;
+			yLabel = ytype;
 		
 		} else if (graphType.equals("Bar")) {
 			
@@ -230,7 +250,7 @@ public class OutputManager {
 			
 			for ( TraverserRecord traverser : traverserRecords ) {
 				
-				((BarGraph) graph).addBar(traverser.getAverageAttributeValue(attribute), traverser.toString(), attribute);
+				((BarGraph) graph).addBar(traverser.getAverageAttributeValue(ytype), traverser.toString(), traverser.getTopology());
 			
 			}
 			
@@ -260,7 +280,7 @@ public class OutputManager {
 			
 			for ( HiderRecord hiderRecord : hiderRecords ) {
 				
-				returner += "\n" + hiderRecord.getParameters();
+				returner += "\n" + hiderRecord.getTopology();
 				
 				returner += "\n" + hiderRecord.printStats();
 				

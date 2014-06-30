@@ -29,6 +29,52 @@ public class TraverserRecord {
 	/**
 	 * 
 	 */
+	private String parameters;
+	
+	/**
+	 * @return
+	 */
+	public String getParameters() {
+		
+		return parameters;
+	
+	}
+
+	/**
+	 * @param parameters
+	 */
+	public void setParameters(String parameters) {
+	
+		this.parameters = parameters;
+	
+	}
+
+	/**
+	 * 
+	 */
+	private String topology;
+	
+	/**
+	 * @param parameters
+	 */
+	public void setTopology(String topology) {
+		
+		this.topology = topology;
+		
+	}
+	
+	/**
+	 * @return
+	 */
+	public String getTopology() {
+		
+		return topology;
+		
+	}
+	
+	/**
+	 * 
+	 */
 	protected int gameNumber;
 	
 	/**

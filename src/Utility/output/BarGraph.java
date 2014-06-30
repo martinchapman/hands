@@ -56,7 +56,7 @@ public class BarGraph extends TraverserGraph {
             ylabel,                  // range axis label
             dataset,                  // data
             PlotOrientation.VERTICAL, // orientation
-            false,                     // include legend
+            true,                     // include legend
             true,                     // tooltips?
             false                     // URLs?
         );
@@ -94,9 +94,9 @@ public class BarGraph extends TraverserGraph {
 	 * @param value
 	 * @param attribute
 	 */
-	public void addBar(Double value, String traverser, String attribute) {
+	public void addBar(Double value, String traverser, String topology) {
 		
-		dataset.addValue(value, attribute, traverser);
+		dataset.addValue(value, topology, traverser);
 			
 	}
 

@@ -1,2 +1,0 @@
-[1, [RandomSet,1], [LeastConnectedFirst,1][DepthFirstSearchLowCost,1], {Topology,random}, {NumberOfNodes,100}, {NumberOfHideLocations,5}, {Rounds,1000}, {EdgeWeight,10.0}, {FixedOrUpperWeight,random}, {EdgeTraversalDecrement,0}, {MixHiders,false}, {MixSeekers,false}]
-hRandomSet,Cost, 41.14796746182675, Score, 33.07749999999998,sLeastConnectedFirst,Cost, 479.31377601782117, Score, -29.32100000000001, PathLength, 86.0,sDepthFirstSearchLowCost,Cost, 347.1612990372155, Score, -36.83400000000001, PathLength, 109.0,

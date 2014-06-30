@@ -167,9 +167,13 @@ public class BacktrackPath extends SeekerLocalGraph {
 				
 				//Utils.talk(toString(), "Original current node edges: " + graphController.edgesOf(currentNode));
 				
-				//Utils.talk(toString(), pathInProgress.size() + " " + 
-									 // ( graphController.getEdgeWeight(connectedEdges.get(0)) - graphController.getEdgeWeight(cheaperEdge) ) + " vs " +
-									 // totalBacktrackPathCost );
+				if ( connectedEdges.size() > 0 && ( BACKTRACKCOSTSENSITIVE && ( graphController.getEdgeWeight(connectedEdges.get(0)) - graphController.getEdgeWeight(cheaperEdge) > totalBacktrackPathCost ) ) ) {
+				
+					Utils.talk(toString(), pathInProgress.size() + " " + 
+										 ( graphController.getEdgeWeight(connectedEdges.get(0)) - graphController.getEdgeWeight(cheaperEdge) ) + " vs " +
+										   totalBacktrackPathCost );
+				
+				}
 				
 				/* 
 				 * If the seeker is not permitted to backtrack this far, simply continue onwards

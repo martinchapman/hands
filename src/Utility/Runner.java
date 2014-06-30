@@ -63,7 +63,6 @@ public class Runner extends JFrame {
 		  "LowEdgeCostRandomFixedDistance",
 		  "VariableFixedDistance",
 		  "LowEdgeCostVariableFixedDistance",
-		  "LowEdgeCostFixedDistance",
 		  "MinimumConnectivity",
 		  "MaxDistance",
 		  
@@ -201,6 +200,8 @@ public class Runner extends JFrame {
 		add(tabbedPane);
 		
 		//
+		
+		setupTab(tabbedPane);
 		
 		simulationsTab(tabbedPane);
 		
@@ -477,11 +478,11 @@ public class Runner extends JFrame {
 					
 					selectedHiders.add(hider);
 					
-					title += hider.toString().replace(" ", "");
+					title += hider.getTopology() + " " + hider.toString().replace(" ", "");
 					
 					for ( TraverserRecord hidersSeekers : hider.getSeekersAndAttributes() ) {
 						
-						if (selectedHiders.size() > 1) hidersSeekers.setTraverser(hidersSeekers.getTraverser() + " (" + hider.getTraverser() + ")");
+						hidersSeekers.setTraverser(hidersSeekers.getTraverser() + " (" + hider.getTraverser() + ")");
 						
 						selectedSeekers.add(hidersSeekers);
 						
@@ -524,23 +525,15 @@ public class Runner extends JFrame {
 		
 	}
 	
-	private void simulationsTab(JTabbedPane tabbedPane) {
+	private void setupTab(JTabbedPane tabbedPane) {
 		
 		//////
 		
-		JPanel simulationsTab = new JPanel();
+		JPanel setupTab = new JPanel();
 		
-		simulationsTab.setLayout(new BorderLayout());
+		setupTab.setLayout(new GridLayout(2, 2));
 		
-		tabbedPane.addTab("Simulations", simulationsTab);
-		
-		////
-		
-		JPanel northPane = new JPanel();
-		
-		northPane.setLayout(new GridLayout(2, 2));
-		
-		simulationsTab.add(northPane, BorderLayout.NORTH);
+		tabbedPane.addTab("Setup", setupTab);
 		
 		////
 		
@@ -608,7 +601,7 @@ public class Runner extends JFrame {
 		
 		//
 		
-		northPane.add(parameters);
+		setupTab.add(parameters);
 		
 		////
 		
@@ -710,7 +703,7 @@ public class Runner extends JFrame {
 		
 		//
 		
-		northPane.add(hiders);
+		setupTab.add(hiders);
 		
 		////
 		
@@ -726,6 +719,8 @@ public class Runner extends JFrame {
 		
 		numberOfRounds = new JTextField("1");
 		
+		numberOfRounds.setPreferredSize(new Dimension(100, 10));
+		
 		simulationParameters.add(numberOfRounds);
 		
 		//
@@ -738,7 +733,7 @@ public class Runner extends JFrame {
 		
 		//
 		
-		northPane.add(simulationParameters);
+		setupTab.add(simulationParameters);
 		
 		////
 		
@@ -840,10 +835,24 @@ public class Runner extends JFrame {
 		
 		//
 		
-		northPane.add(seekers);
+		setupTab.add(seekers);
 		
 		////////
 		
+	}
+	
+	private void simulationsTab(JTabbedPane tabbedPane) {
+		
+		//////
+		
+		JPanel simulationsTab = new JPanel();
+		
+		simulationsTab.setLayout(new BorderLayout());
+		
+		tabbedPane.addTab("Simulations", simulationsTab);
+		
+		////
+			
 		queueListModel = new DefaultListModel<String>();
 		
 		queueList = new JList<String>(queueListModel);

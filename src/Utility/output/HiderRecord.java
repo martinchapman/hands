@@ -22,29 +22,6 @@ public class HiderRecord extends TraverserRecord {
 		return seekersAndAttributes;
 	
 	}
-
-	/**
-	 * 
-	 */
-	private String parameters;
-	
-	/**
-	 * @param parameters
-	 */
-	public void setParameters(String parameters) {
-		
-		this.parameters = parameters;
-		
-	}
-	
-	/**
-	 * @return
-	 */
-	public String getParameters() {
-		
-		return parameters;
-		
-	}
 	
 	/**
 	 * @param hider
