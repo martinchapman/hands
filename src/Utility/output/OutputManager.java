@@ -115,11 +115,12 @@ public class OutputManager {
 									// If mixing, only ever one hide record, for all hiders
 									if ( (hiderRecords.size() == 0) ) {
 									
-										hiderRecords.add(new HiderRecord("MixedStrats"));
+										hiderRecords.add(new HiderRecord(path.toAbsolutePath().toString(), "MixedStrats"));
 										
 										hiderRecords.get(hiderRecords.size() - 1 ).setTopology(topology);
 										
 										hiderRecords.get(hiderRecords.size() - 1 ).setParameters(parameters);
+										
 									
 									}
 									
@@ -131,7 +132,7 @@ public class OutputManager {
 									if (!hiderRecords.contains(new TraverserRecord(word))) {
 										
 										// Create it
-										hiderRecords.add(new HiderRecord(word));
+										hiderRecords.add(new HiderRecord(path.toAbsolutePath().toString(), word));
 										
 										hiderRecords.get(hiderRecords.size() - 1 ).setTopology(topology);
 										

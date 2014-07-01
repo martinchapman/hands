@@ -15,6 +15,11 @@ public class HiderRecord extends TraverserRecord {
 	private ArrayList<TraverserRecord> seekersAndAttributes;
 	
 	/**
+	 * 
+	 */
+	private String fileRelatingTo;
+	
+	/**
 	 * @return
 	 */
 	public ArrayList<TraverserRecord> getSeekersAndAttributes() {
@@ -29,6 +34,20 @@ public class HiderRecord extends TraverserRecord {
 	public HiderRecord(String hider) {
 		
 		super(hider);
+		
+		seekersAndAttributes = new ArrayList<TraverserRecord>();
+	
+	}
+	
+	/**
+	 * @param fileRelatingTo
+	 * @param hider
+	 */
+	public HiderRecord(String fileRelatingTo, String hider) {
+		
+		super(hider);
+		
+		this.fileRelatingTo = fileRelatingTo;
 		
 		seekersAndAttributes = new ArrayList<TraverserRecord>();
 	

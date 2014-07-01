@@ -376,6 +376,23 @@ public class Runner extends JFrame {
 			
 		});
 		
+		deleteOnClick(outputFeedbackList, outputFeedback, new PostDelete() {
+
+			@Override
+			public void postDelete(String deleted) {
+				
+				if (simulationHidersModel.toArray().length == 1) { 
+					
+					start.setEnabled(false);
+					
+					queue.setEnabled(false);
+					
+				}
+				
+			}
+			
+		});
+		
 		centerPane.add(simulationParameters, BorderLayout.NORTH);
 		
 		centerPane.add(outputFeedbackListScroll, BorderLayout.CENTER);
@@ -566,6 +583,7 @@ public class Runner extends JFrame {
 		for ( String topology : graphTypes ) {
 			
 			topologies.addItem(topology);
+			
 		}
 		
 		parameters.add(topologies);
