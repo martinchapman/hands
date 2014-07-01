@@ -333,6 +333,8 @@ public class Runner extends JFrame {
 		
 		final JList<HiderRecord> outputFeedbackList = new JList<HiderRecord>(outputFeedback);
 		
+		JScrollPane outputFeedbackListScroll = new JScrollPane(outputFeedbackList);
+		
 		final JComboBox<String> measure = new JComboBox<String>();
 		
 		final JLabel simulationParameters = new JLabel();
@@ -362,7 +364,7 @@ public class Runner extends JFrame {
 		
 		centerPane.add(simulationParameters, BorderLayout.NORTH);
 		
-		centerPane.add(outputFeedbackList, BorderLayout.CENTER);
+		centerPane.add(outputFeedbackListScroll, BorderLayout.CENTER);
 		
 		////
 		

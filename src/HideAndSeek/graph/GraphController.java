@@ -36,6 +36,8 @@ public class GraphController<V, E> {
 	 */
 	private HiddenObjectGraph<StringVertex, StringEdge> graph;
 	
+	private TopologyProperties<StringVertex, StringEdge> topologyProperties;
+	
 	/**
 	 * @param graph
 	 */
@@ -92,6 +94,7 @@ public class GraphController<V, E> {
 		
 		Utils.talk("Graph Controller", "Graph generated. \n" + graph.edgeSet());
 		
+		topologyProperties = new TopologyProperties<StringVertex, StringEdge>(topology, graph);
 		
 		// Assign nodes types
 		
@@ -122,6 +125,15 @@ public class GraphController<V, E> {
 		}
 		
 		Utils.talk("Graph Controller", "Graph generated. Edges: " + graph.edgeSet().size());
+		
+	}
+	
+	/**
+	 * @return Get information on the topology generated for the current game
+	 */
+	public TopologyProperties<StringVertex, StringEdge> getTopologyProperties() {
+		
+		return topologyProperties;
 		
 	}
 

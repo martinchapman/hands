@@ -2,7 +2,6 @@ package HideAndSeek.seeker.singleshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import HideAndSeek.graph.GraphController;
@@ -75,6 +74,25 @@ public class LeastConnectedFirst extends Seeker {
 		
 	}
 	
+	
+
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraverser#startNode()
+	 */
+	@Override
+	protected StringVertex startNode() {
+
+		return randomNode();
+		
+	}
+
+	@Override
+	protected StringVertex nextNode(StringVertex currentNode) {
+		
+		return connectedNode(currentNode);
+		
+	}
+	
 	/**
 	 * Pairs Edges with a figure denoting the number of nodes connected to the vertex
 	 * at the end of that edge
@@ -131,23 +149,6 @@ public class LeastConnectedFirst extends Seeker {
 			}
 		
 		}
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see HideAndSeek.GraphTraverser#startNode()
-	 */
-	@Override
-	protected StringVertex startNode() {
-
-		return randomNode();
-		
-	}
-
-	@Override
-	protected StringVertex nextNode(StringVertex currentNode) {
-		
-		return connectedNode(currentNode);
 		
 	}
 
