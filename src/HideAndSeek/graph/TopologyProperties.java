@@ -59,7 +59,7 @@ public class TopologyProperties<V, E extends DefaultWeightedEdge> {
 	/**
 	 * @return
 	 */
-	public int degreeOfMostConnectedNode() {
+	public int degreeOfLeastConnectedNode() {
 		
 		return nodeConnectivity.get(0).getNodeConnections();
 		
@@ -68,9 +68,66 @@ public class TopologyProperties<V, E extends DefaultWeightedEdge> {
 	/**
 	 * @return
 	 */
-	public int degreeOfLeastConnectedNode() {
+	public int degreeOfMostConnectedNode() {
 		
-		return nodeConnectivity.get(nodeConnectivity.size()).getNodeConnections();
+		return nodeConnectivity.get(nodeConnectivity.size() - 1).getNodeConnections();
+		
+	}
+	
+	
+	
+	/**
+	 * @return
+	 */
+	public int numberOfLeastConnectedNodes() {
+		
+		int lowestConnectivityCount = nodeConnectivity.get(0).getNodeConnections();
+		
+		int leastConnectedNodes = 0;
+		
+		for ( NodeConnectionCount count : nodeConnectivity ) {
+			
+			if ( count.getNodeConnections() > lowestConnectivityCount ) {
+				
+				break;
+				
+			}
+			
+			leastConnectedNodes++;
+			
+		}
+		
+		return leastConnectedNodes;
+				
+	}
+	
+	/**
+	 * @return
+	 */
+	public int numberOfMostConnectedNodes() {
+		
+		// Reverse to find most connected (reversed back later)
+		Collections.reverse(nodeConnectivity);
+		
+		int highestConnectivityCount = nodeConnectivity.get(0).getNodeConnections();
+		
+		int mostConnectedNodes = 0;
+		
+		for ( NodeConnectionCount count : nodeConnectivity ) {
+			
+			if ( count.getNodeConnections() < highestConnectivityCount ) {
+				
+				break;
+				
+			}
+			
+			mostConnectedNodes++;
+			
+		}
+		
+		Collections.reverse(nodeConnectivity);
+		
+		return mostConnectedNodes;
 		
 	}
 	

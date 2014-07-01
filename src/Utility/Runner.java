@@ -339,6 +339,8 @@ public class Runner extends JFrame {
 		
 		final JLabel simulationParameters = new JLabel();
 		
+		final JRadioButton seekers = new JRadioButton("Seekers");
+		
 		outputFeedbackList.addListSelectionListener(new ListSelectionListener() {
 
 			@Override
@@ -350,9 +352,21 @@ public class Runner extends JFrame {
 				
 				measure.removeAllItems();
 				
-				for ( String attribute : outputFeedbackList.getSelectedValue().getSeekerAttributes() ) {
+				if ( seekers.isSelected() ) {
+				
+					for ( String attribute : outputFeedbackList.getSelectedValue().getSeekerAttributes() ) {
+						
+						measure.addItem(attribute);
+						
+					}
+				
+				} else {
 					
-					measure.addItem(attribute);
+					for ( String attribute : outputFeedbackList.getSelectedValue().getAttributes() ) {
+						
+						measure.addItem(attribute);
+						
+					}
 					
 				}
 				
@@ -383,8 +397,6 @@ public class Runner extends JFrame {
 		//
 		
 		centerPaneRightCenter.add(new JLabel("Data for:"));
-		
-		final JRadioButton seekers = new JRadioButton("Seekers");
 		
 		centerPaneRightCenter.add(seekers);
 		
@@ -661,7 +673,7 @@ public class Runner extends JFrame {
 
 		simulationHidersModel = new DefaultListModel<String>();
 		
-		simulationHidersModel.addElement("Random");
+		simulationHidersModel.addElement("RandomSet");
 		
 		JList<String> simulationHiders = new JList<String>(simulationHidersModel);
 		
@@ -793,7 +805,7 @@ public class Runner extends JFrame {
 
 		simulationSeekersModel = new DefaultListModel<String>();
 		
-		simulationSeekersModel.addElement("RandomWalk");
+		simulationSeekersModel.addElement("ConstrainedRandomWalk");
 		
 		JList<String> simulationSeekers = new JList<String>(simulationSeekersModel);
 		

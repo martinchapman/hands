@@ -36,6 +36,9 @@ public class GraphController<V, E> {
 	 */
 	private HiddenObjectGraph<StringVertex, StringEdge> graph;
 	
+	/**
+	 * 
+	 */
 	private TopologyProperties<StringVertex, StringEdge> topologyProperties;
 	
 	/**
