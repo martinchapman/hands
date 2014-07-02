@@ -1,11 +1,8 @@
 package Utility.output;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Map.Entry;
-
-import org.jfree.ui.RefineryUtilities;
 
 public class HiderRecord extends TraverserRecord {
 	
@@ -17,8 +14,17 @@ public class HiderRecord extends TraverserRecord {
 	/**
 	 * 
 	 */
-	private String fileRelatingTo;
+	private Path fileRelatingTo;
 	
+	/**
+	 * @return
+	 */
+	public Path getFileRelatingTo() {
+		
+		return fileRelatingTo;
+	
+	}
+
 	/**
 	 * @return
 	 */
@@ -43,7 +49,7 @@ public class HiderRecord extends TraverserRecord {
 	 * @param fileRelatingTo
 	 * @param hider
 	 */
-	public HiderRecord(String fileRelatingTo, String hider) {
+	public HiderRecord(Path fileRelatingTo, String hider) {
 		
 		super(hider);
 		

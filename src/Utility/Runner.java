@@ -152,7 +152,7 @@ public class Runner extends JFrame {
 	public interface PostDelete 
     {
 		
-		public void postDelete(String deleted);
+		public void postDelete(Object object);
 		
     }
 
@@ -161,7 +161,7 @@ public class Runner extends JFrame {
 	 * @param model
 	 * @param deleted
 	 */
-	private void deleteOnClick(final JList<String> list, final DefaultListModel<String> model, final PostDelete deleted) {
+	private void deleteOnClick(final JList<?> list, final DefaultListModel<?> model, final PostDelete deleted) {
 		
 		list.addMouseListener(new MouseAdapter() {
 		    
@@ -379,13 +379,13 @@ public class Runner extends JFrame {
 		deleteOnClick(outputFeedbackList, outputFeedback, new PostDelete() {
 
 			@Override
-			public void postDelete(String deleted) {
+			public void postDelete(Object deleted) {
 				
-				if (simulationHidersModel.toArray().length == 1) { 
+				if (!outputFeedbackList.getSelectedValue().toString().equals("-----")) {
 					
-					start.setEnabled(false);
+					outputManager.deleteFile(((HiderRecord)deleted).getFileRelatingTo());
 					
-					queue.setEnabled(false);
+					outputManager.removeOrphaned();
 					
 				}
 				
@@ -479,9 +479,9 @@ public class Runner extends JFrame {
 		
 		final JComboBox<String> graphTypes = new JComboBox<String>();
 		
-		graphTypes.addItem("Line");
-		
 		graphTypes.addItem("Bar");
+		
+		graphTypes.addItem("Line");
 		
 		centerPaneRightCenter.add(new JLabel("Graph types:"));
 		
@@ -702,7 +702,7 @@ public class Runner extends JFrame {
 		deleteOnClick(simulationHiders, simulationHidersModel, new PostDelete() {
 
 			@Override
-			public void postDelete(String deleted) {
+			public void postDelete(Object deleted) {
 				
 				if (simulationHidersModel.toArray().length == 1) { 
 					
@@ -834,7 +834,7 @@ public class Runner extends JFrame {
 		deleteOnClick(simulationSeekers, simulationSeekersModel, new PostDelete() {
 
 			@Override
-			public void postDelete(String deleted) {
+			public void postDelete(Object deleted) {
 				
 				if (simulationSeekersModel.toArray().length == 1) { 
 					
@@ -909,7 +909,7 @@ public class Runner extends JFrame {
 		deleteOnClick(queueList, queueListModel, new PostDelete() {
 
 			@Override
-			public void postDelete(String deleted) {
+			public void postDelete(Object deleted) {
 				
 				if (queueListModel.toArray().length == 1) { 
 					

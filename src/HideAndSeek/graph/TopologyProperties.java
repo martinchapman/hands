@@ -59,6 +59,23 @@ public class TopologyProperties<V, E extends DefaultWeightedEdge> {
 	/**
 	 * @return
 	 */
+	public double averageDegreeOfNodes() {
+		
+		int total = 0;
+		
+		for ( NodeConnectionCount node : nodeConnectivity ) {
+			
+			total += node.getNodeConnections();
+			
+		}
+		
+		return total / nodeConnectivity.size();
+		
+	}
+	
+	/**
+	 * @return
+	 */
 	public int degreeOfLeastConnectedNode() {
 		
 		return nodeConnectivity.get(0).getNodeConnections();

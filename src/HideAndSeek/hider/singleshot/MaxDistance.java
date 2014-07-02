@@ -63,6 +63,8 @@ public class MaxDistance extends HiderLocalGraph {
 	@Override
 	protected boolean hideHere(StringVertex vertex) {
 		
+		Utils.talk(toString(), "Top");
+		
 		DijkstraShortestPath<StringVertex, StringEdge> DSP = null;
 		
 		triedNodes.add(vertex);
@@ -82,6 +84,8 @@ public class MaxDistance extends HiderLocalGraph {
 			
 		}
 		
+		Utils.talk(toString(), "Potential hide location: " + vertex);
+		
 		// If the proposed vertex is not further away than the min distance
 		// from all other hide locations, hide here.
 		for ( StringVertex location : hideLocations ) {
@@ -91,6 +95,8 @@ public class MaxDistance extends HiderLocalGraph {
 			// Try to learn max distance in graph
 			if ( DSP.getPathEdgeList().size() > maxDistance ) maxDistance = DSP.getPathEdgeList().size();
 			
+			Utils.talk(toString(), "Min distance: " + MINDISTANCE + " | Distance to: " + location + " " + DSP.getPathEdgeList().size());
+			
 			if ( DSP.getPathEdgeList().size() < MINDISTANCE ) return false;
 			
 		}
@@ -99,6 +105,15 @@ public class MaxDistance extends HiderLocalGraph {
 		
 		return true;
 		
+	}
+
+	/* (non-Javadoc)
+	 * @see HideAndSeek.hider.Hider#printGameStats()
+	 */
+	@Override
+	public String printGameStats() {
+		// TODO Auto-generated method stub
+		return super.printGameStats() + ", GraphDiameter, " + graphController.requestGraphDiameter();
 	}
 
 	/* (non-Javadoc)

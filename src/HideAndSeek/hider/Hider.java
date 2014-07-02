@@ -160,7 +160,8 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 	 */
 	public String printGameStats() {
 		
-		return "Cost, " + graphController.requestAverageGameCosts(this) + ", Score, " + graphController.requestAverageHiderScore(this) + ", LeastConnectedNodes, " + graphController.getTopologyProperties().numberOfLeastConnectedNodes() + ", MostConnectedNodes, " + graphController.getTopologyProperties().numberOfMostConnectedNodes();
+		return "Cost, " + graphController.requestAverageGameCosts(this) + 
+			 ", Score, " + graphController.requestAverageHiderScore(this);
 		
 	}
 	

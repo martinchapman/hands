@@ -91,6 +91,21 @@ public class MinimumConnectivity extends Hider {
 	}
     
 	/* (non-Javadoc)
+	 * @see HideAndSeek.hider.Hider#printGameStats()
+	 */
+	@Override
+	public String printGameStats() {
+		// TODO Auto-generated method stub
+		return super.printGameStats() + 
+				 ", AverageDegreeOfNodes, " + graphController.getTopologyProperties().averageDegreeOfNodes() +
+				 ", DegreeOfLeastConnectedNodes, " + graphController.getTopologyProperties().degreeOfLeastConnectedNode() + 
+				 ", NumberOfLeastConnectedNodes, " + graphController.getTopologyProperties().numberOfLeastConnectedNodes() + 
+				 ", DegreeOfMostConnectedNodes, " + graphController.getTopologyProperties().degreeOfMostConnectedNode() + 
+				 ", NumberOfMostConnectedNodes, " + graphController.getTopologyProperties().numberOfMostConnectedNodes() +
+				 "";
+	}
+
+	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#startNode()
 	 */
 	@Override

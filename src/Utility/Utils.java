@@ -2,6 +2,7 @@ package Utility;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -143,6 +144,8 @@ public class Utils {
 		
         Graphics2D g = new EpsGraphics2D();
         
+        g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+        
         chart.draw(g, new Rectangle(x,y));
         
         FileWriter writer = null;
@@ -224,7 +227,7 @@ public class Utils {
 	/**
 	 * 
 	 */
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 
 	/**
 	 * @param speaker

@@ -1,0 +1,2 @@
+[1, [MaxDistance,1], [ConstrainedRandomWalk,1], {Topology,random}, {NumberOfNodes,100}, {NumberOfHideLocations,5}, {Rounds,1}, {EdgeWeight,1.0}, {FixedOrUpperWeight,random}, {EdgeTraversalDecrement,0}, {MixHiders,false}, {MixSeekers,false}]
+hMaxDistance,Cost, 8.145200661168493, Score, 33.0, GraphDiameter, 4.0,sConstrainedRandomWalk,Cost, 45.353269878611094, Score, -33.0, PathLength, 98.0,

@@ -42,7 +42,7 @@ public class OutputManager {
 		
 		fileHiderRecords = new ArrayList<ArrayList<HiderRecord>>();
 		
-		ArrayList<Path> files = listFilesForFolder(new File(FILEPREFIX + "/Data"));
+		ArrayList<Path> files = listFilesForFolder(new File(FILEPREFIX + "/data"));
 		
 		if (files.size() == 0) {
 			
@@ -115,7 +115,7 @@ public class OutputManager {
 									// If mixing, only ever one hide record, for all hiders
 									if ( (hiderRecords.size() == 0) ) {
 									
-										hiderRecords.add(new HiderRecord(path.toAbsolutePath().toString(), "MixedStrats"));
+										hiderRecords.add(new HiderRecord(path, "MixedStrats"));
 										
 										hiderRecords.get(hiderRecords.size() - 1 ).setTopology(topology);
 										
@@ -132,7 +132,7 @@ public class OutputManager {
 									if (!hiderRecords.contains(new TraverserRecord(word))) {
 										
 										// Create it
-										hiderRecords.add(new HiderRecord(path.toAbsolutePath().toString(), word));
+										hiderRecords.add(new HiderRecord(path, word));
 										
 										hiderRecords.get(hiderRecords.size() - 1 ).setTopology(topology);
 										
@@ -211,13 +211,13 @@ public class OutputManager {
 	 * @param graphType
 	 * @param attribute
 	 */
-	public void showGraphForAttribute(ArrayList<TraverserRecord> traverserRecords, String title, String graphType, String ytype) {
+	public void showGraphForAttribute(ArrayList<TraverserRecord> traverserRecords, String title, String graphType, String yType) {
 		
 		TraverserGraph graph = null;
 		
 		String xLabel = "";
 		
-		String yLabel = "";
+		String yLabel = yType;
 		
 		if (title.length() > 200) title = title.substring(0, 100);
 		
@@ -231,7 +231,7 @@ public class OutputManager {
 				
 				for ( Entry<Integer, Hashtable<String,Double>> series : traverser.getSeries() ) {
 					
-					attributeToValues.add( series.getValue().get(ytype) );
+					attributeToValues.add( series.getValue().get(yType) );
 					
 				}
 				
@@ -241,8 +241,6 @@ public class OutputManager {
 			
 			xLabel = "Game Number";
 			
-			yLabel = ytype;
-		
 		} else if (graphType.equals("Bar")) {
 			
 			graph = new BarGraph(title);
@@ -251,7 +249,7 @@ public class OutputManager {
 			
 			for ( TraverserRecord traverser : traverserRecords ) {
 				
-				((BarGraph) graph).addBar(traverser.getAverageAttributeValue(ytype), traverser.toString(), traverser.getTopology());
+				((BarGraph) graph).addBar(traverser.getAverageAttributeValue(yType), traverser.toString(), traverser.getTopology());
 			
 			}
 			
@@ -259,7 +257,7 @@ public class OutputManager {
 		
 		graph.createChart(title, xLabel, yLabel);
 		
-		graph.exportChartAsEPS(Utils.FILEPREFIX + "Data/charts/" + title + ".eps");
+		graph.exportChartAsEPS(Utils.FILEPREFIX + "data/charts/" + title + ".eps");
 		
 		graph.pack();
 		
@@ -298,9 +296,52 @@ public class OutputManager {
 	 */
 	public void removeAllOutputFiles() {
 		
-		for ( Path path : listFilesForFolder(new File(FILEPREFIX + "/Data")) ) deleteFile(path);
+		for ( Path path : listFilesForFolder(new File(FILEPREFIX + "/data")) ) deleteFile(path);
 		
-		for ( Path path : listFilesForFolder(new File(FILEPREFIX + "/Data/js/Data")) ) deleteFile(path);
+		for ( Path path : listFilesForFolder(new File(FILEPREFIX + "/data/js/data")) ) deleteFile(path);
+		
+	}
+	
+	/**
+	 * Remove relating .js and .html files if .csv have been removed
+	 */
+	public void removeOrphaned() {
+		
+		ArrayList<String> CSVIDs = new ArrayList<String>();
+		
+		for ( Path path : listFilesForFolder(new File(FILEPREFIX + "/data")) ) { 
+			
+			// If this is a .csv file, track its ID
+			if ( path.toString().substring(path.toString().lastIndexOf('.'), path.toString().length()).equals(".csv")) {
+				
+				CSVIDs.add(path.toString().substring(path.toString().lastIndexOf('/') + 1, path.toString().lastIndexOf('.')));
+			
+			}
+		    
+		}
+		
+		// For all .html files, if no corresponding .csv ID recorded, remove.
+		for ( Path path : listFilesForFolder(new File(FILEPREFIX + "/data")) ) { 
+			
+			if ( path.toString().contains("-") && !CSVIDs.contains( path.toString().substring(path.toString().lastIndexOf('/') + 1, path.toString().lastIndexOf('-')) )) {
+				
+				deleteFile(path);
+				
+			}
+		
+		}
+		
+		// Similar for .js files
+		for ( Path path : listFilesForFolder(new File(FILEPREFIX + "/data/js/data")) ) {
+			
+			if ( path.toString().contains("-") && !CSVIDs.contains( path.toString().substring(path.toString().lastIndexOf('/') + 1, path.toString().lastIndexOf('-')) )) {
+				
+				deleteFile(path);
+				
+			}
+			
+		}
+		
 		
 	}
 	
@@ -312,7 +353,7 @@ public class OutputManager {
 	/**
 	 * @param path
 	 */
-	private void deleteFile(Path path) {
+	public void deleteFile(Path path) {
 		
 		try {
 		    
