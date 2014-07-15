@@ -48,6 +48,29 @@ public class TraverserRecord {
 		this.parameters = parameters;
 	
 	}
+	
+	/**
+	 * 
+	 */
+	private String category;
+	
+	/**
+	 * @return
+	 */
+	public String getCategory() {
+		
+		return category;
+		
+	}
+	
+	/**
+	 * @param category
+	 */
+	public void setCategory(String category) {
+		
+		this.category = category;
+		
+	}
 
 	/**
 	 * 
@@ -92,6 +115,40 @@ public class TraverserRecord {
 		
 		attributes = new HashSet<String>();
 		
+		category = "";
+		
+	}
+	
+	/**
+	 * @param traverser
+	 * @param attributeToValue
+	 * @param attributes
+	 */
+	public TraverserRecord(String traverser, Hashtable<Integer, Hashtable<String, Double>> attributeToValue, HashSet<String> attributes) {
+		
+		this.traverser = traverser;
+		
+		this.attributeToValue = attributeToValue;
+		
+		this.attributes = attributes;
+		
+	}
+	
+	/**
+	 * @param record
+	 */
+	public void integrateRecord(TraverserRecord record) {
+		
+		for ( Entry<Integer, Hashtable<String, Double>> gameToAttributes : record.getAttributeToValue().entrySet() ) {
+			
+			for ( Entry<String,Double> attributeToValue : gameToAttributes.getValue().entrySet() ) {
+				
+				this.attributeToValue.get(gameToAttributes.getKey()).put(attributeToValue.getKey(), this.attributeToValue.get(gameToAttributes.getKey()).get(attributeToValue.getKey()) + attributeToValue.getValue());
+				
+			}
+			
+		}
+		
 	}
 		
 	/**
@@ -109,6 +166,15 @@ public class TraverserRecord {
 	 */
 	protected Hashtable<Integer, Hashtable<String, Double>> attributeToValue;
 	
+	/**
+	 * @return
+	 */
+	public Hashtable<Integer, Hashtable<String, Double>> getAttributeToValue() {
+	
+		return attributeToValue;
+	
+	}
+
 	/**
 	 * 
 	 */
@@ -131,6 +197,8 @@ public class TraverserRecord {
 	    
 		// To maintain list of individual attributes
 		attributes.add(attribute);
+		
+		//value = Math.log(value)/Math.log(2);
 		
 		// If we already have an attribute entry for the most recent game, create new game
 		if (attributeToValue.get(gameNumber).containsKey(attribute)) {

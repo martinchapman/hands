@@ -63,7 +63,11 @@ public class HiderRecord extends TraverserRecord {
 	 * @param seekerRecord
 	 */
 	public void addSeeker(TraverserRecord seekerRecord) {
-	
+		
+		setCategory(getCategory() + " " + seekerRecord.getTraverser());
+		
+		seekerRecord.setCategory(getTraverser());
+		
 		seekersAndAttributes.add(seekerRecord);
 		
 	}
@@ -102,7 +106,7 @@ public class HiderRecord extends TraverserRecord {
 	 */
 	public String toString() {
 		
-		return traverser + " " + seekersAndAttributes;
+		return traverser + " Seekers: " + seekersAndAttributes.toString().replace("[", "").replace("]", "");
 		
 	}
 	

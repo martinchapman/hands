@@ -66,9 +66,9 @@ public class Runner extends JFrame {
 		  "MinimumConnectivity",
 		  "MaxDistance",
 		  
-		  "FullyBiasHider",
-		  "LooselyBiasHider",
-		  "VariableBiasHider" 
+		  "FullyBias",
+		  "LooselyBias",
+		  "VariableBias" 
 		};
 	
 	private static String[] seekerTypes = 
@@ -86,7 +86,7 @@ public class Runner extends JFrame {
 	      "LeastConnectedFirst",
 	      "MostConnectedFirst",
 	      
-          "HighProbabilitySeeker"
+          "HighProbability"
 		};
 	
 	private static String[] graphTypes = 
@@ -240,7 +240,7 @@ public class Runner extends JFrame {
 		
 		//
 		
-		JButton collateOutput = new JButton("Process Output");
+		final JButton collateOutput = new JButton("Process Output");
 		
 		northPane.add(collateOutput);
 		
@@ -489,6 +489,18 @@ public class Runner extends JFrame {
 		
 		//
 		
+		final JComboBox<String> categories = new JComboBox<String>();
+		
+		categories.addItem("Player");
+		
+		categories.addItem("Topology");
+		
+		centerPaneRightCenter.add(new JLabel("Bar graph categories:"));
+		
+		centerPaneRightCenter.add(categories);
+		
+		//
+		
 		JButton generateGraph = new JButton("Generate graph");
 		
 		generateGraph.addActionListener(new ActionListener() {
@@ -509,13 +521,21 @@ public class Runner extends JFrame {
 					
 					selectedHiders.add(hider);
 					
-					title += hider.getTopology() + " " + hider.toString().replace(" ", "");
+					title += "Topology: " + hider.getTopology() + " Hider: " + hider;
 					
 					for ( TraverserRecord hidersSeekers : hider.getSeekersAndAttributes() ) {
 						
-						hidersSeekers.setTraverser(hidersSeekers.getTraverser() + " (" + hider.getTraverser() + ")");
+						//hidersSeekers.setTraverser(hidersSeekers.getTraverser()); //+ " (" + hider.getTraverser() + ")");
 						
+						//if (selectedSeekers.contains(hidersSeekers)) {
+							
+							//selectedSeekers.get(selectedSeekers.indexOf(hidersSeekers)).integrateRecord(hidersSeekers);
+							
+						//} else {
+							
 						selectedSeekers.add(hidersSeekers);
+							
+						//}
 						
 					}
 					
@@ -529,7 +549,7 @@ public class Runner extends JFrame {
 				
 					} else if (graphTypes.getSelectedItem().equals("Bar")) {
 						
-						outputManager.showBarGraphForAttribute(selectedSeekers, title, (String)measure.getSelectedItem());
+						outputManager.showBarGraphForAttribute(selectedSeekers, title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem());
 						
 					}
 					
@@ -541,12 +561,14 @@ public class Runner extends JFrame {
 						
 					} else if (graphTypes.getSelectedItem().equals("Bar")) {
 						
-						outputManager.showBarGraphForAttribute(selectedHiders, title, (String)measure.getSelectedItem());
+						outputManager.showBarGraphForAttribute(selectedHiders, title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem());
 						
 					}
 					
 					
 				}
+				
+				collateOutput.doClick();
 				
 			}
 		

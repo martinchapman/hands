@@ -32,5 +32,5 @@ public class VariableBacktrackPath extends BacktrackPath {
 		MAXBACKTRACKDISTANCE = maxbacktrackdistance;
 		
 	}
-
+	
 }

@@ -144,6 +144,8 @@ public class Utils {
 		
         Graphics2D g = new EpsGraphics2D();
         
+        chart.setTitle("");
+        
         g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
         
         chart.draw(g, new Rectangle(x,y));
@@ -227,7 +229,7 @@ public class Utils {
 	/**
 	 * 
 	 */
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 
 	/**
 	 * @param speaker

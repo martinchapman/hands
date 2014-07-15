@@ -1,13 +1,16 @@
 package Utility.output;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.Map.Entry;
 
@@ -115,7 +118,7 @@ public class OutputManager {
 									// If mixing, only ever one hide record, for all hiders
 									if ( (hiderRecords.size() == 0) ) {
 									
-										hiderRecords.add(new HiderRecord(path, "MixedStrats"));
+										hiderRecords.add(new HiderRecord(path, "MixedHiderStrats"));
 										
 										hiderRecords.get(hiderRecords.size() - 1 ).setTopology(topology);
 										
@@ -149,16 +152,32 @@ public class OutputManager {
 							// If we come across an entry for a Seeker
 							} else if ( word.charAt(0) == 's' ) {
 								
-								// If the last hider doesn't have a record of this seeker, add it
-								if (!hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).containsSeeker(new TraverserRecord(word))) {
+								if ( parameters.contains("{MixSeekers,true}") ) { 
 									
-									hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).addSeeker(new TraverserRecord(word));
+									if ( hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeekersAndAttributes().size() == 0 ) {
+										
+										hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).addSeeker(new TraverserRecord("MixedSeekerStrats"));
+										
+										hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker("MixedSeekerStrats").setTopology(topology);
 									
-									hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker(word).setTopology(topology);
+									}
+									
+									lastSeeker = hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker("MixedSeekerStrats").getTraverser();
+									
+								} else {
+									
+									// If the last hider doesn't have a record of this seeker, add it
+									if (!hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).containsSeeker(new TraverserRecord(word))) {
+											
+										hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).addSeeker(new TraverserRecord(word));
+										
+										hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker(word).setTopology(topology);
+									
+									}
+									
+									lastSeeker = word;
 									
 								}
-								
-								lastSeeker = word;
 								
 								lastTraverser = "seeker";
 							
@@ -190,7 +209,7 @@ public class OutputManager {
 	 */
 	public void showLineGraphForAttribute(ArrayList<TraverserRecord> traversers, String title, String attribute) {
 		
-		showGraphForAttribute(traversers, title, "Line", attribute);
+		showGraphForAttribute(traversers, title, "Line", attribute, "");
 		
 	}
 
@@ -199,9 +218,9 @@ public class OutputManager {
 	 * @param title
 	 * @param attribute
 	 */
-	public void showBarGraphForAttribute(ArrayList<TraverserRecord> traversers, String title, String attribute) {
+	public void showBarGraphForAttribute(ArrayList<TraverserRecord> traversers, String title, String attribute, String category) {
 		
-		showGraphForAttribute(traversers, title, "Bar", attribute);
+		showGraphForAttribute(traversers, title, "Bar", attribute, category);
 		
 	}
 	
@@ -211,15 +230,13 @@ public class OutputManager {
 	 * @param graphType
 	 * @param attribute
 	 */
-	public void showGraphForAttribute(ArrayList<TraverserRecord> traverserRecords, String title, String graphType, String yType) {
+	public void showGraphForAttribute(ArrayList<TraverserRecord> traverserRecords, String title, String graphType, String yLabel, String category) {
 		
 		TraverserGraph graph = null;
 		
 		String xLabel = "";
 		
-		String yLabel = yType;
-		
-		if (title.length() > 200) title = title.substring(0, 100);
+		if ( title.length() > 200 ) title = title.substring(0, 200);
 		
 		if (graphType.equals("Line")) {
 		
@@ -231,7 +248,7 @@ public class OutputManager {
 				
 				for ( Entry<Integer, Hashtable<String,Double>> series : traverser.getSeries() ) {
 					
-					attributeToValues.add( series.getValue().get(yType) );
+					attributeToValues.add( series.getValue().get(yLabel) );
 					
 				}
 				
@@ -249,15 +266,40 @@ public class OutputManager {
 			
 			for ( TraverserRecord traverser : traverserRecords ) {
 				
-				((BarGraph) graph).addBar(traverser.getAverageAttributeValue(yType), traverser.toString(), traverser.getTopology());
+				String localCategory = "";
+				
+				if ( category.equals("Topology") ) {
+				
+					localCategory = traverser.getTopology();
+					
+				} else if ( category.equals("Player") ) {
+					
+					localCategory = traverser.getCategory();
+					
+				}
+				
+				((BarGraph) graph).addBar(traverser.getAverageAttributeValue(yLabel), traverser.toString(), localCategory);
 			
 			}
 			
 		}
 		
-		graph.createChart(title, xLabel, yLabel);
+		String filename = "figure" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
 		
-		graph.exportChartAsEPS(Utils.FILEPREFIX + "data/charts/" + title + ".eps");
+		graph.createChart(filename + " " + title, xLabel, yLabel);
+		
+		graph.exportChartAsEPS(Utils.FILEPREFIX + "data/charts/" + filename + ".eps");
+		
+		try {
+		
+			Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "/data/charts/figures.bib", true), "\n @FIG{" + filename + ", main = {}, add = { " + title + " }, file = {/Users/Martin/Dropbox/workspace/SearchGames/output/data/charts/" + filename + "}, source = {}}");
+		
+		} catch (IOException e) {
+			
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		
+		}
 		
 		graph.pack();
 		

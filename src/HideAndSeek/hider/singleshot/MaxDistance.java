@@ -63,8 +63,6 @@ public class MaxDistance extends HiderLocalGraph {
 	@Override
 	protected boolean hideHere(StringVertex vertex) {
 		
-		Utils.talk(toString(), "Top");
-		
 		DijkstraShortestPath<StringVertex, StringEdge> DSP = null;
 		
 		triedNodes.add(vertex);

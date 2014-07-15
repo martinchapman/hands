@@ -24,6 +24,20 @@ public abstract class Seeker extends GraphTraverser implements Runnable {
 	/**
 	 * 
 	 */
+	protected String name;
+	
+	/**
+	 * @param name
+	 */
+	public void setName(String name) {
+		
+		this.name = name;
+	
+	}
+
+	/**
+	 * 
+	 */
 	protected ArrayList<StringVertex> hideLocations;
 	
 	/**
@@ -47,6 +61,20 @@ public abstract class Seeker extends GraphTraverser implements Runnable {
 		// List of nodes that have been explored
 		exploredNodes = new ArrayList<StringVertex>();
 		
+		name = this.getClass().toString().substring(this.getClass().toString().lastIndexOf('.') + 1, this.getClass().toString().length());
+		
+	}
+	
+	/**
+	 * @param name
+	 * @param graphController
+	 */
+	public Seeker(String name, GraphController <StringVertex, StringEdge> graphController) {
+		
+		this(graphController);
+		
+		this.name = name;
+		
 	}
 	
 	/* (non-Javadoc)
@@ -54,8 +82,7 @@ public abstract class Seeker extends GraphTraverser implements Runnable {
 	 */
 	public String toString() {
 		
-		return "s" + this.getClass().toString().substring(this.getClass().toString().lastIndexOf('.') + 1, this.getClass().toString().length());
-		
+		return "s" + name;
 	}
 	
 	/* (non-Javadoc)
@@ -64,7 +91,7 @@ public abstract class Seeker extends GraphTraverser implements Runnable {
 	@Override
 	public void run() {
 		
-		Utils.talk(toString(), "Running " + ID + " " + this.getClass());
+		Utils.talk(toString(), "Running " + ID + " " + name);
 		
 		search();
 		

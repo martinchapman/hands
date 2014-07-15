@@ -2,7 +2,8 @@ package Utility.output;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Paint;
+import java.awt.GradientPaint;
+import java.util.ArrayList;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -12,6 +13,7 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.category.StandardBarPainter;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 /**
@@ -75,6 +77,18 @@ public class BarGraph extends TraverserGraph {
 
         rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
        
+        final BarRenderer renderer = (BarRenderer) plot.getRenderer();
+        
+        renderer.setDrawBarOutline(false);
+        
+    	((BarRenderer)renderer).setBarPainter(new StandardBarPainter());
+    	
+        for ( int i = 0; i < dataset.getRowCount(); i++ ) {
+        
+        	//renderer.setSeriesPaint(i, colours.get(i));
+        	
+        }
+        
         final CategoryAxis domainAxis = plot.getDomainAxis();
        
         domainAxis.setCategoryLabelPositions(
@@ -94,9 +108,9 @@ public class BarGraph extends TraverserGraph {
 	 * @param value
 	 * @param attribute
 	 */
-	public void addBar(Double value, String traverser, String topology) {
+	public void addBar(Double value, String traverser, String category) {
 		
-		dataset.addValue(value, topology, traverser);
+		dataset.addValue(value, category, traverser);
 			
 	}
 

@@ -80,7 +80,13 @@ public class LineGraph extends TraverserGraph {
         renderer.setSeriesShapesVisible(1, true);
         
         plot.setRenderer(renderer);
-
+        
+        for ( int i = 0; i < dataset.getSeriesCount(); i++ ) {
+            
+        	//renderer.setSeriesPaint(i, colours.get(i%colours.size()));
+        	
+        }
+        
         final NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
         
         rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
