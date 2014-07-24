@@ -59,6 +59,7 @@ public class Runner extends JFrame {
 		  "RandomVariableHidePotential",
 		  "RandomDirection",
 		  "RandomSet",
+		  "LowEdgeCostRandomSet",
 		  "RandomFixedDistance",
 		  "LowEdgeCostRandomFixedDistance",
 		  "VariableFixedDistance",
@@ -525,7 +526,7 @@ public class Runner extends JFrame {
 					
 					for ( TraverserRecord hidersSeekers : hider.getSeekersAndAttributes() ) {
 						
-						//hidersSeekers.setTraverser(hidersSeekers.getTraverser()); //+ " (" + hider.getTraverser() + ")");
+						hidersSeekers.setTraverser(hidersSeekers.getTraverser() + " (" + hider.getTraverser() + ")");
 						
 						//if (selectedSeekers.contains(hidersSeekers)) {
 							

@@ -45,7 +45,7 @@ public class OutputManager {
 		
 		fileHiderRecords = new ArrayList<ArrayList<HiderRecord>>();
 		
-		ArrayList<Path> files = listFilesForFolder(new File(FILEPREFIX + "/data"));
+		ArrayList<Path> files = listFilesForFolder(new File(FILEPREFIX + "data"));
 		
 		if (files.size() == 0) {
 			
@@ -209,7 +209,7 @@ public class OutputManager {
 	 */
 	public void showLineGraphForAttribute(ArrayList<TraverserRecord> traversers, String title, String attribute) {
 		
-		showGraphForAttribute(traversers, title, "Line", attribute, "");
+		showGraphForAttribute(traversers, title, "Line", "Game Number", attribute, "");
 		
 	}
 
@@ -220,7 +220,7 @@ public class OutputManager {
 	 */
 	public void showBarGraphForAttribute(ArrayList<TraverserRecord> traversers, String title, String attribute, String category) {
 		
-		showGraphForAttribute(traversers, title, "Bar", attribute, category);
+		showGraphForAttribute(traversers, title, "Bar", "Game Number", attribute, category);
 		
 	}
 	
@@ -230,11 +230,9 @@ public class OutputManager {
 	 * @param graphType
 	 * @param attribute
 	 */
-	public void showGraphForAttribute(ArrayList<TraverserRecord> traverserRecords, String title, String graphType, String yLabel, String category) {
+	public void showGraphForAttribute(ArrayList<TraverserRecord> traverserRecords, String title, String graphType, String xLabel, String yLabel, String category) {
 		
 		TraverserGraph graph = null;
-		
-		String xLabel = "";
 		
 		if ( title.length() > 200 ) title = title.substring(0, 200);
 		
@@ -255,8 +253,6 @@ public class OutputManager {
 				((LineGraph) graph).addDataset(traverser.getTraverser(), attributeToValues);
 				
 			}
-			
-			xLabel = "Game Number";
 			
 		} else if (graphType.equals("Bar")) {
 			

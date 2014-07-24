@@ -1,1 +1,0 @@
-[1, [MinimumConnectivity,1], [HighProbability,1], {Topology,random}, {NumberOfNodes,100}, {NumberOfHideLocations,5}, {Rounds,100}, {EdgeWeight,10.0}, {FixedOrUpperWeight,random}, {EdgeTraversalDecrement,0}, {MixHiders,false}, {MixSeekers,false}]

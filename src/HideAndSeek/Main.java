@@ -12,10 +12,11 @@ import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.Hider;
 import HideAndSeek.hider.repeatgame.VariableBiasHider;
+import HideAndSeek.hider.singleshot.LeastConnected;
 import HideAndSeek.hider.singleshot.LowEdgeCostRandomFixedDistance;
+import HideAndSeek.hider.singleshot.LowEdgeCostRandomSet;
 import HideAndSeek.hider.singleshot.LowEdgeCostVariableFixedDistance;
 import HideAndSeek.hider.singleshot.MaxDistance;
-import HideAndSeek.hider.singleshot.LeastConnected;
 import HideAndSeek.hider.singleshot.Random;
 import HideAndSeek.hider.singleshot.RandomDirection;
 import HideAndSeek.hider.singleshot.RandomFixedDistance;
@@ -170,6 +171,12 @@ public class Main {
 			if (hiderType.getElement0().equals("RandomSet")) {
 				
 				allHidingAgents.add(new RandomSet(graphController, numberOfHideLocations));
+			
+			} 
+			
+			if (hiderType.getElement0().equals("LowEdgeCostRandomSet")) {
+				
+				allHidingAgents.add(new LowEdgeCostRandomSet(graphController, numberOfHideLocations));
 			
 			} 
 			
