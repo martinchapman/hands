@@ -147,6 +147,10 @@ public class Runner extends JFrame {
 	private JCheckBox mixHiders;
 	
 	/**
+	 * Helper interface for specifying different actions
+	 * to take place once something has been deleted
+	 * from a JList. 
+	 * 
 	 * @author Martin
 	 *
 	 */

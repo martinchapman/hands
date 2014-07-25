@@ -413,6 +413,15 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	protected double edgeTraversalDecrement = 1.0;
 	
 	/**
+	 * @return
+	 */
+	public double getEdgeTraversalDecrement() {
+		
+		return edgeTraversalDecrement;
+	
+	}
+
+	/**
 	 * @param edgeTraversalDecrement (as a percentage)
 	 */
 	public void setEdgeTraversalDecrement(int edgeTraversalDecrement) {

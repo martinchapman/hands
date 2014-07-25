@@ -42,9 +42,25 @@ public class GraphController<V, E> {
 	private TopologyProperties<StringVertex, StringEdge> topologyProperties;
 	
 	/**
+	 * 
+	 */
+	private double fixedOrUpperValue;
+	
+	/**
+	 * @return
+	 */
+	public double getFixedOrUpperValue() {
+		
+		return fixedOrUpperValue;
+	
+	}
+
+	/**
 	 * @param graph
 	 */
 	public GraphController(String topology, int numberOfVertices, String fixedOrUpperBound, double fixedOrUpperValue, int edgeTraversalDecrement) {
+		
+		this.fixedOrUpperValue = fixedOrUpperValue;
 		
 		/**************************
     	 * 
@@ -487,6 +503,15 @@ public class GraphController<V, E> {
 	public double requestAveragePathLength(GraphTraverser traverser) {
 		
 		return graph.requestAveragePathLength(traverser);
+		
+	}
+
+	/**
+	 * @return
+	 */
+	public double getEdgeTraverselDecrement() {
+		
+		return graph.getEdgeTraversalDecrement();
 		
 	}
 

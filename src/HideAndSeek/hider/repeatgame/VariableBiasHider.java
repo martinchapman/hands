@@ -13,19 +13,19 @@ import HideAndSeek.hider.Hider;
  * A hider who's tendency to choose pre-explored nodes (cheaper)
  * over unexplored nodes is manually set.
  * 
- * Relies on the % cost reduction for exploring an edge to be greater
- * than 0.
+ * Relies on EITHER edges being of variable weight OR the % cost 
+ * reduction for exploring an edge to be greater than 0.
  * 
  * @author Martin
  */
 public class VariableBiasHider extends Hider {
 
 	/**
-	 * 
 	 * Hider in which the tendency to take pre-traversed edges
 	 * can be set.
 	 * 
 	 * Hides in first K locations.
+	 * 
 	 * 
 	 * @param graph
 	 * @param numberOfHideLocations
@@ -54,7 +54,13 @@ public class VariableBiasHider extends Hider {
 	 *  Percentage of original cost that an edge must reach in order
 	 *  to be considered 'well traversed'
 	 */
-	protected static double WELLTRAVERSEDPERCENTAGE = 0.5;
+	protected final static double WELLTRAVERSEDPERCENTAGE = 0.5;
+	
+	/**
+	 * A percentage of the maximum value below which an edge weight must 
+	 * fall under to be considered a cheap edge
+	 */
+	protected final static double CHEAPTHRESHOLD = 0.5;
 	
 	/**
 	 * 
@@ -125,13 +131,30 @@ public class VariableBiasHider extends Hider {
 		
 		for ( StringEdge edge : connectedEdges ) {
 			
-			if ( graphController.traverserEdgeCost(this, edge.getSource(), edge.getTarget()) < ( graphController.getEdgeWeight(edge) *  WELLTRAVERSEDPERCENTAGE ) ) {
+			// If no edge traversal decrement has been set 
+			if ( graphController.getEdgeTraverselDecrement() == 1.0 ) {
 				
-				biasEdges.add(edge);
+				if ( graphController.getEdgeWeight(edge) < graphController.getFixedOrUpperValue() * CHEAPTHRESHOLD) {
+					
+					biasEdges.add(edge);
+					
+				} else {
+					
+					explorativeEdges.add(edge);
+					
+				}
 				
 			} else {
-				
-				explorativeEdges.add(edge);
+			
+				if ( graphController.traverserEdgeCost(this, edge.getSource(), edge.getTarget()) < ( graphController.getEdgeWeight(edge) *  WELLTRAVERSEDPERCENTAGE ) ) {
+					
+					biasEdges.add(edge);
+					
+				} else {
+					
+					explorativeEdges.add(edge);
+					
+				}
 				
 			}
 		
@@ -162,6 +185,39 @@ public class VariableBiasHider extends Hider {
 			}
 			
 		}
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraverser#getConnectedEdge(HideAndSeek.graph.StringVertex, java.util.List)
+	 */
+	@Override
+	protected StringEdge getConnectedEdge(StringVertex currentNode, List<StringEdge> connectedEdges) {
+		
+		for (StringEdge edge : connectedEdges ) {
+
+			if ( uniquelyVisitedNodes().contains(edgeToTarget(edge, currentNode)) ) continue;
+			
+			return edge;
+			
+		}
+		
+		return connectedEdges.get((int)(Math.random() * connectedEdges.size()));
+		
+	}
+
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraverser#getConnectedEdges(HideAndSeek.graph.StringVertex)
+	 */
+	@Override
+	protected List<StringEdge> getConnectedEdges(StringVertex currentNode) {
+		
+		ArrayList<StringEdge> edges = new ArrayList<StringEdge>(graphController.edgesOf(currentNode));
+		
+		Collections.sort(edges);
+		
+		return edges;
 		
 	}
 	
