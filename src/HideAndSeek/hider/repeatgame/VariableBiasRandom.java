@@ -9,7 +9,7 @@ import HideAndSeek.graph.StringVertex;
  * 
  * @author Martin
  */
-public class VariableBiasHiderRandom extends VariableBiasHider {
+public class VariableBiasRandom extends VariableBias {
 
 	/**
 	 * As parent, except has percentage chance to hide in each location
@@ -18,7 +18,7 @@ public class VariableBiasHiderRandom extends VariableBiasHider {
 	 * @param numberOfHideLocations
 	 * @param bias
 	 */
-	public VariableBiasHiderRandom(
+	public VariableBiasRandom(
 			GraphController <StringVertex, StringEdge> graphController,
 			int numberOfHideLocations, double bias) {
 		super(graphController, numberOfHideLocations, bias);

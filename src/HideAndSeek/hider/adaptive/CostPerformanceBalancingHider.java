@@ -3,7 +3,7 @@ package HideAndSeek.hider.adaptive;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.repeatgame.VariableBiasHider;
+import HideAndSeek.hider.repeatgame.VariableBias;
 import Utility.Utils;
 
 /**
@@ -19,7 +19,7 @@ import Utility.Utils;
  * @author Martin
  *
  */
-public class CostPerformanceBalancingHider extends VariableBiasHider {
+public class CostPerformanceBalancingHider extends VariableBias {
 
 	/**
 	 * @param graph

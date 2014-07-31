@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.repeatgame.VariableBiasLocationsHider;
+import HideAndSeek.hider.repeatgame.VariableBiasLocations;
 
 /**
  * Changes the number of bias hide locations employed in an attempt to deceive
@@ -16,7 +16,7 @@ import HideAndSeek.hider.repeatgame.VariableBiasLocationsHider;
  * @author Martin
  *
  */
-public class DeceptiveHider extends VariableBiasLocationsHider {
+public class DeceptiveHider extends VariableBiasLocations {
 
 	/**
 	 * @param graph

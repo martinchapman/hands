@@ -119,15 +119,15 @@ public class HiderRecord extends TraverserRecord {
 		returner += "\nAverages:\n";
 		returner += "\n-------------------\n";
 		
-		returner += "\n" + traverser + " " + calculateAverage() + "\n";
+		returner += "\n" + traverser + " " + calculateGameAverage() + "\n";
 		
-		for ( TraverserRecord seeker : seekersAndAttributes ) returner += "\n" + seeker.printAverage() + "\n";
+		for ( TraverserRecord seeker : seekersAndAttributes ) returner += "\n" + seeker.printGameAverage() + "\n";
 		
 		returner += "\n-------------------\n";
 		returner += "\nSeries:\n";
 		returner += "\n-------------------\n";
 		
-		returner += "\n" + traverser + " " + showSeries() + "\n";
+		returner += "\n" + traverser + " " + showGameSeries() + "\n";
 		
 		for ( TraverserRecord seeker : seekersAndAttributes ) returner += "\n" + seeker.printSeries() + "\n";
 		

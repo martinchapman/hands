@@ -11,7 +11,7 @@ import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.Hider;
-import HideAndSeek.hider.repeatgame.VariableBiasHider;
+import HideAndSeek.hider.repeatgame.VariableBias;
 import HideAndSeek.hider.singleshot.LeastConnected;
 import HideAndSeek.hider.singleshot.LowEdgeCostRandomFixedDistance;
 import HideAndSeek.hider.singleshot.LowEdgeCostRandomSet;
@@ -111,15 +111,8 @@ public class Main {
 		
 		int numberOfHideLocations = Integer.parseInt(args[6]);
 		
-		if ( totalGames == 1 ) {
+		startRounds(initHiders(hiderList, numberOfHideLocations, mixHiders), initSeekers(seekerList, mixSeekers), rounds, true);
 		
-			startRounds(initHiders(hiderList, numberOfHideLocations, mixHiders), initSeekers(seekerList, mixSeekers), rounds, true);
-		
-		} else {
-			
-			startRounds(initHiders(hiderList, numberOfHideLocations, mixHiders), initSeekers(seekerList, mixSeekers), rounds, false);
-			
-		}
 	}
 	
 	/**
@@ -220,19 +213,19 @@ public class Main {
 			
 			if (hiderType.getElement0().equals("FullyBias")) {
 				
-				allHidingAgents.add(new VariableBiasHider(graphController, numberOfHideLocations, 1.0));
+				allHidingAgents.add(new VariableBias(graphController, numberOfHideLocations, 1.0));
 			
 			}
 			
 			if (hiderType.getElement0().equals("LooselyBias")) {
 				
-				allHidingAgents.add(new VariableBiasHider(graphController, numberOfHideLocations, 0.5));
+				allHidingAgents.add(new VariableBias(graphController, numberOfHideLocations, 0.5));
 			
 			} 
 			
 			if (hiderType.getElement0().equals("VariableBias")) {
 				
-				allHidingAgents.add(new VariableBiasHider(graphController, numberOfHideLocations, gameNumber/((float)totalGames)));
+				allHidingAgents.add(new VariableBias(graphController, numberOfHideLocations, gameNumber/((float)totalGames)));
 			
 			} 
 			
@@ -448,7 +441,7 @@ public class Main {
 	    		
 	    		if (recordPerRound) {
 	        		
-	    			Utils.writeToFile(mainOutputWriter, hider.toString() + "," + hider.printRoundStats() + ",");
+	    			Utils.writeToFile(mainOutputWriter, "R, " + hider.toString() + "," + hider.printRoundStats() + ",");
 	    			
 	    			for( Seeker seeker : seekers ) {
 	    				
@@ -508,9 +501,9 @@ public class Main {
 			
 			Utils.talk("Main", hider.toString() + "," + hider.printGameStats());
 			
-			if ( !recordPerRound ) {
+			//if ( !recordPerRound ) {
 			
-				Utils.writeToFile(mainOutputWriter, hider.toString() + "," + hider.printGameStats() + ",");
+				Utils.writeToFile(mainOutputWriter, "G, " + hider.toString() + "," + hider.printGameStats() + ",");
 				
 		    	// Output costs for Seekers
 			
@@ -528,7 +521,7 @@ public class Main {
 				
 				Utils.writeToFile(mainOutputWriter, "\n");
 			
-			}
+			//}
 			
 			graphController.newGame(this);
 			

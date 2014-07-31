@@ -412,7 +412,7 @@ public class Runner extends JFrame {
 		
 		//
 		
-		JPanel centerPaneRightCenter = new JPanel(new GridLayout(10, 4));
+		JPanel centerPaneRightCenter = new JPanel(new GridLayout(12, 4));
 		
 		centerPaneRight.add(centerPaneRightCenter, BorderLayout.CENTER);
 		
@@ -506,6 +506,18 @@ public class Runner extends JFrame {
 		
 		//
 		
+		final JComboBox<String> gameOrRound = new JComboBox<String>();
+		
+		gameOrRound.addItem("Game");
+		
+		gameOrRound.addItem("Round");
+		
+		centerPaneRightCenter.add(new JLabel("Game or Round:"));
+		
+		centerPaneRightCenter.add(gameOrRound);
+		
+		//
+		
 		JButton generateGraph = new JButton("Generate graph");
 		
 		generateGraph.addActionListener(new ActionListener() {
@@ -550,11 +562,11 @@ public class Runner extends JFrame {
 					
 					if (graphTypes.getSelectedItem().equals("Line")) {
 						
-						outputManager.showLineGraphForAttribute(selectedSeekers, title, (String)measure.getSelectedItem());
+						outputManager.showLineGraphForAttribute(selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem());
 				
 					} else if (graphTypes.getSelectedItem().equals("Bar")) {
 						
-						outputManager.showBarGraphForAttribute(selectedSeekers, title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem());
+						outputManager.showBarGraphForAttribute(selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem());
 						
 					}
 					
@@ -562,11 +574,11 @@ public class Runner extends JFrame {
 					
 					if (graphTypes.getSelectedItem().equals("Line")) {
 						
-						outputManager.showLineGraphForAttribute(selectedHiders, title, (String)measure.getSelectedItem());
+						outputManager.showLineGraphForAttribute(selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem());
 						
 					} else if (graphTypes.getSelectedItem().equals("Bar")) {
 						
-						outputManager.showBarGraphForAttribute(selectedHiders, title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem());
+						outputManager.showBarGraphForAttribute(selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem());
 						
 					}
 					

@@ -18,7 +18,7 @@ import HideAndSeek.hider.Hider;
  * 
  * @author Martin
  */
-public class VariableBiasHider extends Hider {
+public class VariableBias extends Hider {
 
 	/**
 	 * Hider in which the tendency to take pre-traversed edges
@@ -31,7 +31,7 @@ public class VariableBiasHider extends Hider {
 	 * @param numberOfHideLocations
 	 * @param bias
 	 */
-	public VariableBiasHider(
+	public VariableBias(
 			GraphController <StringVertex, StringEdge> graphController,
 			int numberOfHideLocations, double bias) {
 		super(graphController, numberOfHideLocations);
@@ -138,14 +138,14 @@ public class VariableBiasHider extends Hider {
 					
 					biasEdges.add(edge);
 					
-				} else {
-					
-					explorativeEdges.add(edge);
-					
 				}
 				
+				explorativeEdges.add(edge);
+					
 			} else {
 			
+				/* When edges are decremented, traversers have a better understanding of where they have been before,
+				   and thus which edges are explorative. In the mechanism above, all edges must be considered explorative. */
 				if ( graphController.traverserEdgeCost(this, edge.getSource(), edge.getTarget()) < ( graphController.getEdgeWeight(edge) *  WELLTRAVERSEDPERCENTAGE ) ) {
 					
 					biasEdges.add(edge);
@@ -176,11 +176,23 @@ public class VariableBiasHider extends Hider {
 				
 			} else {
 				
-				// Get *most* weighted unvisited (most explorative) edge
-				Collections.sort(explorativeEdges);
-				Collections.reverse(explorativeEdges);
-				
-				return exploreEdges(currentNode, explorativeEdges);
+				// If there is no edge traversal decrement, ordering explorative nodes
+				// is also exploitable as strategy will always select most expensive ones
+				if ( graphController.getEdgeTraverselDecrement() == 1.0 ) {
+					
+					Collections.shuffle(explorativeEdges);
+					
+					return exploreEdges(currentNode, explorativeEdges);
+					
+				} else {
+					
+					// Get *most* weighted unvisited (most explorative) edge
+					Collections.sort(explorativeEdges);
+					Collections.reverse(explorativeEdges);
+					
+					return exploreEdges(currentNode, explorativeEdges);
+					
+				}
 				
 			}
 			
@@ -256,6 +268,8 @@ public class VariableBiasHider extends Hider {
 		
 		return randomNode();
 		
+		//return firstNode();
+		
 	}
 	
 	/* (non-Javadoc)
@@ -273,7 +287,7 @@ public class VariableBiasHider extends Hider {
 	@Override
 	public String printRoundStats() {
 		
-		return super.printRoundStats() + "," + tendencyToBias;
+		return super.printRoundStats(); //+ "," + tendencyToBias;
 	
 	}
 
@@ -284,7 +298,7 @@ public class VariableBiasHider extends Hider {
 	@Override
 	public String printGameStats() {
 		// TODO Auto-generated method stub
-		return super.printGameStats() + graphController.requestAverageHiderScore(this);
+		return super.printGameStats(); //+ ",Score," + graphController.requestAverageHiderScore(this);
 	}
 
 }

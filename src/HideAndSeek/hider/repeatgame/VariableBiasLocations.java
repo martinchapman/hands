@@ -18,14 +18,14 @@ import HideAndSeek.graph.StringVertex;
  * 
  * @author Martin
  */
-public class VariableBiasLocationsHider extends VariableBiasHider {
+public class VariableBiasLocations extends VariableBias {
 
 	/**
 	 * @param graph
 	 * @param numberOfHideLocations
 	 * @param bias
 	 */
-	public VariableBiasLocationsHider(
+	public VariableBiasLocations(
 			GraphController <StringVertex, StringEdge> graphController,
 			int numberOfHideLocations, int numberOfBiasLocations) {
 		super(graphController, numberOfHideLocations, 1.0);

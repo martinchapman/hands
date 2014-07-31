@@ -96,22 +96,17 @@ public class TraverserRecord {
 	}
 	
 	/**
-	 * 
-	 */
-	protected int gameNumber;
-	
-	/**
 	 * @param traverser
 	 */
 	public TraverserRecord(String traverser) {
 	
 		this.traverser = traverser;
 		
-		attributeToValue = new Hashtable<Integer, Hashtable<String, Double>>();
+		attributeToValue = new Hashtable<AttributeSetIdentifier, Hashtable<String, Double>>();
 		
-		gameNumber = 1;
+		//gameNumber = 1;
 		
-		attributeToValue.put(gameNumber, new Hashtable<String, Double>());
+		//attributeToValue.put(gameNumber, new Hashtable<String, Double>());
 		
 		attributes = new HashSet<String>();
 		
@@ -124,7 +119,7 @@ public class TraverserRecord {
 	 * @param attributeToValue
 	 * @param attributes
 	 */
-	public TraverserRecord(String traverser, Hashtable<Integer, Hashtable<String, Double>> attributeToValue, HashSet<String> attributes) {
+	public TraverserRecord(String traverser, Hashtable<AttributeSetIdentifier, Hashtable<String, Double>> attributeToValue, HashSet<String> attributes) {
 		
 		this.traverser = traverser;
 		
@@ -139,7 +134,7 @@ public class TraverserRecord {
 	 */
 	public void integrateRecord(TraverserRecord record) {
 		
-		for ( Entry<Integer, Hashtable<String, Double>> gameToAttributes : record.getAttributeToValue().entrySet() ) {
+		for ( Entry<AttributeSetIdentifier, Hashtable<String, Double>> gameToAttributes : record.getAttributeToValue().entrySet() ) {
 			
 			for ( Entry<String,Double> attributeToValue : gameToAttributes.getValue().entrySet() ) {
 				
@@ -164,12 +159,12 @@ public class TraverserRecord {
 	 * Game Number to a list of the attributes and their values,
 	 * for this traverser, in that game.
 	 */
-	protected Hashtable<Integer, Hashtable<String, Double>> attributeToValue;
+	protected Hashtable<AttributeSetIdentifier, Hashtable<String, Double>> attributeToValue;
 	
 	/**
 	 * @return
 	 */
-	public Hashtable<Integer, Hashtable<String, Double>> getAttributeToValue() {
+	public Hashtable<AttributeSetIdentifier, Hashtable<String, Double>> getAttributeToValue() {
 	
 		return attributeToValue;
 	
@@ -193,34 +188,50 @@ public class TraverserRecord {
 	 * @param attribute
 	 * @param value
 	 */
-	public void attribute(String attribute, double value) {
+	public void attribute(String gameOrRound, int number, String attribute, double value) {
 	    
 		// To maintain list of individual attributes
 		attributes.add(attribute);
 		
 		//value = Math.log(value)/Math.log(2);
 		
-		// If we already have an attribute entry for the most recent game, create new game
-		if (attributeToValue.get(gameNumber).containsKey(attribute)) {
+		// If we already have an entry for this game / round, and no entry for the given attribute, add it to this entry. 
+		if (attributeToValue.containsKey(new AttributeSetIdentifier(gameOrRound, number)) && 
+			!attributeToValue.get(new AttributeSetIdentifier(gameOrRound, number)).containsKey(attribute) ) {
+			
+			attributeToValue.get(new AttributeSetIdentifier(gameOrRound, number)).put(attribute, value);
 		
-			gameNumber++;
+		// If there is no entry for this game / round then add it.
+		} else {
 			
 			Hashtable<String, Double> newGameTable = new Hashtable<String, Double>();
 			
 			newGameTable.put(attribute, value);
 			
-			attributeToValue.put(gameNumber, newGameTable);
-		
-		// Otherwise, attribute should go to this game
-		} else {
-		
-			Hashtable<String, Double> currentGameTable = attributeToValue.get(gameNumber);
+			attributeToValue.put(new AttributeSetIdentifier(gameOrRound, number), newGameTable);
 			
-			currentGameTable.put(attribute, value);
-			
-			attributeToValue.put(gameNumber, currentGameTable);
-		
 		}
+		
+	}
+	
+	/**
+	 * @return
+	 */
+	protected Hashtable<String, Double> calculateGameAverage() {
+		
+		Hashtable<AttributeSetIdentifier, Hashtable<String,Double>> gameEntries = new Hashtable<AttributeSetIdentifier, Hashtable<String,Double>>();
+		
+		for (Entry<AttributeSetIdentifier, Hashtable<String, Double>> attributeEntry : attributeToValue.entrySet()) {
+			
+			if ( attributeEntry.getKey().getGameOrRound().equals("Game") ) {
+				
+				gameEntries.put(attributeEntry.getKey(), attributeEntry.getValue());
+				
+			}
+			
+		}
+		
+		return calculateAverage(gameEntries);
 		
 	}
 	
@@ -228,22 +239,24 @@ public class TraverserRecord {
 	 * 
 	 * Match each measure to an average value over all games
 	 * 
+	 * @param attributeToValue - a subset of interaction records that we want to take an average of
+	 * @return
 	 */
-	protected Hashtable<String, Double> calculateAverage() {
+	protected Hashtable<String, Double> calculateAverage(Hashtable<AttributeSetIdentifier, Hashtable<String,Double>> attributeToValue) {
 		
 		Hashtable<String, Double> cumulativeAttributeToValue = new Hashtable<String, Double>();
 		
-		for (Entry<Integer, Hashtable<String, Double>> gameAttributeEntry : attributeToValue.entrySet()) {
+		for (Entry<AttributeSetIdentifier, Hashtable<String, Double>> attributeEntry : attributeToValue.entrySet()) {
 		
-			for (Entry<String, Double> attributeToValue : gameAttributeEntry.getValue().entrySet()) {
+			for (Entry<String, Double> attributeToValueEntry : attributeEntry.getValue().entrySet()) {
 				
-				if (cumulativeAttributeToValue.containsKey(attributeToValue.getKey())) {
+				if (cumulativeAttributeToValue.containsKey(attributeToValueEntry.getKey())) {
 					
-					cumulativeAttributeToValue.put(attributeToValue.getKey(), cumulativeAttributeToValue.get(attributeToValue.getKey()) + attributeToValue.getValue());
+					cumulativeAttributeToValue.put(attributeToValueEntry.getKey(), cumulativeAttributeToValue.get(attributeToValueEntry.getKey()) + attributeToValueEntry.getValue());
 					
 				} else {
 					
-					cumulativeAttributeToValue.put(attributeToValue.getKey(), attributeToValue.getValue());
+					cumulativeAttributeToValue.put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
 					
 				}
 				
@@ -255,7 +268,7 @@ public class TraverserRecord {
 		
 		for (Entry<String, Double> attribute : cumulativeAttributeToValue.entrySet()) {
 			
-			averageAttributeToValue.put(attribute.getKey(), attribute.getValue() / gameNumber);
+			averageAttributeToValue.put(attribute.getKey(), attribute.getValue() / attributeToValue.size());
 			
 		}
 		
@@ -269,25 +282,25 @@ public class TraverserRecord {
 	 * @param attribute
 	 * @return
 	 */
-	public double getAverageAttributeValue(String attribute) {
+	public double getAverageGameAttributeValue(String attribute) {
 		
-		return calculateAverage().get(attribute);
+		return calculateGameAverage().get(attribute);
 		
 	}
 	
 	/**
 	 * @return
 	 */
-	protected String showSeries() {
+	protected String showGameSeries() {
 		
 		String returner = "";
 		
-		ArrayList<Entry<Integer, Hashtable<String,Double>>> series = 
-				new ArrayList<Entry<Integer, Hashtable<String,Double>>>(attributeToValue.entrySet());
+		ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>> series = 
+				new ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>>(getGameSeries());
 		
 		Collections.reverse(series);
 		
-		for ( Entry<Integer, Hashtable<String,Double>> entry : series ) {
+		for ( Entry<AttributeSetIdentifier, Hashtable<String,Double>> entry : series ) {
 			
 			returner += "\n" + entry; 
 			
@@ -299,15 +312,125 @@ public class TraverserRecord {
 	
 	/**
 	 * 
+	 * Allow for multiple games with multiple rounds to be run, and the average of all rounds
+	 * over those games to be viewed.
+	 * 
+	 * For example, I run 100 games and want to plot the average from round 1, 2, 3 etc. on a graph,
+	 * with the number of points still being equal to the number of games.
+	 * 
+	 * @return
+	 * 
+	 * 
+	 */
+	public ArrayList<Entry<Integer, Hashtable<String,Double>>> getRoundSeries() {
+	
+		// Create map to hold round numbers to average values for all attributes within that round
+		Hashtable<Integer, Hashtable<String, Double>> cumulativeRoundsAttributeToValue = new Hashtable<Integer, Hashtable<String, Double>>();
+		
+		int attributeAdditions = 0; 
+		
+		// For each record 
+		for ( Entry<AttributeSetIdentifier, Hashtable<String, Double>> attributeEntry : attributeToValue.entrySet() ) {
+			
+			// If this is a round entry
+			if ( attributeEntry.getKey().getGameOrRound().equals("Round") ) {
+			
+				// For each attribute entry within that round
+				for ( Entry<String, Double> attributeToValueEntry : attributeEntry.getValue().entrySet() ) {
+					
+					// If an entry for the round doesn't exist within our cumulative map...
+					if ( !cumulativeRoundsAttributeToValue.containsKey( attributeEntry.getKey().getNumber() ) ) {
+					
+						// Create it
+						cumulativeRoundsAttributeToValue.put(attributeEntry.getKey().getNumber(), new Hashtable<String, Double>());
+					
+					}
+						
+					// See if an entry for this attribute already exists at this round number, if it does, add it on
+					if ( cumulativeRoundsAttributeToValue.get(attributeEntry.getKey().getNumber()).containsKey(attributeToValueEntry.getKey()) ) {
+						
+						cumulativeRoundsAttributeToValue.get(attributeEntry.getKey().getNumber()).put(attributeToValueEntry.getKey(), cumulativeRoundsAttributeToValue.get(attributeEntry.getKey().getNumber()).get(attributeToValueEntry.getKey()) + attributeToValueEntry.getValue() );
+					
+						attributeAdditions++;
+						
+					// Otherwise create this entry, at that round number
+					} else {
+						
+						cumulativeRoundsAttributeToValue.get(attributeEntry.getKey().getNumber()).put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
+						
+						attributeAdditions++;
+						
+					}
+					
+				}
+			
+			}
+		
+		}
+		
+		/* We now have a map from each round number to a map from each attribute to their cumulative values.
+		Complete by creating a new map to the average value: */
+		
+		Hashtable<Integer, Hashtable<String, Double>> averageRoundAttributeToValue = new Hashtable<Integer, Hashtable<String, Double>>();
+		
+		for (Entry<Integer, Hashtable<String, Double>> attribute : cumulativeRoundsAttributeToValue.entrySet()) {
+			
+			for ( Entry<String, Double> attributeCumulative: attribute.getValue().entrySet()) {
+				
+				// No entry in the average mapping from round to attribute:value exists
+				if ( !averageRoundAttributeToValue.containsKey( attribute.getKey() ) ) {
+				
+					// Create it
+					averageRoundAttributeToValue.put(attribute.getKey(), new Hashtable<String, Double>());
+				
+				}
+				
+				/* Get the existing key, be it previously created, and put the key of the current attribute, plus the value
+				   of the current attribute divided by the number of rounds, as shown in the cumulative mapping. 
+				   
+				   To work out `how many round 1s' etc (how many games), we priorly calculate the number of round attribute
+				   additions for this traverser. Taking this number, divided by the number of attributes, we work out the number
+				   of attributes within one column. Dividing this number by the number of rounds in a game gives the number of games.
+				   */
+				averageRoundAttributeToValue.get(attribute.getKey()).put(attributeCumulative.getKey(), cumulativeRoundsAttributeToValue.get(attribute.getKey()).get(attributeCumulative.getKey()) / ( ( attributeAdditions / attribute.getValue().entrySet().size() ) / cumulativeRoundsAttributeToValue.entrySet().size()) ); 
+			
+			}
+			
+		}
+		
+		ArrayList<Entry<Integer, Hashtable<String,Double>>> series = 
+				new ArrayList<Entry<Integer, Hashtable<String,Double>>>(averageRoundAttributeToValue.entrySet());
+		
+		Collections.reverse(series);
+		
+		return series;
+		
+	}
+	
+	/**
+	 * 
 	 * Return the series for each attribute
 	 * 
 	 * @param attribute
 	 * @return
 	 */
-	public ArrayList<Entry<Integer, Hashtable<String,Double>>> getSeries() {
+	public ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>> getGameSeries() {
+
+		ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>> series = 
+				new ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>>(attributeToValue.entrySet());
 		
-		ArrayList<Entry<Integer, Hashtable<String,Double>>> series = 
-				new ArrayList<Entry<Integer, Hashtable<String,Double>>>(attributeToValue.entrySet());
+		// For each record 
+		for ( Entry<AttributeSetIdentifier, Hashtable<String, Double>> attributeEntry : attributeToValue.entrySet() ) {
+			
+			// If this is a game entry
+			if ( attributeEntry.getKey().getGameOrRound().equals("Game") ) {
+			
+				// Add it to the series
+				series.add(attributeEntry);
+			
+			}
+		
+		}
 		
 		Collections.reverse(series);
 		
@@ -318,9 +441,9 @@ public class TraverserRecord {
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
-	public String printAverage() {
+	public String printGameAverage() {
 	
-		return traverser + " " + calculateAverage();
+		return traverser + " " + calculateGameAverage();
 		
 	}
 	
@@ -329,7 +452,7 @@ public class TraverserRecord {
 	 */
 	public String printSeries() {
 		
-		return traverser + " " + showSeries();
+		return traverser + " " + showGameSeries();
 		
 	}
 	

@@ -167,12 +167,9 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 						   costs of the hider. Thus, if costs are too high or a seeker's performance
 						   is too good, score is likely to be lower. */
 										    // 
-						scoreAgainstEach += requestLatestSeekerRoundPerformance((Seeker)seeker); //- 
-										    /* The hiders cost on their hiding path as a portion of the full cost
-											   of this path i.e. their cost, lowered if they take pre-traversed roots
-											   as a portion of full cost path */
-											//((latestRoundCosts(agent) / totalPathCost(latestRoundPaths(agent))) * 100);
-						
+						scoreAgainstEach += requestLatestSeekerRoundPerformance((Seeker)seeker) -
+											requestLatestHiderRoundPerformance((Hider)agent);
+										   
 					}
 				
 				}
@@ -218,12 +215,22 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	}
 	
 	/**
+	 * Designated metric for a Hider's performance
+	 * 
 	 * @param hider
 	 * @return
 	 */
 	public double requestLatestHiderRoundPerformance(Hider hider) {
 		
-		return latestRoundPaths(hider).size() / ((double)edgeSet().size()) * 100;
+		// return latestRoundPaths(hider).size() / ((double)edgeSet().size()) * 100;
+		
+		 /* The hiders cost on their hiding path as a portion of the full cost
+		   of this path i.e. their cost, lowered if they take pre-traversed roots
+		   as a portion of full cost path */
+		
+		// return (latestRoundCosts(agent) / totalPathCost(latestRoundPaths(agent))) * 100;
+		
+		return latestRoundCosts(hider);
 		
 	}
 	
@@ -231,13 +238,16 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	 * Designated metric for a Seeker's performance
 	 * 
 	 * @param seeeker
-	 * @return performance as percentage
+	 * @return 
 	 */
 	public double requestLatestSeekerRoundPerformance(Seeker seeker) {
 		
 		/* Higher is worse for seeker: represents steps taken as a portion of
 		   all possible steps in graph */
-		return latestRoundPaths(seeker).size() / ((double)edgeSet().size()) * 100;
+		
+		// return latestRoundPaths(seeker).size() / ((double)edgeSet().size()) * 100;
+		
+		return latestRoundCosts(seeker);
 		
 	}
 	

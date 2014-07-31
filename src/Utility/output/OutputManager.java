@@ -79,6 +79,12 @@ public class OutputManager {
 					
 				}
 				
+				int gameNumber = -1;
+				
+				int roundNumber = -1;
+				
+				int number = -1;
+				
 				for ( String line : lines ) {
 				
 					String lastHider = "";
@@ -88,6 +94,8 @@ public class OutputManager {
 					String lastTraverser = "";
 					
 					String lastAttribute = "";
+					
+					String gameOrRound = "";
 					
 					for ( String word : line.split(",")) {
 						
@@ -99,11 +107,11 @@ public class OutputManager {
 							
 							if ( lastTraverser.equals("hider") ) {
 							
-								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).attribute(lastAttribute, value);
+								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).attribute(gameOrRound, number, lastAttribute, value);
 								
 							} else if ( lastTraverser.equals("seeker") ) {
 							
-								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker(lastSeeker).attribute(lastAttribute, value);
+								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker(lastSeeker).attribute(gameOrRound, number, lastAttribute, value);
 								
 							}
 
@@ -181,6 +189,24 @@ public class OutputManager {
 								
 								lastTraverser = "seeker";
 							
+							} else if ( word.equals("G") ) {
+							
+								gameOrRound = "Game";
+								
+								roundNumber = -1;
+								
+								gameNumber++;
+								
+								number = gameNumber;
+								
+							} else if ( word.equals("R") ) {
+								
+								gameOrRound = "Round";
+								
+								roundNumber++;
+								
+								number = roundNumber;
+								
 							// If we come across an attribute entry
 							} else {
 							
@@ -207,9 +233,11 @@ public class OutputManager {
 	 * @param title
 	 * @param attribute
 	 */
-	public void showLineGraphForAttribute(ArrayList<TraverserRecord> traversers, String title, String attribute) {
+	public void showLineGraphForAttribute(ArrayList<TraverserRecord> traversers, String gameOrRound, String title, String attribute) {
 		
-		showGraphForAttribute(traversers, title, "Line", "Game Number", attribute, "");
+		System.out.println(traversers);
+		
+		showGraphForAttribute(traversers, gameOrRound, title, "Line", "Game Number", attribute, "");
 		
 	}
 
@@ -218,9 +246,9 @@ public class OutputManager {
 	 * @param title
 	 * @param attribute
 	 */
-	public void showBarGraphForAttribute(ArrayList<TraverserRecord> traversers, String title, String attribute, String category) {
+	public void showBarGraphForAttribute(ArrayList<TraverserRecord> traversers, String gameOrRound, String title, String attribute, String category) {
 		
-		showGraphForAttribute(traversers, title, "Bar", "Game Number", attribute, category);
+		showGraphForAttribute(traversers, gameOrRound, title, "Bar", "Game Number", attribute, category);
 		
 	}
 	
@@ -230,7 +258,7 @@ public class OutputManager {
 	 * @param graphType
 	 * @param attribute
 	 */
-	public void showGraphForAttribute(ArrayList<TraverserRecord> traverserRecords, String title, String graphType, String xLabel, String yLabel, String category) {
+	public void showGraphForAttribute(ArrayList<TraverserRecord> traverserRecords, String gameOrRound, String title, String graphType, String xLabel, String yLabel, String category) {
 		
 		TraverserGraph graph = null;
 		
@@ -244,9 +272,21 @@ public class OutputManager {
 				
 				ArrayList<Double> attributeToValues = new ArrayList<Double>();
 				
-				for ( Entry<Integer, Hashtable<String,Double>> series : traverser.getSeries() ) {
+				if ( gameOrRound.equals("Game") ) {
+				
+					for ( Entry<AttributeSetIdentifier, Hashtable<String,Double>> series : traverser.getGameSeries() ) {
+						
+						attributeToValues.add( series.getValue().get(yLabel) );
+						
+					}
+				
+				} else if ( gameOrRound.equals("Round") ) {
 					
-					attributeToValues.add( series.getValue().get(yLabel) );
+					for ( Entry<Integer, Hashtable<String,Double>> series : traverser.getRoundSeries() ) {
+						
+						attributeToValues.add( series.getValue().get(yLabel) );
+						
+					}
 					
 				}
 				
@@ -274,7 +314,7 @@ public class OutputManager {
 					
 				}
 				
-				((BarGraph) graph).addBar(traverser.getAverageAttributeValue(yLabel), traverser.toString(), localCategory);
+				((BarGraph) graph).addBar(traverser.getAverageGameAttributeValue(yLabel), traverser.toString(), localCategory);
 			
 			}
 			
@@ -292,7 +332,6 @@ public class OutputManager {
 		
 		} catch (IOException e) {
 			
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		
 		}

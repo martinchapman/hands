@@ -283,4 +283,16 @@ public abstract class GraphTraverser {
 	 */
 	protected abstract StringVertex startNode();
 
+	public String printGameStats() {
+		
+		return "";
+		
+	}
+
+	public String printRoundStats() {
+		
+		return "";
+		
+	}
+
 }
