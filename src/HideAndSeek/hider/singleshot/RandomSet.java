@@ -45,6 +45,8 @@ public class RandomSet extends HiderLocalGraph {
 	 */
 	private void populateHideSet() {
 		
+		hideSet.clear();
+		
 		StringVertex randomVertex = randomNode();
 		
 		while ( hideSet.size() != numberOfHideLocations ) {
@@ -58,6 +60,8 @@ public class RandomSet extends HiderLocalGraph {
 			randomVertex = randomNode();
 			
 		}
+		
+		System.out.println("Hide set: " + hideSet);
 		
 	}
 

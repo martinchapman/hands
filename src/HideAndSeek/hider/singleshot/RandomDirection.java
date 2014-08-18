@@ -7,7 +7,7 @@ import HideAndSeek.hider.Hider;
 
 /**
  * 
- * Weaker version of truly random hider, which only moves randomly, but 
+ * Weaker version of truly random hider, which moves randomly, but 
  * hides in the first K nodes moved to.
  * 
  * @author Martin

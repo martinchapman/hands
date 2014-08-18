@@ -235,9 +235,15 @@ public class OutputManager {
 	 */
 	public void showLineGraphForAttribute(ArrayList<TraverserRecord> traversers, String gameOrRound, String title, String attribute) {
 		
-		System.out.println(traversers);
-		
-		showGraphForAttribute(traversers, gameOrRound, title, "Line", "Game Number", attribute, "");
+		if ( gameOrRound.equals("Game") ) {
+			
+			showGraphForAttribute(traversers, gameOrRound, title, "Line", "Game Number", attribute, "");
+			
+		} else if ( gameOrRound.equals("Round") ) {
+			
+			showGraphForAttribute(traversers, gameOrRound, title, "Line", "Round Number", attribute, "");
+			
+		}
 		
 	}
 

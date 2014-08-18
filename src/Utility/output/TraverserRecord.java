@@ -318,6 +318,8 @@ public class TraverserRecord {
 	 * For example, I run 100 games and want to plot the average from round 1, 2, 3 etc. on a graph,
 	 * with the number of points still being equal to the number of games.
 	 * 
+	 * ~MDC 31/7/14 This could be much neater.
+	 * 
 	 * @return
 	 * 
 	 * 

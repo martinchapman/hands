@@ -8,7 +8,7 @@ import Utility.Utils;
 
 /**
  * 
- * Employ a fixed distance between each hide location
+ * Employ a random (0 to N) fixed distance between each hide location
  * 
  * @author Martin
  *
@@ -22,8 +22,17 @@ public class RandomFixedDistance extends Hider implements Runnable {
 	
 		super(graphController, numberOfHideLocations);
 		
-		minHideDistance = ((int)(Math.random() * 10)) + 1;
+		setMinHideDistance();
 
+	}
+	
+	/**
+	 * 
+	 */
+	private void setMinHideDistance() {
+		
+		minHideDistance = ((int)(Math.random() * graphController.vertexSet().size())) + 1;
+		
 	}
 	
     /**
@@ -70,6 +79,18 @@ public class RandomFixedDistance extends Hider implements Runnable {
 		
 		return randomNode();
 		
+	}
+
+	/* (non-Javadoc)
+	 * @see HideAndSeek.hider.Hider#endOfRound()
+	 */
+	@Override
+	public void endOfRound() {
+
+		super.endOfRound();
+		
+		setMinHideDistance();
+	
 	}
 	
 }
