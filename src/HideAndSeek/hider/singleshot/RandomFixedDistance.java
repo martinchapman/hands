@@ -22,14 +22,14 @@ public class RandomFixedDistance extends Hider implements Runnable {
 	
 		super(graphController, numberOfHideLocations);
 		
-		setMinHideDistance();
+		setRandomMinHideDistance();
 
 	}
 	
 	/**
 	 * 
 	 */
-	private void setMinHideDistance() {
+	private void setRandomMinHideDistance() {
 		
 		minHideDistance = ((int)(Math.random() * graphController.vertexSet().size())) + 1;
 		
@@ -89,7 +89,7 @@ public class RandomFixedDistance extends Hider implements Runnable {
 
 		super.endOfRound();
 		
-		setMinHideDistance();
+		setRandomMinHideDistance();
 	
 	}
 	

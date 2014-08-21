@@ -68,6 +68,7 @@ public class Runner extends JFrame {
 		  "MaxDistance",
 		  
 		  "FullyBias",
+		  "FullyExplorative",
 		  "LooselyBias",
 		  "VariableBias" 
 		};

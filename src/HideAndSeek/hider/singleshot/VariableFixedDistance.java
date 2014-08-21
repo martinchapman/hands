@@ -25,4 +25,19 @@ public class VariableFixedDistance extends RandomFixedDistance implements Runnab
 
 	}
 	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.hider.Hider#endOfRound()
+	 */
+	@Override
+	public void endOfRound() {
+
+		int minHideDistance = this.minHideDistance;
+		
+		super.endOfRound();
+	
+		// Because super overrides with new random after each round
+		this.minHideDistance = minHideDistance;
+		
+	}
+	
 }

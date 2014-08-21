@@ -13,7 +13,7 @@ import HideAndSeek.hider.Hider;
  * @author Martin
  *
  */
-public class RandomDirection extends Hider {
+public class RandomDirection extends Random {
 
 	public RandomDirection(
 			GraphController <StringVertex, StringEdge> graphController,
@@ -26,20 +26,6 @@ public class RandomDirection extends Hider {
 	protected boolean hideHere(StringVertex vertex) {
 		
 		return true;
-		
-	}
-
-	@Override
-	protected StringVertex nextNode(StringVertex currentNode) {
-		
-		return connectedNode(currentNode);
-		
-	}
-
-	@Override
-	protected StringVertex startNode() {
-		
-		return randomNode();
 		
 	}
 

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
 /**
@@ -102,7 +103,7 @@ public class TraverserRecord {
 	
 		this.traverser = traverser;
 		
-		attributeToValue = new Hashtable<AttributeSetIdentifier, Hashtable<String, Double>>();
+		attributeToValue = new LinkedHashMap<AttributeSetIdentifier, Hashtable<String, Double>>();
 		
 		//gameNumber = 1;
 		
@@ -119,7 +120,7 @@ public class TraverserRecord {
 	 * @param attributeToValue
 	 * @param attributes
 	 */
-	public TraverserRecord(String traverser, Hashtable<AttributeSetIdentifier, Hashtable<String, Double>> attributeToValue, HashSet<String> attributes) {
+	public TraverserRecord(String traverser, LinkedHashMap<AttributeSetIdentifier, Hashtable<String, Double>> attributeToValue, HashSet<String> attributes) {
 		
 		this.traverser = traverser;
 		
@@ -159,12 +160,12 @@ public class TraverserRecord {
 	 * Game Number to a list of the attributes and their values,
 	 * for this traverser, in that game.
 	 */
-	protected Hashtable<AttributeSetIdentifier, Hashtable<String, Double>> attributeToValue;
+	protected LinkedHashMap<AttributeSetIdentifier, Hashtable<String, Double>> attributeToValue;
 	
 	/**
 	 * @return
 	 */
-	public Hashtable<AttributeSetIdentifier, Hashtable<String, Double>> getAttributeToValue() {
+	public LinkedHashMap<AttributeSetIdentifier, Hashtable<String, Double>> getAttributeToValue() {
 	
 		return attributeToValue;
 	
@@ -403,7 +404,8 @@ public class TraverserRecord {
 		ArrayList<Entry<Integer, Hashtable<String,Double>>> series = 
 				new ArrayList<Entry<Integer, Hashtable<String,Double>>>(averageRoundAttributeToValue.entrySet());
 		
-		Collections.reverse(series);
+		// ~MDC Need this?
+		//Collections.reverse(series);
 		
 		return series;
 		
@@ -419,7 +421,7 @@ public class TraverserRecord {
 	public ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>> getGameSeries() {
 
 		ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>> series = 
-				new ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>>(attributeToValue.entrySet());
+				new ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>>();
 		
 		// For each record 
 		for ( Entry<AttributeSetIdentifier, Hashtable<String, Double>> attributeEntry : attributeToValue.entrySet() ) {
@@ -429,12 +431,10 @@ public class TraverserRecord {
 			
 				// Add it to the series
 				series.add(attributeEntry);
-			
+				
 			}
 		
 		}
-		
-		Collections.reverse(series);
 		
 		return series;
 		

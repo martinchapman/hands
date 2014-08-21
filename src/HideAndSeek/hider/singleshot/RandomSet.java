@@ -12,7 +12,10 @@ import Utility.Utils;
 
 /**
  * Produces a K size set of random nodes and then
- * heads for those nodes on the graph to hide in them
+ * heads for those nodes on the graph to hide in them.
+ * 
+ * NB: Doesn't allow bias to emerge as a product of low
+ * weighted edges.
  * 
  * @author Martin
  *
@@ -71,7 +74,7 @@ public class RandomSet extends HiderLocalGraph {
 	@Override
 	protected boolean hideHere(StringVertex vertex) {
 
-		Utils.talk(toString(), "Current node: " + vertex + " Random set: " + hideSet + " Hide locations: " + hideLocations);
+		// Utils.talk(toString(), "Current node: " + vertex + " Random set: " + hideSet + " Hide locations: " + hideLocations);
 		
 		// If we land on a node in our random set, hide here
 		if ( hideSet.contains(vertex) ) { 

@@ -217,6 +217,12 @@ public class Main {
 			
 			}
 			
+			if (hiderType.getElement0().equals("FullyExplorative")) {
+				
+				allHidingAgents.add(new VariableBias(graphController, numberOfHideLocations, 1.0));
+			
+			}
+			
 			if (hiderType.getElement0().equals("LooselyBias")) {
 				
 				allHidingAgents.add(new VariableBias(graphController, numberOfHideLocations, 0.5));
