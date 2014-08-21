@@ -19,9 +19,7 @@ public class VariableFixedDistance extends RandomFixedDistance implements Runnab
 	
 		super(graphController, numberOfHideLocations);
 		
-		if (minHideDistance == 0) { minHideDistance = 1; }
-		
-		else { this.minHideDistance = minHideDistance; }
+		this.minHideDistance = minHideDistance;
 
 	}
 	

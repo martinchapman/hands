@@ -513,7 +513,7 @@ public class Runner extends JFrame {
 		
 		gameOrRound.addItem("Round");
 		
-		centerPaneRightCenter.add(new JLabel("Game or Round:"));
+		centerPaneRightCenter.add(new JLabel("Average over Game or Round:"));
 		
 		centerPaneRightCenter.add(gameOrRound);
 		

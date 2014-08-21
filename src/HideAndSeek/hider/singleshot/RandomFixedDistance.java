@@ -31,7 +31,7 @@ public class RandomFixedDistance extends Hider implements Runnable {
 	 */
 	private void setRandomMinHideDistance() {
 		
-		minHideDistance = ((int)(Math.random() * graphController.vertexSet().size())) + 1;
+		minHideDistance = ((int)(Math.random() * graphController.vertexSet().size()));
 		
 	}
 	
@@ -46,6 +46,8 @@ public class RandomFixedDistance extends Hider implements Runnable {
 	protected boolean hideHere(StringVertex vertex) {
 		
 		Utils.talk(toString(), "exploredNodes.size() " + exploredNodes.size() + " minHideDistance: " + minHideDistance );
+		
+		if (minHideDistance == 0) { return true; }
 		
 		if ( exploredNodes.size() > 0 && ( exploredNodes.size() % minHideDistance == 0 ) ) { 
 			
