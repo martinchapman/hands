@@ -64,8 +64,6 @@ public class RandomSet extends HiderLocalGraph {
 			
 		}
 		
-		System.out.println("Hide set: " + hideSet);
-		
 	}
 
 	/* (non-Javadoc)

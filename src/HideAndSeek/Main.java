@@ -18,7 +18,6 @@ import HideAndSeek.hider.singleshot.LowEdgeCostRandomSet;
 import HideAndSeek.hider.singleshot.LowEdgeCostVariableFixedDistance;
 import HideAndSeek.hider.singleshot.MaxDistance;
 import HideAndSeek.hider.singleshot.Random;
-import HideAndSeek.hider.singleshot.RandomDirection;
 import HideAndSeek.hider.singleshot.RandomFixedDistance;
 import HideAndSeek.hider.singleshot.RandomSet;
 import HideAndSeek.hider.singleshot.RandomVariableHidePotential;
@@ -157,7 +156,10 @@ public class Main {
 			
 			if (hiderType.getElement0().equals("RandomDirection")) {
 				
-				allHidingAgents.add(new RandomDirection(graphController, numberOfHideLocations));
+				allHidingAgents.add(new VariableFixedDistance(graphController, numberOfHideLocations, 0));
+				
+				// Have to set ID manually as identifier and class used are different
+				allHidingAgents.get(allHidingAgents.size() - 1).setID("RandomDirection");
 			
 			} 
 			
@@ -219,7 +221,7 @@ public class Main {
 			
 			if (hiderType.getElement0().equals("FullyExplorative")) {
 				
-				allHidingAgents.add(new VariableBias(graphController, numberOfHideLocations, 1.0));
+				allHidingAgents.add(new VariableBias(graphController, numberOfHideLocations, 0.0));
 			
 			}
 			

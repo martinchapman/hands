@@ -46,6 +46,15 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 	private String ID;
 	
 	/**
+	 * @param ID
+	 */
+	public void setID(String ID) {
+		
+		this.ID = "h" + ID;
+		
+	}
+	
+	/**
 	 * @param graph
 	 */
 	public Hider(GraphController <StringVertex, StringEdge> graphController, int numberOfHideLocations) {

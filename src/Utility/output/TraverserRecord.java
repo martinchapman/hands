@@ -185,31 +185,47 @@ public class TraverserRecord {
 	
 	}
 
+	private int currentGameNumber = -1;
+	
+	private int currentRoundNumber = -1;
+	
 	/**
 	 * @param attribute
 	 * @param value
 	 */
-	public void attribute(String gameOrRound, int number, String attribute, double value) {
-	    
+	public void attribute(String gameOrRound, String attribute, double value) {
+	   
 		// To maintain list of individual attributes
 		attributes.add(attribute);
 		
 		//value = Math.log(value)/Math.log(2);
 		
 		// If we already have an entry for this game / round, and no entry for the given attribute, add it to this entry. 
-		if (attributeToValue.containsKey(new AttributeSetIdentifier(gameOrRound, number)) && 
-			!attributeToValue.get(new AttributeSetIdentifier(gameOrRound, number)).containsKey(attribute) ) {
+		if (attributeToValue.containsKey(new AttributeSetIdentifier(currentGameNumber, currentRoundNumber)) && 
+			!attributeToValue.get(new AttributeSetIdentifier(currentGameNumber, currentRoundNumber)).containsKey(attribute) ) {
 			
-			attributeToValue.get(new AttributeSetIdentifier(gameOrRound, number)).put(attribute, value);
+			attributeToValue.get(new AttributeSetIdentifier(currentGameNumber, currentRoundNumber)).put(attribute, value);
 		
 		// If there is no entry for this game / round then add it.
 		} else {
 			
-			Hashtable<String, Double> newGameTable = new Hashtable<String, Double>();
+			if ( gameOrRound.equals("Game") ) {
+				
+				currentGameNumber++;
+				
+				currentRoundNumber = -1;
+				
+			} else if ( gameOrRound.equals("Round") ) {
+				
+				currentRoundNumber++;
+				
+			}
 			
-			newGameTable.put(attribute, value);
+			Hashtable<String, Double> newGameRoundTable = new Hashtable<String, Double>();
 			
-			attributeToValue.put(new AttributeSetIdentifier(gameOrRound, number), newGameTable);
+			newGameRoundTable.put(attribute, value);
+			
+			attributeToValue.put(new AttributeSetIdentifier(currentGameNumber, currentRoundNumber), newGameRoundTable);
 			
 		}
 		
@@ -332,6 +348,8 @@ public class TraverserRecord {
 		
 		int attributeAdditions = 0; 
 		
+		System.out.println(attributeToValue);
+		
 		// For each record 
 		for ( Entry<AttributeSetIdentifier, Hashtable<String, Double>> attributeEntry : attributeToValue.entrySet() ) {
 			
@@ -341,25 +359,27 @@ public class TraverserRecord {
 				// For each attribute entry within that round
 				for ( Entry<String, Double> attributeToValueEntry : attributeEntry.getValue().entrySet() ) {
 					
+					if ( attributeEntry.getKey().getRoundNumber() == 0 ) { System.out.println(attributeToValueEntry.getValue()); }
+					
 					// If an entry for the round doesn't exist within our cumulative map...
-					if ( !cumulativeRoundsAttributeToValue.containsKey( attributeEntry.getKey().getNumber() ) ) {
+					if ( !cumulativeRoundsAttributeToValue.containsKey( attributeEntry.getKey().getRoundNumber() ) ) {
 					
 						// Create it
-						cumulativeRoundsAttributeToValue.put(attributeEntry.getKey().getNumber(), new Hashtable<String, Double>());
+						cumulativeRoundsAttributeToValue.put(attributeEntry.getKey().getRoundNumber(), new Hashtable<String, Double>());
 					
 					}
 						
-					// See if an entry for this attribute already exists at this round number, if it does, add it on
-					if ( cumulativeRoundsAttributeToValue.get(attributeEntry.getKey().getNumber()).containsKey(attributeToValueEntry.getKey()) ) {
+					// See if an entry for this attribute already exists at this round number, if it does, add it on 
+					if ( cumulativeRoundsAttributeToValue.get(attributeEntry.getKey().getRoundNumber()).containsKey(attributeToValueEntry.getKey()) ) {
 						
-						cumulativeRoundsAttributeToValue.get(attributeEntry.getKey().getNumber()).put(attributeToValueEntry.getKey(), cumulativeRoundsAttributeToValue.get(attributeEntry.getKey().getNumber()).get(attributeToValueEntry.getKey()) + attributeToValueEntry.getValue() );
+						cumulativeRoundsAttributeToValue.get(attributeEntry.getKey().getRoundNumber()).put(attributeToValueEntry.getKey(), cumulativeRoundsAttributeToValue.get(attributeEntry.getKey().getRoundNumber()).get(attributeToValueEntry.getKey()) + attributeToValueEntry.getValue() );
 					
 						attributeAdditions++;
 						
 					// Otherwise create this entry, at that round number
 					} else {
 						
-						cumulativeRoundsAttributeToValue.get(attributeEntry.getKey().getNumber()).put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
+						cumulativeRoundsAttributeToValue.get(attributeEntry.getKey().getRoundNumber()).put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
 						
 						attributeAdditions++;
 						
@@ -375,6 +395,8 @@ public class TraverserRecord {
 		Complete by creating a new map to the average value: */
 		
 		Hashtable<Integer, Hashtable<String, Double>> averageRoundAttributeToValue = new Hashtable<Integer, Hashtable<String, Double>>();
+		
+		System.out.println(cumulativeRoundsAttributeToValue);
 		
 		for (Entry<Integer, Hashtable<String, Double>> attribute : cumulativeRoundsAttributeToValue.entrySet()) {
 			
@@ -404,8 +426,9 @@ public class TraverserRecord {
 		ArrayList<Entry<Integer, Hashtable<String,Double>>> series = 
 				new ArrayList<Entry<Integer, Hashtable<String,Double>>>(averageRoundAttributeToValue.entrySet());
 		
-		// ~MDC Need this?
-		//Collections.reverse(series);
+		Collections.reverse(series);
+		
+		System.out.println(series);
 		
 		return series;
 		
@@ -423,6 +446,8 @@ public class TraverserRecord {
 		ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>> series = 
 				new ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>>();
 		
+		System.out.println("In Traverser Record: " + attributeToValue);
+		
 		// For each record 
 		for ( Entry<AttributeSetIdentifier, Hashtable<String, Double>> attributeEntry : attributeToValue.entrySet() ) {
 			
@@ -435,6 +460,8 @@ public class TraverserRecord {
 			}
 		
 		}
+		
+		System.out.println("series in record: " + series);
 		
 		return series;
 		

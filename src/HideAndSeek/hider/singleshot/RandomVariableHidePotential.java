@@ -10,6 +10,8 @@ import HideAndSeek.hider.Hider;
  * Truly random hider, who starts at a random location each time, moves randomly,
  * and selects, with a specified chance, to hide at a node when he lands on it.
  * 
+ * Allows for investigation with varying levels of chance to hide within a node.
+ * 
  * @author Martin
  *
  */

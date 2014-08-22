@@ -79,12 +79,6 @@ public class OutputManager {
 					
 				}
 				
-				int gameNumber = -1;
-				
-				int roundNumber = -1;
-				
-				int number = -1;
-				
 				for ( String line : lines ) {
 				
 					String lastHider = "";
@@ -107,11 +101,11 @@ public class OutputManager {
 							
 							if ( lastTraverser.equals("hider") ) {
 							
-								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).attribute(gameOrRound, number, lastAttribute, value);
+								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).attribute(gameOrRound, lastAttribute, value);
 								
 							} else if ( lastTraverser.equals("seeker") ) {
 							
-								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker(lastSeeker).attribute(gameOrRound, number, lastAttribute, value);
+								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker(lastSeeker).attribute(gameOrRound, lastAttribute, value);
 								
 							}
 
@@ -193,19 +187,9 @@ public class OutputManager {
 							
 								gameOrRound = "Game";
 								
-								roundNumber = -1;
-								
-								gameNumber++;
-								
-								number = gameNumber;
-								
 							} else if ( word.equals("R") ) {
 								
 								gameOrRound = "Round";
-								
-								roundNumber++;
-								
-								number = roundNumber;
 								
 							// If we come across an attribute entry
 							} else {
@@ -479,6 +463,4 @@ public class OutputManager {
 	    
 	}
 
-	
-	
 }
