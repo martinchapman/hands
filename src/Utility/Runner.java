@@ -56,16 +56,27 @@ public class Runner extends JFrame {
 	private static String[] hiderTypes = 
 		{ 
 		  "Random",
+		  "RandomFixedStart",
 		  "RandomVariableHidePotential",
+		  
 		  "RandomDirection",
+		  
 		  "RandomSet",
 		  "LowEdgeCostRandomSet",
+		  
 		  "RandomFixedDistance",
+		  "RandomFixedDistanceFixedStart",
 		  "LowEdgeCostRandomFixedDistance",
+		  
 		  "VariableFixedDistance",
+		  "VariableFixedDistanceFixedStart",
 		  "LowEdgeCostVariableFixedDistance",
+		  
 		  "MinimumConnectivity",
+		  
 		  "MaxDistance",
+		  
+		  "VariableLowEdgeCost",
 		  
 		  "FullyBias",
 		  "FullyExplorative",

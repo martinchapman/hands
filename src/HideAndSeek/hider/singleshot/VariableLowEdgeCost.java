@@ -1,4 +1,4 @@
-package HideAndSeek.hider.repeatgame;
+package HideAndSeek.hider.singleshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,27 +10,22 @@ import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.Hider;
 
 /**
- * A hider who's tendency to choose pre-explored edges (cheaper)
- * over unexplored edges is manually set.
+ * A hider who's tendency to choose cheap edges over random edges
+ * is manually set.
  * 
- * Relies on the % cost reduction for exploring an edge to be greater than 0.
+ * Relies on edges being of variable weight.
  * 
  * @author Martin
  */
-public class VariableBias extends Hider {
+public class VariableLowEdgeCost extends Hider {
 
+	
 	/**
-	 * Hider in which the tendency to take pre-traversed edges
-	 * can be set.
-	 * 
-	 * Hides in first K locations.
-	 * 
-	 * 
-	 * @param graph
+	 * @param graphController
 	 * @param numberOfHideLocations
 	 * @param bias
 	 */
-	public VariableBias(
+	public VariableLowEdgeCost(
 			GraphController <StringVertex, StringEdge> graphController,
 			int numberOfHideLocations, double bias) {
 		super(graphController, numberOfHideLocations);
@@ -48,12 +43,12 @@ public class VariableBias extends Hider {
 		return true;
 		
 	}
-
+	
 	/**
-	 *  Percentage of original cost that an edge must reach in order
-	 *  to be considered 'well traversed'
+	 * A percentage of the maximum value below which an edge weight must 
+	 * fall under to be considered a cheap edge
 	 */
-	protected final static double WELLTRAVERSEDPERCENTAGE = 0.5;
+	protected final static double CHEAPTHRESHOLD = 0.5;
 	
 	/**
 	 * 
@@ -116,77 +111,7 @@ public class VariableBias extends Hider {
 	@Override
 	protected StringVertex nextNode(StringVertex currentNode) {
 		
-		List<StringEdge> connectedEdges = getConnectedEdges(currentNode);
-		
-		ArrayList<StringEdge> biasEdges = new ArrayList<StringEdge>();
-		
-		ArrayList<StringEdge> explorativeEdges = new ArrayList<StringEdge>();
-		
-		for ( StringEdge edge : connectedEdges ) {
-			
-			// If no edge traversal decrement has been set 
-			if ( graphController.getEdgeTraverselDecrement() == 1.0 ) {
-				
-				// Simply return a random connected node
-				return connectedNode(currentNode);
-					
-			} else {
-			
-				/* When edges are decremented, traversers have a better understanding of where they have been before,
-				   and thus which edges are explorative. In the mechanism above, there is no way to discern which edges
-				   are more explorative.
-				   Is this true? */
-				if ( graphController.traverserEdgeCost(this, edge.getSource(), edge.getTarget()) < ( graphController.getEdgeWeight(edge) *  WELLTRAVERSEDPERCENTAGE ) ) {
-					
-					biasEdges.add(edge);
-					
-				} else {
-					
-					explorativeEdges.add(edge);
-					
-				}
-				
-			}
-		
-		}
-		
-		// If there is no information on the proportion of biased edges, select node at random
-		if ( biasEdges.size() == 0 ) {
-			
-			return connectedNode(currentNode);
-			
-		} else {
-			
-			if (Math.random() < tendencyToBias) {
-				
-				// Get *least* weighted unvisisted (most bias) edge
-				Collections.sort(biasEdges);
-				
-				return exploreEdges(currentNode, biasEdges);
-				
-			} else {
-				
-				// If there is no edge traversal decrement, ordering explorative nodes
-				// is also exploitable as strategy will always select most expensive ones
-				if ( graphController.getEdgeTraverselDecrement() == 1.0 ) {
-					
-					Collections.shuffle(explorativeEdges);
-					
-					return exploreEdges(currentNode, explorativeEdges);
-					
-				} else {
-					
-					// Get *most* weighted unvisited (most explorative) edge
-					Collections.sort(explorativeEdges);
-					Collections.reverse(explorativeEdges);
-					
-					return exploreEdges(currentNode, explorativeEdges);
-					
-				}
-				
-			}
-			
-		}
+		return connectedNode(currentNode);
 		
 	}
 	
@@ -208,7 +133,6 @@ public class VariableBias extends Hider {
 		
 	}
 
-	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#getConnectedEdges(HideAndSeek.graph.StringVertex)
 	 */
@@ -217,32 +141,13 @@ public class VariableBias extends Hider {
 		
 		ArrayList<StringEdge> edges = new ArrayList<StringEdge>(graphController.edgesOf(currentNode));
 		
-		Collections.sort(edges);
+		if (Math.random() < tendencyToBias) {
+			
+			Collections.sort(edges);
+		
+		}
 		
 		return edges;
-		
-	}
-	
-	/**
-	 * @param currentNode
-	 * @param biasEdges
-	 * @return
-	 */
-	private StringVertex exploreEdges(StringVertex currentNode, ArrayList<StringEdge> edges) {
-		
-		StringVertex target;
-		
-		for ( StringEdge edge : edges ) {
-			
-			if ( !uniquelyVisitedNodes().contains(edgeToTarget(edge, currentNode)) ) {
-				
-				return edgeToTarget(edge, currentNode);
-				
-			}
-			
-		};
-		
-		return connectedNode(currentNode);
 		
 	}
 
@@ -280,7 +185,6 @@ public class VariableBias extends Hider {
 		return super.printRoundStats(); //+ "," + tendencyToBias;
 	
 	}
-
 
 	/* (non-Javadoc)
 	 * @see HideAndSeek.hider.Hider#printGameStats()

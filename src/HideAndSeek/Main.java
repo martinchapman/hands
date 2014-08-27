@@ -19,9 +19,13 @@ import HideAndSeek.hider.singleshot.LowEdgeCostVariableFixedDistance;
 import HideAndSeek.hider.singleshot.MaxDistance;
 import HideAndSeek.hider.singleshot.Random;
 import HideAndSeek.hider.singleshot.RandomFixedDistance;
+import HideAndSeek.hider.singleshot.RandomFixedDistanceFixedStart;
+import HideAndSeek.hider.singleshot.RandomFixedStart;
 import HideAndSeek.hider.singleshot.RandomSet;
 import HideAndSeek.hider.singleshot.RandomVariableHidePotential;
 import HideAndSeek.hider.singleshot.VariableFixedDistance;
+import HideAndSeek.hider.singleshot.VariableFixedDistanceFixedStart;
+import HideAndSeek.hider.singleshot.VariableLowEdgeCost;
 import HideAndSeek.seeker.Seeker;
 import HideAndSeek.seeker.repeatgame.HighProbability;
 import HideAndSeek.seeker.singleshot.BacktrackPath;
@@ -148,6 +152,12 @@ public class Main {
 			
 			} 
 			
+			if (hiderType.getElement0().equals("RandomFixedStart")) {
+				
+				allHidingAgents.add(new RandomFixedStart(graphController, numberOfHideLocations));
+			
+			} 
+			
 			if (hiderType.getElement0().equals("RandomVariableHidePotential")) {
 				
 				allHidingAgents.add(new RandomVariableHidePotential(graphController, numberOfHideLocations, gameNumber / ((float)totalGames)));
@@ -159,7 +169,7 @@ public class Main {
 				allHidingAgents.add(new VariableFixedDistance(graphController, numberOfHideLocations, 0));
 				
 				// Have to set ID manually as identifier and class used are different
-				allHidingAgents.get(allHidingAgents.size() - 1).setID("RandomDirection");
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("RandomDirection");
 			
 			} 
 			
@@ -181,6 +191,12 @@ public class Main {
 			
 			} 
 			
+			if (hiderType.getElement0().equals("RandomFixedDistanceFixedStart")) {
+				
+				allHidingAgents.add(new RandomFixedDistanceFixedStart(graphController, numberOfHideLocations));
+			
+			} 
+			
 			if (hiderType.getElement0().equals("LowEdgeCostRandomFixedDistance")) {
 				
 				allHidingAgents.add(new LowEdgeCostRandomFixedDistance(graphController, numberOfHideLocations));
@@ -190,6 +206,12 @@ public class Main {
 			if (hiderType.getElement0().equals("VariableFixedDistance")) {
 				
 				allHidingAgents.add(new VariableFixedDistance(graphController, numberOfHideLocations, gameNumber));
+			
+			} 
+			
+			if (hiderType.getElement0().equals("VariableFixedDistanceFixedStart")) {
+				
+				allHidingAgents.add(new VariableFixedDistanceFixedStart(graphController, numberOfHideLocations, gameNumber));
 			
 			} 
 			
@@ -211,17 +233,27 @@ public class Main {
 			
 			} 
 			
+			if (hiderType.getElement0().equals("VariableLowEdgeCost")) {
+				
+				allHidingAgents.add(new VariableLowEdgeCost(graphController, numberOfHideLocations, gameNumber));
+			
+			} 
+			
 			// Repeat-game:
 			
 			if (hiderType.getElement0().equals("FullyBias")) {
 				
 				allHidingAgents.add(new VariableBias(graphController, numberOfHideLocations, 1.0));
+				
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("FullyBias");
 			
 			}
 			
 			if (hiderType.getElement0().equals("FullyExplorative")) {
 				
 				allHidingAgents.add(new VariableBias(graphController, numberOfHideLocations, 0.0));
+				
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("FullyExplorative");
 			
 			}
 			

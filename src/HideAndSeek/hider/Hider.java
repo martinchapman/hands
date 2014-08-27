@@ -48,9 +48,9 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 	/**
 	 * @param ID
 	 */
-	public void setID(String ID) {
+	public void setName(String name) {
 		
-		this.ID = "h" + ID;
+		this.name = name;
 		
 	}
 	
@@ -63,6 +63,8 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 		
 		this.numberOfHideLocations = numberOfHideLocations;
 		
+		name = this.getClass().toString().substring(this.getClass().toString().lastIndexOf('.') + 1, this.getClass().toString().length());
+		
 		ID = "" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime()) + Math.random() * 100;
 
 		hideLocations = new ArrayList<StringVertex>();
@@ -71,12 +73,17 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 		
 	}
 	
+	/**
+	 * 
+	 */
+	private String name;
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
 		
-		return "h" + this.getClass().toString().substring(this.getClass().toString().lastIndexOf('.') + 1, this.getClass().toString().length());
+		return "h" + name;
 		
 	}
 	

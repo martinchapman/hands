@@ -348,8 +348,6 @@ public class TraverserRecord {
 		
 		int attributeAdditions = 0; 
 		
-		System.out.println(attributeToValue);
-		
 		// For each record 
 		for ( Entry<AttributeSetIdentifier, Hashtable<String, Double>> attributeEntry : attributeToValue.entrySet() ) {
 			
@@ -358,8 +356,6 @@ public class TraverserRecord {
 			
 				// For each attribute entry within that round
 				for ( Entry<String, Double> attributeToValueEntry : attributeEntry.getValue().entrySet() ) {
-					
-					if ( attributeEntry.getKey().getRoundNumber() == 0 ) { System.out.println(attributeToValueEntry.getValue()); }
 					
 					// If an entry for the round doesn't exist within our cumulative map...
 					if ( !cumulativeRoundsAttributeToValue.containsKey( attributeEntry.getKey().getRoundNumber() ) ) {
@@ -396,8 +392,6 @@ public class TraverserRecord {
 		
 		Hashtable<Integer, Hashtable<String, Double>> averageRoundAttributeToValue = new Hashtable<Integer, Hashtable<String, Double>>();
 		
-		System.out.println(cumulativeRoundsAttributeToValue);
-		
 		for (Entry<Integer, Hashtable<String, Double>> attribute : cumulativeRoundsAttributeToValue.entrySet()) {
 			
 			for ( Entry<String, Double> attributeCumulative: attribute.getValue().entrySet()) {
@@ -428,8 +422,6 @@ public class TraverserRecord {
 		
 		Collections.reverse(series);
 		
-		System.out.println(series);
-		
 		return series;
 		
 	}
@@ -446,8 +438,6 @@ public class TraverserRecord {
 		ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>> series = 
 				new ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>>();
 		
-		System.out.println("In Traverser Record: " + attributeToValue);
-		
 		// For each record 
 		for ( Entry<AttributeSetIdentifier, Hashtable<String, Double>> attributeEntry : attributeToValue.entrySet() ) {
 			
@@ -460,8 +450,6 @@ public class TraverserRecord {
 			}
 		
 		}
-		
-		System.out.println("series in record: " + series);
 		
 		return series;
 		
