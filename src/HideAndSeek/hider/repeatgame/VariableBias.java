@@ -159,7 +159,7 @@ public class VariableBias extends Hider {
 			
 			if (Math.random() < tendencyToBias) {
 				
-				// Get *least* weighted unvisisted (most bias) edge
+				// Get *least* weighted unvisited (most bias) edge
 				Collections.sort(biasEdges);
 				
 				return exploreEdges(currentNode, biasEdges);

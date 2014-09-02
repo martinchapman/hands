@@ -76,6 +76,7 @@ public class Runner extends JFrame {
 		  
 		  "MaxDistance",
 		  
+		  "LowEdgeCost",
 		  "VariableLowEdgeCost",
 		  
 		  "FullyBias",

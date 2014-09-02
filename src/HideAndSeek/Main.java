@@ -233,9 +233,15 @@ public class Main {
 			
 			} 
 			
+			if (hiderType.getElement0().equals("LowEdgeCost")) {
+				
+				allHidingAgents.add(new VariableLowEdgeCost(graphController, numberOfHideLocations, 1.0));
+			
+			} 
+
 			if (hiderType.getElement0().equals("VariableLowEdgeCost")) {
 				
-				allHidingAgents.add(new VariableLowEdgeCost(graphController, numberOfHideLocations, gameNumber));
+				allHidingAgents.add(new VariableLowEdgeCost(graphController, numberOfHideLocations, gameNumber / (float)totalGames));
 			
 			} 
 			
