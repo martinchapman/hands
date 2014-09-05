@@ -138,8 +138,6 @@ public class HighProbability extends SeekerLocalGraph {
 		   so just get ALL likely locations) */
 		likelyNodes = behaviourPrediction.rankLikelyHideLocations(predictiveNodes);
 		
-		Utils.talk(toString(), "Likely nodes: " + likelyNodes);
-		
 	}
 
 }

@@ -465,13 +465,13 @@ public class Main {
 	        	
 				hider.run();
 				
-				Utils.talk("Main", hider.toString() + "," + hider.printRoundStats());
+				System.out.println("Main " + hider.toString() + "," + hider.printRoundStats());
 				
 				for ( Seeker seeker : seekers ) {
 					
 					seeker.run();
 					
-					Utils.talk("Main", seeker.toString() + "," + seeker.printRoundStats());
+					System.out.println("Main " + seeker.toString() + "," + seeker.printRoundStats());
 					
 				}
 				
@@ -545,7 +545,7 @@ public class Main {
 			
 			hider.endOfGame();
 			
-			Utils.talk("Main", hider.toString() + "," + hider.printGameStats());
+			System.out.println("Main" + hider.toString() + "," + hider.printGameStats());
 			
 			//if ( !recordPerRound ) {
 			

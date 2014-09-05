@@ -515,4 +515,14 @@ public class GraphController<V, E> {
 		
 	}
 
+	/**
+	 * @param hider
+	 * @return
+	 */
+	public double latestHiderRoundScores(Hider hider) {
+		
+		return graph.latestHiderRoundScores(hider);
+		
+	}
+
 }

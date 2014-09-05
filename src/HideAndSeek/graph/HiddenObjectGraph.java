@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -16,6 +15,7 @@ import org.jgrapht.graph.SimpleWeightedGraph;
 import HideAndSeek.GraphTraverser;
 import HideAndSeek.hider.Hider;
 import HideAndSeek.seeker.Seeker;
+import Utility.Dataset;
 import Utility.Utils;
 
 /**
@@ -70,17 +70,17 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	 */
 	public void notifyEndOfRound() {
 		
-		calculateHiderScores();
+    	calculateHiderScores();
 		
 		// Calculate average seeker round performance for access by adaptive Hiders
 		averageSeekersRoundPerformance();
 		
 		roundNumber++;
 		
-    	roundCosts.put(roundNumber, new Hashtable<GraphTraverser, Double>());
+		roundCosts.put(roundNumber, new Hashtable<GraphTraverser, Double>());
     	
     	roundPaths.put(roundNumber, new Hashtable<GraphTraverser, ArrayList<V>>());
-    	
+		
 		clearHideLocations();
 		
 	}
@@ -167,8 +167,8 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 						   costs of the hider. Thus, if costs are too high or a seeker's performance
 						   is too good, score is likely to be lower. */
 										    // 
-						scoreAgainstEach += requestLatestSeekerRoundPerformance((Seeker)seeker) -
-											requestLatestHiderRoundPerformance((Hider)agent);
+						scoreAgainstEach += requestLatestHiderRoundPerformance((Hider)agent) -
+											requestLatestSeekerRoundPerformance((Seeker)seeker);
 										   
 					}
 				
@@ -215,7 +215,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	}
 	
 	/**
-	 * Designated metric for a Hider's performance
+	 * (Different) Designated metrics for a Hider's performance.
 	 * 
 	 * @param hider
 	 * @return
@@ -230,12 +230,36 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 		
 		// return (latestRoundCosts(agent) / totalPathCost(latestRoundPaths(agent))) * 100;
 		
-		return latestRoundCosts(hider);
+		// return latestRoundCosts(hider);
+		
+		if ( roundNumber > 0 ) {
+			
+			Dataset dataset = new Dataset();
+			
+			for ( int individualRoundNumber = 0; individualRoundNumber <= roundNumber; individualRoundNumber++) {
+				
+				dataset.addItemToDataset( requestRoundCost(individualRoundNumber, hider) );
+				
+			}
+			
+			// Standardise value: http://stats.stackexchange.com/questions/13267/how-to-sum-two-variables-that-are-on-different-scales
+			return ( requestRoundCost(roundNumber, hider) - dataset.getMean() ) / dataset.getStdDev();
+			
+			// Because any decrease in cost (i.e. -10%) is actually a good thing for the Hider, make positive
+			//System.out.println(hider.toString() + ": Percentage change from round " + ( roundNumber - 1 ) + " to " + roundNumber + " = " + ( ( ( requestRoundCost(roundNumber, hider) - requestRoundCost(roundNumber - 1, hider) ) / requestRoundCost(roundNumber - 1, hider) ) * 100 ));
+			
+			//return -1 * ( ( ( requestRoundCost(roundNumber, hider) - requestRoundCost(roundNumber - 1, hider) ) / requestRoundCost(roundNumber - 1, hider) ) * 100);
+			
+		} else {
+			
+			return 0;
+			
+		}
 		
 	}
 	
 	/**
-	 * Designated metric for a Seeker's performance
+	 * (Different) Designated metrics for a Seeker's performance
 	 * 
 	 * @param seeeker
 	 * @return 
@@ -247,7 +271,32 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 		
 		// return latestRoundPaths(seeker).size() / ((double)edgeSet().size()) * 100;
 		
-		return latestRoundCosts(seeker);
+		// return latestRoundCosts(seeker);
+		
+		if ( roundNumber > 0 ) {
+			
+			Dataset dataset = new Dataset();
+			
+			for ( int individualRoundNumber = 0; individualRoundNumber <= roundNumber; individualRoundNumber++) {
+				
+				dataset.addItemToDataset( requestRoundCost(individualRoundNumber, seeker) );
+				
+			}
+			
+			// Standardise value: http://stats.stackexchange.com/questions/13267/how-to-sum-two-variables-that-are-on-different-scales
+			return ( requestRoundCost(roundNumber, seeker) - dataset.getMean() ) / dataset.getStdDev();
+			
+			// Because any decrease in cost (i.e. -10%) is actually a good thing for the Hider, make positive
+			//System.out.println(seeker.toString() + ": Percentage change from round " + ( roundNumber - 1 ) + " to " + roundNumber + " = " + ( ( ( requestRoundCost(roundNumber, seeker) - requestRoundCost(roundNumber - 1, seeker) ) / requestRoundCost(roundNumber - 1, seeker) ) * 100 ));
+						
+			// Because any decrease in cost (i.e. -10%) is actually a good thing for the Seeker, make positive
+			//return -1 * ( ( ( requestRoundCost(roundNumber, seeker) - requestRoundCost(roundNumber - 1, seeker) ) / requestRoundCost(roundNumber - 1, seeker) ) * 100);
+			
+		} else {
+			
+			return 0;
+			
+		}
 		
 	}
 	
@@ -749,7 +798,8 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 			
 		}
 		
-		return cumulativeScores / roundNumber;
+		// -1 because first round yields 0 (only under current metric though)
+		return cumulativeScores / (roundNumber - 1);
 		
 	}
 	
