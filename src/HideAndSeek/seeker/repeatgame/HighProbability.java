@@ -140,4 +140,14 @@ public class HighProbability extends SeekerLocalGraph {
 		
 	}
 
+	@Override
+	protected void endOfGame() {
+		
+		super.endOfGame();
+		
+		// If game had ended, and an instance of this object may be used in further games, clear all learning.
+		behaviourPrediction = new BehaviourPrediction();
+		
+	}
+
 }

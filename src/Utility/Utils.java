@@ -23,6 +23,11 @@ public class Utils {
 
 	public final static String FILEPREFIX = "output/";
 	
+	/**
+	 * 
+	 */
+	public static boolean DEBUG = true;
+	
 	public static void uploadToFTP(String filePath, String ftpUrl, String user, String pass, String host, String uploadPath) {
 		
 		ftpUrl = String.format(ftpUrl, user, pass, host, uploadPath);
@@ -225,11 +230,6 @@ public class Utils {
         return seekers;
     	
     }
-	
-	/**
-	 * 
-	 */
-	public static boolean DEBUG = false;
 
 	/**
 	 * @param speaker

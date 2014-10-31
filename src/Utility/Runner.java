@@ -82,7 +82,9 @@ public class Runner extends JFrame {
 		  "FullyBias",
 		  "FullyExplorative",
 		  "LooselyBias",
-		  "VariableBias" 
+		  "VariableBias",
+		  "FixedStartVariableBias"
+		  
 		};
 	
 	private static String[] seekerTypes = 

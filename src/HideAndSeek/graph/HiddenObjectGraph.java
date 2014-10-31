@@ -167,8 +167,8 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 						   costs of the hider. Thus, if costs are too high or a seeker's performance
 						   is too good, score is likely to be lower. */
 										    // 
-						scoreAgainstEach += requestLatestHiderRoundPerformance((Hider)agent) -
-											requestLatestSeekerRoundPerformance((Seeker)seeker);
+						scoreAgainstEach += requestLatestSeekerRoundPerformance((Seeker)seeker) - 
+											requestLatestHiderRoundPerformance((Hider)agent);
 										   
 					}
 				
@@ -230,9 +230,9 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 		
 		// return (latestRoundCosts(agent) / totalPathCost(latestRoundPaths(agent))) * 100;
 		
-		// return latestRoundCosts(hider);
+		return latestRoundCosts(hider);
 		
-		if ( roundNumber > 0 ) {
+		/*if ( roundNumber > 0 ) {
 			
 			Dataset dataset = new Dataset();
 			
@@ -254,7 +254,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 			
 			return 0;
 			
-		}
+		}*/
 		
 	}
 	
@@ -271,9 +271,9 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 		
 		// return latestRoundPaths(seeker).size() / ((double)edgeSet().size()) * 100;
 		
-		// return latestRoundCosts(seeker);
+		return latestRoundCosts(seeker);
 		
-		if ( roundNumber > 0 ) {
+		/*if ( roundNumber > 0 ) {
 			
 			Dataset dataset = new Dataset();
 			
@@ -296,7 +296,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 			
 			return 0;
 			
-		}
+		}*/
 		
 	}
 	
@@ -559,7 +559,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
     /**
      * 
      */
-    public void newGame() {
+    public void nextHider() {
     	
     	roundNumber = 0;
     	
@@ -570,6 +570,8 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	    	registerTraversingAgent(traverser);
 		
     	}
+    	
+    	Utils.talk("Graph", traverserEdgeCosts.toString());
     	
     }
     
@@ -665,9 +667,19 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 			// The unique cost to the traverser, based upon their traversals so far
 			double uniqueCost = traverserEdgeCosts.get( traverser ).get( traversedEdge );
 			
-			// The new cost, based upon the edge that is currently being traversed
-		    double newCost = uniqueCost * edgeTraversalDecrement;
+			double newCost;
+			
+			// ~MDC TEMPORARY: only decrement costs for Hiders
+			if ( !(traverser instanceof Seeker) ) {
+				
+				// The new cost, based upon the edge that is currently being traversed
+			    newCost = uniqueCost * edgeTraversalDecrement;
 		    
+			} else {
+				
+				newCost = uniqueCost;
+				
+			}
 			// Update round costs
 		    
 			Hashtable<GraphTraverser, Double> thisRoundCostData = roundCosts.get(roundCosts.size() - 1);
@@ -799,7 +811,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 		}
 		
 		// -1 because first round yields 0 (only under current metric though)
-		return cumulativeScores / (roundNumber - 1);
+		return cumulativeScores / roundNumber; //(roundNumber - 1);
 		
 	}
 	

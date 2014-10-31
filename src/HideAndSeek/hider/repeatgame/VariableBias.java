@@ -7,7 +7,7 @@ import java.util.List;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.Hider;
+import HideAndSeek.hider.singleshot.VariableLowEdgeCost;
 
 /**
  * A hider who's tendency to choose pre-explored edges (cheaper)
@@ -17,7 +17,7 @@ import HideAndSeek.hider.Hider;
  * 
  * @author Martin
  */
-public class VariableBias extends Hider {
+public class VariableBias extends VariableLowEdgeCost {
 
 	/**
 	 * Hider in which the tendency to take pre-traversed edges
@@ -33,82 +33,16 @@ public class VariableBias extends Hider {
 	public VariableBias(
 			GraphController <StringVertex, StringEdge> graphController,
 			int numberOfHideLocations, double bias) {
-		super(graphController, numberOfHideLocations);
-		
-		setBias(bias);
+		super(graphController, numberOfHideLocations, bias);
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see HideAndSeek.hider.Hider#hideHere(HideAndSeek.graph.StringVertex)
-	 */
-	@Override
-	protected boolean hideHere(StringVertex vertex) {
-		
-		return true;
-		
-	}
-
-	/**
+	/*
 	 *  Percentage of original cost that an edge must reach in order
 	 *  to be considered 'well traversed'
 	 */
 	protected final static double WELLTRAVERSEDPERCENTAGE = 0.5;
 	
-	/**
-	 * 
-	 */
-	protected double tendencyToBias = 0.0;
-	
-	/**
-	 * 
-	 */
-	protected double tendencyToExplore = 1.0;
-	
-	/**
-	 * @param bias
-	 */
-	public void setBias(double bias) {
-		
-		if (bias > 1.0) { bias = 1.0; }
-		
-		else if (bias < 0.0) { bias = 0.0; }
-		
-		tendencyToBias = bias;
-		
-		tendencyToExplore = 1.0 - bias;
-		
-	}
-	
-	/**
-	 * 
-	 */
-	protected void incrementBias() {
-		
-		if (tendencyToBias < 1.0 && tendencyToExplore > 0.0) {
-			
-			tendencyToBias += 0.1;
-			
-			tendencyToExplore -= 0.1;
-			
-		}
-		
-	}
-	
-	/**
-	 * 
-	 */
-	protected void decrementBias() {
-
-		if (tendencyToBias > 0.0 && tendencyToExplore < 1.0) {
-			
-			tendencyToBias -= 0.1;
-			
-			tendencyToExplore += 0.1;
-			
-		}
-		
-	}
 	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
@@ -132,10 +66,6 @@ public class VariableBias extends Hider {
 					
 			} else {
 			
-				/* When edges are decremented, traversers have a better understanding of where they have been before,
-				   and thus which edges are explorative. In the mechanism above, there is no way to discern which edges
-				   are more explorative.
-				   Is this true? */
 				if ( graphController.traverserEdgeCost(this, edge.getSource(), edge.getTarget()) < ( graphController.getEdgeWeight(edge) *  WELLTRAVERSEDPERCENTAGE ) ) {
 					
 					biasEdges.add(edge);
@@ -252,13 +182,7 @@ public class VariableBias extends Hider {
 	@Override
 	protected StringVertex startNode() {
 
-		//StringVertex[] vertices = new StringVertex[graphController.vertexSet().size()];
-		
-		//return graphController.vertexSet().toArray(vertices)[0];
-		
 		return randomNode();
-		
-		//return firstNode();
 		
 	}
 	

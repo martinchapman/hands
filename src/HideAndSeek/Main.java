@@ -11,6 +11,7 @@ import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.Hider;
+import HideAndSeek.hider.repeatgame.FixedStartVariableBias;
 import HideAndSeek.hider.repeatgame.VariableBias;
 import HideAndSeek.hider.singleshot.LeastConnected;
 import HideAndSeek.hider.singleshot.LowEdgeCostRandomFixedDistance;
@@ -238,6 +239,12 @@ public class Main {
 				allHidingAgents.add(new VariableLowEdgeCost(graphController, numberOfHideLocations, 1.0));
 			
 			} 
+			
+			if (hiderType.getElement0().equals("LowEdgeCost")) {
+				
+				allHidingAgents.add(new VariableLowEdgeCost(graphController, numberOfHideLocations, 1.0));
+			
+			} 
 
 			if (hiderType.getElement0().equals("VariableLowEdgeCost")) {
 				
@@ -266,16 +273,24 @@ public class Main {
 			if (hiderType.getElement0().equals("LooselyBias")) {
 				
 				allHidingAgents.add(new VariableBias(graphController, numberOfHideLocations, 0.5));
+				
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("LooselyBias");
 			
 			} 
 			
 			if (hiderType.getElement0().equals("VariableBias")) {
 				
-				allHidingAgents.add(new VariableBias(graphController, numberOfHideLocations, gameNumber/((float)totalGames)));
+				allHidingAgents.add(new VariableBias(graphController, numberOfHideLocations, gameNumber / (float)totalGames));
 			
 			} 
 			
+			if (hiderType.getElement0().equals("FixedStartVariableBias")) {
+				
+				allHidingAgents.add(new FixedStartVariableBias(graphController, numberOfHideLocations, gameNumber / (float)totalGames));
 			
+			} 
+			
+			//
 			
 		}
 		
@@ -457,6 +472,8 @@ public class Main {
 		// Run rounds and record output per hider
 		for ( Hider hider : hiders ) {
 			
+			Utils.talk("Main", hiders.toString());
+			
 			for (int i = 0; i < rounds; i++) {
 	        	
 	        	Utils.talk("Main", "Game " + gameNumber + " Round " + i);
@@ -465,13 +482,9 @@ public class Main {
 	        	
 				hider.run();
 				
-				System.out.println("Main " + hider.toString() + "," + hider.printRoundStats());
-				
 				for ( Seeker seeker : seekers ) {
 					
 					seeker.run();
-					
-					System.out.println("Main " + seeker.toString() + "," + seeker.printRoundStats());
 					
 				}
 				
@@ -489,9 +502,13 @@ public class Main {
 	        		
 	    			Utils.writeToFile(mainOutputWriter, "R, " + hider.toString() + "," + hider.printRoundStats() + ",");
 	    			
+	    			Utils.talk("Main", hider.toString() + "," + hider.printRoundStats());
+	    			
 	    			for( Seeker seeker : seekers ) {
 	    				
 	    				Utils.writeToFile(mainOutputWriter, seeker.toString() + "," + seeker.printRoundStats());
+	    				
+	    				Utils.talk("Main ", seeker.toString() + "," + seeker.printRoundStats());
 	    				
 	    			}
 	    			
@@ -569,7 +586,7 @@ public class Main {
 			
 			//}
 			
-			graphController.newGame(this);
+			graphController.nextHider(this);
 			
 		} // End of hider loop
 		
