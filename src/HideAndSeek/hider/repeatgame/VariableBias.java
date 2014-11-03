@@ -18,6 +18,10 @@ import Utility.Utils;
  * 
  * Relies on the % cost reduction for exploring an edge to be greater than 0.
  * 
+ * NB. Best run with FIXED edge costs, as decremented edge cost is used
+ * as a metric for how explored a connection is. With variables costs, this may
+ * distort this measure.
+ * 
  * @author Martin
  */
 public class VariableBias extends VariableLowEdgeCost {
@@ -59,8 +63,6 @@ public class VariableBias extends VariableLowEdgeCost {
 		
 		Map<StringEdge, Double> explorativeEdgesToCost = new HashMap<StringEdge, Double>();
 		
-		System.out.println("Connected edges: " + connectedEdges);
-		
 		for ( StringEdge edge : connectedEdges ) {
 			
 			// If no edge traversal decrement has been set 
@@ -73,14 +75,10 @@ public class VariableBias extends VariableLowEdgeCost {
 			
 				if ( graphController.traverserEdgeCost(this, edge.getSource(), edge.getTarget()) < ( graphController.getEdgeWeight(edge) *  WELLTRAVERSEDPERCENTAGE ) ) {
 					
-					System.out.println("Adding edge: " + edge + " " + graphController.traverserEdgeCost(this, edge.getSource(), edge.getTarget()));
-					
 					// Better to be a set of potential bias edges (as opposed to just one), as may have been traversed before.
 					biasEdgesToCost.put(edge, graphController.traverserEdgeCost(this, edge.getSource(), edge.getTarget()));
 					
 				} else {
-					
-					System.out.println("Adding edge: " + edge + " " + graphController.traverserEdgeCost(this, edge.getSource(), edge.getTarget()));
 					
 					explorativeEdgesToCost.put(edge, graphController.traverserEdgeCost(this, edge.getSource(), edge.getTarget()));
 					
@@ -93,9 +91,6 @@ public class VariableBias extends VariableLowEdgeCost {
 		
 		explorativeEdgesToCost = Utils.sortByComparator(explorativeEdgesToCost, true);
 		biasEdgesToCost = Utils.sortByComparator(biasEdgesToCost, true);
-		
-		System.out.println("Explorative Edges: " + explorativeEdgesToCost);
-		System.out.println("Bias Edges: " + biasEdgesToCost);
 		
 		// If there is no information on the proportion of biased edges, or no edge traversal decrement 
 		// (i.e. no info on explorative) select node at random
