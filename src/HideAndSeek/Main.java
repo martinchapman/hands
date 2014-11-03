@@ -13,6 +13,7 @@ import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.Hider;
 import HideAndSeek.hider.repeatgame.FixedStartVariableBias;
 import HideAndSeek.hider.repeatgame.VariableBias;
+import HideAndSeek.hider.singleshot.FixedStartVariableLowEdgeCost;
 import HideAndSeek.hider.singleshot.LeastConnected;
 import HideAndSeek.hider.singleshot.LowEdgeCostRandomFixedDistance;
 import HideAndSeek.hider.singleshot.LowEdgeCostRandomSet;
@@ -252,6 +253,12 @@ public class Main {
 			
 			} 
 			
+			if (hiderType.getElement0().equals("FixedStartVariableLowEdgeCost")) {
+				
+				allHidingAgents.add(new FixedStartVariableLowEdgeCost(graphController, numberOfHideLocations, gameNumber / (float)totalGames));
+			
+			} 
+			
 			// Repeat-game:
 			
 			if (hiderType.getElement0().equals("FullyBias")) {
@@ -287,6 +294,22 @@ public class Main {
 			if (hiderType.getElement0().equals("FixedStartVariableBias")) {
 				
 				allHidingAgents.add(new FixedStartVariableBias(graphController, numberOfHideLocations, gameNumber / (float)totalGames));
+			
+			} 
+			
+			if (hiderType.getElement0().equals("FixedStartFullyBias")) {
+				
+				allHidingAgents.add(new FixedStartVariableBias(graphController, numberOfHideLocations, 1.0));
+				
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("FixedStartFullyBias");
+			
+			} 
+			
+			if (hiderType.getElement0().equals("FixedStartFullyExplorative")) {
+				
+				allHidingAgents.add(new FixedStartVariableBias(graphController, numberOfHideLocations, 0.0));
+				
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("FixedStartFullyExplorative");
 			
 			} 
 			

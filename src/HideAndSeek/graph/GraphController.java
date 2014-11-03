@@ -119,7 +119,6 @@ public class GraphController<V, E> {
 		
 		graph.setNodeTypes(new char[]{ 'A', 'B', 'C' });
 		
-		
 		// Set edge weights
 		
 		for ( StringEdge edge : graph.edgeSet() ) {
@@ -522,6 +521,16 @@ public class GraphController<V, E> {
 	public double latestHiderRoundScores(Hider hider) {
 		
 		return graph.latestHiderRoundScores(hider);
+		
+	}
+	
+	/**
+	 * @param edge
+	 * @param weight
+	 */
+	public void setEdgeWeight(StringEdge edge, double weight) {
+		
+		graph.setEdgeWeight(edge, weight);
 		
 	}
 

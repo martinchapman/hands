@@ -9,9 +9,10 @@ public class StringEdge extends DefaultWeightedEdge implements Comparable<String
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
+	
 	@Override
 	public StringVertex getSource() {
+		
 		// TODO Auto-generated method stub
 		return (StringVertex) super.getSource();
 	}
@@ -54,7 +55,7 @@ public class StringEdge extends DefaultWeightedEdge implements Comparable<String
 			
 		} else {
 		
-			return 0;
+			return -1;
 		
 		}
 		

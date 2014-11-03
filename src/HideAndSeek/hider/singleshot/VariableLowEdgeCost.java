@@ -143,9 +143,12 @@ public class VariableLowEdgeCost extends Hider {
 		
 		if (Math.random() < tendencyToBias) {
 			
+			
 			Collections.sort(edges);
 		
 		}
+		
+		System.out.println("Edges: " + edges);
 		
 		return edges;
 		

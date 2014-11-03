@@ -898,7 +898,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 		
 		this.addEdge(source, target);
 		
-		this.setEdgeWeight(this.getEdge(source, target), weight);
+		setEdgeWeight(this.getEdge(source, target), weight);
 		
 	}
 	

@@ -2,12 +2,15 @@ package HideAndSeek.hider.repeatgame;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.singleshot.VariableLowEdgeCost;
+import Utility.Utils;
 
 /**
  * A hider who's tendency to choose pre-explored edges (cheaper)
@@ -52,9 +55,11 @@ public class VariableBias extends VariableLowEdgeCost {
 		
 		List<StringEdge> connectedEdges = getConnectedEdges(currentNode);
 		
-		ArrayList<StringEdge> biasEdges = new ArrayList<StringEdge>();
+		Map<StringEdge, Double> biasEdgesToCost = new HashMap<StringEdge, Double>();
 		
-		ArrayList<StringEdge> explorativeEdges = new ArrayList<StringEdge>();
+		Map<StringEdge, Double> explorativeEdgesToCost = new HashMap<StringEdge, Double>();
+		
+		System.out.println("Connected edges: " + connectedEdges);
 		
 		for ( StringEdge edge : connectedEdges ) {
 			
@@ -68,11 +73,16 @@ public class VariableBias extends VariableLowEdgeCost {
 			
 				if ( graphController.traverserEdgeCost(this, edge.getSource(), edge.getTarget()) < ( graphController.getEdgeWeight(edge) *  WELLTRAVERSEDPERCENTAGE ) ) {
 					
-					biasEdges.add(edge);
+					System.out.println("Adding edge: " + edge + " " + graphController.traverserEdgeCost(this, edge.getSource(), edge.getTarget()));
+					
+					// Better to be a set of potential bias edges (as opposed to just one), as may have been traversed before.
+					biasEdgesToCost.put(edge, graphController.traverserEdgeCost(this, edge.getSource(), edge.getTarget()));
 					
 				} else {
 					
-					explorativeEdges.add(edge);
+					System.out.println("Adding edge: " + edge + " " + graphController.traverserEdgeCost(this, edge.getSource(), edge.getTarget()));
+					
+					explorativeEdgesToCost.put(edge, graphController.traverserEdgeCost(this, edge.getSource(), edge.getTarget()));
 					
 				}
 				
@@ -80,38 +90,70 @@ public class VariableBias extends VariableLowEdgeCost {
 		
 		}
 		
-		// If there is no information on the proportion of biased edges, select node at random
-		if ( biasEdges.size() == 0 ) {
+		
+		explorativeEdgesToCost = Utils.sortByComparator(explorativeEdgesToCost, true);
+		biasEdgesToCost = Utils.sortByComparator(biasEdgesToCost, true);
+		
+		System.out.println("Explorative Edges: " + explorativeEdgesToCost);
+		System.out.println("Bias Edges: " + biasEdgesToCost);
+		
+		// If there is no information on the proportion of biased edges, or no edge traversal decrement 
+		// (i.e. no info on explorative) select node at random
+		if ( biasEdgesToCost.size() == 0 || graphController.getEdgeTraverselDecrement() == 1.0) {
 			
 			return connectedNode(currentNode);
-			
+		
+		// Otherwise proceed to probabilistic selection
 		} else {
 			
 			if (Math.random() < tendencyToBias) {
 				
-				// Get *least* weighted unvisited (most bias) edge
-				Collections.sort(biasEdges);
-				
-				return exploreEdges(currentNode, biasEdges);
+				// Gets *least* weighted unvisited (most bias) edge, by being sorted.
+				return exploreEdges(currentNode, new ArrayList<StringEdge>(biasEdgesToCost.keySet()));
 				
 			} else {
 				
-				// If there is no edge traversal decrement, ordering explorative nodes
-				// is also exploitable as strategy will always select most expensive ones
-				if ( graphController.getEdgeTraverselDecrement() == 1.0 ) {
+				// If there are no immediately explorative edges (i.e. all fall below the threshold), then the most explorative 
+				// edges (edge) are those with the highest cost  
+				if ( explorativeEdgesToCost.size() == 0 ) {
 					
-					Collections.shuffle(explorativeEdges);
+					ArrayList<StringEdge> biasEdges = new ArrayList<StringEdge>(biasEdgesToCost.keySet());
 					
-					return exploreEdges(currentNode, explorativeEdges);
+					System.out.println("Max: " + Collections.max(biasEdgesToCost.values()));
 					
+					int firstIndexOfMax = new ArrayList<Double>(biasEdgesToCost.values()).indexOf(Collections.max(biasEdgesToCost.values()));
+					
+					int lastIndexOfMax = new ArrayList<Double>(biasEdgesToCost.values()).lastIndexOf(Collections.max(biasEdgesToCost.values()));
+					
+					ArrayList<StringEdge> leastBias;
+					
+					if (firstIndexOfMax == lastIndexOfMax) { // Only one max value
+						
+						leastBias = new ArrayList<StringEdge>();
+						
+						leastBias.add(biasEdges.get(firstIndexOfMax));
+						
+					} else {
+					
+						// Get first instance of max value to last instance of last value, so all possible max explorative edges.
+						leastBias = new ArrayList<StringEdge>(biasEdges.subList(firstIndexOfMax, lastIndexOfMax + 1));
+					
+					}
+					
+					System.out.println("Least Bias: " + leastBias);
+					
+					return exploreEdges(currentNode, leastBias);
+				
+				// Otherwise simply return explorative edges in reverse order
 				} else {
 					
+					ArrayList<StringEdge> explorativeEdges = new ArrayList<StringEdge>(explorativeEdgesToCost.keySet());
+					
 					// Get *most* weighted unvisited (most explorative) edge
-					Collections.sort(explorativeEdges);
 					Collections.reverse(explorativeEdges);
 					
 					return exploreEdges(currentNode, explorativeEdges);
-					
+				
 				}
 				
 			}
@@ -138,27 +180,14 @@ public class VariableBias extends VariableLowEdgeCost {
 		
 	}
 
-	
-	/* (non-Javadoc)
-	 * @see HideAndSeek.GraphTraverser#getConnectedEdges(HideAndSeek.graph.StringVertex)
-	 */
-	@Override
-	protected List<StringEdge> getConnectedEdges(StringVertex currentNode) {
-		
-		ArrayList<StringEdge> edges = new ArrayList<StringEdge>(graphController.edgesOf(currentNode));
-		
-		Collections.sort(edges);
-		
-		return edges;
-		
-	}
-	
 	/**
 	 * @param currentNode
 	 * @param biasEdges
 	 * @return
 	 */
 	private StringVertex exploreEdges(StringVertex currentNode, ArrayList<StringEdge> edges) {
+		
+		System.out.println("Chosen edges: " + edges);
 		
 		StringVertex target;
 		

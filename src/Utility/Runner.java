@@ -78,12 +78,15 @@ public class Runner extends JFrame {
 		  
 		  "LowEdgeCost",
 		  "VariableLowEdgeCost",
+		  "FixedStartVariableLowEdgeCost",
 		  
 		  "FullyBias",
 		  "FullyExplorative",
 		  "LooselyBias",
 		  "VariableBias",
-		  "FixedStartVariableBias"
+		  "FixedStartVariableBias",
+		  "FixedStartFullyBias",
+		  "FixedStartFullyExplorative"
 		  
 		};
 	

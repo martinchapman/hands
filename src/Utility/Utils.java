@@ -12,6 +12,13 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,6 +34,40 @@ public class Utils {
 	 * 
 	 */
 	public static boolean DEBUG = true;
+	
+	// http://stackoverflow.com/questions/8119366/sorting-hashmap-by-values
+	public static <K> Map<K, Double> sortByComparator(Map<K, Double> unsortMap, final boolean order)
+    {
+
+        List<Entry<K, Double>> list = new LinkedList<Entry<K, Double>>(unsortMap.entrySet());
+
+        // Sorting the list based on values
+        Collections.sort(list, new Comparator<Entry<K, Double>>()
+        {
+            public int compare(Entry<K, Double> o1,
+                    Entry<K, Double> o2)
+            {
+                if (order)
+                {
+                    return o1.getValue().compareTo(o2.getValue());
+                }
+                else
+                {
+                    return o2.getValue().compareTo(o1.getValue());
+
+                }
+            }
+        });
+
+        // Maintaining insertion order with the help of LinkedList
+        Map<K, Double> sortedMap = new LinkedHashMap<K, Double>();
+        for (Entry<K, Double> entry : list)
+        {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+
+        return sortedMap;
+    }
 	
 	public static void uploadToFTP(String filePath, String ftpUrl, String user, String pass, String host, String uploadPath) {
 		

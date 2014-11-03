@@ -166,7 +166,7 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 	 */
 	public String printRoundStats() {
 		
-		return super.printRoundStats() + "Cost, " + graphController.latestRoundCosts(this);
+		return super.printRoundStats() + "Cost, " + graphController.latestRoundCosts(this) + ",Path," + exploredNodes.toString().replace(",", "");
 		
 	}
 	
@@ -195,6 +195,8 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 		super.endOfRound();
 		
 		hideLocations.clear();
+		
+		exploredNodes.clear();
 		
 		roundsPassed++;
 		
