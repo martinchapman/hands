@@ -24,7 +24,13 @@ public class Dataset {
     
     	size = 0;
     
-    }   
+    }  
+    
+    public ArrayList<Double> getDataset() {
+    	
+    	return data;
+    	
+    }
     
     /**
      * @param item

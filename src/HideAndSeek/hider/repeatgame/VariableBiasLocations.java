@@ -30,7 +30,15 @@ public class VariableBiasLocations extends VariableBias {
 			int numberOfHideLocations, int numberOfBiasLocations) {
 		super(graphController, numberOfHideLocations, 1.0);
 		
-		this.numberOfBiasLocations = numberOfBiasLocations;
+		if ( numberOfBiasLocations > numberOfHideLocations ) {
+			
+			this.numberOfBiasLocations = numberOfHideLocations;
+			
+		} else {
+			
+			this.numberOfBiasLocations = numberOfBiasLocations;
+			
+		}
 		
 	}
 
@@ -45,7 +53,7 @@ public class VariableBiasLocations extends VariableBias {
 	@Override
 	protected StringVertex nextNode(StringVertex currentNode) {
 		
-		if ( hideLocations.size() == numberOfBiasLocations ) {
+		if ( hideLocations.size() >= numberOfBiasLocations ) {
 			
 			return connectedNode(currentNode);
 			

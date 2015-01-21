@@ -3,7 +3,7 @@ package HideAndSeek.hider.adaptive;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.singleshot.LeastConnected;
+import HideAndSeek.hider.singleshot.preference.LeastConnected;
 
 /**
  * 

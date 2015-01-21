@@ -1,6 +1,7 @@
 package HideAndSeek.graph;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.jgrapht.GraphPath;
@@ -358,6 +359,24 @@ public class GraphController<V, E> {
 			StringVertex nextNode) {
 		
 		return graph.fromVertexToVertex(traverser, currentNode, nextNode);
+		
+	}
+	
+	/**
+	 * Walks a given traverser over a specific path
+	 * 
+	 * @param traverser
+	 * @param sourceVertex
+	 * @param targetVertex
+	 * @return
+	 */
+	public void walkPathFromVertexToVertex(GraphTraverser traverser, StringVertex sourceVertex, StringVertex targetVertex) {
+		
+		for (StringEdge edge : graph.pathFromVertexToVertex(traverser, sourceVertex, targetVertex)) {
+			
+			graph.fromVertexToVertex(traverser, edge.getSource(), edge.getTarget());
+			
+		}
 		
 	}
 

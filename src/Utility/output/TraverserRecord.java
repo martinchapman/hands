@@ -234,7 +234,7 @@ public class TraverserRecord {
 	/**
 	 * @return
 	 */
-	protected Hashtable<String, Double> calculateGameAverage() {
+	protected Hashtable<String, Double> calculateGameAverage(boolean relativised) {
 		
 		Hashtable<AttributeSetIdentifier, Hashtable<String,Double>> gameEntries = new Hashtable<AttributeSetIdentifier, Hashtable<String,Double>>();
 		
@@ -248,7 +248,7 @@ public class TraverserRecord {
 			
 		}
 		
-		return calculateAverage(gameEntries);
+		return calculateAverage(relativised, gameEntries);
 		
 	}
 	
@@ -259,9 +259,11 @@ public class TraverserRecord {
 	 * @param attributeToValue - a subset of interaction records that we want to take an average of
 	 * @return
 	 */
-	protected Hashtable<String, Double> calculateAverage(Hashtable<AttributeSetIdentifier, Hashtable<String,Double>> attributeToValue) {
+	protected Hashtable<String, Double> calculateAverage(boolean relativised, Hashtable<AttributeSetIdentifier, Hashtable<String,Double>> attributeToValue) {
 		
 		Hashtable<String, Double> cumulativeAttributeToValue = new Hashtable<String, Double>();
+		
+		Hashtable<String, Double> lastAttributeToValueEntries = new Hashtable<String, Double>();
 		
 		for (Entry<AttributeSetIdentifier, Hashtable<String, Double>> attributeEntry : attributeToValue.entrySet()) {
 		
@@ -269,16 +271,34 @@ public class TraverserRecord {
 				
 				if (cumulativeAttributeToValue.containsKey(attributeToValueEntry.getKey())) {
 					
-					cumulativeAttributeToValue.put(attributeToValueEntry.getKey(), cumulativeAttributeToValue.get(attributeToValueEntry.getKey()) + attributeToValueEntry.getValue());
+					if ( relativised ) {
+						
+						cumulativeAttributeToValue.put(attributeToValueEntry.getKey(), (attributeToValueEntry.getValue() / lastAttributeToValueEntries.get(attributeToValueEntry.getKey())) * 100);
+						
+					} else {
+					
+						cumulativeAttributeToValue.put(attributeToValueEntry.getKey(), cumulativeAttributeToValue.get(attributeToValueEntry.getKey()) + attributeToValueEntry.getValue());
+					
+					}
 					
 				} else {
 					
-					cumulativeAttributeToValue.put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
+					if ( relativised ) {
+					
+						cumulativeAttributeToValue.put(attributeToValueEntry.getKey(), 100.0);
+						
+					} else {
+						
+						cumulativeAttributeToValue.put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
+						
+					}
 					
 				}
 				
+				lastAttributeToValueEntries.put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
+				
 			}
-		
+			
 		}
 		
 		Hashtable<String, Double> averageAttributeToValue = new Hashtable<String, Double>();
@@ -301,7 +321,13 @@ public class TraverserRecord {
 	 */
 	public double getAverageGameAttributeValue(String attribute) {
 		
-		return calculateGameAverage().get(attribute);
+		return calculateGameAverage(false).get(attribute);
+		
+	}
+	
+	public double getRelativisedAverageGameAttributeValue(String attribute) {
+		
+		return calculateGameAverage(true).get(attribute);
 		
 	}
 	
@@ -460,7 +486,7 @@ public class TraverserRecord {
 	 */
 	public String printGameAverage() {
 	
-		return traverser + " " + calculateGameAverage();
+		return traverser + " " + calculateGameAverage(false);
 		
 	}
 	

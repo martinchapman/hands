@@ -116,12 +116,32 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 	}
 	
 	/**
+	 * 
+	 */
+	private StringVertex currentNode = null;
+	
+	/**
+	 * @return
+	 */
+	protected StringVertex getCurrentNode() {
+		
+		return currentNode;
+		
+	}
+	
+	/**
 	 * @param searchPath
 	 * @return
 	 */
 	private boolean hide() {
 		
-		StringVertex currentNode = startNode();
+		if ( currentNode != null && currentNode != startNode() ) {
+			
+			//graphController.walkPathFromVertexToVertex(this, currentNode, startNode());
+			
+		} 
+		
+		currentNode = startNode();
 		
 		StringVertex nextNode = null;
 		

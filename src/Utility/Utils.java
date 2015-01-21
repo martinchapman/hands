@@ -33,7 +33,7 @@ public class Utils {
 	/**
 	 * 
 	 */
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 	
 	//http://stackoverflow.com/questions/8119366/sorting-hashmap-by-values
 	public static <K> Map<K, Double> sortByComparator(Map<K, Double> unsortMap, final boolean order)

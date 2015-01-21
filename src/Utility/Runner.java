@@ -48,6 +48,8 @@ import Utility.output.TraverserRecord;
  */
 public class Runner extends JFrame {
 	
+	public static ArrayList<TraverserRecord> selectedSeekers;
+	
 	/**
 	 * 
 	 */
@@ -59,7 +61,8 @@ public class Runner extends JFrame {
 		  "RandomFixedStart",
 		  "RandomVariableHidePotential",
 		  
-		  "RandomDirection",
+		  "FirstN",
+		  //"RandomDirection",
 		  
 		  "RandomSet",
 		  "LowEdgeCostRandomSet",
@@ -77,6 +80,8 @@ public class Runner extends JFrame {
 		  "MaxDistance",
 		  
 		  "LowEdgeCost",
+		  "EqualEdgeCost",
+		  "FixedStartEqualEdgeCost",
 		  "VariableLowEdgeCost",
 		  "FixedStartVariableLowEdgeCost",
 		  
@@ -86,7 +91,9 @@ public class Runner extends JFrame {
 		  "VariableBias",
 		  "FixedStartVariableBias",
 		  "FixedStartFullyBias",
-		  "FixedStartFullyExplorative"
+		  "FixedStartFullyExplorative",
+		  
+		  "VariableBiasLocations"
 		  
 		};
 	
@@ -548,7 +555,7 @@ public class Runner extends JFrame {
 				// Allows for selection of multiple hiders or multiple seekers from list
 				ArrayList<TraverserRecord> selectedHiders = new ArrayList<TraverserRecord>();
 				
-				ArrayList<TraverserRecord> selectedSeekers = new ArrayList<TraverserRecord>();
+				selectedSeekers = new ArrayList<TraverserRecord>();
 				
 				String title = "";
 				

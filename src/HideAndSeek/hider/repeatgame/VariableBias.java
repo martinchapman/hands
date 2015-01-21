@@ -9,7 +9,7 @@ import java.util.Map;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.singleshot.VariableLowEdgeCost;
+import HideAndSeek.hider.singleshot.cost.VariableLowEdgeCost;
 import Utility.Utils;
 
 /**
@@ -91,6 +91,9 @@ public class VariableBias extends VariableLowEdgeCost {
 		
 		explorativeEdgesToCost = Utils.sortByComparator(explorativeEdgesToCost, true);
 		biasEdgesToCost = Utils.sortByComparator(biasEdgesToCost, true);
+		
+		System.out.println(explorativeEdgesToCost);
+		System.out.println(biasEdgesToCost);
 		
 		// If there is no information on the proportion of biased edges, or no edge traversal decrement 
 		// (i.e. no info on explorative) select node at random

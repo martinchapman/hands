@@ -13,21 +13,22 @@ import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.Hider;
 import HideAndSeek.hider.repeatgame.FixedStartVariableBias;
 import HideAndSeek.hider.repeatgame.VariableBias;
-import HideAndSeek.hider.singleshot.FixedStartVariableLowEdgeCost;
-import HideAndSeek.hider.singleshot.LeastConnected;
-import HideAndSeek.hider.singleshot.LowEdgeCostRandomFixedDistance;
-import HideAndSeek.hider.singleshot.LowEdgeCostRandomSet;
-import HideAndSeek.hider.singleshot.LowEdgeCostVariableFixedDistance;
-import HideAndSeek.hider.singleshot.MaxDistance;
-import HideAndSeek.hider.singleshot.Random;
-import HideAndSeek.hider.singleshot.RandomFixedDistance;
-import HideAndSeek.hider.singleshot.RandomFixedDistanceFixedStart;
-import HideAndSeek.hider.singleshot.RandomFixedStart;
-import HideAndSeek.hider.singleshot.RandomSet;
-import HideAndSeek.hider.singleshot.RandomVariableHidePotential;
-import HideAndSeek.hider.singleshot.VariableFixedDistance;
-import HideAndSeek.hider.singleshot.VariableFixedDistanceFixedStart;
-import HideAndSeek.hider.singleshot.VariableLowEdgeCost;
+import HideAndSeek.hider.repeatgame.VariableBiasLocations;
+import HideAndSeek.hider.singleshot.cost.FixedStartVariableLowEdgeCost;
+import HideAndSeek.hider.singleshot.cost.VariableLowEdgeCost;
+import HideAndSeek.hider.singleshot.distance.LowEdgeCostRandomFixedDistance;
+import HideAndSeek.hider.singleshot.distance.LowEdgeCostVariableFixedDistance;
+import HideAndSeek.hider.singleshot.distance.RandomFixedDistance;
+import HideAndSeek.hider.singleshot.distance.RandomFixedDistanceFixedStart;
+import HideAndSeek.hider.singleshot.distance.VariableFixedDistance;
+import HideAndSeek.hider.singleshot.distance.VariableFixedDistanceFixedStart;
+import HideAndSeek.hider.singleshot.preference.LeastConnected;
+import HideAndSeek.hider.singleshot.preference.MaxDistance;
+import HideAndSeek.hider.singleshot.random.LowEdgeCostRandomSet;
+import HideAndSeek.hider.singleshot.random.Random;
+import HideAndSeek.hider.singleshot.random.RandomFixedStart;
+import HideAndSeek.hider.singleshot.random.RandomSet;
+import HideAndSeek.hider.singleshot.random.RandomVariableHidePotential;
 import HideAndSeek.seeker.Seeker;
 import HideAndSeek.seeker.repeatgame.HighProbability;
 import HideAndSeek.seeker.singleshot.BacktrackPath;
@@ -166,12 +167,13 @@ public class Main {
 			
 			} 
 			
-			if (hiderType.getElement0().equals("RandomDirection")) {
+			if (hiderType.getElement0().equals("FirstN")) {
 				
 				allHidingAgents.add(new VariableFixedDistance(graphController, numberOfHideLocations, 0));
 				
 				// Have to set ID manually as identifier and class used are different
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("RandomDirection");
+				// allHidingAgents.get(allHidingAgents.size() - 1).setName("RandomDirection");
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("FirstN");
 			
 			} 
 			
@@ -241,9 +243,15 @@ public class Main {
 			
 			} 
 			
-			if (hiderType.getElement0().equals("LowEdgeCost")) {
+			if (hiderType.getElement0().equals("EqualEdgeCost")) {
 				
-				allHidingAgents.add(new VariableLowEdgeCost(graphController, numberOfHideLocations, 1.0));
+				allHidingAgents.add(new VariableLowEdgeCost(graphController, numberOfHideLocations, 0.0));
+			
+			}
+			
+			if (hiderType.getElement0().equals("FixedStartEqualEdgeCost")) {
+				
+				allHidingAgents.add(new FixedStartVariableLowEdgeCost(graphController, numberOfHideLocations, 0.0));
 			
 			} 
 
@@ -312,6 +320,21 @@ public class Main {
 				allHidingAgents.get(allHidingAgents.size() - 1).setName("FixedStartFullyExplorative");
 			
 			} 
+			
+			// Discovered through experimentation
+			if (hiderType.getElement0().equals("OptimalBias")) {
+				
+				allHidingAgents.add(new VariableBias(graphController, numberOfHideLocations, 0.6));
+			
+			}
+
+			//
+			
+			if (hiderType.getElement0().equals("VariableBiasLocations")) {
+				
+				allHidingAgents.add(new VariableBiasLocations(graphController, numberOfHideLocations, gameNumber));
+			
+			}
 			
 			//
 			

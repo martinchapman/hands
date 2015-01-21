@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.jgrapht.EdgeFactory;
+import org.jgrapht.alg.DijkstraShortestPath;
 import org.jgrapht.graph.ClassBasedEdgeFactory;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
@@ -15,7 +17,6 @@ import org.jgrapht.graph.SimpleWeightedGraph;
 import HideAndSeek.GraphTraverser;
 import HideAndSeek.hider.Hider;
 import HideAndSeek.seeker.Seeker;
-import Utility.Dataset;
 import Utility.Utils;
 
 /**
@@ -232,6 +233,16 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 		
 		return latestRoundCosts(hider);
 		
+		/*if (  roundNumber > 0  ) {
+			
+			return ( latestRoundCosts(hider) / requestRoundCost( roundNumber - 1, hider ) ) * 100;
+			
+		} else {
+			
+			return 100;
+			
+		}*/
+		
 		/*if ( roundNumber > 0 ) {
 			
 			Dataset dataset = new Dataset();
@@ -273,6 +284,16 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 		
 		return latestRoundCosts(seeker);
 		
+		/*if (  roundNumber > 0  ) {
+			
+			return ( latestRoundCosts(seeker) / requestRoundCost( roundNumber - 1, seeker ) ) * 100;
+			
+		} else {
+			
+			return 100;
+			
+		}*/
+
 		/*if ( roundNumber > 0 ) {
 			
 			Dataset dataset = new Dataset();
@@ -686,11 +707,11 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 			
 			if (thisRoundCostData.containsKey(traverser)) {
 				
-				thisRoundCostData.put(traverser, thisRoundCostData.get(traverser) + uniqueCost);
+				thisRoundCostData.put(traverser, thisRoundCostData.get(traverser) + newCost);
 				
 			} else {
 			
-				thisRoundCostData.put(traverser, uniqueCost);
+				thisRoundCostData.put(traverser, newCost);
 				
 			}
 			
@@ -728,7 +749,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 			
 			// Update total costs and path length
 			
-			traverserCost.put( traverser, traverserCost.get(traverser) + uniqueCost );
+			traverserCost.put( traverser, traverserCost.get(traverser) + newCost );
 			
 			traverserPathLength.put( traverser, traverserPathLength.get(traverser) + 1 );
 		
@@ -744,6 +765,18 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 		
 	}
 	
+	/**
+	 * @param traverser
+	 * @param sourceVertex
+	 * @param targetVertex
+	 * @return
+	 */
+	public List<E> pathFromVertexToVertex(GraphTraverser traverser, V sourceVertex, V targetVertex) {
+		
+		return DijkstraShortestPath.findPathBetween(this, sourceVertex, targetVertex);
+		
+	}
+
 	/**
 	 * Request the costs associated with a particular edge, *without* actually traversing 
 	 * that edge
