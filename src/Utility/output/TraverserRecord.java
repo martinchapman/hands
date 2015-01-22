@@ -234,9 +234,9 @@ public class TraverserRecord {
 	/**
 	 * @return
 	 */
-	protected Hashtable<String, Double> calculateGameAverage(boolean relativised) {
+	protected Hashtable<String, Double> calculateGameAverage(boolean normalised) {
 		
-		Hashtable<AttributeSetIdentifier, Hashtable<String,Double>> gameEntries = new Hashtable<AttributeSetIdentifier, Hashtable<String,Double>>();
+		LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>> gameEntries = new LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>>();
 		
 		for (Entry<AttributeSetIdentifier, Hashtable<String, Double>> attributeEntry : attributeToValue.entrySet()) {
 			
@@ -248,7 +248,7 @@ public class TraverserRecord {
 			
 		}
 		
-		return calculateAverage(relativised, gameEntries);
+		return calculateAverage(normalised, gameEntries);
 		
 	}
 	
@@ -259,11 +259,47 @@ public class TraverserRecord {
 	 * @param attributeToValue - a subset of interaction records that we want to take an average of
 	 * @return
 	 */
-	protected Hashtable<String, Double> calculateAverage(boolean relativised, Hashtable<AttributeSetIdentifier, Hashtable<String,Double>> attributeToValue) {
+	protected Hashtable<String, Double> calculateAverage(boolean normalised, LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>> attributeToValue) {
 		
 		Hashtable<String, Double> cumulativeAttributeToValue = new Hashtable<String, Double>();
 		
-		Hashtable<String, Double> lastAttributeToValueEntries = new Hashtable<String, Double>();
+		Hashtable<String, Double> maxAttributeToValueEntries = new Hashtable<String, Double>();
+		
+		Hashtable<String, Double> minAttributeToValueEntries = new Hashtable<String, Double>();
+		
+		if ( normalised ) {
+			
+			for (Entry<AttributeSetIdentifier, Hashtable<String, Double>> attributeEntry : attributeToValue.entrySet()) {
+				
+				for (Entry<String, Double> attributeToValueEntry : attributeEntry.getValue().entrySet()) {
+					
+					if ( !maxAttributeToValueEntries.containsKey(attributeToValueEntry.getKey()) && !minAttributeToValueEntries.containsKey(attributeToValueEntry.getKey())) {
+						
+						maxAttributeToValueEntries.put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
+						
+						minAttributeToValueEntries.put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
+						
+					} else {
+						
+						if ( attributeToValueEntry.getValue() > maxAttributeToValueEntries.get(attributeToValueEntry.getKey())) {
+							
+							maxAttributeToValueEntries.put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
+							
+						}
+						
+						if ( attributeToValueEntry.getValue() < minAttributeToValueEntries.get(attributeToValueEntry.getKey())) {
+							
+							minAttributeToValueEntries.put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
+							
+						}
+						
+					}
+					
+				}
+			
+			}
+			
+		}
 		
 		for (Entry<AttributeSetIdentifier, Hashtable<String, Double>> attributeEntry : attributeToValue.entrySet()) {
 		
@@ -271,9 +307,9 @@ public class TraverserRecord {
 				
 				if (cumulativeAttributeToValue.containsKey(attributeToValueEntry.getKey())) {
 					
-					if ( relativised ) {
+					if ( normalised ) {
 						
-						cumulativeAttributeToValue.put(attributeToValueEntry.getKey(), (attributeToValueEntry.getValue() / lastAttributeToValueEntries.get(attributeToValueEntry.getKey())) * 100);
+						cumulativeAttributeToValue.put(attributeToValueEntry.getKey(), cumulativeAttributeToValue.get(attributeToValueEntry.getKey()) + ( (attributeToValueEntry.getValue() - minAttributeToValueEntries.get(attributeToValueEntry.getKey())) / (maxAttributeToValueEntries.get(attributeToValueEntry.getKey()) - minAttributeToValueEntries.get(attributeToValueEntry.getKey())) ));
 						
 					} else {
 					
@@ -283,9 +319,9 @@ public class TraverserRecord {
 					
 				} else {
 					
-					if ( relativised ) {
+					if ( normalised ) {
 					
-						cumulativeAttributeToValue.put(attributeToValueEntry.getKey(), 100.0);
+						cumulativeAttributeToValue.put(attributeToValueEntry.getKey(), ( (attributeToValueEntry.getValue() - minAttributeToValueEntries.get(attributeToValueEntry.getKey())) / (maxAttributeToValueEntries.get(attributeToValueEntry.getKey()) - minAttributeToValueEntries.get(attributeToValueEntry.getKey())) ));
 						
 					} else {
 						
@@ -294,8 +330,6 @@ public class TraverserRecord {
 					}
 					
 				}
-				
-				lastAttributeToValueEntries.put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
 				
 			}
 			
@@ -453,13 +487,31 @@ public class TraverserRecord {
 	}
 	
 	/**
+	 * @return
+	 */
+	public ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>> getNormalisedGameSeries() {
+		
+		return gameSeries(true);
+		
+	}
+	
+	/**
+	 * @return
+	 */
+	public ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>> getGameSeries() {
+		
+		return gameSeries(false);
+		
+	}
+	
+	/**
 	 * 
 	 * Return the series for each attribute
 	 * 
 	 * @param attribute
 	 * @return
 	 */
-	public ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>> getGameSeries() {
+	private ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>> gameSeries(boolean normalise) {
 
 		ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>> series = 
 				new ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>>();
@@ -474,6 +526,65 @@ public class TraverserRecord {
 				series.add(attributeEntry);
 				
 			}
+		
+		}
+		
+		if (normalise) {
+			
+			Hashtable<String, Double> maxAttributeInSeries = new Hashtable<String, Double>();
+			
+			Hashtable<String, Double> minAttributeInSeries = new Hashtable<String, Double>();
+			
+			for (Entry<AttributeSetIdentifier, Hashtable<String, Double>> attributeEntry : series ) {
+				
+				for (Entry<String, Double> attributeToValueEntry : attributeEntry.getValue().entrySet()) {
+					
+					if ( !maxAttributeInSeries.containsKey(attributeToValueEntry.getKey()) && !minAttributeInSeries.containsKey(attributeToValueEntry.getKey())) {
+						
+						maxAttributeInSeries.put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
+						
+						minAttributeInSeries.put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
+						
+					} else {
+						
+						if ( attributeToValueEntry.getValue() > maxAttributeInSeries.get(attributeToValueEntry.getKey())) {
+							
+							maxAttributeInSeries.put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
+							
+						}
+						
+						if ( attributeToValueEntry.getValue() < minAttributeInSeries.get(attributeToValueEntry.getKey())) {
+							
+							minAttributeInSeries.put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
+							
+						}
+						
+					}
+					
+				}
+			
+			}
+			
+			ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>> newSeries = 
+					new ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>>();
+			
+			for ( Entry<AttributeSetIdentifier, Hashtable<String, Double>> attributeEntry : series ) {
+				
+				Hashtable<String, Double> normalisedAttributeEntry = new Hashtable<String, Double>();
+				
+				for (Entry<String, Double> attributeToValueEntry : attributeEntry.getValue().entrySet()) {
+					
+					normalisedAttributeEntry.put(attributeToValueEntry.getKey(), ( (attributeToValueEntry.getValue() - minAttributeInSeries.get(attributeToValueEntry.getKey())) / (maxAttributeInSeries.get(attributeToValueEntry.getKey()) - minAttributeInSeries.get(attributeToValueEntry.getKey())) ));
+					
+				}
+				
+				attributeEntry.setValue(normalisedAttributeEntry);
+				
+				newSeries.add(attributeEntry);
+				
+			}
+			
+			series = newSeries;
 		
 		}
 		

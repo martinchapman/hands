@@ -260,60 +260,30 @@ public class OutputManager {
 		
 			graph = new LineGraph(title);
 			
-			System.out.println(traverserRecords);
-			
-			//int j = 0;
-			
 			for ( TraverserRecord traverser : traverserRecords ) {
 				
 				ArrayList<Double> attributeToValues = new ArrayList<Double>();
 				
+				ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>> gameSeries;
+				
 				if ( gameOrRound.equals("Game") ) {
 				
-					//~MDC TEMP!
-					//double lastCost = 0;
-					//double lastSeekerCost = 0;
-					//int i = 0;
+					if ( yLabel.contains("Score" )) {
+						
+						gameSeries = traverser.getNormalisedGameSeries();
+						
+					} else {
+						
+						gameSeries = traverser.getGameSeries();
+						
+					}
 					
-					for ( Entry<AttributeSetIdentifier, Hashtable<String,Double>> series : traverser.getGameSeries() ) {
-						
-						/*if ( lastCost == 0 ) {
-							
-							attributeToValues.add( 100.0 - 100.0 );
-							
-							lastCost = series.getValue().get("Cost");
-							lastSeekerCost = Runner.selectedSeekers.get(j).getGameSeries().get(0).getValue().get("Cost");
-							
-						} else {
-							
-							System.out.println( traverser + 
-											   " | Hider Cost: " + series.getValue().get("Cost") + " | As Percentage: " + ( ( series.getValue().get("Cost") / lastCost ) * 100 ) +
-											   " | Seeker Cost: " +  Runner.selectedSeekers.get(j).getGameSeries().get(i).getValue().get("Cost")  + " | As Percentage: " + ( ( Runner.selectedSeekers.get(j).getGameSeries().get(i).getValue().get("Cost") / lastSeekerCost ) * 100 ) );
-							
-							attributeToValues.add( 
-							    ( 
-							    	( 
-							    		Runner.selectedSeekers.get(j).getGameSeries().get(i).getValue().get("Cost") / lastSeekerCost 
-							    	) * 100 
-							    ) 
-							    - 
-							    ( 
-							    	( 
-							    		series.getValue().get("Cost") / lastCost 
-							    	) * 100 
-							    ) 
-							);
-							
-						}
-						
-						i++;*/
+					for ( Entry<AttributeSetIdentifier, Hashtable<String,Double>> series : gameSeries ) {
 						
 						attributeToValues.add( series.getValue().get(yLabel) );
 						
 					}
 					
-					//j++;
-				
 				} else if ( gameOrRound.equals("Round") ) {
 					
 					for ( Entry<Integer, Hashtable<String,Double>> series : traverser.getRoundSeries() ) {
@@ -332,22 +302,9 @@ public class OutputManager {
 			
 			graph = new BarGraph(title);
 			
-			Hashtable<String, Double> traverserToAverageForAttribute = new Hashtable<String, Double>();
-			
-			ArrayList<String> hiderNames = new ArrayList<String>();
-			
-			int j = 0;
-			
-			LinkedHashMap<Double, Double> hiderToSeeker = new LinkedHashMap<Double, Double>();
-			
-			double maxHider = Double.MIN_VALUE;
-			double maxSeeker = Double.MIN_VALUE;
-			
 			String globalCategory = "";
 			
 			for ( TraverserRecord traverser : traverserRecords ) {
-				
-				hiderNames.add(traverser.toString());
 				
 				String localCategory = "";
 				
@@ -363,96 +320,7 @@ public class OutputManager {
 				
 				globalCategory = localCategory;
 				
-				if ( traverser.getAverageGameAttributeValue("Cost") > maxHider ) {
-					
-					maxHider = traverser.getAverageGameAttributeValue("Cost");
-					
-				}
-				
-				// ~MDC Will fail with multiple Seekers (hence temporary)
-				if ( Runner.selectedSeekers.get(j).getAverageGameAttributeValue("Cost") > maxSeeker ) {
-					
-					maxSeeker = Runner.selectedSeekers.get(j).getAverageGameAttributeValue("Cost");
-					
-				}
-				
-				hiderToSeeker.put(traverser.getAverageGameAttributeValue("Cost"), Runner.selectedSeekers.get(j).getAverageGameAttributeValue("Cost"));
-				
-				/*int i = 0;
-				
-				Dataset cumulativeHiderCost = new Dataset();
-				Dataset cumulativeSeekerCost = new Dataset();
-					
-				for ( Entry<AttributeSetIdentifier, Hashtable<String,Double>> series : traverser.getGameSeries() ) {
-					
-					cumulativeHiderCost.addItemToDataset( series.getValue().get("Cost") );
-					cumulativeSeekerCost.addItemToDataset( Runner.selectedSeekers.get(j).getGameSeries().get(i).getValue().get("Cost") );
-					
-					i++;
-					
-				}
-				
-				//System.out.println("Hider mean: " + cumulativeHiderCost.getMean());
-				//System.out.println("Seeker mean: " + cumulativeSeekerCost.getMean());
-				
-				//System.out.println("Hider std dev: " + cumulativeHiderCost.getStdDev());
-				//System.out.println("Seeker std dev: " + cumulativeSeekerCost.getStdDev());
-				
-				
-				
-				double cumulativeStandardHiderCost = 0.0;
-				
-				for ( double hiderCost : cumulativeHiderCost.getDataset() ) {
-					
-					//System.out.println(hiderCost + " " + (( hiderCost - cumulativeHiderCost.getMean() ) / cumulativeHiderCost.getStdDev()));
-					
-					cumulativeStandardHiderCost += (( hiderCost - cumulativeHiderCost.getMean() ) / cumulativeHiderCost.getStdDev());
-					
-					//System.out.println("Cumulative Hider: " + cumulativeStandardHiderCost);
-					
-				}
-				
-				double cumulativeStandardSeekerCost = 0.0;
-				
-				for ( double seekerCost : cumulativeSeekerCost.getDataset() ) {
-					
-					cumulativeStandardSeekerCost += (( seekerCost - cumulativeSeekerCost.getMean() ) / cumulativeSeekerCost.getStdDev());
-					
-				}
-				
-				System.out.println((cumulativeStandardSeekerCost / cumulativeSeekerCost.getDataset().size()) - 
-								   (cumulativeStandardHiderCost / cumulativeHiderCost.getDataset().size()));
-				
-				((BarGraph) graph).addBar(cumulativeStandardSeekerCost - cumulativeStandardHiderCost, traverser.toString(), localCategory);
-				*/
-				
-				
-				//((BarGraph) graph).addBar(traverser.getRelativisedAverageGameAttributeValue(yLabel), traverser.toString(), localCategory);
-				
 				((BarGraph) graph).addBar(traverser.getAverageGameAttributeValue(yLabel), traverser.toString(), localCategory);
-				
-				
-				
-				j++;
-				
-			}
-			
-			// ~MDC Following is temporary:
-			int k = 0;
-			
-			System.out.println("Max Seeker value: " + maxSeeker);
-			System.out.println("Max Hider value: " + maxHider);
-			
-			for ( Entry<Double, Double> entry : hiderToSeeker.entrySet()) {
-				
-				System.out.println(hiderNames.get(k) + " " + entry);
-				
-				System.out.println("New values ( Hider then seeker) : " + ((entry.getKey() / maxHider) * 100) + " " + ((entry.getValue() / maxSeeker) * 100));
-				
-				// ~MDC Uncomment for overall score
-				//((BarGraph) graph).addBar(((entry.getValue() / maxSeeker) * 100) - ((entry.getKey() / maxHider) * 100), hiderNames.get(k), globalCategory);
-				
-				k++;
 				
 			}
 			

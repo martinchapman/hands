@@ -3,6 +3,8 @@ package Utility.output;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Map.Entry;
 
 public class HiderRecord extends TraverserRecord {
 	
@@ -102,6 +104,45 @@ public class HiderRecord extends TraverserRecord {
 	}
 	
 	/* (non-Javadoc)
+	 * @see Utility.output.TraverserRecord#getRelativisedAverageGameAttributeValue(java.lang.String)
+	 */
+	public double getAverageGameAttributeValue(String attribute) {
+		
+		if (attribute.contains("Score")) {
+			
+			System.out.println(this);
+			
+			System.out.println("--------------------");
+			
+			double hiderCost = super.getRelativisedAverageGameAttributeValue("Cost");
+			
+			double cumulativeRelativisedSeekerCost = 0.0;
+			
+			for ( TraverserRecord hidersSeeker : seekersAndAttributes ) {
+				
+				System.out.println(hidersSeeker);
+				
+				System.out.println("--------------------");
+				
+				cumulativeRelativisedSeekerCost += hidersSeeker.getRelativisedAverageGameAttributeValue("Cost");
+				
+			}
+			
+			double seekerCost = cumulativeRelativisedSeekerCost / seekersAndAttributes.size();
+			
+			System.out.println("------------->:" + seekerCost + " " + hiderCost);
+			
+			return seekerCost - hiderCost;
+			
+		} else {
+		
+			return super.getAverageGameAttributeValue(attribute);
+		
+		}
+		
+	}
+	
+	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
@@ -119,7 +160,7 @@ public class HiderRecord extends TraverserRecord {
 		returner += "\nAverages:\n";
 		returner += "\n-------------------\n";
 		
-		returner += "\n" + traverser + " " + calculateGameAverage() + "\n";
+		returner += "\n" + traverser + " " + calculateGameAverage(false) + "\n";
 		
 		for ( TraverserRecord seeker : seekersAndAttributes ) returner += "\n" + seeker.printGameAverage() + "\n";
 		
