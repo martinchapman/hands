@@ -15,6 +15,7 @@ import HideAndSeek.hider.Hider;
  * 
  * Relies on edges being of variable weight.
  * 
+ * 
  * @author Martin
  */
 public class VariableLowEdgeCost extends Hider {
@@ -161,13 +162,7 @@ public class VariableLowEdgeCost extends Hider {
 	@Override
 	protected StringVertex startNode() {
 
-		//StringVertex[] vertices = new StringVertex[graphController.vertexSet().size()];
-		
-		//return graphController.vertexSet().toArray(vertices)[0];
-		
 		return randomNode();
-		
-		//return firstNode();
 		
 	}
 	

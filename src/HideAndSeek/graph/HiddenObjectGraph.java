@@ -691,16 +691,17 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 			double newCost;
 			
 			// ~MDC TEMPORARY: only decrement costs for Hiders
-			if ( !(traverser instanceof Seeker) ) {
+			// if ( !(traverser instanceof Seeker) ) {
 				
 				// The new cost, based upon the edge that is currently being traversed
 			    newCost = uniqueCost * edgeTraversalDecrement;
 		    
-			} else {
+			//} else {
 				
-				newCost = uniqueCost;
+				//newCost = uniqueCost;
 				
-			}
+			//}
+			    
 			// Update round costs
 		    
 			Hashtable<GraphTraverser, Double> thisRoundCostData = roundCosts.get(roundCosts.size() - 1);

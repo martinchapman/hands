@@ -4,7 +4,13 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
 
+import javax.swing.JFrame;
+import javax.swing.JTabbedPane;
+
+import org.jfree.ui.RefineryUtilities;
+
 import HideAndSeek.graph.StringVertex;
+import Utility.output.BarGraph;
 
 /**
  * @author Martin
@@ -39,11 +45,24 @@ public class BehaviourPrediction  {
 	/**
 	 * 
 	 */
+	//private JFrame likelyLocationsGraphs;
+	/**
+	 * 
+	 */
+	//private JTabbedPane tlikelyLocationsGraphs;
+	
+	/**
+	 * 
+	 */
 	public BehaviourPrediction() {
 		
 		hideLocationsList.add(new Hashtable<StringVertex, Integer>());
 		
 		hideProbabilitiesList.add(new Hashtable<StringVertex, Double>());
+		
+		//likelyLocationsGraphs = new JFrame();
+		
+		//tlikelyLocationsGraphs = new JTabbedPane();
 		
 	}
 	
@@ -98,6 +117,8 @@ public class BehaviourPrediction  {
 		hideLocationsList.add(new Hashtable<StringVertex, Integer>());
 		
 		hideProbabilitiesList.add(new Hashtable<StringVertex, Double>());
+		
+		addGraph();
 		
 	}
 	
@@ -196,6 +217,38 @@ public class BehaviourPrediction  {
 	public double getProbability(StringVertex vertex) {
 		
 		return hideProbabilities().get(vertex);
+		
+	}
+	
+	/**
+	 * 
+	 */
+	private void addGraph() {
+		
+		ArrayList<StringVertex> likelyHideLocations = rankLikelyHideLocations(Integer.MAX_VALUE);
+		
+		//BarGraph likelyGraph = new BarGraph("");
+		
+		for ( StringVertex likelyLocation : likelyHideLocations ) {
+			
+			//likelyGraph.addBar(hideProbabilities().get(likelyLocation) * 100, likelyLocation.toString(), "");
+			
+		}
+		
+		//tlikelyLocationsGraphs.addTab("", likelyGraph.createChartPanel(" " + "", "", ""));
+		
+	}
+	
+	/**
+	 * 
+	 */
+	public void showGraphs() {
+		
+		//likelyLocationsGraphs.getContentPane().add(tlikelyLocationsGraphs);
+		
+		//likelyLocationsGraphs.pack();
+		
+		//likelyLocationsGraphs.setVisible(true);
 		
 	}
 	

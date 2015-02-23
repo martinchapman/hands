@@ -73,6 +73,9 @@ public class GraphController<V, E> {
 		
 		do {
 			
+			// ~MDC 22/1/15 Messy?
+			StringVertex.resetNodes();
+			
 			graph = new HiddenObjectGraph<StringVertex, StringEdge>(StringEdge.class);
 			
 			graph.setEdgeTraversalDecrement(edgeTraversalDecrement);
@@ -372,7 +375,11 @@ public class GraphController<V, E> {
 	 */
 	public void walkPathFromVertexToVertex(GraphTraverser traverser, StringVertex sourceVertex, StringVertex targetVertex) {
 		
-		for (StringEdge edge : graph.pathFromVertexToVertex(traverser, sourceVertex, targetVertex)) {
+		List<StringEdge> path = graph.pathFromVertexToVertex(traverser, sourceVertex, targetVertex);
+		
+		for (StringEdge edge : path) {
+			
+			System.out.println("Walk: " + edge);
 			
 			graph.fromVertexToVertex(traverser, edge.getSource(), edge.getTarget());
 			

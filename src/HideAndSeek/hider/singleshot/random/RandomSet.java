@@ -35,26 +35,42 @@ public class RandomSet extends HiderLocalGraph {
 		
 		super(graphController, numberOfHideLocations);
 		
-		hideSet = new ArrayList<StringVertex>();
+		populateHideSet(createRandomSet(numberOfHideLocations, new ArrayList<StringVertex>()));
 		
 		currentPath = new ArrayList<StringEdge>();
 		
-		populateHideSet();
+	}
+	
+	/**
+	 * @param set
+	 */
+	protected void populateHideSet(ArrayList<StringVertex> hideSet) {
+		
+		this.hideSet = hideSet;
+		
+	}
+	
+	/**
+	 * @return
+	 */
+	protected ArrayList<StringVertex> getHideSet() {
+		
+		return this.hideSet;
 		
 	}
 	
 	/**
 	 * 
 	 */
-	private void populateHideSet() {
+	protected ArrayList<StringVertex> createRandomSet(int size, ArrayList<StringVertex> ignoreSet) {
 		
-		hideSet.clear();
+		ArrayList<StringVertex> hideSet = new ArrayList<StringVertex>();
 		
 		StringVertex randomVertex = randomNode();
 		
-		while ( hideSet.size() != numberOfHideLocations ) {
+		while ( hideSet.size() != size ) {
 			
-			if (!hideSet.contains(randomVertex)) {
+			if (!hideSet.contains(randomVertex) & !ignoreSet.contains(randomVertex)) {
 				
 				hideSet.add(randomVertex);
 				
@@ -63,6 +79,8 @@ public class RandomSet extends HiderLocalGraph {
 			randomVertex = randomNode();
 			
 		}
+		
+		return hideSet;
 		
 	}
 
@@ -143,7 +161,7 @@ public class RandomSet extends HiderLocalGraph {
 		
 		super.endOfRound();
 		
-		populateHideSet();
+		populateHideSet(createRandomSet(numberOfHideLocations, new ArrayList<StringVertex>()));
 		
 	}
 

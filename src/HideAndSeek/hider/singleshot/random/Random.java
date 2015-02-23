@@ -57,7 +57,7 @@ public class Random extends Hider {
 	@Override
 	protected StringVertex startNode() {
 		
-		return getCurrentNode();
+		return randomNode();
 		
 	}
 

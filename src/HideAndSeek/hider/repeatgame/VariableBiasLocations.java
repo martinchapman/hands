@@ -9,12 +9,12 @@ import HideAndSeek.graph.StringVertex;
  * Traverses bias edges up until a specified number of object have been
  * hidden, and then hides randomly.
  * 
- * If all objects are hidden randomly this will yield a cheaper 
+ * Hypothesis: If all objects are hidden randomly this will yield a cheaper 
  * traversal cost for the hider, although this will make their
  * behaviour more obvious to an observing seeker.
  * 
  * Assumes that this hider always chooses bias edges over explorative ones.
- * Higher level of bias control than Variable Bias Hider.
+ * Hypothesis: Higher level of bias control than Variable Bias Hider.
  * 
  * @author Martin
  */

@@ -4,10 +4,12 @@ import java.awt.Color;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
+import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.ui.ApplicationFrame;
 
 import Utility.Utils;
+
 
 /**
  * @author Martin
@@ -68,6 +70,8 @@ public abstract class TraverserGraph extends ApplicationFrame {
 	}
 	
 	public abstract void createChart(String title, String xlabel, String ylabel);
+	
+	public abstract ChartPanel createChartPanel(String title, String xlabel, String ylabel);
 
 	
 }

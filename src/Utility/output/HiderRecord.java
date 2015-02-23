@@ -104,41 +104,33 @@ public class HiderRecord extends TraverserRecord {
 	}
 	
 	/* (non-Javadoc)
-	 * @see Utility.output.TraverserRecord#getRelativisedAverageGameAttributeValue(java.lang.String)
+	 * @see Utility.output.TraverserRecord#getAverageGameAttributeValue(java.lang.String, java.util.Hashtable, java.util.Hashtable)
 	 */
-	public double getAverageGameAttributeValue(String attribute) {
+	public double getAverageGameAttributeValue(String attribute, Hashtable<String, Double> maxAttributeToValueAllSeries, Hashtable<String, Double> minAttributeToValueAllSeries) {
 		
-		if (attribute.contains("Score")) {
+		System.out.println(this);
+		
+		System.out.println("--------------------");
+		
+		double hiderCost = super.getAverageGameAttributeValue("Cost", maxAttributeToValueAllSeries, minAttributeToValueAllSeries);
+		
+		double cumulativeRelativisedSeekerCost = 0.0;
+		
+		for ( TraverserRecord hidersSeeker : seekersAndAttributes ) {
 			
-			System.out.println(this);
+			System.out.println(hidersSeeker);
 			
 			System.out.println("--------------------");
 			
-			double hiderCost = super.getRelativisedAverageGameAttributeValue("Cost");
+			cumulativeRelativisedSeekerCost += hidersSeeker.getAverageGameAttributeValue("Cost", maxAttributeToValueAllSeries, minAttributeToValueAllSeries);
 			
-			double cumulativeRelativisedSeekerCost = 0.0;
-			
-			for ( TraverserRecord hidersSeeker : seekersAndAttributes ) {
-				
-				System.out.println(hidersSeeker);
-				
-				System.out.println("--------------------");
-				
-				cumulativeRelativisedSeekerCost += hidersSeeker.getRelativisedAverageGameAttributeValue("Cost");
-				
-			}
-			
-			double seekerCost = cumulativeRelativisedSeekerCost / seekersAndAttributes.size();
-			
-			System.out.println("------------->:" + seekerCost + " " + hiderCost);
-			
-			return seekerCost - hiderCost;
-			
-		} else {
-		
-			return super.getAverageGameAttributeValue(attribute);
-		
 		}
+		
+		double seekerCost = cumulativeRelativisedSeekerCost / seekersAndAttributes.size();
+		
+		System.out.println("------------->:" + seekerCost + " " + hiderCost);
+		
+		return seekerCost - hiderCost;
 		
 	}
 	
@@ -160,7 +152,7 @@ public class HiderRecord extends TraverserRecord {
 		returner += "\nAverages:\n";
 		returner += "\n-------------------\n";
 		
-		returner += "\n" + traverser + " " + calculateGameAverage(false) + "\n";
+		returner += "\n" + traverser + " " + calculateGameAverage() + "\n";
 		
 		for ( TraverserRecord seeker : seekersAndAttributes ) returner += "\n" + seeker.printGameAverage() + "\n";
 		

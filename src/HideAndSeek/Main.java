@@ -11,23 +11,34 @@ import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.Hider;
+import HideAndSeek.hider.reactive.DeceptiveHider;
 import HideAndSeek.hider.repeatgame.FixedStartVariableBias;
 import HideAndSeek.hider.repeatgame.VariableBias;
 import HideAndSeek.hider.repeatgame.VariableBiasLocations;
+import HideAndSeek.hider.repeatgame.VariableBiasStaticBetween;
+import HideAndSeek.hider.singleshot.staticlocations.StaticLocations;
 import HideAndSeek.hider.singleshot.cost.FixedStartVariableLowEdgeCost;
 import HideAndSeek.hider.singleshot.cost.VariableLowEdgeCost;
+import HideAndSeek.hider.singleshot.cost.VariableLowEdgeCostStaticBetween;
 import HideAndSeek.hider.singleshot.distance.LowEdgeCostRandomFixedDistance;
+import HideAndSeek.hider.singleshot.distance.LowEdgeCostRandomFixedDistanceStaticBetween;
 import HideAndSeek.hider.singleshot.distance.LowEdgeCostVariableFixedDistance;
 import HideAndSeek.hider.singleshot.distance.RandomFixedDistance;
 import HideAndSeek.hider.singleshot.distance.RandomFixedDistanceFixedStart;
+import HideAndSeek.hider.singleshot.distance.RandomFixedDistanceStaticBetween;
 import HideAndSeek.hider.singleshot.distance.VariableFixedDistance;
 import HideAndSeek.hider.singleshot.distance.VariableFixedDistanceFixedStart;
+import HideAndSeek.hider.singleshot.distance.VariableFixedDistanceStaticBetween;
 import HideAndSeek.hider.singleshot.preference.LeastConnected;
+import HideAndSeek.hider.singleshot.preference.LeastConnectedStaticBetween;
 import HideAndSeek.hider.singleshot.preference.MaxDistance;
 import HideAndSeek.hider.singleshot.random.LowEdgeCostRandomSet;
+import HideAndSeek.hider.singleshot.random.LowEdgeCostRandomSetStaticBetween;
 import HideAndSeek.hider.singleshot.random.Random;
 import HideAndSeek.hider.singleshot.random.RandomFixedStart;
 import HideAndSeek.hider.singleshot.random.RandomSet;
+import HideAndSeek.hider.singleshot.random.RandomSetStaticBetween;
+import HideAndSeek.hider.singleshot.random.RandomStaticBetween;
 import HideAndSeek.hider.singleshot.random.RandomVariableHidePotential;
 import HideAndSeek.seeker.Seeker;
 import HideAndSeek.seeker.repeatgame.HighProbability;
@@ -61,6 +72,11 @@ public class Main {
 	 * 
 	 */
 	private int totalGames;
+	
+	/**
+	 * 
+	 */
+	private int totalRounds;
 	
 	/**
 	 * 
@@ -111,6 +127,8 @@ public class Main {
 		
 		int rounds = Integer.parseInt(args[7]);
 		
+		this.totalRounds = rounds;
+		
 		String hiderList = args[2];
 		
 		String seekerList = args[3];
@@ -149,6 +167,12 @@ public class Main {
 			
 			// Single-shot:
 			
+			if (hiderType.getElement0().equals("StaticLocations")) {
+				
+				allHidingAgents.add(new StaticLocations(graphController, numberOfHideLocations));
+			
+			} 
+
 			if (hiderType.getElement0().equals("Random")) {
 				
 				allHidingAgents.add(new Random(graphController, numberOfHideLocations));
@@ -161,11 +185,19 @@ public class Main {
 			
 			} 
 			
+			if (hiderType.getElement0().equals("RandomStaticBetween")) {
+				
+				allHidingAgents.add(new RandomStaticBetween(graphController, numberOfHideLocations));
+			
+			}
+			
 			if (hiderType.getElement0().equals("RandomVariableHidePotential")) {
 				
 				allHidingAgents.add(new RandomVariableHidePotential(graphController, numberOfHideLocations, gameNumber / ((float)totalGames)));
 			
 			} 
+			
+			//
 			
 			if (hiderType.getElement0().equals("FirstN")) {
 				
@@ -175,11 +207,29 @@ public class Main {
 				// allHidingAgents.get(allHidingAgents.size() - 1).setName("RandomDirection");
 				allHidingAgents.get(allHidingAgents.size() - 1).setName("FirstN");
 			
-			} 
+			}
+			
+			if (hiderType.getElement0().equals("FirstNStaticBetween")) {
+				
+				allHidingAgents.add(new VariableFixedDistanceStaticBetween(graphController, numberOfHideLocations, 0));
+				
+				// Have to set ID manually as identifier and class used are different
+				// allHidingAgents.get(allHidingAgents.size() - 1).setName("RandomDirection");
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("FirstNStaticBetween");
+			
+			}
+			
+			//
 			
 			if (hiderType.getElement0().equals("RandomSet")) {
 				
 				allHidingAgents.add(new RandomSet(graphController, numberOfHideLocations));
+			
+			} 
+			
+			if (hiderType.getElement0().equals("RandomSetStaticBetween")) {
+				
+				allHidingAgents.add(new RandomSetStaticBetween(graphController, numberOfHideLocations));
 			
 			} 
 			
@@ -188,6 +238,14 @@ public class Main {
 				allHidingAgents.add(new LowEdgeCostRandomSet(graphController, numberOfHideLocations));
 			
 			} 
+			
+			if (hiderType.getElement0().equals("LowEdgeCostRandomSetStaticBetween")) {
+				
+				allHidingAgents.add(new LowEdgeCostRandomSetStaticBetween(graphController, numberOfHideLocations));
+			
+			} 
+			
+			//
 			
 			if (hiderType.getElement0().equals("RandomFixedDistance")) {
 				
@@ -201,11 +259,25 @@ public class Main {
 			
 			} 
 			
+			if (hiderType.getElement0().equals("RandomFixedDistanceStaticBetween")) {
+				
+				allHidingAgents.add(new RandomFixedDistanceStaticBetween(graphController, numberOfHideLocations));
+			
+			} 
+			
 			if (hiderType.getElement0().equals("LowEdgeCostRandomFixedDistance")) {
 				
 				allHidingAgents.add(new LowEdgeCostRandomFixedDistance(graphController, numberOfHideLocations));
 			
-			} 
+			}
+			
+			if (hiderType.getElement0().equals("LowEdgeCostRandomFixedDistanceStaticBetween")) {
+				
+				allHidingAgents.add(new LowEdgeCostRandomFixedDistanceStaticBetween(graphController, numberOfHideLocations));
+			
+			}
+			
+			
 			
 			if (hiderType.getElement0().equals("VariableFixedDistance")) {
 				
@@ -219,15 +291,29 @@ public class Main {
 			
 			} 
 			
+			if (hiderType.getElement0().equals("VariableFixedDistanceStaticBetween")) {
+				
+				allHidingAgents.add(new VariableFixedDistanceStaticBetween(graphController, numberOfHideLocations, gameNumber));
+			
+			} 
+			
 			if (hiderType.getElement0().equals("LowEdgeCostVariableFixedDistance")) {
 				
 				allHidingAgents.add(new LowEdgeCostVariableFixedDistance(graphController, numberOfHideLocations, gameNumber));
 			
 			} 
 			
-			if (hiderType.getElement0().equals("MinimumConnectivity")) {
+			//
+			
+			if (hiderType.getElement0().equals("LeastConnected")) {
 				
 				allHidingAgents.add(new LeastConnected(graphController, numberOfHideLocations));
+			
+			} 
+			
+			if (hiderType.getElement0().equals("LeastConnectedStaticBetween")) {
+				
+				allHidingAgents.add(new LeastConnectedStaticBetween(graphController, numberOfHideLocations));
 			
 			} 
 
@@ -242,6 +328,12 @@ public class Main {
 				allHidingAgents.add(new VariableLowEdgeCost(graphController, numberOfHideLocations, 1.0));
 			
 			} 
+			
+			if (hiderType.getElement0().equals("LowEdgeCostStaticBetween")) {
+				
+				allHidingAgents.add(new VariableLowEdgeCostStaticBetween(graphController, numberOfHideLocations, 1.0));
+			
+			}
 			
 			if (hiderType.getElement0().equals("EqualEdgeCost")) {
 				
@@ -274,6 +366,14 @@ public class Main {
 				allHidingAgents.add(new VariableBias(graphController, numberOfHideLocations, 1.0));
 				
 				allHidingAgents.get(allHidingAgents.size() - 1).setName("FullyBias");
+			
+			}
+			
+			if (hiderType.getElement0().equals("FullyBiasStaticBetween")) {
+				
+				allHidingAgents.add(new VariableBiasStaticBetween(graphController, numberOfHideLocations, 1.0));
+				
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("FullyBiasStaticBetween");
 			
 			}
 			
@@ -337,6 +437,73 @@ public class Main {
 			}
 			
 			//
+			
+			if (hiderType.getElement0().equals("SetDeceptiveNodes")) {
+				
+				allHidingAgents.add(new DeceptiveHider(graphController, numberOfHideLocations, numberOfHideLocations, (int)(totalRounds / 2)));
+			
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptiveNodes");
+				
+			}
+	
+			if (hiderType.getElement0().equals("VariableDeceptiveNodes")) {
+				
+				allHidingAgents.add(new DeceptiveHider(graphController, numberOfHideLocations, gameNumber, (int)(Math.random() * totalGames)));
+			
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("VariableDeceptiveNodes");
+				
+			}
+			
+			if (hiderType.getElement0().equals("SetDeceptionDuration")) {
+				
+				allHidingAgents.add(new DeceptiveHider(graphController, numberOfHideLocations, numberOfHideLocations, (int)(totalRounds / 2)));
+				
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptionDurations");
+				
+			}
+
+			if (hiderType.getElement0().equals("VariableDeceptionDuration")) {
+				
+				allHidingAgents.add(new DeceptiveHider(graphController, numberOfHideLocations, numberOfHideLocations, gameNumber));
+				
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("VariableDeceptionDuration");
+			
+			}
+			
+			if (hiderType.getElement0().equals("VariableDeceptionDurationNodes")) {
+				
+				for ( int a = 1; a <= numberOfHideLocations; a++) {
+					
+					allHidingAgents.add(new DeceptiveHider(graphController, numberOfHideLocations, a, gameNumber));
+					
+					allHidingAgents.get(allHidingAgents.size() - 1).setName("VariableDeceptionDurationNodes-" + a);
+					
+				}
+				
+			}
+			
+			//
+			
+			if (hiderType.getElement0().equals("SetDeceptionInterval")) {
+				
+				// ~MDC There's a multi-dimentional graph to be had with this
+				allHidingAgents.add(new DeceptiveHider(graphController, numberOfHideLocations, numberOfHideLocations, 2, 10, 0, true));
+				
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptionInterval");
+				
+			}
+			
+			if (hiderType.getElement0().equals("SetDeceptionIntervalVariableDeceptiveNodes")) {
+				
+				for ( int a = 1; a <= numberOfHideLocations; a++) {
+					
+					allHidingAgents.add(new DeceptiveHider(graphController, numberOfHideLocations, a, 2, 10, 0, true));
+					
+					allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptionIntervalDeceptiveNodes-" + a);
+				
+				}
+				
+			}
 			
 		}
 		

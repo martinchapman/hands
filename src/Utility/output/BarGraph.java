@@ -45,11 +45,16 @@ public class BarGraph extends TraverserGraph {
 		
 	}
 
+	public void createChart(String title, String xlabel, String ylabel) {
+		
+	      setContentPane(createChartPanel(title, xlabel, ylabel));
+		
+	}
 	/* (non-Javadoc)
 	 * @see Utility.output.TraverserGraph#createChart(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void createChart(String title, String xlabel, String ylabel) {
+	public ChartPanel createChartPanel(String title, String xlabel, String ylabel) {
 		
 		// create the chart...
         chart = ChartFactory.createBarChart(
@@ -99,13 +104,13 @@ public class BarGraph extends TraverserGraph {
         
         chartPanel.setPreferredSize(new Dimension(500, 270));
         
-        setContentPane(chartPanel);
+        return chartPanel;
         
 	}
 
 	/**
-	 * @param traverser
 	 * @param value
+	 * @param traverser
 	 * @param attribute
 	 */
 	public void addBar(Double value, String traverser, String category) {

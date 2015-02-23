@@ -86,6 +86,8 @@ public class HighProbability extends SeekerLocalGraph {
 			
 			DijkstraShortestPath<StringVertex, StringEdge> dsp = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, likelyNodes.get(0));
 	    	
+			Utils.talk(this.toString(), "Heading for " + likelyNodes.get(0));
+			
 			// If no path available, return random connected node
 			if (dsp.getPathEdgeList() == null || dsp.getPathEdgeList().size() == 0) return connectedNode(currentNode);
 			
@@ -138,6 +140,9 @@ public class HighProbability extends SeekerLocalGraph {
 		   so just get ALL likely locations) */
 		likelyNodes = behaviourPrediction.rankLikelyHideLocations(predictiveNodes);
 		
+		Utils.talk(this.toString(), "Likely nodes:");
+		Utils.talk(this.toString(), behaviourPrediction.toString());
+		
 	}
 
 	@Override
@@ -145,8 +150,11 @@ public class HighProbability extends SeekerLocalGraph {
 		
 		super.endOfGame();
 		
+		behaviourPrediction.showGraphs();
+		
 		// If game had ended, and an instance of this object may be used in further games, clear all learning.
 		behaviourPrediction = new BehaviourPrediction();
+		
 		
 	}
 

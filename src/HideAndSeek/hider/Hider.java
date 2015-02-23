@@ -125,7 +125,15 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 	 */
 	protected StringVertex getCurrentNode() {
 		
-		return currentNode;
+		if (currentNode == null) {
+			
+			return randomNode();
+			
+		} else {
+			
+			return currentNode;
+			
+		}
 		
 	}
 	
@@ -135,13 +143,15 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 	 */
 	private boolean hide() {
 		
-		if ( currentNode != null && currentNode != startNode() ) {
+		StringVertex startNode = startNode();
+		
+		if ( currentNode != null && currentNode != startNode ) {
 			
-			//graphController.walkPathFromVertexToVertex(this, currentNode, startNode());
+			graphController.walkPathFromVertexToVertex(this, currentNode, startNode);
 			
 		} 
 		
-		currentNode = startNode();
+		currentNode = startNode;
 		
 		StringVertex nextNode = null;
 		
@@ -225,6 +235,9 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 	/**
 	 * Given a vertex, do I hide in that vertex, based upon
 	 * the content of this method
+	 * 
+	 * Note: returning 'true', with non-static inter-round
+	 * movement, will make this choice, effectively, random.
 	 * @param vertex
 	 * @return
 	 */

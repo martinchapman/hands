@@ -16,6 +16,8 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.ApplicationFrame;
 
 
+
+
 /**
  * Based on: http://www.java2s.com/Code/Java/Chart/JFreeChartLineChartDemo6.htm
  * 
@@ -44,12 +46,21 @@ public class LineGraph extends TraverserGraph {
 
     }
     
+    /* (non-Javadoc)
+     * @see Utility.output.TraverserGraph#createChartPanel(java.lang.String, java.lang.String, java.lang.String)
+     */
+    public void createChart(String title, String xlabel, String ylabel) {
+    	
+    	setContentPane(createChartPanel(title, xlabel, ylabel));
+    	
+    }
+    
     /**
      * @param title
      * @param xlabel
      * @param ylabel
      */
-    public void createChart(String title, String xlabel, String ylabel) {
+    public ChartPanel createChartPanel(String title, String xlabel, String ylabel) {
 
     	 // create the chart...
         chart = ChartFactory.createXYLineChart(
@@ -95,8 +106,8 @@ public class LineGraph extends TraverserGraph {
         
         chartPanel.setPreferredSize(new java.awt.Dimension(500, 270));
         
-        setContentPane(chartPanel);
-
+        return chartPanel;
+        
     }
    
     /**

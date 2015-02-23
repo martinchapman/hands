@@ -28,6 +28,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -37,6 +38,8 @@ import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import org.jfree.ui.ApplicationFrame;
 
 import Utility.output.HiderRecord;
 import Utility.output.OutputManager;
@@ -57,35 +60,50 @@ public class Runner extends JFrame {
 	
 	private static String[] hiderTypes = 
 		{ 
+		
+		  "StaticLocations",
+		  
 		  "Random",
 		  "RandomFixedStart",
 		  "RandomVariableHidePotential",
-		  
-		  "FirstN",
-		  //"RandomDirection",
+		  "RandomStaticBetween",
 		  
 		  "RandomSet",
 		  "LowEdgeCostRandomSet",
+		  "LowEdgeCostRandomSetStaticBetween",
+		  "RandomSetStaticBetween",
+		  
+		  "FirstN",
+		  //"RandomDirection",
+		  "FirstNStaticBetween",
 		  
 		  "RandomFixedDistance",
 		  "RandomFixedDistanceFixedStart",
+		  "RandomFixedDistanceStaticBetween",
 		  "LowEdgeCostRandomFixedDistance",
+		  "LowEdgeCostRandomFixedDistanceStaticBetween",
+		  
 		  
 		  "VariableFixedDistance",
 		  "VariableFixedDistanceFixedStart",
 		  "LowEdgeCostVariableFixedDistance",
+		  "VariableFixedDistanceStaticBetween",
 		  
-		  "MinimumConnectivity",
+		  "LeastConnected",
+		  "LeastConnectedStaticBetween",
 		  
 		  "MaxDistance",
+		  "MaxDistanceStaticBetween",
 		  
 		  "LowEdgeCost",
+		  "LowEdgeCostStaticBetween",
 		  "EqualEdgeCost",
 		  "FixedStartEqualEdgeCost",
 		  "VariableLowEdgeCost",
 		  "FixedStartVariableLowEdgeCost",
 		  
 		  "FullyBias",
+		  "FullyBiasStaticBetween",
 		  "FullyExplorative",
 		  "LooselyBias",
 		  "VariableBias",
@@ -93,7 +111,18 @@ public class Runner extends JFrame {
 		  "FixedStartFullyBias",
 		  "FixedStartFullyExplorative",
 		  
-		  "VariableBiasLocations"
+		  "VariableBiasLocations",
+		  
+		  //
+		  
+		  "SetDeceptiveNodes",
+		  "VariableDeceptiveNodes",
+		  "SetDeceptionDuration",
+		  "VariableDeceptionDuration",
+		  "VariableDeceptionDurationNodes",
+		  
+		  "SetDeceptionInterval",
+		  "SetDeceptionIntervalVariableDeceptiveNodes"
 		  
 		};
 	
@@ -199,12 +228,18 @@ public class Runner extends JFrame {
 		        
 		        if (evt.getClickCount() == 2) {
 		       
-		        	/* After something has been deleted, pass what has been deleted to the 'post delete' method
-		        	 * for processing
-		        	 */
-		        	deleted.postDelete(model.getElementAt(list.locationToIndex(evt.getPoint())));
+		        	int dialogResult = JOptionPane.showConfirmDialog (null, "Delete record?", "!", JOptionPane.YES_NO_OPTION);
 		        	
-		        	model.remove(list.locationToIndex(evt.getPoint()));
+		        	if ( dialogResult == JOptionPane.YES_OPTION ) {
+		        	  
+			        	/* After something has been deleted, pass what has been deleted to the 'post delete' method
+			        	 * for processing
+			        	 */
+			        	deleted.postDelete(model.getElementAt(list.locationToIndex(evt.getPoint())));
+			        	
+			        	model.remove(list.locationToIndex(evt.getPoint()));
+		        	
+		        	}
 		        	
 		        } 
 		        
@@ -994,6 +1029,7 @@ public class Runner extends JFrame {
 					
 					writer.write("");
 					
+					// ~MDC Note: this removing process may lead to duplicate errors i.e. may not be order proof
 					for (String simulation : simulations) { 
 						
 						writer.append(simulation + "\n");
@@ -1495,7 +1531,7 @@ public class Runner extends JFrame {
 			
 			try {
 				
-				proc = Runtime.getRuntime().exec("java -classpath bin:lib/jgrapht-core-0.9.0.jar:lib/epsgraphics.jar HideAndSeek.Main " + i + " " + GAMES + " " + paramString);
+				proc = Runtime.getRuntime().exec("java -classpath bin:lib/jgrapht-core-0.9.0.jar:lib/epsgraphics.jar:lib/jcommon-1.0.21.jar:lib/jfreechart-1.0.17.jar HideAndSeek.Main " + i + " " + GAMES + " " + paramString);
 			
 			} catch (IOException e1) {
 				

@@ -13,6 +13,15 @@ public class StringVertex {
 		
 	}
 	
+	/**
+	 * 
+	 */
+	public static void resetNodes() {
+		
+		nodes = -1;
+		
+	}
+	
 	public StringVertex(int node) {
 		
 		this.node = node;
