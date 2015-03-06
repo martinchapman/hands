@@ -13,7 +13,7 @@ import Utility.Utils;
  * @author Martin
  *
  */
-public class RandomFixedDistance extends Hider implements Runnable {
+public class RandomFixedDistance extends Hider {
 	
 	/**
 	 * @param graph
@@ -74,10 +74,6 @@ public class RandomFixedDistance extends Hider implements Runnable {
 	 */
 	@Override
 	protected StringVertex startNode() {
-		
-		// StringVertex[] vertices = new StringVertex[graph.vertexSet().size()];
-		
-		// return graph.vertexSet().toArray(vertices)[0];
 		
 		return randomNode();
 		

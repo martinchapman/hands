@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
+import javax.swing.WindowConstants;
 
 import org.jfree.ui.RefineryUtilities;
 
@@ -23,46 +24,71 @@ public class BehaviourPrediction  {
 	 * frequencies from that round onwards. Allows to access an offset of the data.
 	 * 
 	 */
-	private ArrayList<Hashtable<StringVertex, Integer>> hideLocationsList = new ArrayList<Hashtable<StringVertex, Integer>>();
+	protected ArrayList<Hashtable<StringVertex, Integer>> hideLocationsList = new ArrayList<Hashtable<StringVertex, Integer>>();
 	
 	/**
 	 * Each position in array is a new Hashtable, added at the start of every round, and thus only recording
 	 * probabilities from that round onwards. Allows to access an offset of the data.
 	 * 
 	 */
-	private ArrayList<Hashtable<StringVertex, Double>> hideProbabilitiesList = new ArrayList<Hashtable<StringVertex, Double>>();
+	protected ArrayList<Hashtable<StringVertex, Double>> hideProbabilitiesList = new ArrayList<Hashtable<StringVertex, Double>>();
 	
 	/**
 	 * 
 	 */
-	private int beginningGap = 0;
+	protected int recordStartIndex = 0;
 	
 	/**
 	 * @param gap
 	 */
-	public void setBeginningGap(int gap) { beginningGap = gap; }
+	public void setRecordStartIndex(int index) { this.recordStartIndex = index; }
 	
 	/**
 	 * 
 	 */
-	//private JFrame likelyLocationsGraphs;
+	private JFrame likelyLocationsGraphs;
+	
 	/**
 	 * 
 	 */
-	//private JTabbedPane tlikelyLocationsGraphs;
+	private JTabbedPane tlikelyLocationsGraphs;
+	
+	/**
+	 * 
+	 */
+	private boolean recordFrequencyGraph = true;
 	
 	/**
 	 * 
 	 */
 	public BehaviourPrediction() {
 		
+		resetData();
+		
+		if (recordFrequencyGraph) {
+			
+			likelyLocationsGraphs = new JFrame();
+			
+			likelyLocationsGraphs.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+			
+			tlikelyLocationsGraphs = new JTabbedPane();
+		
+		}
+		
+	}
+	
+	/**
+	 * 
+	 */
+	protected void resetData() {
+		
+		hideLocationsList.clear();
+		
 		hideLocationsList.add(new Hashtable<StringVertex, Integer>());
 		
+		hideProbabilitiesList.clear();
+		
 		hideProbabilitiesList.add(new Hashtable<StringVertex, Double>());
-		
-		//likelyLocationsGraphs = new JFrame();
-		
-		//tlikelyLocationsGraphs = new JTabbedPane();
 		
 	}
 	
@@ -127,9 +153,11 @@ public class BehaviourPrediction  {
 	 */
 	private Hashtable<StringVertex, Integer> hideLocations() {
 		
-		if( beginningGap + 1 > hideLocationsList.size() ) { return new Hashtable<StringVertex, Integer>(); }
+		if( recordStartIndex + 1 > hideLocationsList.size() ) return new Hashtable<StringVertex, Integer>();
 		
-		return hideLocationsList.get(beginningGap);
+		if( recordStartIndex < 0 ) return hideLocationsList.get(0);
+		
+		return hideLocationsList.get(recordStartIndex);
 		
 	}
 	
@@ -138,9 +166,11 @@ public class BehaviourPrediction  {
 	 */
 	private Hashtable<StringVertex, Double> hideProbabilities() {
 		
-		if( beginningGap + 1 > hideProbabilitiesList.size() ) { return new Hashtable<StringVertex, Double>(); }
+		if( recordStartIndex + 1 > hideProbabilitiesList.size() ) return new Hashtable<StringVertex, Double>();
 		
-		return hideProbabilitiesList.get(beginningGap);
+		if( recordStartIndex < 0 ) return hideProbabilitiesList.get(0);
+		
+		return hideProbabilitiesList.get(recordStartIndex);
 		
 	}
 	
@@ -225,17 +255,19 @@ public class BehaviourPrediction  {
 	 */
 	private void addGraph() {
 		
+		if (!recordFrequencyGraph) return;
+		
 		ArrayList<StringVertex> likelyHideLocations = rankLikelyHideLocations(Integer.MAX_VALUE);
 		
-		//BarGraph likelyGraph = new BarGraph("");
+		BarGraph likelyGraph = new BarGraph("");
 		
 		for ( StringVertex likelyLocation : likelyHideLocations ) {
 			
-			//likelyGraph.addBar(hideProbabilities().get(likelyLocation) * 100, likelyLocation.toString(), "");
+			likelyGraph.addBar(hideProbabilities().get(likelyLocation) * 100, likelyLocation.toString(), "");
 			
 		}
 		
-		//tlikelyLocationsGraphs.addTab("", likelyGraph.createChartPanel(" " + "", "", ""));
+		tlikelyLocationsGraphs.addTab("", likelyGraph.createChartPanel(" " + "", "", ""));
 		
 	}
 	
@@ -244,11 +276,13 @@ public class BehaviourPrediction  {
 	 */
 	public void showGraphs() {
 		
-		//likelyLocationsGraphs.getContentPane().add(tlikelyLocationsGraphs);
+		if (!recordFrequencyGraph) return;
 		
-		//likelyLocationsGraphs.pack();
+		likelyLocationsGraphs.getContentPane().add(tlikelyLocationsGraphs);
 		
-		//likelyLocationsGraphs.setVisible(true);
+		likelyLocationsGraphs.pack();
+		
+		likelyLocationsGraphs.setVisible(true);
 		
 	}
 	

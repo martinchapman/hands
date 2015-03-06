@@ -10,7 +10,7 @@ import HideAndSeek.graph.StringVertex;
  * @author Martin
  *
  */
-public class VariableFixedDistanceFixedStart extends VariableFixedDistance implements Runnable {
+public class VariableFixedDistanceFixedStart extends VariableFixedDistance {
 	
 	/**
 	 * @param graph
@@ -27,9 +27,7 @@ public class VariableFixedDistanceFixedStart extends VariableFixedDistance imple
 	@Override
 	protected StringVertex startNode() {
 		
-		StringVertex[] vertices = new StringVertex[graphController.vertexSet().size()];
-		
-		return graphController.vertexSet().toArray(vertices)[0];
+		return firstNode();
 		
 	}
 	

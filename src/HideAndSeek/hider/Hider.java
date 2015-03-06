@@ -41,6 +41,15 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 	protected ArrayList<StringVertex> exploredNodes;
 	
 	/**
+	 * @return
+	 */
+	public ArrayList<StringVertex> getExploredNodes() {
+		
+		return exploredNodes;
+	
+	}
+
+	/**
 	 * 
 	 */
 	private String ID;
@@ -229,6 +238,15 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 		exploredNodes.clear();
 		
 		roundsPassed++;
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraverser#endOfGame()
+	 */
+	public void endOfGame(){
+		
+		roundsPassed = 0;
 		
 	}
 	

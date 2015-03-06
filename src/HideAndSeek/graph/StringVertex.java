@@ -1,8 +1,9 @@
 package HideAndSeek.graph;
 
-public class StringVertex {
+public class StringVertex implements Comparable<StringVertex> {
 
 	private static int nodes = -1;
+	
 	private int node;
 	
 	public StringVertex() {
@@ -11,6 +12,15 @@ public class StringVertex {
 		
 		node = nodes;
 		
+	}
+	
+	/**
+	 * @return
+	 */
+	public int getNode() { 
+		
+		return node;
+	
 	}
 	
 	/**
@@ -39,6 +49,25 @@ public class StringVertex {
 		//System.out.println("Comparing " + "v" + node + " and " + arg0.toString());
 		
 		return ("v" + node).equals(arg0.toString());
+		
+	}
+
+	@Override
+	public int compareTo(StringVertex o) {
+		
+		if (node < o.getNode()) { 
+			
+			return -1;
+		
+		} else if (node > o.getNode()) {
+		
+			return 1;
+		
+		} else {
+		
+			return 0;
+		
+		}
 		
 	}
 

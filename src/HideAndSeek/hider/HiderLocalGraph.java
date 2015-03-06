@@ -57,5 +57,20 @@ public abstract class HiderLocalGraph extends Hider {
 		return null;
 		
 	}
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraverser#randomNode()
+	 */
+	protected StringVertex knownRandomNode() {
+		
+		StringVertex[] vertices = new StringVertex[localGraph.vertexSet().size()];
+		
+		localGraph.vertexSet().toArray(vertices);
+		
+		if ( vertices.length == 0 ) { return null; }
+		
+		return vertices[(int)(Math.random() * vertices.length)];
+		
+	}
 
 }

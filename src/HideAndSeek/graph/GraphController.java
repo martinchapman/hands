@@ -214,11 +214,11 @@ public class GraphController<V, E> {
 	/**
 	 * @param caller
 	 */
-	public void nextHider(Object caller) {
+	public void resetGameEnvironment(Object caller) {
 		
 		if (!(caller instanceof Main)) return;
 		
-		graph.nextHider();
+		graph.resetGameEnvironment();
 		
 	}
 	

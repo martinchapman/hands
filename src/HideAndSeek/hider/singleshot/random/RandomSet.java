@@ -1,6 +1,7 @@
 package HideAndSeek.hider.singleshot.random;
 
 import java.util.ArrayList;
+import java.util.TreeSet;
 
 import org.jgrapht.alg.DijkstraShortestPath;
 
@@ -35,7 +36,7 @@ public class RandomSet extends HiderLocalGraph {
 		
 		super(graphController, numberOfHideLocations);
 		
-		populateHideSet(createRandomSet(numberOfHideLocations, new ArrayList<StringVertex>()));
+		populateHideSet(createRandomSet(numberOfHideLocations, new TreeSet<StringVertex>()));
 		
 		currentPath = new ArrayList<StringEdge>();
 		
@@ -62,21 +63,32 @@ public class RandomSet extends HiderLocalGraph {
 	/**
 	 * 
 	 */
-	protected ArrayList<StringVertex> createRandomSet(int size, ArrayList<StringVertex> ignoreSet) {
+	protected ArrayList<StringVertex> createRandomSet(int size, TreeSet<StringVertex> ignoreSet) {
 		
 		ArrayList<StringVertex> hideSet = new ArrayList<StringVertex>();
+		
+		if (ignoreSet.size() > (graphController.vertexSet().size() - size)) { 
+			
+			Utils.talk(this.toString(), "Too many nodes to disregard supplied. Hiding completely randomly.");
+			
+			ignoreSet = new TreeSet<StringVertex>();
+			
+		}
 		
 		StringVertex randomVertex = randomNode();
 		
 		while ( hideSet.size() != size ) {
 			
-			if (!hideSet.contains(randomVertex) & !ignoreSet.contains(randomVertex)) {
+			if (!hideSet.contains(randomVertex) && !ignoreSet.contains(randomVertex)) {
 				
 				hideSet.add(randomVertex);
 				
 			}
 			
 			randomVertex = randomNode();
+			
+			// ~MDC Double check.
+			// if ( ignoreSet.size() + hideSet.size() >= graphController.vertexSet().size()) ignoreSet = new TreeSet<StringVertex>();
 			
 		}
 		
@@ -161,7 +173,7 @@ public class RandomSet extends HiderLocalGraph {
 		
 		super.endOfRound();
 		
-		populateHideSet(createRandomSet(numberOfHideLocations, new ArrayList<StringVertex>()));
+		populateHideSet(createRandomSet(numberOfHideLocations, new TreeSet<StringVertex>()));
 		
 	}
 

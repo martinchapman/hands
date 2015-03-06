@@ -121,6 +121,8 @@ public abstract class Seeker extends GraphTraverser implements Runnable {
 		
 		while ( hideLocations.size() != graphController.numberOfHideLocations() ) {
 			
+			//Utils.talk(this.toString(), "At: " + currentNode);
+			
 			exploredNodes.add(currentNode);
 			
 			addUniquelyVisitedNode(currentNode);
@@ -190,6 +192,17 @@ public abstract class Seeker extends GraphTraverser implements Runnable {
 		hideLocations.clear();
 		
 		roundsPassed++;
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraverser#endOfGame()
+	 */
+	public void endOfGame() {
+		
+		super.endOfGame();
+		
+		roundsPassed = 0;
 		
 	}
 	

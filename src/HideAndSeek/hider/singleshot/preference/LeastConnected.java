@@ -47,6 +47,15 @@ public class LeastConnected extends HiderLocalGraph {
 	private ArrayList<StringVertex> minimumConnectivityNodes;
 	
 	/**
+	 * @return
+	 */
+	public ArrayList<StringVertex> getMinimumConnectivityNodes() {
+		
+		return minimumConnectivityNodes;
+	
+	}
+
+	/**
 	 * 
 	 */
 	private static int MAXCONNECTIONS = 1;
@@ -88,13 +97,23 @@ public class LeastConnected extends HiderLocalGraph {
 			
 			triedNodes.clear(); 
 			
-			minimumConnectivityNodes.add(vertex);
+			if ( !minimumConnectivityNodes.contains(vertex) ) minimumConnectivityNodes.add(vertex);
 			
 			return true; 
 			
 		}
 		
 		return false;
+		
+	}
+	
+	/**
+	 * @param vertex
+	 * @return
+	 */
+	public boolean hideHereInterface(StringVertex vertex) {
+		
+		return hideHere(vertex);
 		
 	}
 

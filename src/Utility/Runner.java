@@ -72,6 +72,7 @@ public class Runner extends JFrame {
 		  "LowEdgeCostRandomSet",
 		  "LowEdgeCostRandomSetStaticBetween",
 		  "RandomSetStaticBetween",
+		  "UniqueRandomSet",
 		  
 		  "FirstN",
 		  //"RandomDirection",
@@ -113,21 +114,44 @@ public class Runner extends JFrame {
 		  
 		  "VariableBiasLocations",
 		  
-		  //
+		  ////
 		  
 		  "SetDeceptiveNodes",
 		  "VariableDeceptiveNodes",
+		  
 		  "SetDeceptionDuration",
 		  "VariableDeceptionDuration",
-		  "VariableDeceptionDurationNodes",
 		  
-		  "SetDeceptionInterval",
-		  "SetDeceptionIntervalVariableDeceptiveNodes"
+		  "SetDeceptionDurationVariableDeceptiveNodes",
+		  "VariableDeceptionDurationVariableDeceptiveNodes",
+		  
+		  //
+		  
+		  "SetDeceptionDurationSetDeceptionIntervalSetRepeatDuration",
+		  "SetDeceptionDurationVariableDeceptionIntervalSetRepeatDuration",
+		  "VariableDeceptionDurationSetDeceptionIntervalSetRepeatDuration",
+		  "VariableDeceptionDurationVariableDeceptionIntervalSetRepeatDuration",
+		  
+		  "SetDeceptionDurationSetDeceptionIntervalVariableRepeatDuration",
+		  //"VariableDeceptionDurationVariableDeceptionIntervalVariableRepeatDuration",
+		  "VariableDeceptiveNodesSetDeceptionDurationSetDeceptionIntervalSetRepeatDuration",
+		  
+		  "GroupedDeceptiveSetDuration",
+		  "GroupedDeceptive",
+		  "GroupedDeceptiveVariableDeceptionDuration",
+		  
+		  "VariableDeceptiveSets",
+		  "VariableGroupedDeceptiveSets",
+		  "EpsilonDeceptive",
+		  "LeastConnectedDeceptive",
+		  
+		  //
 		  
 		};
 	
 	private static String[] seekerTypes = 
 		{ 
+		
 		  "RandomWalk",
 		  "ConstrainedRandomWalk",
 		  "LowEdgeCost",
@@ -141,15 +165,20 @@ public class Runner extends JFrame {
 	      "LeastConnectedFirst",
 	      "MostConnectedFirst",
 	      
-          "HighProbability"
+          "HighProbability",
+          "VariableHistoryHighProbability",
+          "HighProbabilityRepetitionCheck"
+          
 		};
 	
 	private static String[] graphTypes = 
 		{
+		
 		  "random",
 		  "ring",
 		  "scalefree",
 		  "complete"
+		  
 		};
 	
 	// 
@@ -543,10 +572,10 @@ public class Runner extends JFrame {
 		//
 		
 		final JComboBox<String> graphTypes = new JComboBox<String>();
+
+		graphTypes.addItem("Line");
 		
 		graphTypes.addItem("Bar");
-		
-		graphTypes.addItem("Line");
 		
 		centerPaneRightCenter.add(new JLabel("Graph types:"));
 		
@@ -568,9 +597,9 @@ public class Runner extends JFrame {
 		
 		final JComboBox<String> gameOrRound = new JComboBox<String>();
 		
-		gameOrRound.addItem("Game");
-		
 		gameOrRound.addItem("Round");
+		
+		gameOrRound.addItem("Game");
 		
 		centerPaneRightCenter.add(new JLabel("Average over Game or Round:"));
 		
@@ -1188,22 +1217,22 @@ public class Runner extends JFrame {
 				
 					queueListModel.addElement(Arrays.toString(getUISettings()).substring(1, Arrays.toString(getUISettings()).length() - 1));
 				
+					try {
+						
+						Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "simulationSchedule.txt", true), Arrays.toString(getUISettings()).substring(1, Arrays.toString(getUISettings()).length() - 1) + "\n");
+						
+						simulations = Utils.readFromFile(Utils.FILEPREFIX + "simulationSchedule.txt");
+						
+					} catch (IOException e1) {
+					
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					
+					}
+					
+					startQueue.setEnabled(true);
+					
 				}
-				
-				try {
-					
-					Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "simulationSchedule.txt", true), Arrays.toString(getUISettings()).substring(1, Arrays.toString(getUISettings()).length() - 1) + "\n");
-					
-					simulations = Utils.readFromFile(Utils.FILEPREFIX + "simulationSchedule.txt");
-					
-				} catch (IOException e1) {
-				
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				
-				}
-				
-				startQueue.setEnabled(true);
 				
 			}
         	

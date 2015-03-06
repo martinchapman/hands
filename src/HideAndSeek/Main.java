@@ -11,12 +11,14 @@ import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.Hider;
-import HideAndSeek.hider.reactive.DeceptiveHider;
-import HideAndSeek.hider.repeatgame.FixedStartVariableBias;
-import HideAndSeek.hider.repeatgame.VariableBias;
-import HideAndSeek.hider.repeatgame.VariableBiasLocations;
-import HideAndSeek.hider.repeatgame.VariableBiasStaticBetween;
-import HideAndSeek.hider.singleshot.staticlocations.StaticLocations;
+import HideAndSeek.hider.repeatgame.bias.FixedStartVariableBias;
+import HideAndSeek.hider.repeatgame.bias.VariableBias;
+import HideAndSeek.hider.repeatgame.bias.VariableBiasLocations;
+import HideAndSeek.hider.repeatgame.bias.VariableBiasStaticBetween;
+import HideAndSeek.hider.repeatgame.deceptive.Deceptive;
+import HideAndSeek.hider.repeatgame.deceptive.EpsilonDeceptive;
+import HideAndSeek.hider.repeatgame.deceptive.GroupedDeceptive;
+import HideAndSeek.hider.repeatgame.deceptive.LeastConnectedDeceptive;
 import HideAndSeek.hider.singleshot.cost.FixedStartVariableLowEdgeCost;
 import HideAndSeek.hider.singleshot.cost.VariableLowEdgeCost;
 import HideAndSeek.hider.singleshot.cost.VariableLowEdgeCostStaticBetween;
@@ -40,20 +42,24 @@ import HideAndSeek.hider.singleshot.random.RandomSet;
 import HideAndSeek.hider.singleshot.random.RandomSetStaticBetween;
 import HideAndSeek.hider.singleshot.random.RandomStaticBetween;
 import HideAndSeek.hider.singleshot.random.RandomVariableHidePotential;
+import HideAndSeek.hider.singleshot.random.UniqueRandomSet;
+import HideAndSeek.hider.singleshot.staticlocations.StaticLocations;
 import HideAndSeek.seeker.Seeker;
-import HideAndSeek.seeker.repeatgame.HighProbability;
-import HideAndSeek.seeker.singleshot.BacktrackPath;
-import HideAndSeek.seeker.singleshot.BreadthFirstSearch;
-import HideAndSeek.seeker.singleshot.BreadthFirstSearchLowCost;
-import HideAndSeek.seeker.singleshot.ConstrainedRandomWalk;
-import HideAndSeek.seeker.singleshot.DepthFirstSearch;
-import HideAndSeek.seeker.singleshot.DepthFirstSearchLowCost;
-import HideAndSeek.seeker.singleshot.FixedStartRandomWalk;
-import HideAndSeek.seeker.singleshot.LeastConnectedFirst;
-import HideAndSeek.seeker.singleshot.LowEdgeCost;
-import HideAndSeek.seeker.singleshot.MostConnectedFirst;
-import HideAndSeek.seeker.singleshot.RandomWalk;
-import HideAndSeek.seeker.singleshot.VariableBacktrackPath;
+import HideAndSeek.seeker.repeatgame.probability.HighProbability;
+import HideAndSeek.seeker.repeatgame.probability.HighProbabilityRepetitionCheck;
+import HideAndSeek.seeker.repeatgame.probability.VariableHistoryHighProbability;
+import HideAndSeek.seeker.singleshot.cost.LowEdgeCost;
+import HideAndSeek.seeker.singleshot.coverage.BacktrackPath;
+import HideAndSeek.seeker.singleshot.coverage.BreadthFirstSearch;
+import HideAndSeek.seeker.singleshot.coverage.BreadthFirstSearchLowCost;
+import HideAndSeek.seeker.singleshot.coverage.DepthFirstSearch;
+import HideAndSeek.seeker.singleshot.coverage.DepthFirstSearchLowCost;
+import HideAndSeek.seeker.singleshot.coverage.VariableBacktrackPath;
+import HideAndSeek.seeker.singleshot.nonhomo.LeastConnectedFirst;
+import HideAndSeek.seeker.singleshot.nonhomo.MostConnectedFirst;
+import HideAndSeek.seeker.singleshot.random.ConstrainedRandomWalk;
+import HideAndSeek.seeker.singleshot.random.FixedStartRandomWalk;
+import HideAndSeek.seeker.singleshot.random.RandomWalk;
 import Utility.Pair;
 import Utility.Utils;
 
@@ -87,6 +93,11 @@ public class Main {
 	 * Graph 
 	 */
 	private GraphController<StringVertex, StringEdge> graphController;
+	
+	/**
+	 * Whether to output a corresponding animation of the search process
+	 */
+	private final boolean OUTPUTJS = false;
 	
 	/**
 	 * @param args
@@ -135,7 +146,8 @@ public class Main {
 		
 		int numberOfHideLocations = Integer.parseInt(args[6]);
 		
-		startRounds(initHiders(hiderList, numberOfHideLocations, mixHiders), initSeekers(seekerList, mixSeekers), rounds, true);
+		
+		startRounds(initHiders(hiderList, numberOfHideLocations, mixHiders), initSeekers(seekerList, numberOfHideLocations, mixSeekers), rounds, true);
 		
 	}
 	
@@ -242,6 +254,12 @@ public class Main {
 			if (hiderType.getElement0().equals("LowEdgeCostRandomSetStaticBetween")) {
 				
 				allHidingAgents.add(new LowEdgeCostRandomSetStaticBetween(graphController, numberOfHideLocations));
+			
+			} 
+			
+			if (hiderType.getElement0().equals("UniqueRandomSet")) {
+				
+				allHidingAgents.add(new UniqueRandomSet(graphController, numberOfHideLocations));
 			
 			} 
 			
@@ -421,7 +439,7 @@ public class Main {
 			
 			} 
 			
-			// Discovered through experimentation
+			// Discovered through experimentation (~MDC 24/2/15 ?)
 			if (hiderType.getElement0().equals("OptimalBias")) {
 				
 				allHidingAgents.add(new VariableBias(graphController, numberOfHideLocations, 0.6));
@@ -436,11 +454,11 @@ public class Main {
 			
 			}
 			
-			//
+			////
 			
 			if (hiderType.getElement0().equals("SetDeceptiveNodes")) {
 				
-				allHidingAgents.add(new DeceptiveHider(graphController, numberOfHideLocations, numberOfHideLocations, (int)(totalRounds / 2)));
+				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, (int)(totalRounds / 2)));
 			
 				allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptiveNodes");
 				
@@ -448,35 +466,45 @@ public class Main {
 	
 			if (hiderType.getElement0().equals("VariableDeceptiveNodes")) {
 				
-				allHidingAgents.add(new DeceptiveHider(graphController, numberOfHideLocations, gameNumber, (int)(Math.random() * totalGames)));
+				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, gameNumber, (int)(Math.random() * totalGames)));
 			
 				allHidingAgents.get(allHidingAgents.size() - 1).setName("VariableDeceptiveNodes");
 				
 			}
 			
+			//
+			
 			if (hiderType.getElement0().equals("SetDeceptionDuration")) {
 				
-				allHidingAgents.add(new DeceptiveHider(graphController, numberOfHideLocations, numberOfHideLocations, (int)(totalRounds / 2)));
+				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, (int)(totalRounds / 2)));
 				
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptionDurations");
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptionDuration");
 				
 			}
-
+			
 			if (hiderType.getElement0().equals("VariableDeceptionDuration")) {
 				
-				allHidingAgents.add(new DeceptiveHider(graphController, numberOfHideLocations, numberOfHideLocations, gameNumber));
+				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, gameNumber));
 				
 				allHidingAgents.get(allHidingAgents.size() - 1).setName("VariableDeceptionDuration");
 			
 			}
+
+			if (hiderType.getElement0().equals("SetDeceptionDurationVariableDeceptiveNodes")) {
+				
+				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, gameNumber, (int)(totalRounds / 2)));
+				
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptionDurationVariableDeceptiveNodes");
+				
+			}
 			
-			if (hiderType.getElement0().equals("VariableDeceptionDurationNodes")) {
+			if (hiderType.getElement0().equals("VariableDeceptionDurationVariableDeceptiveNodes")) {
 				
 				for ( int a = 1; a <= numberOfHideLocations; a++) {
 					
-					allHidingAgents.add(new DeceptiveHider(graphController, numberOfHideLocations, a, gameNumber));
+					allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, a, gameNumber));
 					
-					allHidingAgents.get(allHidingAgents.size() - 1).setName("VariableDeceptionDurationNodes-" + a);
+					allHidingAgents.get(allHidingAgents.size() - 1).setName("VariableDeceptionDurationVariableDeceptiveNodes-" + a);
 					
 				}
 				
@@ -484,24 +512,122 @@ public class Main {
 			
 			//
 			
-			if (hiderType.getElement0().equals("SetDeceptionInterval")) {
+			// ~MDC Values (deception duration and repeat interval) considered to be 'optimal' via experimentation
+			if (hiderType.getElement0().equals("SetDeceptionDurationSetDeceptionIntervalSetRepeatDuration")) {
 				
-				// ~MDC There's a multi-dimentional graph to be had with this
-				allHidingAgents.add(new DeceptiveHider(graphController, numberOfHideLocations, numberOfHideLocations, 2, 10, 0, true));
+				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, 2, 0, (int)(totalRounds / 2), true));
 				
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptionInterval");
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptionDurationSetDeceptionIntervalSetRepeatDuration");
 				
 			}
 			
-			if (hiderType.getElement0().equals("SetDeceptionIntervalVariableDeceptiveNodes")) {
+			if (hiderType.getElement0().equals("SetDeceptionDurationVariableDeceptionIntervalSetRepeatDuration")) {
 				
-				for ( int a = 1; a <= numberOfHideLocations; a++) {
+				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, 1, gameNumber, totalRounds, true));
+			
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptionDurationVariableDeceptionIntervalSetRepeatDuration");
+				
+			}
+			
+			if (hiderType.getElement0().equals("VariableDeceptionDurationSetDeceptionIntervalSetRepeatDuration")) {
+				
+				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, gameNumber, 0, totalRounds, true));
+			
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("VariableDeceptionDurationSetDeceptionIntervalSetRepeatDuration");
+				
+			}
+			
+			if (hiderType.getElement0().equals("VariableDeceptionDurationVariableDeceptionIntervalSetRepeatDuration")) {
+				
+				final int MAXINTERVAL = totalGames;
+				
+				// ~MDC There's a multi-dimensional graph to be had with this!
+				for ( int interval = 0; interval <= MAXINTERVAL; interval++) {
 					
-					allHidingAgents.add(new DeceptiveHider(graphController, numberOfHideLocations, a, 2, 10, 0, true));
+					allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, gameNumber, MAXINTERVAL, totalRounds, true));
 					
-					allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptionIntervalDeceptiveNodes-" + a);
+					allHidingAgents.get(allHidingAgents.size() - 1).setName("VariableDeceptionDurationVariableDeceptionInterval-" + interval);
 				
 				}
+				
+			}
+
+			// ~MDC Expanded as necessary by the results above
+			
+			if (hiderType.getElement0().equals("SetDeceptionDurationSetDeceptionIntervalVariableRepeatDuration")) {
+				
+				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, 1, 0, gameNumber, true));
+				
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptionDurationSetDeceptionIntervalVariableRepeatDuration");
+				
+			}
+			
+			if (hiderType.getElement0().equals("SetDeceptionDurationSetDeceptionIntervalVariableRepeatDuration-NonUniqueRandom")) {
+				
+				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, 1, 0, gameNumber, true, false));
+				
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptionDurationSetDeceptionIntervalVariableRepeatDuration");
+				
+			}
+
+			if (hiderType.getElement0().equals("VariableDeceptiveNodesSetDeceptionDurationSetDeceptionIntervalSetRepeatDuration")) {
+				
+				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, gameNumber, 1, 0, totalRounds, true));
+				
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptionDurationSetDeceptionIntervalVariableDeceptiveNodes");
+				
+			}
+			
+			// ~Misc.
+
+			if (hiderType.getElement0().equals("EpsilonDeceptive")) {
+				
+				allHidingAgents.add(new EpsilonDeceptive(graphController, numberOfHideLocations, numberOfHideLocations, 0, (double)(gameNumber / 100.0)));
+				
+			}
+			
+			if (hiderType.getElement0().equals("LeastConnectedDeceptive")) {
+				
+				allHidingAgents.add(new LeastConnectedDeceptive(graphController, numberOfHideLocations, numberOfHideLocations, 1, 0, totalRounds, true));
+				
+			}
+			
+			if (hiderType.getElement0().equals("GroupedDeceptiveSetDuration")) {
+				
+				allHidingAgents.add(new GroupedDeceptive(graphController, numberOfHideLocations, numberOfHideLocations,  (int)(totalRounds / 2)));
+				
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("GroupedDeceptiveSetDuration");
+				
+			}
+			
+			if (hiderType.getElement0().equals("GroupedDeceptive")) {
+				
+				allHidingAgents.add(new GroupedDeceptive(graphController, numberOfHideLocations, numberOfHideLocations, 1, 0, totalRounds, true));
+				
+			}
+			
+			if (hiderType.getElement0().equals("GroupedDeceptiveVariableDeceptionDuration")) {
+				
+				allHidingAgents.add(new GroupedDeceptive(graphController, numberOfHideLocations, numberOfHideLocations, 11));
+				
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("GroupedDeceptiveVariableDeceptionDuration");
+				
+			}
+			
+			if (hiderType.getElement0().equals("VariableDeceptiveSets")) {
+				
+				// ~MDC Choice of repeat duration here is arbitrary
+				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, (int)(totalRounds / 2), 0, (int)(totalRounds / 2), 10));
+				
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("VariableDeceptiveSets");
+				
+			}
+			
+			if (hiderType.getElement0().equals("VariableGroupedDeceptiveSets")) {
+				
+				allHidingAgents.add(new GroupedDeceptive(graphController, numberOfHideLocations, numberOfHideLocations, (int)(totalRounds / 2), 0, (int)(totalRounds / 2), 10));
+				
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("VariableDeceptiveSets");
 				
 			}
 			
@@ -513,7 +639,7 @@ public class Main {
 			
 			allHidingAgents = allHidingAgents.subList(0, 1);
 			
-			System.out.println("Strat: " + allHidingAgents);
+			System.out.println("Strategy: " + allHidingAgents);
 			
 		}
 		
@@ -525,7 +651,7 @@ public class Main {
 	 * @param agentList
 	 * @return
 	 */
-	private List<Seeker> initSeekers(String agentList, boolean mixSeekers) {
+	private List<Seeker> initSeekers(String agentList, int numberOfHideLocations, boolean mixSeekers) {
 		
 		/**************************
     	 * 
@@ -628,6 +754,18 @@ public class Main {
 				
 			}
 			
+			if (seekerType.getElement0().equals("VariableHistoryHighProbability")) {
+				
+				allSeekingAgents.add(new VariableHistoryHighProbability(graphController, gameNumber));
+				
+			}
+			
+			if (seekerType.getElement0().equals("HighProbabilityRepetitionCheck")) {
+				
+				allSeekingAgents.add(new HighProbabilityRepetitionCheck(graphController, 2, numberOfHideLocations));
+				
+			}
+			
 			
 		}
 		
@@ -664,9 +802,13 @@ public class Main {
 			
 			mainOutputWriter = new FileWriter(Utils.FILEPREFIX + "/data/" + currentSimulationIdentifier + ".csv", true);
 		
-			outputJavascript = new FileWriter(Utils.FILEPREFIX + "/data/js/data/" + currentSimulationIdentifier + "-vis.js", true);
+			if (OUTPUTJS) {
+				
+				outputJavascript = new FileWriter(Utils.FILEPREFIX + "/data/js/data/" + currentSimulationIdentifier + "-vis.js", true);
+				
+				outputHTML = new FileWriter(Utils.FILEPREFIX + "/data/" + currentSimulationIdentifier + "-vis.html", true);
 			
-			outputHTML = new FileWriter(Utils.FILEPREFIX + "/data/" + currentSimulationIdentifier + "-vis.html", true);
+			}
         
 		} catch (IOException e) {
 		
@@ -674,7 +816,7 @@ public class Main {
 		
 		}
 		
-		Utils.writeToFile(outputJavascript, "var graphNodes = \"" + graphController.edgeSet(this) + "\"; \n var hidden = new Array(); \n var path = new Array(); \n");
+		if (OUTPUTJS) Utils.writeToFile(outputJavascript, "var graphNodes = \"" + graphController.edgeSet(this) + "\"; \n var hidden = new Array(); \n var path = new Array(); \n");
 		
 		/**************************
     	 * 
@@ -682,134 +824,182 @@ public class Main {
     	 * 
     	 * * * * * * * * * * * * */
 		
+		int repeatAllRounds = 1;
+		
+		// Pre-checks for presence of strategy which is defined by a sequence of rounds,
+		// not individual ones, and thus must be tested multiple times in addition.
+		for ( Hider hider : hiders ) {
+			
+			if (hider.getStrategyOverRounds()) repeatAllRounds = rounds;
+			
+		}
+		
+		for ( Seeker  seeker : seekers ) {
+			
+			if (seeker.getStrategyOverRounds()) repeatAllRounds = rounds;
+			
+		}
+		
 		// Run rounds and record output per hider
 		for ( Hider hider : hiders ) {
 			
 			Utils.talk("Main", hiders.toString());
 			
-			for (int i = 0; i < rounds; i++) {
-	        	
-	        	Utils.talk("Main", "Game " + gameNumber + " Round " + i);
-	        	
-	        	System.out.println( "Game " + gameNumber + " Round " + i + ": " + ( ( i / ( ( (float) rounds * hiders.size() ) ) ) * 100 ) + "%" );
-	        	
-				hider.run();
+			/* If changes occur over a set of rounds (over a game), by nature of the strategy,
+			 * this process must repeat.
+			 */
+			for (int roundRepeat = 0; roundRepeat < repeatAllRounds; roundRepeat++) {
 				
-				for ( Seeker seeker : seekers ) {
+				hider.startPlaying();
+				
+				boolean lastRoundRepeat = false;
+				if (roundRepeat == (repeatAllRounds - 1)) lastRoundRepeat = true;
+				
+				for (int i = 0; i < rounds; i++) {
+		        	
+		        	Utils.talk("Main", "Game " + gameNumber + " Round " + i);
+		        	
+		        	System.out.println( "Game " + gameNumber + " Round " + i + ": " + ( ( i / ( ( (float) rounds * hiders.size() ) ) ) * 100 ) + "%" );
+		        	
+					hider.run();
 					
-					seeker.run();
+					for ( Seeker seeker : seekers ) {
+						
+						seeker.run();
+						
+					}
 					
+					graphController.clearHideLocations(this);
+		    		
+		    		if (OUTPUTJS) {
+		    			
+		    			// Visualise first hider and first seeker, for novelty, mainly.
+		    			
+		    			Utils.writeToFile(outputJavascript, "hidden[" + i + "] = \"" + hiders.get(0).getHideLocations() + "\"; \n");
+		    		
+		    			Utils.writeToFile(outputJavascript, "path[" + i + "] = \"" + graphController.latestRoundPaths(this, seekers.get(0)) + "\"; \n");
+			    		
+		    		}
+		    		
+		    		//
+		    		
+		    		if (recordPerRound) {
+		        		
+		    			Utils.writeToFile(mainOutputWriter, "R, " + hider.toString() + "," + hider.printRoundStats() + ",");
+		    			
+		    			Utils.talk("Main", hider.toString() + "," + hider.printRoundStats());
+		    			
+		    			for( Seeker seeker : seekers ) {
+		    				
+		    				Utils.writeToFile(mainOutputWriter, seeker.toString() + "," + seeker.printRoundStats() + ",");
+		    				
+		    				Utils.talk("Main ", seeker.toString() + "," + seeker.printRoundStats());
+		    				
+		    			}
+		    			
+		    			Utils.writeToFile(mainOutputWriter, "\n");
+		    			
+		        	}
+		    		
+		    		graphController.notifyEndOfRound(this);
+		    		
+		    		hider.endOfRound();
+		    		
+		    		for (Seeker seeker : seekers) {
+		    			
+		    			seeker.endOfRound();
+		    			
+		    		}
+		    		
 				}
 				
-				graphController.clearHideLocations(this);
-	    		
-	    		// Visualise first hider and first seeker, for novelty, mainly.
-	    		
-	    		Utils.writeToFile(outputJavascript, "hidden[" + i + "] = \"" + hiders.get(0).getHideLocations() + "\"; \n");
-	    		
-	    		Utils.writeToFile(outputJavascript, "path[" + i + "] = \"" + graphController.latestRoundPaths(this, seekers.get(0)) + "\"; \n");
-	    		
-	    		//
-	    		
-	    		if (recordPerRound) {
-	        		
-	    			Utils.writeToFile(mainOutputWriter, "R, " + hider.toString() + "," + hider.printRoundStats() + ",");
-	    			
-	    			Utils.talk("Main", hider.toString() + "," + hider.printRoundStats());
-	    			
-	    			for( Seeker seeker : seekers ) {
-	    				
-	    				Utils.writeToFile(mainOutputWriter, seeker.toString() + "," + seeker.printRoundStats());
-	    				
-	    				Utils.talk("Main ", seeker.toString() + "," + seeker.printRoundStats());
-	    				
-	    			}
-	    			
-	    			Utils.writeToFile(mainOutputWriter, "\n");
-	    			
-	        	}
-	    		
-	    		graphController.notifyEndOfRound(this);
-	    		
-	    		hider.endOfRound();
-	    		
-	    		for (Seeker seeker : seekers) {
-	    			
-	    			seeker.endOfRound();
-	    			
-	    		}
-	    		
-			}
-			
-			//
-	    		
-	    	ArrayList<String> javascriptOutputTemplate = Utils.readFromFile(Utils.FILEPREFIX + "data/js/vis-template.js");
-	    	
-	    	for ( String line : javascriptOutputTemplate ) {
-	    		
-	    		Utils.writeToFile(outputJavascript, line + "\n");
-	    		
-	    	}
-	    			
-			ArrayList<String> firstHalfHTMLTemplate = Utils.readFromFile(Utils.FILEPREFIX + "data/template/vis-template-1.html");
-			
-			for (String line : firstHalfHTMLTemplate) {
-			
-				Utils.writeToFile(outputHTML, line + "\n");
-				
-			}
-			
-			Utils.writeToFile(outputHTML, "<script type=\"text/javascript\" src=\"js/data/" + currentSimulationIdentifier + "-vis.js\"></script>");
-	    	
-			ArrayList<String> secondHalfHTMLTemplate = Utils.readFromFile(Utils.FILEPREFIX + "data/template/vis-template-2.html");
-			
-			for (String line : secondHalfHTMLTemplate) {
-				
-				Utils.writeToFile(outputHTML, line + "\n");
-				
-			}
-			
-			// Output hider stats
-			
-			Utils.talk("Main", "End of game \n------------------------------------------");
-			
-			hider.endOfGame();
-			
-			System.out.println("Main" + hider.toString() + "," + hider.printGameStats());
-			
-			//if ( !recordPerRound ) {
-			
-				Utils.writeToFile(mainOutputWriter, "G, " + hider.toString() + "," + hider.printGameStats() + ",");
-				
-		    	// Output costs for Seekers
-			
-				for ( Seeker seeker : seekers ) {
-				
-					seeker.endOfGame();
+				//
+		    	
+				if (OUTPUTJS) {
 					
-					Utils.talk("Main", seeker.toString() + "," + seeker.printGameStats());
+			    	ArrayList<String> javascriptOutputTemplate = Utils.readFromFile(Utils.FILEPREFIX + "data/js/vis-template.js");
+			    	
+			    	for ( String line : javascriptOutputTemplate ) {
+			    		
+			    		Utils.writeToFile(outputJavascript, line + "\n");
+			    		
+			    	}
+			    			
+					ArrayList<String> firstHalfHTMLTemplate = Utils.readFromFile(Utils.FILEPREFIX + "data/template/vis-template-1.html");
 					
-					// Cost per round
+					for (String line : firstHalfHTMLTemplate) {
 					
-					Utils.writeToFile(mainOutputWriter, seeker.toString() + "," + seeker.printGameStats() + ",");
+						Utils.writeToFile(outputHTML, line + "\n");
+						
+					}
 					
+					Utils.writeToFile(outputHTML, "<script type=\"text/javascript\" src=\"js/data/" + currentSimulationIdentifier + "-vis.js\"></script>");
+			    	
+					ArrayList<String> secondHalfHTMLTemplate = Utils.readFromFile(Utils.FILEPREFIX + "data/template/vis-template-2.html");
+					
+					for (String line : secondHalfHTMLTemplate) {
+						
+						Utils.writeToFile(outputHTML, line + "\n");
+						
+					}
+				
 				}
 				
-				Utils.writeToFile(mainOutputWriter, "\n");
-			
-			//}
-			
-			graphController.nextHider(this);
-			
-		} // End of hider loop
+				hider.endOfGame();
+				
+				// Output hider stats
+				
+				if (lastRoundRepeat) {
+					
+					Utils.talk("Main", "End of game \n------------------------------------------");
+					
+					System.out.println("Main" + hider.toString() + "," + hider.printGameStats());
+				
+				}
+				
+				//if ( !recordPerRound ) {
+				
+					if (lastRoundRepeat) Utils.writeToFile(mainOutputWriter, "G, " + hider.toString() + "," + hider.printGameStats() + ",");
+					
+			    	// Output costs for Seekers
+				
+					for ( Seeker seeker : seekers ) {
+					
+						seeker.endOfGame();
+						
+						if (lastRoundRepeat) {
+						
+							Utils.talk("Main", seeker.toString() + "," + seeker.printGameStats());
+						
+							// Cost per round
+						
+							Utils.writeToFile(mainOutputWriter, seeker.toString() + "," + seeker.printGameStats() + ",");
+						
+						}
+						
+					}
+					
+					if (lastRoundRepeat) Utils.writeToFile(mainOutputWriter, "\n");
+				
+				//}
+				
+				graphController.resetGameEnvironment(this);
+				
+			} // End of hider loop
+		
+		} // End of repeat loop
 		
 		try {
 			
 			mainOutputWriter.close();
 			
-			outputJavascript.close();
+			if (OUTPUTJS) {
+				
+				outputJavascript.close();
+				
+				outputHTML.close();
 			
-			outputHTML.close();
+			}
 			
 		} catch (IOException e) {
 			

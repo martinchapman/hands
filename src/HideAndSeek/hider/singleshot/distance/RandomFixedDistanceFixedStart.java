@@ -14,7 +14,7 @@ import Utility.Utils;
  * @author Martin
  *
  */
-public class RandomFixedDistanceFixedStart extends RandomFixedDistance implements Runnable {
+public class RandomFixedDistanceFixedStart extends RandomFixedDistance {
 	
 	/**
 	 * @param graph
@@ -31,9 +31,7 @@ public class RandomFixedDistanceFixedStart extends RandomFixedDistance implement
 	@Override
 	protected StringVertex startNode() {
 		
-		StringVertex[] vertices = new StringVertex[graphController.vertexSet().size()];
-		
-		return graphController.vertexSet().toArray(vertices)[0];
+		return firstNode();
 		
 	}
 	

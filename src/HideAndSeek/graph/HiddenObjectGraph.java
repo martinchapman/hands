@@ -578,9 +578,9 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
     }
     
     /**
-     * 
+     * Resets for experiment with 'next hider'
      */
-    public void nextHider() {
+    public void resetGameEnvironment() {
     	
     	roundNumber = 0;
     	

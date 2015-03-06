@@ -13,6 +13,10 @@ import Utility.Utils;
  * @author Martin
  *
  */
+/**
+ * @author Martin
+ *
+ */
 public abstract class GraphTraverser {
 
 	/**
@@ -58,6 +62,8 @@ public abstract class GraphTraverser {
 		StringVertex[] vertices = new StringVertex[graphController.vertexSet().size()];
 		
 		graphController.vertexSet().toArray(vertices);
+		
+		Utils.talk(this.toString(), graphController.vertexSet().size() + "");
 		
 		return vertices[(int)(Math.random() * vertices.length)];
 		
@@ -235,6 +241,22 @@ public abstract class GraphTraverser {
 			uniquelyVisitedEdges.clear();
 			
 		}
+		
+	}
+	
+	/**
+	 * Flags whether this strategy develops over all rounds.
+	 * Required to test correct number of times (i.e. a single
+	 * set of rounds isn't sufficient if this is true).
+	 */
+	protected boolean strategyOverRounds = false;
+	
+	/**
+	 * 
+	 */
+	public boolean getStrategyOverRounds() {
+		
+		return strategyOverRounds;
 		
 	}
 	
