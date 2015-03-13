@@ -56,7 +56,7 @@ public class BehaviourPrediction  {
 	/**
 	 * 
 	 */
-	private boolean recordFrequencyGraph = true;
+	private boolean recordFrequencyGraph = false;
 	
 	/**
 	 * 

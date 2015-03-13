@@ -87,7 +87,7 @@ public class RandomSet extends HiderLocalGraph {
 			
 			randomVertex = randomNode();
 			
-			// ~MDC Double check.
+			// Double check.
 			// if ( ignoreSet.size() + hideSet.size() >= graphController.vertexSet().size()) ignoreSet = new TreeSet<StringVertex>();
 			
 		}

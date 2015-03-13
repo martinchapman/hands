@@ -12,15 +12,14 @@ import HideAndSeek.seeker.SeekerLocalGraph;
 import Utility.BehaviourPrediction;
 import Utility.Utils;
 
-/* Rather than just learning likely nodes could also learn the PROPERTIES of those nodes desired by a Hider?
-   i.e. doesn't just learn hider always hiding in V20, learns the properties of V20 that attract the Hider to it */
-
 /**
  * @author Martin
  *
  */
 public class HighProbability extends SeekerLocalGraph {
 
+	protected boolean printHighestProbabilityNodes = true;
+	
 	/**
 	 * 
 	 */
@@ -52,6 +51,8 @@ public class HighProbability extends SeekerLocalGraph {
 		behaviourPrediction = new BehaviourPrediction();
 		
 		currentPath = new ArrayList<StringEdge>();
+		
+		lastHighestProbabilityNodes = new ArrayList<StringVertex>();
 		
 	}
 
@@ -123,6 +124,8 @@ public class HighProbability extends SeekerLocalGraph {
 		
 	}
 
+	ArrayList<StringVertex> lastHighestProbabilityNodes;
+	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.seeker.Seeker#endOfRound()
 	 */
@@ -137,6 +140,26 @@ public class HighProbability extends SeekerLocalGraph {
 		/* Recreate list of likely vertices (currently assuming unknown value of K on part of seeker (until all objects are found), 
 		   so just get ALL likely locations) */
 		likelyNodes = behaviourPrediction.rankLikelyHideLocations(predictiveNodes);
+		
+		ArrayList<StringVertex> highestProbabilityNodes = new ArrayList<StringVertex>();
+		
+		for (StringVertex likelyNode : likelyNodes) {
+			
+			if (highestProbabilityNodes.size() == 0 || 
+					behaviourPrediction.getProbability(highestProbabilityNodes.get(highestProbabilityNodes.size() - 1)) 
+					== behaviourPrediction.getProbability(likelyNode) ) {
+			
+				highestProbabilityNodes.add(likelyNode);
+			
+			} else {
+				
+				break;
+				
+			}
+			
+		}
+		
+		Utils.talk(this.toString(), highestProbabilityNodes.size() + " highest probability nodes: " + highestProbabilityNodes);
 		
 	}
 

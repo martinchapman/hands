@@ -46,8 +46,6 @@ public class Deceptive extends RandomSet {
 		
 		createDeceptiveSet(deceptiveNodes);
 		
-		//BinomialProbability bp = new BinomialProbability(deceptionDuration, 100, graphController.vertexSet().size());
-		
 	}
 	
 	/**

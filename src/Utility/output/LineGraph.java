@@ -118,13 +118,13 @@ public class LineGraph extends TraverserGraph {
 
         XYSeries s = new XYSeries(title);
         
-        int gameNumber = 0;
+        int xNumber = 0;
         
         for (Double value : data) {
         	
-        	s.add(gameNumber, value);
+        	s.add(xNumber, value);
         	
-        	gameNumber++;
+        	xNumber++;
         	
         }
         

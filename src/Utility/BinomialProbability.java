@@ -53,10 +53,10 @@ public class BinomialProbability {
 	}
 	
 	/**
-	 * @param minus_r (n)
-	 * @param r (k)
+	 * @param minus_r (n or 'number of trials')
+	 * @param r (k or 'number of successes')
 	 * @param numberOfNodes
-	 * @param numberOfHideLocations
+	 * @param numberOfHideLocations (taken with the above to calculate a probability of success in each trial, e.g. 1 (hide location) / 100 (nodes).)
 	 */
 	public BinomialProbability(int minus_r, int r, int numberOfNodes, int numberOfHideLocations) {
 		
@@ -77,8 +77,8 @@ public class BinomialProbability {
 	}
 	
 	/**
-	 * @param minus_r (n)
-	 * @param r (k)
+	 * @param minus_r (n or 'number of trials')
+	 * @param r (k or 'number of successes')
 	 * @param p
 	 */
 	public BinomialProbability(int minus_r, int r, double p) {
@@ -178,7 +178,7 @@ public class BinomialProbability {
 		// http://www.mathwords.com/b/binomial_probability_formula.htm
 		// BinomialProbability bp = new BinomialProbability(10, 7, 0.25);
 		
-		BinomialProbability bp = new BinomialProbability(99 * 5, 1, 95, 1);
+		BinomialProbability bp = new BinomialProbability(99, 1, 95, 5);
 		
 		for (int i = 1; i <= 100; i++) {
 			
@@ -186,7 +186,7 @@ public class BinomialProbability {
 			
 			int remainingRounds = 100 - deceptionDuration;
 			
-			bp.setMinus_r(remainingRounds * 5);
+			bp.setMinus_r(remainingRounds);
 			
 			bp.setR(deceptionDuration);
 			

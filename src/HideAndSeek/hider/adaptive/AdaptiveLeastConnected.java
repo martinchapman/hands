@@ -3,6 +3,7 @@ package HideAndSeek.hider.adaptive;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
+import HideAndSeek.hider.AdaptiveHiderStrategy;
 import HideAndSeek.hider.singleshot.preference.LeastConnected;
 
 /**
@@ -13,7 +14,7 @@ import HideAndSeek.hider.singleshot.preference.LeastConnected;
  * @author Martin
  *
  */
-public class AdaptiveLeastConnected extends LeastConnected {
+public class AdaptiveLeastConnected extends LeastConnected implements AdaptiveHiderStrategy {
 
 	/**
 	 * @param graphController
@@ -23,6 +24,12 @@ public class AdaptiveLeastConnected extends LeastConnected {
 		
 		super(graphController, numberOfHideLocations);
 
+	}
+
+	@Override
+	public double abilityToPerform() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 	
 }

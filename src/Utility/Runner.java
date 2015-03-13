@@ -73,6 +73,7 @@ public class Runner extends JFrame {
 		  "LowEdgeCostRandomSetStaticBetween",
 		  "RandomSetStaticBetween",
 		  "UniqueRandomSet",
+		  "UniqueRandomSetRepeat",
 		  
 		  "FirstN",
 		  //"RandomDirection",

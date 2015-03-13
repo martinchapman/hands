@@ -12,12 +12,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Hashtable;
-import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
 import org.jfree.ui.RefineryUtilities;
 
-import Utility.Runner;
+import com.panayotis.gnuplot.terminal.PostscriptTerminal;
+
 import Utility.Utils;
 
 /**
@@ -356,7 +356,8 @@ public class OutputManager {
 	 */
 	public void showGraphForAttribute(ArrayList<TraverserRecord> traverserRecords, String gameOrRound, String title, String graphType, String xLabel, String yLabel, String category) {
 		
-		TraverserGraph graph = null;
+		//TraverserGraph graph = null;
+		GNUGraph graph = null;
 		
 		if ( title.length() > 200 ) title = title.substring(0, 200);
 		
@@ -366,7 +367,8 @@ public class OutputManager {
 		
 		if (graphType.equals("Line")) {
 		
-			graph = new LineGraph(title);
+			//graph = new LineGraph(title);
+			graph = new GNULineGraph(title);
 			
 			for ( TraverserRecord traverser : traverserRecords ) {
 				
@@ -400,13 +402,13 @@ public class OutputManager {
 					
 				}
 				
-				((LineGraph) graph).addDataset(traverser.getTraverser(), attributeToValues);
+				((GNULineGraph) graph).addDataset(traverser.getTraverser(), attributeToValues);
 				
 			}
 			
 		} else if (graphType.equals("Bar")) {
 			
-			graph = new BarGraph(title);
+			graph = new GNUBarGraph(title);
 			
 			String globalCategory = "";
 			
@@ -428,11 +430,11 @@ public class OutputManager {
 				
 				if ( yLabel.contains("Score") ) {
 					
-					((BarGraph) graph).addBar(traverser.getAverageGameAttributeValue(yLabel, maxAttributeToValueAllSeries, minAttributeToValueAllSeries), traverser.toString(), localCategory);
+					((GNUBarGraph) graph).addBar(traverser.getAverageGameAttributeValue(yLabel, maxAttributeToValueAllSeries, minAttributeToValueAllSeries), traverser.toString(), localCategory);
 					
 				} else {
 					
-					((BarGraph) graph).addBar(traverser.getAverageGameAttributeValue(yLabel), traverser.toString(), localCategory);
+					((GNUBarGraph) graph).addBar(traverser.getAverageGameAttributeValue(yLabel), traverser.toString(), localCategory);
 					
 				}
 				
@@ -440,15 +442,17 @@ public class OutputManager {
 			
 		}
 		
-		String filename = "figure" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
+		graph.styleGraph();
+
+		String outputPath = "figure" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
 		
-		graph.createChart(filename + " " + title, xLabel, yLabel);
+		graph.createChart(outputPath + " " + title, xLabel, yLabel);
 		
-		graph.exportChartAsEPS(Utils.FILEPREFIX + "data/charts/" + filename + ".eps");
+		graph.exportChartAsEPS(Utils.FILEPREFIX + "data/charts/" + outputPath + ".eps");
 		
 		try {
 		
-			Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "/data/charts/figures.bib", true), "\n @FIG{" + filename + ", main = {}, add = { " + title + " }, file = {/Users/Martin/Dropbox/workspace/SearchGames/output/data/charts/" + filename + "}, source = {}}");
+			Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "/data/charts/figures.bib", true), "\n @FIG{" + outputPath + ", main = {}, add = { " + title + " }, file = {/Users/Martin/Dropbox/workspace/SearchGames/output/data/charts/" + outputPath + "}, source = {}}");
 		
 		} catch (IOException e) {
 			
@@ -456,11 +460,11 @@ public class OutputManager {
 		
 		}
 		
-		graph.pack();
+		//graph.pack();
 		
-		RefineryUtilities.centerFrameOnScreen(graph);
+		//RefineryUtilities.centerFrameOnScreen(graph);
 		 
-		graph.setVisible(true);
+		//graph.setVisible(true);
 		
 	}
 	

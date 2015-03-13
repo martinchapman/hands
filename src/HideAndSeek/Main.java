@@ -19,6 +19,8 @@ import HideAndSeek.hider.repeatgame.deceptive.Deceptive;
 import HideAndSeek.hider.repeatgame.deceptive.EpsilonDeceptive;
 import HideAndSeek.hider.repeatgame.deceptive.GroupedDeceptive;
 import HideAndSeek.hider.repeatgame.deceptive.LeastConnectedDeceptive;
+import HideAndSeek.hider.repeatgame.random.UniqueRandomSet;
+import HideAndSeek.hider.repeatgame.random.UniqueRandomSetRepeat;
 import HideAndSeek.hider.singleshot.cost.FixedStartVariableLowEdgeCost;
 import HideAndSeek.hider.singleshot.cost.VariableLowEdgeCost;
 import HideAndSeek.hider.singleshot.cost.VariableLowEdgeCostStaticBetween;
@@ -42,7 +44,6 @@ import HideAndSeek.hider.singleshot.random.RandomSet;
 import HideAndSeek.hider.singleshot.random.RandomSetStaticBetween;
 import HideAndSeek.hider.singleshot.random.RandomStaticBetween;
 import HideAndSeek.hider.singleshot.random.RandomVariableHidePotential;
-import HideAndSeek.hider.singleshot.random.UniqueRandomSet;
 import HideAndSeek.hider.singleshot.staticlocations.StaticLocations;
 import HideAndSeek.seeker.Seeker;
 import HideAndSeek.seeker.repeatgame.probability.HighProbability;
@@ -55,8 +56,8 @@ import HideAndSeek.seeker.singleshot.coverage.BreadthFirstSearchLowCost;
 import HideAndSeek.seeker.singleshot.coverage.DepthFirstSearch;
 import HideAndSeek.seeker.singleshot.coverage.DepthFirstSearchLowCost;
 import HideAndSeek.seeker.singleshot.coverage.VariableBacktrackPath;
-import HideAndSeek.seeker.singleshot.nonhomo.LeastConnectedFirst;
-import HideAndSeek.seeker.singleshot.nonhomo.MostConnectedFirst;
+import HideAndSeek.seeker.singleshot.preference.LeastConnectedFirst;
+import HideAndSeek.seeker.singleshot.preference.MostConnectedFirst;
 import HideAndSeek.seeker.singleshot.random.ConstrainedRandomWalk;
 import HideAndSeek.seeker.singleshot.random.FixedStartRandomWalk;
 import HideAndSeek.seeker.singleshot.random.RandomWalk;
@@ -260,6 +261,12 @@ public class Main {
 			if (hiderType.getElement0().equals("UniqueRandomSet")) {
 				
 				allHidingAgents.add(new UniqueRandomSet(graphController, numberOfHideLocations));
+			
+			}
+			
+			if (hiderType.getElement0().equals("UniqueRandomSetRepeat")) {
+				
+				allHidingAgents.add(new UniqueRandomSetRepeat(graphController, numberOfHideLocations));
 			
 			} 
 			
