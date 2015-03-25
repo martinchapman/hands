@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import HideAndSeek.GraphTraverser;
+import HideAndSeek.GraphTraversingAgent;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.HiddenObjectGraph;
 import HideAndSeek.graph.StringEdge;
@@ -15,7 +15,7 @@ import Utility.Utils;
  * @author Martin
  *
  */
-public abstract class HiderLocalGraph extends Hider {
+public abstract class HiderLocalGraph extends HidingAgent {
 	
 	/**
 	 * 
@@ -37,7 +37,7 @@ public abstract class HiderLocalGraph extends Hider {
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
-	protected StringVertex nextNode(StringVertex currentNode) {
+	public StringVertex nextNode(StringVertex currentNode) {
 		
 		addUniquelyVisitedNode(currentNode);
 		

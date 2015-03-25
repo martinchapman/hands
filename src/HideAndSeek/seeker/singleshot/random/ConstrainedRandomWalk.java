@@ -3,9 +3,9 @@ package HideAndSeek.seeker.singleshot.random;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.seeker.Seeker;
+import HideAndSeek.seeker.SeekingAgent;
 
-public class ConstrainedRandomWalk extends Seeker {
+public class ConstrainedRandomWalk extends SeekingAgent {
 
 	public ConstrainedRandomWalk(
 			GraphController <StringVertex, StringEdge> graphController) {
@@ -15,13 +15,13 @@ public class ConstrainedRandomWalk extends Seeker {
 	}
 
 	@Override
-	protected StringVertex nextNode(StringVertex currentNode) {
+	public StringVertex nextNode(StringVertex currentNode) {
 
 		return connectedNode(currentNode);
 	}
 
 	@Override
-	protected StringVertex startNode() {
+	public StringVertex startNode() {
 
 		return randomNode();
 		

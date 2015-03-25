@@ -10,6 +10,8 @@ import java.util.List;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
+import HideAndSeek.hider.AdaptiveHider;
+import HideAndSeek.hider.AdaptiveHiderStrategy;
 import HideAndSeek.hider.Hider;
 import HideAndSeek.hider.repeatgame.bias.FixedStartVariableBias;
 import HideAndSeek.hider.repeatgame.bias.VariableBias;
@@ -21,6 +23,8 @@ import HideAndSeek.hider.repeatgame.deceptive.GroupedDeceptive;
 import HideAndSeek.hider.repeatgame.deceptive.LeastConnectedDeceptive;
 import HideAndSeek.hider.repeatgame.random.UniqueRandomSet;
 import HideAndSeek.hider.repeatgame.random.UniqueRandomSetRepeat;
+import HideAndSeek.hider.repeatgame.random.adaptable.RandomSetAdaptable;
+import HideAndSeek.hider.repeatgame.random.adaptable.UniqueRandomSetRepeatAdaptable;
 import HideAndSeek.hider.singleshot.cost.FixedStartVariableLowEdgeCost;
 import HideAndSeek.hider.singleshot.cost.VariableLowEdgeCost;
 import HideAndSeek.hider.singleshot.cost.VariableLowEdgeCostStaticBetween;
@@ -45,10 +49,15 @@ import HideAndSeek.hider.singleshot.random.RandomSetStaticBetween;
 import HideAndSeek.hider.singleshot.random.RandomStaticBetween;
 import HideAndSeek.hider.singleshot.random.RandomVariableHidePotential;
 import HideAndSeek.hider.singleshot.staticlocations.StaticLocations;
+import HideAndSeek.seeker.AdaptiveSeeker;
+import HideAndSeek.seeker.AdaptiveSeekerStrategy;
 import HideAndSeek.seeker.Seeker;
 import HideAndSeek.seeker.repeatgame.probability.HighProbability;
 import HideAndSeek.seeker.repeatgame.probability.HighProbabilityRepetitionCheck;
+import HideAndSeek.seeker.repeatgame.probability.InverseHighProbability;
 import HideAndSeek.seeker.repeatgame.probability.VariableHistoryHighProbability;
+import HideAndSeek.seeker.repeatgame.probability.adaptable.HighProbabilityAdaptable;
+import HideAndSeek.seeker.repeatgame.probability.adaptable.InverseHighProbabilityAdaptable;
 import HideAndSeek.seeker.singleshot.cost.LowEdgeCost;
 import HideAndSeek.seeker.singleshot.coverage.BacktrackPath;
 import HideAndSeek.seeker.singleshot.coverage.BreadthFirstSearch;
@@ -519,10 +528,20 @@ public class Main {
 			
 			//
 			
+			boolean refreshDeceptiveNodes = false;
+			
+			if (hiderType.getElement0().contains("RefreshDeceptiveNodes")) { 
+				
+				refreshDeceptiveNodes = true;
+				
+				hiderType = Pair.createPair(hiderType.getElement0().substring(0, hiderType.getElement0().indexOf("RefreshDeceptiveNodes")), hiderType.getElement1());
+			
+			}
+			
 			// ~MDC Values (deception duration and repeat interval) considered to be 'optimal' via experimentation
 			if (hiderType.getElement0().equals("SetDeceptionDurationSetDeceptionIntervalSetRepeatDuration")) {
 				
-				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, 2, 0, (int)(totalRounds / 2), true));
+				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, 1, 0, (int)(totalRounds / 2), refreshDeceptiveNodes));
 				
 				allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptionDurationSetDeceptionIntervalSetRepeatDuration");
 				
@@ -530,7 +549,7 @@ public class Main {
 			
 			if (hiderType.getElement0().equals("SetDeceptionDurationVariableDeceptionIntervalSetRepeatDuration")) {
 				
-				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, 1, gameNumber, totalRounds, true));
+				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, 1, gameNumber, totalRounds, refreshDeceptiveNodes));
 			
 				allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptionDurationVariableDeceptionIntervalSetRepeatDuration");
 				
@@ -538,7 +557,7 @@ public class Main {
 			
 			if (hiderType.getElement0().equals("VariableDeceptionDurationSetDeceptionIntervalSetRepeatDuration")) {
 				
-				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, gameNumber, 0, totalRounds, true));
+				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, gameNumber, 0, totalRounds, refreshDeceptiveNodes));
 			
 				allHidingAgents.get(allHidingAgents.size() - 1).setName("VariableDeceptionDurationSetDeceptionIntervalSetRepeatDuration");
 				
@@ -548,13 +567,12 @@ public class Main {
 				
 				final int MAXINTERVAL = totalGames;
 				
-				// ~MDC There's a multi-dimensional graph to be had with this!
-				for ( int interval = 0; interval <= MAXINTERVAL; interval++) {
+				for ( int interval = 0; interval < MAXINTERVAL; interval++) {
 					
-					allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, gameNumber, MAXINTERVAL, totalRounds, true));
+					allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, gameNumber, MAXINTERVAL, totalRounds, refreshDeceptiveNodes));
 					
 					allHidingAgents.get(allHidingAgents.size() - 1).setName("VariableDeceptionDurationVariableDeceptionInterval-" + interval);
-				
+					
 				}
 				
 			}
@@ -563,7 +581,7 @@ public class Main {
 			
 			if (hiderType.getElement0().equals("SetDeceptionDurationSetDeceptionIntervalVariableRepeatDuration")) {
 				
-				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, 1, 0, gameNumber, true));
+				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, 1, 0, gameNumber, refreshDeceptiveNodes));
 				
 				allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptionDurationSetDeceptionIntervalVariableRepeatDuration");
 				
@@ -571,7 +589,7 @@ public class Main {
 			
 			if (hiderType.getElement0().equals("SetDeceptionDurationSetDeceptionIntervalVariableRepeatDuration-NonUniqueRandom")) {
 				
-				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, 1, 0, gameNumber, true, false));
+				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, 1, 0, gameNumber, refreshDeceptiveNodes, false));
 				
 				allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptionDurationSetDeceptionIntervalVariableRepeatDuration");
 				
@@ -579,7 +597,7 @@ public class Main {
 
 			if (hiderType.getElement0().equals("VariableDeceptiveNodesSetDeceptionDurationSetDeceptionIntervalSetRepeatDuration")) {
 				
-				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, gameNumber, 1, 0, totalRounds, true));
+				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, gameNumber, 1, 0, totalRounds, refreshDeceptiveNodes));
 				
 				allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptionDurationSetDeceptionIntervalVariableDeceptiveNodes");
 				
@@ -595,7 +613,7 @@ public class Main {
 			
 			if (hiderType.getElement0().equals("LeastConnectedDeceptive")) {
 				
-				allHidingAgents.add(new LeastConnectedDeceptive(graphController, numberOfHideLocations, numberOfHideLocations, 1, 0, totalRounds, true));
+				allHidingAgents.add(new LeastConnectedDeceptive(graphController, numberOfHideLocations, numberOfHideLocations, 1, 0, totalRounds, refreshDeceptiveNodes));
 				
 			}
 			
@@ -609,7 +627,7 @@ public class Main {
 			
 			if (hiderType.getElement0().equals("GroupedDeceptive")) {
 				
-				allHidingAgents.add(new GroupedDeceptive(graphController, numberOfHideLocations, numberOfHideLocations, 1, 0, totalRounds, true));
+				allHidingAgents.add(new GroupedDeceptive(graphController, numberOfHideLocations, numberOfHideLocations, 1, 0, totalRounds, refreshDeceptiveNodes));
 				
 			}
 			
@@ -635,6 +653,22 @@ public class Main {
 				allHidingAgents.add(new GroupedDeceptive(graphController, numberOfHideLocations, numberOfHideLocations, (int)(totalRounds / 2), 0, (int)(totalRounds / 2), 10));
 				
 				allHidingAgents.get(allHidingAgents.size() - 1).setName("VariableDeceptiveSets");
+				
+			}
+			
+			// Adaptive:
+			
+			ArrayList<AdaptiveHiderStrategy> strategyPortfolio = new ArrayList<AdaptiveHiderStrategy>();
+			
+			if (hiderType.getElement0().equals("AdaptiveRandom")) {
+				
+				strategyPortfolio.clear();
+				
+				strategyPortfolio.add(new RandomSetAdaptable(graphController, numberOfHideLocations));
+				
+				strategyPortfolio.add(new UniqueRandomSetRepeatAdaptable(graphController, numberOfHideLocations));
+				
+				allHidingAgents.add(new AdaptiveHider<AdaptiveHiderStrategy>(graphController, totalRounds, strategyPortfolio.get(1), strategyPortfolio, 0.5, 0.5, 0.5, false));
 				
 			}
 			
@@ -773,6 +807,27 @@ public class Main {
 				
 			}
 			
+			if (seekerType.getElement0().equals("InverseHighProbability")) {
+				
+				allSeekingAgents.add(new InverseHighProbability(graphController));
+				
+			}
+			
+			// Adaptive:
+			
+			ArrayList<AdaptiveSeekerStrategy> strategyPortfolio = new ArrayList<AdaptiveSeekerStrategy>();
+			
+			if (seekerType.getElement0().equals("AdaptiveHighProbability")) {
+				
+				strategyPortfolio.clear();
+				
+				strategyPortfolio.add(new InverseHighProbabilityAdaptable(graphController, Integer.MAX_VALUE));
+				
+				strategyPortfolio.add(new HighProbabilityAdaptable(graphController));
+				
+				allSeekingAgents.add(new AdaptiveSeeker<AdaptiveSeekerStrategy>(graphController, totalRounds, strategyPortfolio.get(1), strategyPortfolio, 0.5, 0.5, 0.5, false));
+				
+			}
 			
 		}
 		
@@ -830,20 +885,21 @@ public class Main {
     	 * Main rounds loop
     	 * 
     	 * * * * * * * * * * * * */
-		
+		// Default repeat.
 		int repeatAllRounds = 1;
 		
 		// Pre-checks for presence of strategy which is defined by a sequence of rounds,
-		// not individual ones, and thus must be tested multiple times in addition.
+		// not individual ones (e.g. deceptive), and thus must be tested multiple times, as sets of rounds, in addition.
 		for ( Hider hider : hiders ) {
 			
-			if (hider.getStrategyOverRounds()) repeatAllRounds = rounds;
+			// Dramatically affects the size of the output files
+			if (hider.getStrategyOverRounds()) repeatAllRounds = 10; //rounds;
 			
 		}
 		
 		for ( Seeker  seeker : seekers ) {
 			
-			if (seeker.getStrategyOverRounds()) repeatAllRounds = rounds;
+			if (seeker.getStrategyOverRounds()) repeatAllRounds = 10; //rounds;
 			
 		}
 		
@@ -908,8 +964,6 @@ public class Main {
 		    			
 		        	}
 		    		
-		    		graphController.notifyEndOfRound(this);
-		    		
 		    		hider.endOfRound();
 		    		
 		    		for (Seeker seeker : seekers) {
@@ -917,6 +971,9 @@ public class Main {
 		    			seeker.endOfRound();
 		    			
 		    		}
+		    		
+		    		// Must be notified before hider and seeker are if these two agents wish to print latest score information
+		    		graphController.notifyEndOfRound(this);
 		    		
 				}
 				

@@ -7,13 +7,13 @@ import java.util.List;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.seeker.Seeker;
+import HideAndSeek.seeker.SeekingAgent;
 
 /**
  * @author Martin
  *
  */
-public class LowEdgeCost extends Seeker {
+public class LowEdgeCost extends SeekingAgent {
 
 	/**
 	 * @param graph
@@ -59,7 +59,7 @@ public class LowEdgeCost extends Seeker {
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
-	protected StringVertex nextNode(StringVertex currentNode) {
+	public StringVertex nextNode(StringVertex currentNode) {
 
 		return connectedNode(currentNode);
 		
@@ -69,7 +69,7 @@ public class LowEdgeCost extends Seeker {
 	 * @see HideAndSeek.GraphTraverser#startNode()
 	 */
 	@Override
-	protected StringVertex startNode() {
+	public StringVertex startNode() {
 
 		return randomNode();
 		

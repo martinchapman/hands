@@ -3,7 +3,7 @@ package HideAndSeek.hider.singleshot.random;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.Hider;
+import HideAndSeek.hider.HidingAgent;
 
 /**
  * 

@@ -3,7 +3,7 @@ package HideAndSeek.hider.singleshot.distance;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.Hider;
+import HideAndSeek.hider.HidingAgent;
 import Utility.Utils;
 
 /**
@@ -28,7 +28,7 @@ public class RandomFixedDistanceStaticBetween extends RandomFixedDistance implem
 	 * @see HideAndSeek.hider.Hider#startNode()
 	 */
 	@Override
-	protected StringVertex startNode() {
+	public StringVertex startNode() {
 
 		return getCurrentNode();
 

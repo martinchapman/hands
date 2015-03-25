@@ -7,7 +7,7 @@ import java.util.List;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.seeker.Seeker;
+import HideAndSeek.seeker.SeekingAgent;
 
 /**
  * @author Martin
@@ -28,7 +28,7 @@ public class LowEdgeCostRandomFixedDistanceStaticBetween extends LowEdgeCostRand
 	 * @see HideAndSeek.GraphTraverser#startNode()
 	 */
 	@Override
-	protected StringVertex startNode() {
+	public StringVertex startNode() {
 
 		return getCurrentNode();
 		

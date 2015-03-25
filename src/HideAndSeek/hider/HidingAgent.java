@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import HideAndSeek.GraphTraverser;
+import HideAndSeek.GraphTraversingAgent;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
@@ -14,7 +14,7 @@ import Utility.Utils;
  * @author Martin
  *
  */
-public abstract class Hider extends GraphTraverser implements Runnable {
+public abstract class HidingAgent extends GraphTraversingAgent implements Runnable, Hider {
 
 	/**
 	 * 
@@ -26,9 +26,10 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 	 */
 	protected ArrayList<StringVertex> hideLocations;
 	
-	/**
-	 * @return
+	/* (non-Javadoc)
+	 * @see HideAndSeek.hider.HiderTemplate#getHideLocations()
 	 */
+	@Override
 	public ArrayList<StringVertex> getHideLocations() {
 		
 		return hideLocations;
@@ -40,66 +41,46 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 	 */
 	protected ArrayList<StringVertex> exploredNodes;
 	
-	/**
-	 * @return
+	/* (non-Javadoc)
+	 * @see HideAndSeek.hider.HiderTemplate#getExploredNodes()
 	 */
+	@Override
 	public ArrayList<StringVertex> getExploredNodes() {
 		
 		return exploredNodes;
 	
 	}
-
-	/**
-	 * 
-	 */
-	private String ID;
-	
-	/**
-	 * @param ID
-	 */
-	public void setName(String name) {
-		
-		this.name = name;
-		
-	}
 	
 	/**
 	 * @param graph
 	 */
-	public Hider(GraphController <StringVertex, StringEdge> graphController, int numberOfHideLocations) {
+	public HidingAgent(GraphController <StringVertex, StringEdge> graphController, int numberOfHideLocations) {
 	
 		super(graphController);
 		
 		this.numberOfHideLocations = numberOfHideLocations;
 		
-		name = this.getClass().toString().substring(this.getClass().toString().lastIndexOf('.') + 1, this.getClass().toString().length());
-		
-		ID = "" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime()) + Math.random() * 100;
-
 		hideLocations = new ArrayList<StringVertex>();
 		
 		exploredNodes = new ArrayList<StringVertex>();
 		
 	}
 	
-	/**
-	 * 
-	 */
-	private String name;
-	
 	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
+	 * @see HideAndSeek.hider.HiderTemplate#toString()
 	 */
+	@Override
 	public String toString() {
 		
 		return "h" + name;
 		
 	}
 	
-	/**
-	 * @param location
+	/* (non-Javadoc)
+	 * @see HideAndSeek.hider.HiderTemplate#addHideLocation(HideAndSeek.graph.StringVertex)
 	 */
-	protected void addHideLocation(StringVertex location) {
+	@Override
+	public void addHideLocation(StringVertex location) {
 		
 		Utils.talk(toString(), "---------------------------------- Hiding in " + location);
 		
@@ -111,7 +92,7 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 	}
 	
 	/* (non-Javadoc)
-	 * @see java.lang.Runnable#run()
+	 * @see HideAndSeek.hider.HiderTemplate#run()
 	 */
 	@Override
 	public void run() {
@@ -121,28 +102,6 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 		startPlaying();
 		
 		hide();
-		
-	}
-	
-	/**
-	 * 
-	 */
-	private StringVertex currentNode = null;
-	
-	/**
-	 * @return
-	 */
-	protected StringVertex getCurrentNode() {
-		
-		if (currentNode == null) {
-			
-			return randomNode();
-			
-		} else {
-			
-			return currentNode;
-			
-		}
 		
 	}
 	
@@ -200,35 +159,31 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 		
 	}
 	
-	/**
-	 * @return
+	/* (non-Javadoc)
+	 * @see HideAndSeek.hider.HiderTemplate#printRoundStats()
 	 */
+	@Override
 	public String printRoundStats() {
 		
-		return super.printRoundStats() + "Cost, " + graphController.latestRoundCosts(this) + ",Path," + exploredNodes.toString().replace(",", "");
+		return super.printRoundStats() + "Cost, " + graphController.latestRoundCosts(this, false) + ",Path," + exploredNodes.toString().replace(",", "");
 		
 	}
-	
-	/**
-	 * @param rounds
-	 * @return
-	 */
-	public String printGameStats() {
-		
-		return super.printGameStats() + "Cost, " + graphController.requestAverageGameCosts(this) + 
-			 ", Score, " + graphController.requestAverageHiderScore(this);
-		
-	}
-	
-	
-	/**
-	 * Record of the number of rounds passed 
-	 */
-	protected int roundsPassed = 0;
 	
 	/* (non-Javadoc)
-	 * @see HideAndSeek.GraphTraverser#endOfRound()
+	 * @see HideAndSeek.hider.HiderTemplate#printGameStats()
 	 */
+	@Override
+	public String printGameStats() {
+		
+		return super.printGameStats() + "Cost, " + graphController.averageGameCosts(this);
+		
+	}
+	
+
+	/* (non-Javadoc)
+	 * @see HideAndSeek.hider.HiderTemplate#endOfRound()
+	 */
+	@Override
 	public void endOfRound() {
 		
 		super.endOfRound();
@@ -237,28 +192,12 @@ public abstract class Hider extends GraphTraverser implements Runnable {
 		
 		exploredNodes.clear();
 		
-		roundsPassed++;
-		
 	}
 	
 	/* (non-Javadoc)
-	 * @see HideAndSeek.GraphTraverser#endOfGame()
+	 * @see HideAndSeek.hider.HiderTemplate#hideHere(HideAndSeek.graph.StringVertex)
 	 */
-	public void endOfGame(){
-		
-		roundsPassed = 0;
-		
-	}
-	
-	/**
-	 * Given a vertex, do I hide in that vertex, based upon
-	 * the content of this method
-	 * 
-	 * Note: returning 'true', with non-static inter-round
-	 * movement, will make this choice, effectively, random.
-	 * @param vertex
-	 * @return
-	 */
-	protected abstract boolean hideHere(StringVertex vertex);
+	@Override
+	public abstract boolean hideHere(StringVertex vertex);
 
 }

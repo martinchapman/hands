@@ -61,7 +61,7 @@ public class LeastConnectedDeceptive extends Deceptive {
 	/* (non-Javadoc)
 	 * @see HideAndSeek.hider.singleshot.random.RandomSet#hideHere(HideAndSeek.graph.StringVertex)
 	 */
-	protected boolean hideHere(StringVertex vertex) {
+	public boolean hideHere(StringVertex vertex) {
 		
 		leastConnectedMechanism.hideHereInterface(vertex);
 		

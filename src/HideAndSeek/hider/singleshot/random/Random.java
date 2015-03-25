@@ -3,7 +3,7 @@ package HideAndSeek.hider.singleshot.random;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.Hider;
+import HideAndSeek.hider.HidingAgent;
 
 /**
  * 
@@ -13,7 +13,7 @@ import HideAndSeek.hider.Hider;
  * @author Martin
  *
  */
-public class Random extends Hider {
+public class Random extends HidingAgent {
 
 	/**
 	 * @param graph
@@ -33,7 +33,7 @@ public class Random extends Hider {
 	 * @see HideAndSeek.hider.Hider#hideHere(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
-	protected boolean hideHere(StringVertex vertex) {
+	public boolean hideHere(StringVertex vertex) {
 		
 		if (Math.random() < HIDEPOTENTIAL) { return true; }
 		
@@ -45,7 +45,7 @@ public class Random extends Hider {
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
-	protected StringVertex nextNode(StringVertex currentNode) {
+	public StringVertex nextNode(StringVertex currentNode) {
 		
 		return connectedNode(currentNode);
 		
@@ -55,7 +55,7 @@ public class Random extends Hider {
 	 * @see HideAndSeek.GraphTraverser#startNode()
 	 */
 	@Override
-	protected StringVertex startNode() {
+	public StringVertex startNode() {
 		
 		return randomNode();
 		

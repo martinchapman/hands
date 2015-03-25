@@ -55,7 +55,7 @@ public class VariableBias extends VariableLowEdgeCost {
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
-	protected StringVertex nextNode(StringVertex currentNode) {
+	public StringVertex nextNode(StringVertex currentNode) {
 		
 		List<StringEdge> connectedEdges = getConnectedEdges(currentNode);
 		
@@ -207,7 +207,7 @@ public class VariableBias extends VariableLowEdgeCost {
 	 * @see HideAndSeek.GraphTraverser#startNode()
 	 */
 	@Override
-	protected StringVertex startNode() {
+	public StringVertex startNode() {
 
 		return randomNode();
 		

@@ -56,7 +56,7 @@ public class CostSensitiveHider extends VariableBias {
 	 */
 	protected void adjustBias() {
 		
-		double costChange = ( ( graphController.requestRoundCost(roundsPassed, this) - graphController.requestRoundCost(roundsPassed - 1, this) ) / graphController.requestRoundCost(roundsPassed - 1, this) )	* 100;
+		double costChange = ( ( graphController.roundCost(roundsPassed, this) - graphController.roundCost(roundsPassed - 1, this) ) / graphController.roundCost(roundsPassed - 1, this) )	* 100;
 		
 		Utils.talk(toString(), "Cost change: " + costChange);
 		

@@ -3,7 +3,7 @@ package HideAndSeek.hider.singleshot.distance;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.Hider;
+import HideAndSeek.hider.HidingAgent;
 import Utility.Utils;
 
 /**
@@ -13,7 +13,7 @@ import Utility.Utils;
  * @author Martin
  *
  */
-public class RandomFixedDistance extends Hider {
+public class RandomFixedDistance extends HidingAgent {
 	
 	/**
 	 * @param graph
@@ -43,7 +43,7 @@ public class RandomFixedDistance extends Hider {
 	/* (non-Javadoc)
 	 * @see HideAndSeek.hider.Hider#hideHere(HideAndSeek.graph.StringVertex)
 	 */
-	protected boolean hideHere(StringVertex vertex) {
+	public boolean hideHere(StringVertex vertex) {
 		
 		Utils.talk(toString(), "exploredNodes.size() " + exploredNodes.size() + " minHideDistance: " + minHideDistance );
 		
@@ -63,7 +63,7 @@ public class RandomFixedDistance extends Hider {
 	 * @see HideAndSeek.hider.Hider#nextNode(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
-	protected StringVertex nextNode(StringVertex currentNode) {
+	public StringVertex nextNode(StringVertex currentNode) {
 		
 		return connectedNode(currentNode);
 		
@@ -73,7 +73,7 @@ public class RandomFixedDistance extends Hider {
 	 * @see HideAndSeek.hider.Hider#startNode()
 	 */
 	@Override
-	protected StringVertex startNode() {
+	public StringVertex startNode() {
 		
 		return randomNode();
 		

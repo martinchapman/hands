@@ -51,7 +51,7 @@ public class VariableBiasLocations extends VariableBias {
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
-	protected StringVertex nextNode(StringVertex currentNode) {
+	public StringVertex nextNode(StringVertex currentNode) {
 		
 		if ( hideLocations.size() >= numberOfBiasLocations ) {
 			

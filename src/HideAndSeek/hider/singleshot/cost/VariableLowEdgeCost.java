@@ -7,7 +7,7 @@ import java.util.List;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.Hider;
+import HideAndSeek.hider.HidingAgent;
 
 /**
  * A hider who's tendency to choose cheap edges over random edges
@@ -18,7 +18,7 @@ import HideAndSeek.hider.Hider;
  * 
  * @author Martin
  */
-public class VariableLowEdgeCost extends Hider {
+public class VariableLowEdgeCost extends HidingAgent {
 
 	
 	/**
@@ -39,7 +39,7 @@ public class VariableLowEdgeCost extends Hider {
 	 * @see HideAndSeek.hider.Hider#hideHere(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
-	protected boolean hideHere(StringVertex vertex) {
+	public boolean hideHere(StringVertex vertex) {
 		
 		return true;
 		
@@ -110,7 +110,7 @@ public class VariableLowEdgeCost extends Hider {
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
-	protected StringVertex nextNode(StringVertex currentNode) {
+	public StringVertex nextNode(StringVertex currentNode) {
 		
 		return connectedNode(currentNode);
 		
@@ -160,7 +160,7 @@ public class VariableLowEdgeCost extends Hider {
 	 * @see HideAndSeek.GraphTraverser#startNode()
 	 */
 	@Override
-	protected StringVertex startNode() {
+	public StringVertex startNode() {
 
 		return randomNode();
 		

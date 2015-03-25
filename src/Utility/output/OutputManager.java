@@ -112,7 +112,7 @@ public class OutputManager {
 							}
 
 						} catch (NumberFormatException e) { 
-						
+							
 							// If we come across an entry for a Hider
 							if ( word.charAt(0) == 'h') {
 							
@@ -245,6 +245,19 @@ public class OutputManager {
 	}
 	
 	/**
+	 * @param traversers
+	 * @param gameOrRound
+	 * @param title
+	 * @param attribute
+	 * @param category
+	 */
+	public void show3DGraphForAttribute(ArrayList<TraverserRecord> traversers, String gameOrRound, String title, String attribute, String category) {
+		
+		showGraphForAttribute(traversers, gameOrRound, title, "3D", "Game Number", attribute, category);
+		
+	}
+	
+	/**
 	 * @param traverserRecords
 	 * @return
 	 */
@@ -365,12 +378,28 @@ public class OutputManager {
 		
 		Hashtable<String, Double> minAttributeToValueAllSeries = minForAttributeInAllSeries(traverserRecords);
 		
-		if (graphType.equals("Line")) {
+		if (graphType.equals("Line") || graphType.equals("3D")) {
 		
-			//graph = new LineGraph(title);
-			graph = new GNULineGraph(title);
+			if (graphType.equals("Line")) {
+			
+				//graph = new LineGraph(title);
+				graph = new GNULineGraph(title);
+			
+			} else if (graphType.equals("3D")) {
+				
+				graph = new GNU3DGraph(title);
+				
+			}
+			
+			Hashtable<String, ArrayList<ArrayList<Double>>> multipleAttributeToValues = new Hashtable<String, ArrayList<ArrayList<Double>>>();
 			
 			for ( TraverserRecord traverser : traverserRecords ) {
+				
+				String traverserName = traverser.toString();
+				
+				if (traverserName.contains("-")) traverserName = traverserName.substring(0, traverserName.indexOf("-"));
+				
+				if ( !multipleAttributeToValues.containsKey(traverserName)) multipleAttributeToValues.put(traverserName, new ArrayList<ArrayList<Double>>());
 				
 				ArrayList<Double> attributeToValues = new ArrayList<Double>();
 				
@@ -381,7 +410,6 @@ public class OutputManager {
 						if ( yLabel.contains("Score" )) {
 							
 							attributeToValues.add( ( series.getValue().get(yLabel) - minAttributeToValueAllSeries.get(yLabel) ) / ( maxAttributeToValueAllSeries.get(yLabel) - minAttributeToValueAllSeries.get(yLabel) ) );
-							
 							
 						} else {
 						
@@ -402,7 +430,64 @@ public class OutputManager {
 					
 				}
 				
-				((GNULineGraph) graph).addDataset(traverser.getTraverser(), attributeToValues);
+				multipleAttributeToValues.get(traverserName).add(attributeToValues);
+				
+				if (graphType.equals("Line")) {
+					
+					((GNULineGraph) graph).addDataset(traverser.getTraverser(), attributeToValues);
+					
+				}
+				
+			}
+			
+			if (graphType.equals("3D")) {
+				
+				String traverser = traverserRecords.get(0).getTraverser();
+				
+				// Extrapolate those values that will not 'fill' the entire 3D area to do so.
+				
+				int maxRows = Integer.MIN_VALUE;
+				ArrayList<ArrayList<ArrayList<Double>>> datasets = new ArrayList<ArrayList<ArrayList<Double>>>();
+				
+				for ( Entry<String, ArrayList<ArrayList<Double>>> individualAttributeToValues : multipleAttributeToValues.entrySet()) {
+					
+					if ( individualAttributeToValues.getValue().size() > maxRows ) maxRows = individualAttributeToValues.getValue().size();
+					
+					datasets.add(individualAttributeToValues.getValue());
+					
+				}
+				
+				for ( ArrayList<ArrayList<Double>> dataset : datasets ) {
+					
+					if (dataset.size() < maxRows) {
+						
+						for ( int i = 1; i < maxRows; i ++) {
+							
+							dataset.add(dataset.get(0));
+							
+						}
+						
+					}
+					
+					((GNU3DGraph) graph).addDataset(traverserRecords.get(0).getTraverser(), dataset);
+					
+				}
+				
+				((GNU3DGraph) graph).setZAxisLabel(yLabel);
+				
+				traverser = traverser.substring(traverser.indexOf("Variable"), traverser.length());
+				
+				System.out.println(traverser);
+				
+				String[] labels = traverser.split("Variable");
+				
+				if (labels.length > 2 ) {
+					
+					yLabel = labels[1]; 
+				
+					xLabel = labels[2];
+				
+				}
 				
 			}
 			
@@ -446,7 +531,7 @@ public class OutputManager {
 
 		String outputPath = "figure" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
 		
-		graph.createChart(outputPath + " " + title, xLabel, yLabel);
+		graph.createChart(outputPath + " " + "", xLabel, yLabel);
 		
 		graph.exportChartAsEPS(Utils.FILEPREFIX + "data/charts/" + outputPath + ".eps");
 		
@@ -466,8 +551,7 @@ public class OutputManager {
 		 
 		//graph.setVisible(true);
 		
-	}
-	
+	} 
 	
 	/**
 	 * @return

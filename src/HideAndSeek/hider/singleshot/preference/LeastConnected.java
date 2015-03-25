@@ -30,7 +30,7 @@ public class LeastConnected extends HiderLocalGraph {
 		
 		triedNodes = new HashSet<StringVertex>();
 		
-		minimumConnectivityNodes = new ArrayList<StringVertex>();
+		leastConnectedNodes = new ArrayList<StringVertex>();
 		
 		currentPath = new ArrayList<StringEdge>();
 		
@@ -44,14 +44,14 @@ public class LeastConnected extends HiderLocalGraph {
 	/**
 	 * 
 	 */
-	private ArrayList<StringVertex> minimumConnectivityNodes;
+	private ArrayList<StringVertex> leastConnectedNodes;
 	
 	/**
 	 * @return
 	 */
 	public ArrayList<StringVertex> getMinimumConnectivityNodes() {
 		
-		return minimumConnectivityNodes;
+		return leastConnectedNodes;
 	
 	}
 
@@ -74,7 +74,7 @@ public class LeastConnected extends HiderLocalGraph {
 	 * @see HideAndSeek.hider.Hider#hideHere(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
-	protected boolean hideHere(StringVertex vertex) {
+	public boolean hideHere(StringVertex vertex) {
 		
 		triedNodes.add(vertex);
 		
@@ -97,7 +97,7 @@ public class LeastConnected extends HiderLocalGraph {
 			
 			triedNodes.clear(); 
 			
-			if ( !minimumConnectivityNodes.contains(vertex) ) minimumConnectivityNodes.add(vertex);
+			if ( !leastConnectedNodes.contains(vertex) ) leastConnectedNodes.add(vertex);
 			
 			return true; 
 			
@@ -121,7 +121,7 @@ public class LeastConnected extends HiderLocalGraph {
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
-	protected StringVertex nextNode(StringVertex currentNode) {
+	public StringVertex nextNode(StringVertex currentNode) {
 		
 		// If we're on a path to a node in the random set, follow this first
 		if ( currentPath.size() > 0 ) {
@@ -131,9 +131,9 @@ public class LeastConnected extends HiderLocalGraph {
 		}
 		
 		// Otherwise, try and calculate a path to the next node in the set
-		if ( minimumConnectivityNodes.size() > 0 && !uniquelyVisitedNodes().contains(minimumConnectivityNodes.get(0)) && localGraph.containsVertex( minimumConnectivityNodes.get(0) ) ) {
+		if ( leastConnectedNodes.size() > 0 && !uniquelyVisitedNodes().contains(leastConnectedNodes.get(0)) && localGraph.containsVertex( leastConnectedNodes.get(0) ) ) {
 			
-			DijkstraShortestPath<StringVertex, StringEdge> dsp = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, minimumConnectivityNodes.get(0));
+			DijkstraShortestPath<StringVertex, StringEdge> dsp = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, leastConnectedNodes.get(0));
 	    	
 			// If no path available, return random connected node
 			if (dsp.getPathEdgeList() == null || dsp.getPathEdgeList().size() == 0) return connectedNode(currentNode);
@@ -167,7 +167,7 @@ public class LeastConnected extends HiderLocalGraph {
 	 * @see HideAndSeek.GraphTraverser#startNode()
 	 */
 	@Override
-	protected StringVertex startNode() {
+	public StringVertex startNode() {
 	
 		return randomNode();
 		

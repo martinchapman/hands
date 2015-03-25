@@ -25,7 +25,7 @@ public class FixedStartVariableBias extends VariableBias {
 	 * @see HideAndSeek.GraphTraverser#startNode()
 	 */
 	@Override
-	protected StringVertex startNode() {
+	public StringVertex startNode() {
 
 		return firstNode();
 		

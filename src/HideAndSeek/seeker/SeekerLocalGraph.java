@@ -1,15 +1,15 @@
 package HideAndSeek.seeker;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.List;
+import java.util.TreeMap;
 
-import HideAndSeek.GraphTraverser;
+import org.jgrapht.alg.DijkstraShortestPath;
+
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.HiddenObjectGraph;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import Utility.Utils;
 
 /**
  * This seeker constructs its own version of the search graph,
@@ -20,7 +20,7 @@ import Utility.Utils;
  * @author Martin
  *
  */
-public abstract class SeekerLocalGraph extends Seeker {
+public abstract class SeekerLocalGraph extends SeekingAgent {
 
 	/**
 	 * 
@@ -44,7 +44,7 @@ public abstract class SeekerLocalGraph extends Seeker {
 	 * ~MDC: Needs tidying.
 	 */
 	@Override
-	protected StringVertex nextNode(StringVertex currentNode) {
+	public StringVertex nextNode(StringVertex currentNode) {
 		
 		addUniquelyVisitedNode(currentNode);
 		
@@ -62,6 +62,75 @@ public abstract class SeekerLocalGraph extends Seeker {
 		}
 		
 		return currentNode;
+		
+	}
+	
+	/**
+	 * @param currentNode
+	 * @param numberOfNodes Number of nodes to return ordered.
+	 * @param potentialNodes
+	 * @return
+	 */
+	protected ArrayList<StringVertex> orderNodesByProximity(StringVertex currentNode, int numberOfNodes, ArrayList<StringVertex> potentialNodes) {
+		
+		TreeMap<Integer, ArrayList<StringVertex>> distanceAndNodes = new TreeMap<Integer, ArrayList<StringVertex>>();
+		
+		ArrayList<StringVertex> unknownNodes = new ArrayList<StringVertex>();
+		
+		if ( numberOfNodes > potentialNodes.size() ) numberOfNodes = potentialNodes.size();
+		
+		List<StringVertex> subsetPotentialNodes = potentialNodes.subList(0, numberOfNodes);
+		
+		for ( StringVertex targetNode : subsetPotentialNodes ) {
+			
+			if ( !localGraph.containsVertex(currentNode) || !localGraph.containsVertex(targetNode) ) { 
+				
+				unknownNodes.add(targetNode);
+				
+				continue; 
+				
+			}
+			
+			DijkstraShortestPath<StringVertex, StringEdge> dsp = new DijkstraShortestPath<StringVertex, StringEdge>( localGraph, currentNode, targetNode );
+	    	
+			// If no path available, return random connected node
+			if ( dsp.getPathEdgeList() == null || dsp.getPathEdgeList().size() == 0 ) { 
+				
+				unknownNodes.add(targetNode);
+				
+				continue;
+			
+			} else {
+				
+				if (distanceAndNodes.containsKey(dsp.getPathEdgeList().size())) {
+					
+					distanceAndNodes.get(dsp.getPathEdgeList().size()).add(targetNode); 
+				
+				} else {
+				
+					ArrayList<StringVertex> nodes = new ArrayList<StringVertex>();
+					
+					nodes.add(targetNode);
+					
+					distanceAndNodes.put(dsp.getPathEdgeList().size(), nodes);
+					
+				}
+				
+			}
+		
+		}
+		
+		ArrayList<StringVertex> orderedByProximity = new ArrayList<StringVertex>();
+		
+		for ( ArrayList<StringVertex> vertices : distanceAndNodes.values()) {
+			
+			orderedByProximity.addAll(vertices);
+			
+		}
+		
+		orderedByProximity.addAll(unknownNodes);
+		
+		return orderedByProximity;
 		
 	}
 	

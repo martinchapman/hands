@@ -3,9 +3,9 @@ package HideAndSeek.seeker.singleshot.random;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.seeker.Seeker;
+import HideAndSeek.seeker.SeekingAgent;
 
-public class FixedStartRandomWalk extends Seeker {
+public class FixedStartRandomWalk extends SeekingAgent {
 
 	/**
 	 * @param graph
@@ -26,7 +26,7 @@ public class FixedStartRandomWalk extends Seeker {
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
-	protected StringVertex nextNode(StringVertex currentNode) {
+	public StringVertex nextNode(StringVertex currentNode) {
 
 		return connectedNode(currentNode);
 		
@@ -36,7 +36,7 @@ public class FixedStartRandomWalk extends Seeker {
 	 * @see HideAndSeek.GraphTraverser#startNode()
 	 */
 	@Override
-	protected StringVertex startNode() {
+	public StringVertex startNode() {
 
 		return firstNode();
 		

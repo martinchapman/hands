@@ -282,10 +282,6 @@ public class TraverserRecord {
 						
 						cumulativeAttributeToValue.put(attributeToValueEntry.getKey(), cumulativeAttributeToValue.get(attributeToValueEntry.getKey()) + ( (attributeToValueEntry.getValue() - minAttributeToValueAllSeries.get(attributeToValueEntry.getKey())) / (maxAttributeToValueAllSeries.get(attributeToValueEntry.getKey()) - minAttributeToValueAllSeries.get(attributeToValueEntry.getKey())) ));
 						
-						System.out.println(attributeToValueEntry.getKey() + " Get value: " + attributeToValueEntry.getValue());
-						
-						System.out.println(attributeToValueEntry.getKey() + " Normalised: " + (attributeToValueEntry.getValue() - minAttributeToValueAllSeries.get(attributeToValueEntry.getKey())) / (maxAttributeToValueAllSeries.get(attributeToValueEntry.getKey()) - minAttributeToValueAllSeries.get(attributeToValueEntry.getKey())));
-						
 					} else {
 					
 						cumulativeAttributeToValue.put(attributeToValueEntry.getKey(), cumulativeAttributeToValue.get(attributeToValueEntry.getKey()) + attributeToValueEntry.getValue());
@@ -296,8 +292,6 @@ public class TraverserRecord {
 					
 					if ( maxAttributeToValueAllSeries != null && minAttributeToValueAllSeries != null ) {
 					
-						System.out.println(attributeToValueEntry.getKey());
-						
 						cumulativeAttributeToValue.put(attributeToValueEntry.getKey(), ( (attributeToValueEntry.getValue() - minAttributeToValueAllSeries.get(attributeToValueEntry.getKey())) / (maxAttributeToValueAllSeries.get(attributeToValueEntry.getKey()) - minAttributeToValueAllSeries.get(attributeToValueEntry.getKey())) ));
 						
 					} else {
@@ -315,12 +309,6 @@ public class TraverserRecord {
 		Hashtable<String, Double> averageAttributeToValue = new Hashtable<String, Double>();
 		
 		for (Entry<String, Double> attribute : cumulativeAttributeToValue.entrySet()) {
-			
-			/*System.out.println(traverser);
-			
-			System.out.println(attribute);
-			
-			System.out.println(attributeToValue.size());*/
 			
 			averageAttributeToValue.put(attribute.getKey(), attribute.getValue() / attributeToValue.size());
 			

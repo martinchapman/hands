@@ -25,7 +25,7 @@ public class VariableFixedDistanceFixedStart extends VariableFixedDistance {
 	 * @see HideAndSeek.hider.Hider#startNode()
 	 */
 	@Override
-	protected StringVertex startNode() {
+	public StringVertex startNode() {
 		
 		return firstNode();
 		

@@ -36,7 +36,7 @@ public class RandomSetStaticBetween extends RandomSet {
 	 * @see HideAndSeek.GraphTraverser#startNode()
 	 */
 	@Override
-	protected StringVertex startNode() {
+	public StringVertex startNode() {
 		
 		return getCurrentNode();
 		

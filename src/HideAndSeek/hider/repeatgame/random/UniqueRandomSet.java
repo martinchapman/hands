@@ -44,8 +44,6 @@ public class UniqueRandomSet extends RandomSet {
 		
 		usedNodes.addAll(hideSet);
 		
-		Utils.talk(this.toString(), "Adding: " + hideSet);
-		
 		return hideSet;
 		
 	}

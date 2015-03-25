@@ -100,7 +100,7 @@ public class RandomSet extends HiderLocalGraph {
 	 * @see HideAndSeek.hider.Hider#hideHere(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
-	protected boolean hideHere(StringVertex vertex) {
+	public boolean hideHere(StringVertex vertex) {
 
 		// Utils.talk(toString(), "Current node: " + vertex + " Random set: " + hideSet + " Hide locations: " + hideLocations);
 		
@@ -126,7 +126,7 @@ public class RandomSet extends HiderLocalGraph {
 	 * @see HideAndSeek.hider.HiderLocalGraph#nextNode(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
-	protected StringVertex nextNode(StringVertex currentNode) {
+	public StringVertex nextNode(StringVertex currentNode) {
 		
 		super.nextNode(currentNode);
 		
@@ -159,7 +159,7 @@ public class RandomSet extends HiderLocalGraph {
 	 * @see HideAndSeek.GraphTraverser#startNode()
 	 */
 	@Override
-	protected StringVertex startNode() {
+	public StringVertex startNode() {
 		
 		return randomNode();
 		

@@ -33,7 +33,7 @@ public class MaxDistance extends HiderLocalGraph {
 		/* Try and set the minimum distance between two hide locations to be 
 		 * the diameter of the graph. */
 		
-		MINDISTANCE = graphController.requestGraphDiameter();
+		MINDISTANCE = graphController.graphDiameter();
 		
 		Utils.talk(toString(), "Diameter " + MINDISTANCE);
 		
@@ -61,7 +61,7 @@ public class MaxDistance extends HiderLocalGraph {
 	 * @see HideAndSeek.hider.Hider#hideHere(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
-	protected boolean hideHere(StringVertex vertex) {
+	public boolean hideHere(StringVertex vertex) {
 		
 		DijkstraShortestPath<StringVertex, StringEdge> DSP = null;
 		
@@ -111,14 +111,14 @@ public class MaxDistance extends HiderLocalGraph {
 	@Override
 	public String printGameStats() {
 		// TODO Auto-generated method stub
-		return super.printGameStats() + ", GraphDiameter, " + graphController.requestGraphDiameter();
+		return super.printGameStats() + ", GraphDiameter, " + graphController.graphDiameter();
 	}
 
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
-	protected StringVertex nextNode(StringVertex currentNode) {
+	public StringVertex nextNode(StringVertex currentNode) {
 		
 		super.nextNode(currentNode);
 		
@@ -130,7 +130,7 @@ public class MaxDistance extends HiderLocalGraph {
 	 * @see HideAndSeek.GraphTraverser#startNode()
 	 */
 	@Override
-	protected StringVertex startNode() {
+	public StringVertex startNode() {
 		
 		return randomNode();
 		

@@ -46,7 +46,7 @@ public class BreadthFirstSearch extends SeekerLocalGraph {
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
 	 */
-	protected StringVertex nextNode(StringVertex currentNode) {
+	public StringVertex nextNode(StringVertex currentNode) {
 
 		super.nextNode(currentNode);
 		
@@ -101,7 +101,7 @@ public class BreadthFirstSearch extends SeekerLocalGraph {
 	 * @see HideAndSeek.GraphTraverser#startNode()
 	 */
 	@Override
-	protected StringVertex startNode() {
+	public StringVertex startNode() {
 		
 		StringVertex startNode = randomNode();
 		

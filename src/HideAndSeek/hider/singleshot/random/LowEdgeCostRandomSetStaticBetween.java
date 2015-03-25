@@ -33,7 +33,7 @@ public class LowEdgeCostRandomSetStaticBetween extends LowEdgeCostRandomSet {
 	/* (non-Javadoc)
 	 * @see HideAndSeek.hider.singleshot.random.RandomSet#startNode()
 	 */
-	protected StringVertex startNode() {
+	public StringVertex startNode() {
 
 		return getCurrentNode();
 		

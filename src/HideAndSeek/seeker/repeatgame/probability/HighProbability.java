@@ -18,7 +18,10 @@ import Utility.Utils;
  */
 public class HighProbability extends SeekerLocalGraph {
 
-	protected boolean printHighestProbabilityNodes = true;
+	/**
+	 * 
+	 */
+	protected boolean printHighestProbabilityNodes = false;
 	
 	/**
 	 * 
@@ -70,7 +73,7 @@ public class HighProbability extends SeekerLocalGraph {
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
-	protected StringVertex nextNode(StringVertex currentNode) {
+	public StringVertex nextNode(StringVertex currentNode) {
 		
 		super.nextNode(currentNode);
 		
@@ -81,9 +84,9 @@ public class HighProbability extends SeekerLocalGraph {
 		if (currentPath.size() > 0) return edgeToTarget(currentPath.remove(0), currentNode);
 		
 		// Use likely node information if available, and if graph has sufficient information to use:
-		if ( likelyNodes.size() > 0 ) {
+		if ( likelyNodes.size() > 0 && localGraph.containsVertex(likelyNodes.get(0)) ) {
 			
-			Utils.talk(this.toString(), "Heading for: " + likelyNodes.get(0));
+			//Utils.talk(this.toString(), "Heading for: " + likelyNodes.get(0));
 			
 			DijkstraShortestPath<StringVertex, StringEdge> dsp = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, likelyNodes.get(0));
 	    	
@@ -107,7 +110,7 @@ public class HighProbability extends SeekerLocalGraph {
 	 * @see HideAndSeek.GraphTraverser#startNode()
 	 */
 	@Override
-	protected StringVertex startNode() {
+	public StringVertex startNode() {
 		
 		return randomNode();
 		
@@ -116,7 +119,7 @@ public class HighProbability extends SeekerLocalGraph {
 	/* (non-Javadoc)
 	 * @see HideAndSeek.seeker.Seeker#addHideLocation(HideAndSeek.graph.StringVertex)
 	 */
-	protected void addHideLocation(StringVertex location) {
+	public void addHideLocation(StringVertex location) {
 		
 		super.addHideLocation(location);
 		
@@ -124,7 +127,10 @@ public class HighProbability extends SeekerLocalGraph {
 		
 	}
 
-	ArrayList<StringVertex> lastHighestProbabilityNodes;
+	/**
+	 * 
+	 */
+	private ArrayList<StringVertex> lastHighestProbabilityNodes;
 	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.seeker.Seeker#endOfRound()
@@ -141,28 +147,35 @@ public class HighProbability extends SeekerLocalGraph {
 		   so just get ALL likely locations) */
 		likelyNodes = behaviourPrediction.rankLikelyHideLocations(predictiveNodes);
 		
-		ArrayList<StringVertex> highestProbabilityNodes = new ArrayList<StringVertex>();
+		if ( printHighestProbabilityNodes ) {
 		
-		for (StringVertex likelyNode : likelyNodes) {
+			ArrayList<StringVertex> highestProbabilityNodes = new ArrayList<StringVertex>();
 			
-			if (highestProbabilityNodes.size() == 0 || 
-					behaviourPrediction.getProbability(highestProbabilityNodes.get(highestProbabilityNodes.size() - 1)) 
-					== behaviourPrediction.getProbability(likelyNode) ) {
-			
-				highestProbabilityNodes.add(likelyNode);
-			
-			} else {
+			for (StringVertex likelyNode : likelyNodes) {
 				
-				break;
+				if (highestProbabilityNodes.size() == 0 || 
+						behaviourPrediction.getProbability(highestProbabilityNodes.get(highestProbabilityNodes.size() - 1)) 
+						== behaviourPrediction.getProbability(likelyNode) ) {
+				
+					highestProbabilityNodes.add(likelyNode);
+				
+				} else {
+					
+					break;
+					
+				}
 				
 			}
 			
-		}
+			Utils.talk(this.toString(), highestProbabilityNodes.size() + " highest probability nodes: " + highestProbabilityNodes);
 		
-		Utils.talk(this.toString(), highestProbabilityNodes.size() + " highest probability nodes: " + highestProbabilityNodes);
+		}
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see HideAndSeek.seeker.Seeker#endOfGame()
+	 */
 	@Override
 	public void endOfGame() {
 		

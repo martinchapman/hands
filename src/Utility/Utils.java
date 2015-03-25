@@ -280,7 +280,7 @@ public class Utils {
 		
 		if (DEBUG) System.out.println(speaker + ": " + message);
 		
-	}
+	}	
 	
 	/**
 	 * @param inputStr

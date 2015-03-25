@@ -34,7 +34,7 @@ public class LeastConnectedStaticBetween extends LeastConnected {
 	 * @see HideAndSeek.GraphTraverser#startNode()
 	 */
 	@Override
-	protected StringVertex startNode() {
+	public StringVertex startNode() {
 	
 		return getCurrentNode();
 		

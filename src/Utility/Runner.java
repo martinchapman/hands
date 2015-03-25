@@ -133,6 +133,9 @@ public class Runner extends JFrame {
 		  "VariableDeceptionDurationSetDeceptionIntervalSetRepeatDuration",
 		  "VariableDeceptionDurationVariableDeceptionIntervalSetRepeatDuration",
 		  
+		  "VariableDeceptionDurationVariableDeceptionIntervalSetRepeatDurationRefreshDeceptiveNodes",
+		  
+		  
 		  "SetDeceptionDurationSetDeceptionIntervalVariableRepeatDuration",
 		  //"VariableDeceptionDurationVariableDeceptionIntervalVariableRepeatDuration",
 		  "VariableDeceptiveNodesSetDeceptionDurationSetDeceptionIntervalSetRepeatDuration",
@@ -147,6 +150,8 @@ public class Runner extends JFrame {
 		  "LeastConnectedDeceptive",
 		  
 		  //
+		  
+		  "AdaptiveRandom"
 		  
 		};
 	
@@ -168,7 +173,13 @@ public class Runner extends JFrame {
 	      
           "HighProbability",
           "VariableHistoryHighProbability",
-          "HighProbabilityRepetitionCheck"
+          "HighProbabilityRepetitionCheck",
+          
+          "InverseHighProbability",
+          
+          // 
+          
+          "AdaptiveHighProbability"
           
 		};
 	
@@ -578,6 +589,8 @@ public class Runner extends JFrame {
 		
 		graphTypes.addItem("Bar");
 		
+		graphTypes.addItem("3D");
+		
 		centerPaneRightCenter.add(new JLabel("Graph types:"));
 		
 		centerPaneRightCenter.add(graphTypes);
@@ -657,6 +670,10 @@ public class Runner extends JFrame {
 					} else if (graphTypes.getSelectedItem().equals("Bar")) {
 						
 						outputManager.showBarGraphForAttribute(selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem());
+						
+					} else if (graphTypes.getSelectedItem().equals("3D")) {
+						
+						outputManager.show3DGraphForAttribute(selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem());
 						
 					}
 					

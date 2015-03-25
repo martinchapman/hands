@@ -63,7 +63,7 @@ public class BacktrackPath extends SeekerLocalGraph {
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
-	protected StringVertex nextNode(StringVertex currentNode) {
+	public StringVertex nextNode(StringVertex currentNode) {
 		
 		// Call super to add relevant information to local graph
 		super.nextNode(currentNode);
@@ -256,7 +256,7 @@ public class BacktrackPath extends SeekerLocalGraph {
 	 * @see HideAndSeek.GraphTraverser#startNode()
 	 */
 	@Override
-	protected StringVertex startNode() {
+	public StringVertex startNode() {
 		
 		return randomNode();
 	

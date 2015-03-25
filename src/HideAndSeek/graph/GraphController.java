@@ -15,9 +15,11 @@ import org.jgrapht.generate.RingGraphGenerator;
 import org.jgrapht.generate.ScaleFreeGraphGenerator;
 import org.jgrapht.graph.ClassBasedVertexFactory;
 
+import HideAndSeek.GraphTraversingAgent;
+import HideAndSeek.GraphTraversingAgent;
 import HideAndSeek.GraphTraverser;
 import HideAndSeek.Main;
-import HideAndSeek.hider.Hider;
+import HideAndSeek.hider.HidingAgent;
 import HideAndSeek.seeker.Seeker;
 import Utility.Utils;
 
@@ -203,7 +205,7 @@ public class GraphController<V, E> {
 	 * @param hider
 	 * @return
 	 */
-	public double latestHiderRoundScores(Object caller, Hider hider) {
+	public double latestHiderRoundScores(Object caller, HidingAgent hider) {
 		
 		if (!(caller instanceof Main)) return -1;
 		
@@ -241,7 +243,7 @@ public class GraphController<V, E> {
 	 */
 	public void addHideLocation(Object caller, StringVertex location) {
 		
-		if (!(caller instanceof Hider)) return;
+		if (!(caller instanceof HidingAgent)) return;
 		
 		graph.addHideLocation(location);
 		
@@ -260,7 +262,7 @@ public class GraphController<V, E> {
 	 * 
 	 * @return
 	 */
-	public double requestGraphDiameter() {
+	public double graphDiameter() {
 		
 		FloydWarshallShortestPaths<StringVertex, StringEdge> FWSP = new FloydWarshallShortestPaths<StringVertex, StringEdge>(graph);
 		
@@ -303,7 +305,7 @@ public class GraphController<V, E> {
 	 * 
 	 * @param graphTraverser
 	 */
-	public void registerTraversingAgent(GraphTraverser graphTraverser) {
+	public void registerTraversingAgent(GraphTraversingAgent graphTraverser) {
 		
 		graph.registerTraversingAgent(graphTraverser);
 		
@@ -315,9 +317,21 @@ public class GraphController<V, E> {
 	 * @param roundsPassed
 	 * @return
 	 */
-	public double requestAverageSeekersRoundPerformance(int round) {
+	public double averageSeekersRoundPerformance(int round) {
 		
-		return graph.requestAverageSeekersRoundPerformance(round);
+		return graph.averageSeekersRoundPerformance(round);
+		
+	}
+	
+	/**
+	 * Let players request the average performance of all seekers for the LATEST round
+	 * 
+	 * @param roundsPassed
+	 * @return
+	 */
+	public double averageSeekersPerformance(int metric) {
+		
+		return graph.averageSeekersPerformance(metric);
 		
 	}
 	
@@ -358,7 +372,7 @@ public class GraphController<V, E> {
 	 * @param nextNode
 	 * @return
 	 */
-	public boolean fromVertexToVertex(GraphTraverser traverser, StringVertex currentNode,
+	public boolean fromVertexToVertex(GraphTraversingAgent traverser, StringVertex currentNode,
 			StringVertex nextNode) {
 		
 		return graph.fromVertexToVertex(traverser, currentNode, nextNode);
@@ -373,7 +387,7 @@ public class GraphController<V, E> {
 	 * @param targetVertex
 	 * @return
 	 */
-	public void walkPathFromVertexToVertex(GraphTraverser traverser, StringVertex sourceVertex, StringVertex targetVertex) {
+	public void walkPathFromVertexToVertex(GraphTraversingAgent traverser, StringVertex sourceVertex, StringVertex targetVertex) {
 		
 		List<StringEdge> path = graph.pathFromVertexToVertex(traverser, sourceVertex, targetVertex);
 		
@@ -412,9 +426,9 @@ public class GraphController<V, E> {
 	 * @param traverser
 	 * @return
 	 */
-	public double requestRoundCost(int roundsPassed, GraphTraverser traverser) {
+	public double roundCost(int roundsPassed, GraphTraverser traverser) {
 		
-		return graph.requestRoundCost(roundsPassed, traverser);
+		return graph.roundCost(roundsPassed, true, traverser);
 	
 	}
 
@@ -434,9 +448,9 @@ public class GraphController<V, E> {
 	 * @param hider
 	 * @return
 	 */
-	public double requestAverageHiderScore(Hider hider) {
+	public double averageHiderScore(HidingAgent hider) {
 		
-		return graph.requestAverageHiderScore(hider);
+		return graph.averageHiderScore(hider);
 		
 	}
 
@@ -495,9 +509,9 @@ public class GraphController<V, E> {
 	 * @param seeker
 	 * @return
 	 */
-	public double latestRoundCosts(GraphTraverser traverser) {
+	public double latestRoundCosts(GraphTraverser traverser, boolean normalised) {
 		
-		return graph.latestRoundCosts(traverser);
+		return graph.latestRoundCosts(traverser, normalised);
 		
 	}
 
@@ -505,9 +519,9 @@ public class GraphController<V, E> {
 	 * @param traverser
 	 * @return
 	 */
-	public double requestAverageGameCosts(GraphTraverser traverser) {
+	public double averageGameCosts(GraphTraverser traverser) {
 		
-		return graph.requestAverageGameCosts(traverser);
+		return graph.averageGameCosts(traverser);
 		
 	}
 
@@ -515,9 +529,9 @@ public class GraphController<V, E> {
 	 * @param seeker
 	 * @return
 	 */
-	public double requestAverageSeekerScore(Seeker seeker) {
+	public double averageSeekerScore(Seeker seeker) {
 		
-		return graph.requestAverageSeekerScore(seeker);
+		return graph.averageSeekerScore(seeker);
 		
 	}
 
@@ -525,9 +539,9 @@ public class GraphController<V, E> {
 	 * @param traverser
 	 * @return
 	 */
-	public double requestAveragePathLength(GraphTraverser traverser) {
+	public double averagePathLength(GraphTraverser traverser) {
 		
-		return graph.requestAveragePathLength(traverser);
+		return graph.averagePathLength(traverser);
 		
 	}
 
@@ -544,7 +558,7 @@ public class GraphController<V, E> {
 	 * @param hider
 	 * @return
 	 */
-	public double latestHiderRoundScores(Hider hider) {
+	public double latestHiderRoundScores(HidingAgent hider) {
 		
 		return graph.latestHiderRoundScores(hider);
 		
@@ -557,6 +571,17 @@ public class GraphController<V, E> {
 	public void setEdgeWeight(StringEdge edge, double weight) {
 		
 		graph.setEdgeWeight(edge, weight);
+		
+	}
+	
+	/**
+	 * @param traverser
+	 * @param metric
+	 * @return
+	 */
+	public double latestTraverserRoundPerformance(GraphTraversingAgent traverser, int metric) {
+		
+		return graph.latestTraverserRoundPerformance(traverser, metric);
 		
 	}
 

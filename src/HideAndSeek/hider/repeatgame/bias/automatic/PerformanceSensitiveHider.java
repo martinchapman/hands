@@ -56,7 +56,7 @@ public class PerformanceSensitiveHider extends VariableBias {
 	 */
 	protected void adjustBias() {
 		
-		double seekerPerformanceChange = ( ( graphController.requestAverageSeekersRoundPerformance(roundsPassed) - graphController.requestAverageSeekersRoundPerformance(roundsPassed - 1) ) / graphController.requestAverageSeekersRoundPerformance(roundsPassed - 1) ) * 100;
+		double seekerPerformanceChange = ( ( graphController.averageSeekersRoundPerformance(roundsPassed) - graphController.averageSeekersRoundPerformance(roundsPassed - 1) ) / graphController.averageSeekersRoundPerformance(roundsPassed - 1) ) * 100;
         
 		Utils.talk(toString(), "Seeker performance change: " + seekerPerformanceChange);
 		

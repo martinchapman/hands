@@ -23,9 +23,8 @@ import Utility.Utils;
 public class Deceptive extends RandomSet {
 
 	/**
-	 * @param graph
+	 * @param graphController
 	 * @param numberOfHideLocations
-	 * @param numberOfBiasLocations
 	 * @param deceptiveNodes
 	 * @param deceptionDuration
 	 */
@@ -35,7 +34,7 @@ public class Deceptive extends RandomSet {
 		
 		super(graphController, numberOfHideLocations);
 		
-		// ~MDC Change back to true for more reliable results
+		// ~MDC Change back to true for more reliable results (currently added manually in 'main' for some strategies).
 		strategyOverRounds = false;
 		
 		this.deceptiveNodes = deceptiveNodes <= numberOfHideLocations ? deceptiveNodes : numberOfHideLocations;
@@ -55,7 +54,6 @@ public class Deceptive extends RandomSet {
 	 * @param deceptionDuration
 	 * @param repeatInterval
 	 * @param repeatDuration
-	 * @param startRound
 	 * @param refreshDeceptiveSet
 	 */
 	public Deceptive(
@@ -73,6 +71,16 @@ public class Deceptive extends RandomSet {
 		
 	}
 	
+	/**
+	 * @param graphController
+	 * @param numberOfHideLocations
+	 * @param deceptiveNodes
+	 * @param deceptionDuration
+	 * @param repeatInterval
+	 * @param repeatDuration
+	 * @param refreshDeceptiveSet
+	 * @param doNotRevisit
+	 */
 	public Deceptive(
 			GraphController <StringVertex, StringEdge> graphController,
 			int numberOfHideLocations, int deceptiveNodes, int deceptionDuration, 
@@ -164,7 +172,8 @@ public class Deceptive extends RandomSet {
 	protected TreeSet<StringVertex> nodesUsedDeceptively;
 	
 	/**
-	 * 
+	 * Sets whether nodes used in a deceptive set should be 
+	 * revisited once a deceptive period is over.
 	 */
 	protected boolean doNotRevisit = true;
 	

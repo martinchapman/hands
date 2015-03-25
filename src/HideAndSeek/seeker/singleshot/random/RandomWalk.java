@@ -3,7 +3,7 @@ package HideAndSeek.seeker.singleshot.random;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.seeker.Seeker;
+import HideAndSeek.seeker.SeekingAgent;
 
 /**
  * 
@@ -13,7 +13,7 @@ import HideAndSeek.seeker.Seeker;
  * @author Martin
  *
  */
-public class RandomWalk extends Seeker {
+public class RandomWalk extends SeekingAgent {
 
 	/**
 	 * @param graph
@@ -29,7 +29,7 @@ public class RandomWalk extends Seeker {
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
-	protected StringVertex nextNode(StringVertex currentNode) {
+	public StringVertex nextNode(StringVertex currentNode) {
 		
 		uniquelyVisitNodes = false;
 		
@@ -41,7 +41,7 @@ public class RandomWalk extends Seeker {
 	 * @see HideAndSeek.GraphTraverser#startNode()
 	 */
 	@Override
-	protected StringVertex startNode() {
+	public StringVertex startNode() {
 
 		return randomNode();
 		

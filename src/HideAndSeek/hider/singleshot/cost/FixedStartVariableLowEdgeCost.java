@@ -35,7 +35,7 @@ public class FixedStartVariableLowEdgeCost extends VariableLowEdgeCost {
 	 * @see HideAndSeek.GraphTraverser#startNode()
 	 */
 	@Override
-	protected StringVertex startNode() {
+	public StringVertex startNode() {
 
 		return firstNode();
 		

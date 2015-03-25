@@ -32,7 +32,7 @@ public class MaxDistanceStaticBetween extends MaxDistance {
 	 * @see HideAndSeek.GraphTraverser#startNode()
 	 */
 	@Override
-	protected StringVertex startNode() {
+	public StringVertex startNode() {
 		
 		return getCurrentNode();
 		

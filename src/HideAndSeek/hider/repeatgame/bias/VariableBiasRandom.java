@@ -34,7 +34,7 @@ public class VariableBiasRandom extends VariableBias {
 	 * @see HideAndSeek.hider.Hider#hideHere(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
-	protected boolean hideHere(StringVertex vertex) {
+	public boolean hideHere(StringVertex vertex) {
 		
 		if (Math.random() > HIDEPOTENTIAL) { return true; }
 		return false;

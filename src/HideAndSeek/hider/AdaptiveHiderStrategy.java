@@ -1,16 +1,10 @@
 package HideAndSeek.hider;
 
-public interface AdaptiveHiderStrategy {
-	
-	/**
-	 * Adaptive Hiding strategies must provide 
-	 * a mechanism that reports on their ability to 
-	 * hide effectively under their given strategy,
-	 * based upon game conditions, and the performance/attributes
-	 * of their opponent.
-	 * 
-	 * @return
-	 */
-	public double abilityToPerform();
+import java.util.ArrayList;
+import java.util.HashSet;
 
-}
+import HideAndSeek.AdaptiveGraphTraverserStrategy;
+import HideAndSeek.graph.StringEdge;
+import HideAndSeek.graph.StringVertex;
+
+public interface AdaptiveHiderStrategy extends Hider, AdaptiveGraphTraverserStrategy {}

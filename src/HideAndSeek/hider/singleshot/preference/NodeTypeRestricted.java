@@ -5,13 +5,13 @@ import java.util.HashSet;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.Hider;
+import HideAndSeek.hider.HidingAgent;
 
 /**
  * @author Martin
  *
  */
-public class NodeTypeRestricted extends Hider {
+public class NodeTypeRestricted extends HidingAgent {
 
 	/**
 	 * @param graph
@@ -28,7 +28,7 @@ public class NodeTypeRestricted extends Hider {
 	 * @see HideAndSeek.hider.Hider#hideHere(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
-	protected boolean hideHere(StringVertex vertex) {
+	public boolean hideHere(StringVertex vertex) {
 		
 		HashSet<Character> types = new HashSet<Character>();
 		
@@ -54,7 +54,7 @@ public class NodeTypeRestricted extends Hider {
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
-	protected StringVertex nextNode(StringVertex currentNode) {
+	public StringVertex nextNode(StringVertex currentNode) {
 		// TODO Auto-generated method stub
 		return connectedNode(currentNode);
 	}
@@ -63,7 +63,7 @@ public class NodeTypeRestricted extends Hider {
 	 * @see HideAndSeek.GraphTraverser#startNode()
 	 */
 	@Override
-	protected StringVertex startNode() {
+	public StringVertex startNode() {
 		
 		StringVertex[] vertices = new StringVertex[graphController.vertexSet().size()];
 		
