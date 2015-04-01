@@ -23,13 +23,40 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	protected GraphController<StringVertex, StringEdge> graphController;
 	
 	/**
+	 * 
+	 */
+	protected GraphTraversingAgent responsibleAgent = this;
+	
+	/**
+	 * Set the agent that will incur the costs for this strategy.
+	 * (Default it self).
+	 */
+	public void setResponsibleAgent(GraphTraversingAgent responsibleAgent) {
+		
+		this.responsibleAgent = responsibleAgent;
+		
+	}
+	
+	/**
+	 * 
+	 */
+	protected ArrayList<StringVertex> hideLocations;
+	
+	/**
+	 * @return
+	 */
+	public ArrayList<StringVertex> hideLocations() {
+		
+		return hideLocations;
+	
+	}
+	
+	/**
 	 * @param graph
 	 */
 	public GraphTraversingAgent(GraphController<StringVertex, StringEdge> graphController) {
 		
 		this.graphController = graphController;
-		
-		graphController.registerTraversingAgent(this);
 		
 		if ( uniquelyVisitNodes == true ) {
 		
@@ -39,10 +66,18 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 			
 		}
 		
-		name = this.getClass().toString().substring(this.getClass().toString().lastIndexOf('.') + 1, this.getClass().toString().length());
+		name = responsibleAgent.getClass().toString().substring(responsibleAgent.getClass().toString().lastIndexOf('.') + 1, responsibleAgent.getClass().toString().length());
 		
+		// ID according to time of generation
 		ID = "" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime()) + Math.random() * 100;
 
+		graphController.registerTraversingAgent(this);
+		
+		// Record of where hidden items have been found
+		hideLocations = new ArrayList<StringVertex>();
+		
+		// List of nodes that have been explored
+		exploredNodes = new ArrayList<StringVertex>();
 		
 	}
 	
@@ -133,11 +168,9 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 		
 	}
 	
-	/* (non-Javadoc)
-	 * @see HideAndSeek.GraphTraverserTemplate#uniquelyVisitedEdges()
-	 */
+
 	@Override
-	final public HashSet<StringEdge> uniquelyVisitedEdges() {
+	public HashSet<StringEdge> uniquelyVisitedEdges() {
 		
 		return uniquelyVisitedEdges;
 		
@@ -152,6 +185,21 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 		return uniquelyVisitedEdges.contains(edge);
 		
 	}
+	
+	/**
+	 * 
+	 */
+	protected ArrayList<StringVertex> exploredNodes;
+
+	/**
+	 * @return
+	 */
+	public ArrayList<StringVertex> exploredNodes() {
+	
+		return exploredNodes;
+	
+	}
+	
 	
 	/**
 	 * Working with connectedNode in order to determine how nodes
@@ -256,7 +304,7 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	/**
 	 * @return
 	 */
-	protected StringVertex getCurrentNode() {
+	public StringVertex currentNode() {
 		
 		if (currentNode == null) {
 			
@@ -278,7 +326,7 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	/**
 	 * @return
 	 */
-	public int getRoundsPassed() {
+	public int roundsPassed() {
 		
 		return roundsPassed;
 	
@@ -316,7 +364,7 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	 * @see HideAndSeek.GraphTraverserTemplate#getStrategyOverRounds()
 	 */
 	@Override
-	public boolean getStrategyOverRounds() {
+	public boolean strategyOverRounds() {
 		
 		return strategyOverRounds;
 		
@@ -326,7 +374,7 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	 * @see HideAndSeek.GraphTraverserTemplate#setStrategyOverRounds(boolean)
 	 */
 	@Override
-	public void setStrategyOverRounds(boolean strategyOverRounds) {
+	public void strategyOverRounds(boolean strategyOverRounds) {
 		
 		this.strategyOverRounds = strategyOverRounds;
 		
@@ -366,7 +414,7 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 		roundsPassed = 0;
 		
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverserTemplate#nextNode(HideAndSeek.graph.StringVertex)
 	 */
@@ -406,6 +454,41 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	public String toString() {
 		
 		return "t" + name;
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	public int compareTo(GraphTraverser aThat) {
+		
+	    final int BEFORE = -1;
+	    final int EQUAL = 0;
+	    final int AFTER = 1;
+	    
+	    return EQUAL;
+	    
+	}
+	
+	/**
+	 * Allows for the data from another strategy to be merged 
+	 * into this one.
+	 * 
+	 * @param traverser
+	 */
+	public void mergeOtherTraverser(GraphTraverser traverser) {
+		
+		this.currentNode = traverser.currentNode();
+		
+		this.roundsPassed = traverser.roundsPassed();
+		
+		this.uniquelyVisitedEdges.addAll(traverser.uniquelyVisitedEdges());
+		
+		this.uniquelyVisitedNodes.addAll(traverser.uniquelyVisitedNodes());
+		
+		this.exploredNodes.addAll(traverser.exploredNodes());
+		
+		this.hideLocations.addAll(traverser.hideLocations());
 		
 	}
 

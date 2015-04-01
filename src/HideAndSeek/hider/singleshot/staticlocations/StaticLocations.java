@@ -39,7 +39,7 @@ public class StaticLocations extends RandomSet {
 	@Override
 	public StringVertex startNode() {
 		
-		return getCurrentNode();
+		return currentNode();
 		
 	}
 

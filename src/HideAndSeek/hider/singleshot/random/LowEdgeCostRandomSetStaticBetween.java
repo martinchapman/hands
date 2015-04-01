@@ -35,7 +35,7 @@ public class LowEdgeCostRandomSetStaticBetween extends LowEdgeCostRandomSet {
 	 */
 	public StringVertex startNode() {
 
-		return getCurrentNode();
+		return currentNode();
 		
 	}
 

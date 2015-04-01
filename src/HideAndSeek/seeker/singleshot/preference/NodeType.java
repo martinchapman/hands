@@ -1,6 +1,6 @@
 package HideAndSeek.seeker.singleshot.preference;
 
-/*
+/**
  * 
  * 6/3/15 Not used in thesis work. Exists as a possible future extension.
  * 

@@ -30,7 +30,7 @@ public class RandomStaticBetween extends Random {
 	@Override
 	public StringVertex startNode() {
 		
-		return getCurrentNode();
+		return currentNode();
 		
 	}
 

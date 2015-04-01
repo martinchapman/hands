@@ -1,54 +1,100 @@
 package Utility;
 
+import java.util.ArrayList;
+
 import HideAndSeek.GraphTraversingAgent;
 import HideAndSeek.graph.GraphController;
 
+/**
+ * Various mechanisms for computing whether adaptation should take place,
+ * which may be useful for different strategies.
+ * 
+ * @author Martin
+ *
+ */
 public class AdaptiveUtils {
 	
 	/**
-	 * For a given traverser, returns a number between 0.0 (bad) and 1.0 (best) denoting
-	 * the performance of this traverser based upon the reduction in cost ('cost score') 
-	 * they have achieved between this round and the last. 
+	 * Takes a set of performance values, and checks if a sequence
+	 * of size X exists in which the values in this sequence all fall 
+	 * below Y.
 	 * 
-	 * @param graphController
-	 * @param traverser
+	 * @param performanceValues
+	 * @param valueThreshold (Y)
+	 * @param sequenceLength (X)
 	 * @return
 	 */
-	public static double performanceOfSelfUnderCostChange(GraphController<?, ?> graphController, GraphTraversingAgent traverser) {
+	public static boolean containsLowPerformance(ArrayList<Double> performanceValues, double valueThreshold, int sequenceLength) {
 		
-	
-		// -1 indicates that not enough information is available to calculate change (for example, if it is an early round).
-		if ( graphController.latestTraverserRoundPerformance(traverser, ScoreMetric.COST_CHANGE) == -1 ) return 1.0; 
-		
-		System.out.println("= " + graphController.latestTraverserRoundPerformance(traverser, ScoreMetric.COST_CHANGE));
-		
-		// Any improvement in cost score is seen as wholly positive
-		if ( graphController.latestTraverserRoundPerformance(traverser, ScoreMetric.COST_CHANGE) > 0 ) { 
+		if ( performanceValues.size() >= sequenceLength ) {
 			
-			System.out.println("A: 1.0");
-			return 1.0;
-		
-		/* Any loss in cost score, greater than -100%, is taken as an absolute value, and inverted, as an
-		 * indicator of performance. For example, -40%, would indicated a 60% (0.6) performance, as decreasing
-		 * by 40% is not as bad as, say, -60%, which would indicate 40% (0.4) performance.
-		 */
-			
-		} else if ( graphController.latestTraverserRoundPerformance(traverser, ScoreMetric.COST_CHANGE) < 0 &&
-				    graphController.latestTraverserRoundPerformance(traverser, ScoreMetric.COST_CHANGE) > -100) {
-			
-			System.out.println("B: " + (1.0 - (Math.abs(graphController.latestTraverserRoundPerformance(traverser, ScoreMetric.COST_CHANGE)) / 100)));
-			
-			return 1.0 - (Math.abs(graphController.latestTraverserRoundPerformance(traverser, ScoreMetric.COST_CHANGE)) / 100);
-		
-		// Anything else must be greater than an increase in double of cost, and should thus indicate that change is necessary.
-		} else {
-			
-			System.out.println("C: 0");
-			
-			return 0.0;
-
-		}
+			for ( int i = performanceValues.size() - sequenceLength; i < performanceValues.size(); i++ ) {
 				
+				if ( performanceValues.get(i) > valueThreshold ) { 
+					
+					return false;
+				
+				} 	
+				
+			}
+			
+			return true;
+			
+		}
+		
+		return false;
+				
+	}
+	
+	/**
+	 * @param graphController
+	 * @param traverser
+	 * @param percentageChanges
+	 * @return
+	 */
+	public static boolean containsLowPerformance(ArrayList<Double> performanceValues) {
+			
+		return containsLowPerformance(performanceValues, 0.5, 3);
+		
+	}
+	
+	/**
+	 * @param performanceValues
+	 * @param valueThreshold
+	 * @param sequenceLength
+	 * @return
+	 */
+	public static boolean containsHighPerformance(ArrayList<Double> performanceValues, double valueThreshold, int sequenceLength) {
+		
+		if ( performanceValues.size() >= sequenceLength ) {
+			
+			for ( int i = performanceValues.size() - sequenceLength; i < performanceValues.size(); i++ ) {
+				
+				if ( performanceValues.get(i) < valueThreshold ) { 
+					
+					return false;
+				
+				}
+					
+				
+			}
+			
+			return true;
+			
+		}
+		
+		return false;
+				
+	}
+	
+	/**
+	 * @param performanceValues
+	 * @return
+	 */
+	public static boolean containsHighPerformance(ArrayList<Double> performanceValues) {
+		
+		return containsHighPerformance(performanceValues, 0.5, 3);
+		
 	}
 
 }

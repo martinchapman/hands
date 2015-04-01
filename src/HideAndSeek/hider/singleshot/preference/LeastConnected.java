@@ -56,9 +56,11 @@ public class LeastConnected extends HiderLocalGraph {
 	}
 
 	/**
-	 * 
+	 * The imagined number of max connections that a node
+	 * can have in order to be considered to have least connectivity.
+	 * (1 = leaf).
 	 */
-	private static int MAXCONNECTIONS = 1;
+	protected int maxConnections = 1;
 	
 	/**
 	 * 
@@ -78,12 +80,12 @@ public class LeastConnected extends HiderLocalGraph {
 		
 		triedNodes.add(vertex);
 		
-		// If all nodes have been tried, cannot continue, so return true.
+		// If all nodes have been tried, and we still need more hide locations
 		if (triedNodes.size() == (graphController.vertexSet().size() - hideLocations.size())) { 
 			
-			// Increase max connections if none exist at pre-set maximum (e.g. we set out 
-			// to find connections of degree 1, but none of these exist).
-			MAXCONNECTIONS = minConnections;
+			// Increase max connections if not enough exist at pre-set maximum (e.g. we set out 
+			// to find connections of degree 1, but not enough (or none) of these exist).
+			maxConnections = minConnections;
 			
 			triedNodes.clear();
 			
@@ -93,7 +95,7 @@ public class LeastConnected extends HiderLocalGraph {
 		
 		if (graphController.edgesOf(vertex).size() < minConnections) minConnections = graphController.degreeOf(vertex);
 		
-		if (graphController.edgesOf(vertex).size() == MAXCONNECTIONS) { 
+		if (graphController.edgesOf(vertex).size() == maxConnections) { 
 			
 			triedNodes.clear(); 
 			
@@ -107,15 +109,6 @@ public class LeastConnected extends HiderLocalGraph {
 		
 	}
 	
-	/**
-	 * @param vertex
-	 * @return
-	 */
-	public boolean hideHereInterface(StringVertex vertex) {
-		
-		return hideHere(vertex);
-		
-	}
 
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)

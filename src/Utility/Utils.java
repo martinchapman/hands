@@ -26,8 +26,17 @@ import java.util.regex.Pattern;
 import org.jfree.chart.JFreeChart;
 import org.jibble.epsgraphics.EpsGraphics2D;
 
+/**
+ * A set of static utility methods.
+ * 
+ * @author Martin
+ *
+ */
 public class Utils {
 
+	/**
+	 * 
+	 */
 	public final static String FILEPREFIX = "output/";
 	
 	/**
@@ -35,40 +44,57 @@ public class Utils {
 	 */
 	public static boolean DEBUG = true;
 	
-	//http://stackoverflow.com/questions/8119366/sorting-hashmap-by-values
-	public static <K> Map<K, Double> sortByComparator(Map<K, Double> unsortMap, final boolean order)
-    {
+	/**
+	 * /http://stackoverflow.com/questions/8119366/sorting-hashmap-by-values
+	 * 
+	 * @param unsortMap
+	 * @param order
+	 * @return
+	 */
+	public static <K> Map<K, Double> sortByValue(Map<K, Double> unsortMap, final boolean order) {
 
         List<Entry<K, Double>> list = new LinkedList<Entry<K, Double>>(unsortMap.entrySet());
 
         // Sorting the list based on values
-        Collections.sort(list, new Comparator<Entry<K, Double>>()
-        {
-            public int compare(Entry<K, Double> o1,
-                    Entry<K, Double> o2)
-            {
-                if (order)
-                {
-                    return o1.getValue().compareTo(o2.getValue());
-                }
-                else
-                {
-                    return o2.getValue().compareTo(o1.getValue());
+        Collections.sort(list, new Comparator<Entry<K, Double>>() {
+        	
+            public int compare(Entry<K, Double> o1, Entry<K, Double> o2) {
+            	
+                if (order) {
+                
+                	return o1.getValue().compareTo(o2.getValue());
+                
+                } else {
+                    
+                	return o2.getValue().compareTo(o1.getValue());
 
                 }
+                
             }
+            
         });
 
         // Maintaining insertion order with the help of LinkedList
         Map<K, Double> sortedMap = new LinkedHashMap<K, Double>();
-        for (Entry<K, Double> entry : list)
-        {
+        
+        for (Entry<K, Double> entry : list) {
+        	
             sortedMap.put(entry.getKey(), entry.getValue());
+        
         }
 
         return sortedMap;
+        
     }
 	
+	/**
+	 * @param filePath
+	 * @param ftpUrl
+	 * @param user
+	 * @param pass
+	 * @param host
+	 * @param uploadPath
+	 */
 	public static void uploadToFTP(String filePath, String ftpUrl, String user, String pass, String host, String uploadPath) {
 		
 		ftpUrl = String.format(ftpUrl, user, pass, host, uploadPath);
@@ -104,6 +130,7 @@ public class Utils {
         }
         
 	}
+	
 	/**
 	 * @param url
 	 * @return

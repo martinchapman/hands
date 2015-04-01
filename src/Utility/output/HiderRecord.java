@@ -108,27 +108,17 @@ public class HiderRecord extends TraverserRecord {
 	 */
 	public double getAverageGameAttributeValue(String attribute, Hashtable<String, Double> maxAttributeToValueAllSeries, Hashtable<String, Double> minAttributeToValueAllSeries) {
 		
-		System.out.println(this);
-		
-		System.out.println("--------------------");
-		
 		double hiderCost = super.getAverageGameAttributeValue("Cost", maxAttributeToValueAllSeries, minAttributeToValueAllSeries);
 		
 		double cumulativeRelativisedSeekerCost = 0.0;
 		
 		for ( TraverserRecord hidersSeeker : seekersAndAttributes ) {
 			
-			System.out.println(hidersSeeker);
-			
-			System.out.println("--------------------");
-			
 			cumulativeRelativisedSeekerCost += hidersSeeker.getAverageGameAttributeValue("Cost", maxAttributeToValueAllSeries, minAttributeToValueAllSeries);
 			
 		}
 		
 		double seekerCost = cumulativeRelativisedSeekerCost / seekersAndAttributes.size();
-		
-		System.out.println("------------->:" + seekerCost + " " + hiderCost);
 		
 		return seekerCost - hiderCost;
 		
@@ -139,7 +129,7 @@ public class HiderRecord extends TraverserRecord {
 	 */
 	public String toString() {
 		
-		return traverser + " Seekers: " + seekersAndAttributes.toString().replace("[", "").replace("]", "");
+		return traverser + " Seekers: " + seekersAndAttributes.toString().replace("[", "").replace("]", "").replace(",", "");
 		
 	}
 	

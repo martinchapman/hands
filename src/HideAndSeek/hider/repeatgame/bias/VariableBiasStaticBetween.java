@@ -33,7 +33,7 @@ public class VariableBiasStaticBetween extends VariableLowEdgeCost {
 	@Override
 	public StringVertex startNode() {
 
-		return getCurrentNode();
+		return currentNode();
 		
 	}
 

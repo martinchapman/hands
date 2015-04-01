@@ -6,15 +6,17 @@ import java.util.HashSet;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.seeker.AdaptiveSeekerStrategy;
+import HideAndSeek.seeker.AdaptiveSeeker;
 import HideAndSeek.seeker.repeatgame.probability.HighProbability;
 import Utility.AdaptiveUtils;
+import Utility.ScoreMetric;
+import Utility.Utils;
 
 /**
  * @author Martin
  *
  */
-public class HighProbabilityAdaptable extends HighProbability implements AdaptiveSeekerStrategy {
+public class HighProbabilityAdaptable extends HighProbability implements AdaptiveSeeker {
 
 	/**
 	 * 
@@ -25,6 +27,24 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 	 * 
 	 */
 	ArrayList<Integer> uniqueHideLocationsProgression;
+	
+	/**
+	 * Denotes number of rounds for which the same number of 
+	 * new locations can be recorded before it is clear that
+	 * trend detection is not appropriate.
+	 */
+	private final int ROUND_CONSISTENCY_THRESHOLD = 3;
+	
+	/**
+	 * Level at which individual performance is deemed poor.
+	 */
+	private final double INDIVIDUAL_PERFORMANCE_THRESHOLD = 0.5;
+	
+	/** 
+	 * Denotes number of rounds for which performance can be poor before 
+	 * a strategy change is indicated.
+	 */
+	private final int INDIVIDUAL_PERFORMANCE_ROUND_THRESHOLD = 5;
 	
 	/**
 	 * @param graphController
@@ -38,6 +58,8 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 		uniqueHideLocationsProgression = new ArrayList<Integer>();
 		
 		percentageChanges = new ArrayList<Double>();
+		
+		this.name = "HighProbability";
 		
 	}
 	
@@ -70,9 +92,9 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 	 */
 	public double relevanceOfStrategy() {
 		
-		double relevance = 1 - ((uniqueHideLocations.size() / (double)(graphController.vertexSet().size())));
+		System.out.println("uniqueHideLocations.size() " + uniqueHideLocations.size());
 		
-		final int ROUND_CONSISTENCY_THRESHOLD = 5;
+		double relevance = 1 - ((uniqueHideLocations.size() / (double)(graphController.vertexSet().size())));
 		
 		if ( uniqueHideLocationsProgression.size() >= ROUND_CONSISTENCY_THRESHOLD ) {
 			
@@ -89,12 +111,13 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 				
 			}
 			
+			Utils.talk(this.toString(), "Increments are consistent, strategy change needed for this.");
+			
 			return 0.0;
 			
 		}
 		
 		return relevance;
-		
 		
 	}
 
@@ -108,16 +131,31 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 		
 	}
 
-	ArrayList<Double> percentageChanges;
+	/**
+	 * 
+	 */
+	private ArrayList<Double> percentageChanges;
 	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.seeker.AdaptiveSeekerStrategy#performanceOfSelf()
 	 */
 	@Override
 	public double performanceOfSelf() {
-
-		return AdaptiveUtils.performanceOfSelfUnderCostChange(graphController, this);
 		
+		percentageChanges.add(graphController.latestTraverserRoundPerformance(responsibleAgent, ScoreMetric.COST_CHANGE_SCORE));
+		
+		if (AdaptiveUtils.containsLowPerformance(percentageChanges, INDIVIDUAL_PERFORMANCE_THRESHOLD, INDIVIDUAL_PERFORMANCE_ROUND_THRESHOLD)) {
+			
+			Utils.talk(responsibleAgent.toString(), "Consecutive low performance detected.");
+			
+			return 0.0;
+			
+		} else {
+			
+			return 1.0;
+			
+		}
+
 	}
 	
 	/* (non-Javadoc)
@@ -142,6 +180,16 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 		uniqueHideLocationsProgression.clear();
 		
 		super.endOfGame();
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see HideAndSeek.AdaptiveGraphTraverser#stopStrategy()
+	 */
+	@Override
+	public void stopStrategy() {
+		
+		percentageChanges.clear();
 		
 	}
 

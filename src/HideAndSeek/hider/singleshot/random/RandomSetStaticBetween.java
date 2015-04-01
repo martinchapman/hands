@@ -38,7 +38,7 @@ public class RandomSetStaticBetween extends RandomSet {
 	@Override
 	public StringVertex startNode() {
 		
-		return getCurrentNode();
+		return currentNode();
 		
 	}
 

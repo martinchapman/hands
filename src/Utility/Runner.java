@@ -74,6 +74,7 @@ public class Runner extends JFrame {
 		  "RandomSetStaticBetween",
 		  "UniqueRandomSet",
 		  "UniqueRandomSetRepeat",
+		  "AutomaticUniqueRandomSetRepeat",
 		  
 		  "FirstN",
 		  //"RandomDirection",
@@ -151,7 +152,7 @@ public class Runner extends JFrame {
 		  
 		  //
 		  
-		  "AdaptiveRandom"
+		  "UnknownRandom"
 		  
 		};
 	
@@ -585,11 +586,11 @@ public class Runner extends JFrame {
 		
 		final JComboBox<String> graphTypes = new JComboBox<String>();
 
-		graphTypes.addItem("Line");
+		graphTypes.addItem("3D");
 		
 		graphTypes.addItem("Bar");
 		
-		graphTypes.addItem("3D");
+		graphTypes.addItem("Line");
 		
 		centerPaneRightCenter.add(new JLabel("Graph types:"));
 		

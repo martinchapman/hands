@@ -6,7 +6,7 @@ import java.util.Collections;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.singleshot.preference.LeastConnected;
+import HideAndSeek.hider.singleshot.preference.LeastConnectedMechanism;
 import Utility.Utils;
 
 /**
@@ -20,7 +20,7 @@ import Utility.Utils;
  */
 public class LeastConnectedDeceptive extends Deceptive {
 
-	LeastConnected leastConnectedMechanism;
+	LeastConnectedMechanism leastConnectedMechanism;
 	
 	/**
 	 * @param graph
@@ -35,7 +35,7 @@ public class LeastConnectedDeceptive extends Deceptive {
 		
 		super(graphController, numberOfHideLocations, deceptiveNodes, deceptionDuration);
 		
-		leastConnectedMechanism = new LeastConnected(graphController, numberOfHideLocations);
+		leastConnectedMechanism = new LeastConnectedMechanism(graphController, numberOfHideLocations);
 
 	}
 	
@@ -54,7 +54,7 @@ public class LeastConnectedDeceptive extends Deceptive {
 		
 		super(graphController, numberOfHideLocations, deceptiveNodes, deceptionDuration, repeatInterval, repeatDuration, refreshDeceptiveSet);
 		
-		leastConnectedMechanism = new LeastConnected(graphController, numberOfHideLocations);
+		leastConnectedMechanism = new LeastConnectedMechanism(graphController, numberOfHideLocations);
 		
 	}
 	

@@ -7,14 +7,7 @@ import HideAndSeek.seeker.repeatgame.probability.VariableNodesHighProbability;
 import Utility.Utils;
 
 /**
- * Assuming that the portion of nodes that are hidden with bias by the hider
- * is unknown, it may be important to adapt or learn this number to help
- * in the search.
- * 
- * Works with the a confidence level to discern those nodes which are truly bias.
- * 
  * @author Martin
- *
  */
 public class AutomaticVariableNodesHighProbability extends VariableNodesHighProbability {
 	

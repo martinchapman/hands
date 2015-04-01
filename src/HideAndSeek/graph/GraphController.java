@@ -15,11 +15,11 @@ import org.jgrapht.generate.RingGraphGenerator;
 import org.jgrapht.generate.ScaleFreeGraphGenerator;
 import org.jgrapht.graph.ClassBasedVertexFactory;
 
-import HideAndSeek.GraphTraversingAgent;
-import HideAndSeek.GraphTraversingAgent;
+import HideAndSeek.GraphTraverser;
 import HideAndSeek.GraphTraverser;
 import HideAndSeek.Main;
-import HideAndSeek.hider.HidingAgent;
+import HideAndSeek.hider.AdaptiveHider;
+import HideAndSeek.hider.Hider;
 import HideAndSeek.seeker.Seeker;
 import Utility.Utils;
 
@@ -205,7 +205,7 @@ public class GraphController<V, E> {
 	 * @param hider
 	 * @return
 	 */
-	public double latestHiderRoundScores(Object caller, HidingAgent hider) {
+	public double latestHiderRoundScores(Object caller, Hider hider) {
 		
 		if (!(caller instanceof Main)) return -1;
 		
@@ -243,12 +243,29 @@ public class GraphController<V, E> {
 	 */
 	public void addHideLocation(Object caller, StringVertex location) {
 		
-		if (!(caller instanceof HidingAgent)) return;
+		if (!(caller instanceof Hider)) return;
 		
 		graph.addHideLocation(location);
 		
 		
 	}
+	
+	/**
+	 * Whether a seeker is permitted to know the number of hide locations
+	 */
+	private static boolean SEEKER_KNOWS_NUMBER_OF_HIDE_LOCATIONS = true;
+	
+	/**
+	 * @return
+	 */
+	public int numberOfHideLocations(Object caller) {
+		
+		if (!(caller instanceof Hider) && !SEEKER_KNOWS_NUMBER_OF_HIDE_LOCATIONS) return -1;
+		
+		return graph.numberOfHideLocations();
+		
+	}
+
 	
 	/////////////////////////////////////////////
 	
@@ -305,9 +322,20 @@ public class GraphController<V, E> {
 	 * 
 	 * @param graphTraverser
 	 */
-	public void registerTraversingAgent(GraphTraversingAgent graphTraverser) {
+	public void registerTraversingAgent(GraphTraverser graphTraverser) {
 		
 		graph.registerTraversingAgent(graphTraverser);
+		
+	}
+	
+	/**
+	 * Let players deregister themselves
+	 * 
+	 * @param graphTraverser
+	 */
+	public void deregisterTraversingAgent(GraphTraverser graphTraverser) {
+		
+		graph.deregisterTraversingAgent(graphTraverser);
 		
 	}
 	
@@ -358,21 +386,12 @@ public class GraphController<V, E> {
 	}
 
 	/**
-	 * @return
-	 */
-	public int numberOfHideLocations() {
-		
-		return graph.numberOfHideLocations();
-		
-	}
-
-	/**
 	 * @param seeker
 	 * @param currentNode
 	 * @param nextNode
 	 * @return
 	 */
-	public boolean fromVertexToVertex(GraphTraversingAgent traverser, StringVertex currentNode,
+	public boolean fromVertexToVertex(GraphTraverser traverser, StringVertex currentNode,
 			StringVertex nextNode) {
 		
 		return graph.fromVertexToVertex(traverser, currentNode, nextNode);
@@ -387,7 +406,7 @@ public class GraphController<V, E> {
 	 * @param targetVertex
 	 * @return
 	 */
-	public void walkPathFromVertexToVertex(GraphTraversingAgent traverser, StringVertex sourceVertex, StringVertex targetVertex) {
+	public void walkPathFromVertexToVertex(GraphTraverser traverser, StringVertex sourceVertex, StringVertex targetVertex) {
 		
 		List<StringEdge> path = graph.pathFromVertexToVertex(traverser, sourceVertex, targetVertex);
 		
@@ -448,7 +467,7 @@ public class GraphController<V, E> {
 	 * @param hider
 	 * @return
 	 */
-	public double averageHiderScore(HidingAgent hider) {
+	public double averageHiderScore(Hider hider) {
 		
 		return graph.averageHiderScore(hider);
 		
@@ -558,7 +577,7 @@ public class GraphController<V, E> {
 	 * @param hider
 	 * @return
 	 */
-	public double latestHiderRoundScores(HidingAgent hider) {
+	public double latestHiderRoundScores(Hider hider) {
 		
 		return graph.latestHiderRoundScores(hider);
 		
@@ -579,7 +598,7 @@ public class GraphController<V, E> {
 	 * @param metric
 	 * @return
 	 */
-	public double latestTraverserRoundPerformance(GraphTraversingAgent traverser, int metric) {
+	public double latestTraverserRoundPerformance(GraphTraverser traverser, int metric) {
 		
 		return graph.latestTraverserRoundPerformance(traverser, metric);
 		

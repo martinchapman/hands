@@ -1,12 +1,18 @@
 package HideAndSeek;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 
-public interface GraphTraverser extends Runnable {
+public interface GraphTraverser extends Comparable<GraphTraverser>, Runnable {
 
+	/**
+	 * @param responsibleAgent
+	 */
+	public abstract void setResponsibleAgent(GraphTraversingAgent responsibleAgent);
+	
 	/**
 	 * @return
 	 */
@@ -20,12 +26,12 @@ public interface GraphTraverser extends Runnable {
 	/**
 	 * @return
 	 */
-	public abstract boolean getStrategyOverRounds();
+	public abstract boolean strategyOverRounds();
 
 	/**
 	 * @param strategyOverRounds
 	 */
-	public abstract void setStrategyOverRounds(boolean strategyOverRounds);
+	public abstract void strategyOverRounds(boolean strategyOverRounds);
 
 	/**
 	 * @return
@@ -76,6 +82,31 @@ public interface GraphTraverser extends Runnable {
 	/**
 	 * @return
 	 */
-	public int getRoundsPassed();
-
+	public int roundsPassed();
+	
+	/**
+	 * @return
+	 */
+	public StringVertex currentNode();
+	
+	/**
+	 * @return
+	 */
+	public ArrayList<StringVertex> exploredNodes();
+	
+	/**
+	 * @return
+	 */
+	public ArrayList<StringVertex> hideLocations();
+	
+	/**
+	 * @param location
+	 */
+	public void addHideLocation(StringVertex location);
+	
+	/**
+	 * 
+	 */
+	public void mergeOtherTraverser(GraphTraverser traverser);
+	
 }

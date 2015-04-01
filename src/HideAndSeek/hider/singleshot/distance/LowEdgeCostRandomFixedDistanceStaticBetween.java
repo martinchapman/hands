@@ -30,7 +30,7 @@ public class LowEdgeCostRandomFixedDistanceStaticBetween extends LowEdgeCostRand
 	@Override
 	public StringVertex startNode() {
 
-		return getCurrentNode();
+		return currentNode();
 		
 	}
 

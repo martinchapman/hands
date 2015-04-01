@@ -15,17 +15,12 @@ import Utility.Utils;
 /**
  * If the parent strategy, which is tuned to exploiting hiders that attempt
  * to hide uniquely, is faced with such a hider, it may not always be advantageous
- * to use *all* this information, as it becomes 
+ * to use *all* this information, as it becomes detectable.
  * 
  * @author Martin
  *
  */
 public class VariableNodesInverseHighProbability extends InverseHighProbability {
-
-	/**
-	 * 
-	 */
-	private int predictiveNodes;
 	
 	/**
 	 * @param graphController

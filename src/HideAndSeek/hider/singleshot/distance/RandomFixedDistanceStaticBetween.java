@@ -30,7 +30,7 @@ public class RandomFixedDistanceStaticBetween extends RandomFixedDistance implem
 	@Override
 	public StringVertex startNode() {
 
-		return getCurrentNode();
+		return currentNode();
 
 	}
 

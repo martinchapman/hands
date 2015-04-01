@@ -34,7 +34,7 @@ public class MaxDistanceStaticBetween extends MaxDistance {
 	@Override
 	public StringVertex startNode() {
 		
-		return getCurrentNode();
+		return currentNode();
 		
 	}
 

@@ -19,10 +19,13 @@ import org.jfree.ui.RefineryUtilities;
 import com.panayotis.gnuplot.terminal.PostscriptTerminal;
 
 import Utility.Utils;
+import Utility.output.gnuplot.GNU3DGraph;
+import Utility.output.gnuplot.GNUBarGraph;
+import Utility.output.gnuplot.GNUGraph;
+import Utility.output.gnuplot.GNULineGraph;
 
 /**
  * @author Martin
- *
  */
 public class OutputManager {
 	
@@ -477,9 +480,17 @@ public class OutputManager {
 				
 				traverser = traverser.substring(traverser.indexOf("Variable"), traverser.length());
 				
-				System.out.println(traverser);
-				
 				String[] labels = traverser.split("Variable");
+				
+				for ( int i = 0; i < labels.length; i++ ) {
+					
+					if ( labels[i].contains("-") ) {
+						
+						labels[i] = labels[i].substring(0, labels[i].indexOf("-"));
+						
+					}
+					
+				}
 				
 				if (labels.length > 2 ) {
 					
@@ -495,7 +506,9 @@ public class OutputManager {
 			
 			graph = new GNUBarGraph(title);
 			
-			String globalCategory = "";
+			Hashtable<String, Hashtable<String, Double>> categoryToTraverserAndData = new Hashtable<String, Hashtable<String, Double>>();
+			
+			Hashtable<String, Double> traverserAndData = new Hashtable<String, Double>();
 			
 			for ( TraverserRecord traverser : traverserRecords ) {
 				
@@ -511,19 +524,32 @@ public class OutputManager {
 					
 				}
 				
-				globalCategory = localCategory;
-				
 				if ( yLabel.contains("Score") ) {
 					
-					((GNUBarGraph) graph).addBar(traverser.getAverageGameAttributeValue(yLabel, maxAttributeToValueAllSeries, minAttributeToValueAllSeries), traverser.toString(), localCategory);
+					traverserAndData.put(traverser.toString(), traverser.getAverageGameAttributeValue(yLabel, maxAttributeToValueAllSeries, minAttributeToValueAllSeries));
 					
 				} else {
 					
-					((GNUBarGraph) graph).addBar(traverser.getAverageGameAttributeValue(yLabel), traverser.toString(), localCategory);
+
+					System.out.println(traverser.toString() + " " + traverser.getAverageGameAttributeValue(yLabel) + " " + localCategory);
+					
+					traverserAndData.put(traverser.toString().substring(0, traverser.toString().indexOf(" ")), traverser.getAverageGameAttributeValue(yLabel));
 					
 				}
 				
+				categoryToTraverserAndData.put(localCategory, new Hashtable<String, Double>(traverserAndData));
+				
 			}
+			
+			for ( Entry<String, Hashtable<String, Double>> traverserAndData2 : categoryToTraverserAndData.entrySet() ) {
+			
+				System.out.println(traverserAndData2.getKey() + ": " + traverserAndData2.getValue());
+				
+				((GNUBarGraph) graph).addBars(traverserAndData2.getValue(), traverserAndData2.getKey());
+			
+			}
+			
+			xLabel = "Strategy";
 			
 		}
 		
@@ -531,9 +557,11 @@ public class OutputManager {
 
 		String outputPath = "figure" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
 		
-		graph.createChart(outputPath + " " + "", xLabel, yLabel);
+		graph.createChart("", xLabel, yLabel);
 		
-		graph.exportChartAsEPS(Utils.FILEPREFIX + "data/charts/" + outputPath + ".eps");
+		//graph.exportChartAsEPS(Utils.FILEPREFIX + "data/charts/" + outputPath + ".eps");
+		
+		graph.exportChartAsTikz(Utils.FILEPREFIX + "data/charts/" + outputPath + ".tex");
 		
 		try {
 		

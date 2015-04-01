@@ -26,7 +26,7 @@ public class VariableFixedDistanceStaticBetween extends VariableFixedDistance im
 	 */
 	public StringVertex startNode() {
 		
-		return getCurrentNode();
+		return currentNode();
 		
 	}
 	

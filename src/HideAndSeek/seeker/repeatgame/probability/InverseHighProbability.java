@@ -13,6 +13,10 @@ import Utility.BehaviourPrediction;
 import Utility.Utils;
 
 /**
+ * Does not explore potential hide locations based upon frequency,
+ * but instead tracks those nodes which have *not yet been chosen*
+ * by a hider as hide locations, and heads to those 
+ * 
  * @author Martin
  *
  */
@@ -37,6 +41,10 @@ public class InverseHighProbability extends HighProbability {
 		
 		StringVertex newNode = super.startNode();
 		
+		/* 
+		 * At the start of each round, order the likely nodes according to their 
+		 * proximity to the start node. 
+		 */
 		this.likelyNodes = orderNodesByProximity(newNode, Integer.MAX_VALUE, likelyNodes);
 		
 		return newNode;
@@ -73,5 +81,4 @@ public class InverseHighProbability extends HighProbability {
 		
 	}
 	
-
 }

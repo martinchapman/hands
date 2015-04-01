@@ -3,7 +3,7 @@ package HideAndSeek.seeker.repeatgame.preference;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.singleshot.preference.LeastConnected;
+import HideAndSeek.hider.singleshot.preference.LeastConnectedMechanism;
 import HideAndSeek.seeker.repeatgame.probability.HighProbability;
 import Utility.BehaviourPrediction;
 
@@ -24,7 +24,7 @@ import Utility.BehaviourPrediction;
  */
 public class HighProbabilityMinimumConnectivity extends HighProbability {
 
-	private LeastConnected leastConnectedMechanism;
+	private LeastConnectedMechanism leastConnectedMechanism;
 	
 	/**
 	 * @param graph
@@ -34,7 +34,7 @@ public class HighProbabilityMinimumConnectivity extends HighProbability {
 		
 		super(graphController);
 		
-		leastConnectedMechanism = new LeastConnected(graphController, 0);
+		leastConnectedMechanism = new LeastConnectedMechanism(graphController, 0);
 		
 	}
 	

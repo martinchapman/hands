@@ -36,7 +36,7 @@ public class LeastConnectedStaticBetween extends LeastConnected {
 	@Override
 	public StringVertex startNode() {
 	
-		return getCurrentNode();
+		return currentNode();
 		
 	}
 

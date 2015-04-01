@@ -89,8 +89,8 @@ public class VariableBias extends VariableLowEdgeCost {
 		}
 		
 		
-		explorativeEdgesToCost = Utils.sortByComparator(explorativeEdgesToCost, true);
-		biasEdgesToCost = Utils.sortByComparator(biasEdgesToCost, true);
+		explorativeEdgesToCost = Utils.sortByValue(explorativeEdgesToCost, true);
+		biasEdgesToCost = Utils.sortByValue(biasEdgesToCost, true);
 		
 		System.out.println(explorativeEdgesToCost);
 		System.out.println(biasEdgesToCost);

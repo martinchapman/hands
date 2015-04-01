@@ -3,6 +3,7 @@ package HideAndSeek.seeker;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 
 import HideAndSeek.GraphTraversingAgent;
 import HideAndSeek.graph.GraphController;
@@ -15,22 +16,49 @@ import Utility.Utils;
  *
  */
 public abstract class SeekingAgent extends GraphTraversingAgent implements Runnable, Seeker {
-
-	/**
-	 * 
-	 */
-	protected ArrayList<StringVertex> hideLocations;
 	
 	/**
 	 * All hide locations encountered in a game.
 	 */
 	protected ArrayList<StringVertex> allHideLocations;
+
+	/**
+	 * @return
+	 */
+	public ArrayList<StringVertex> allHideLocations() {
+		
+		return allHideLocations;
+	
+	}
 	
 	/**
 	 * 
 	 */
-	protected ArrayList<StringVertex> exploredNodes;
-
+	protected HashSet<StringVertex> uniqueHideLocations;
+	
+	/**
+	 * @return
+	 */
+	public HashSet<StringVertex> uniqueHideLocations() {
+		
+		return uniqueHideLocations;
+		
+	}
+	
+	/**
+	 * We assume a default number of hide locations as 5.
+	 */
+	private int estimatedNumberOfHideLocations = 5;
+	
+	/**
+	 * @return
+	 */
+	protected int estimatedNumberOfHideLocations() {
+		
+		return estimatedNumberOfHideLocations;
+		
+	}
+	
 	/**
 	 * @param graph
 	 */
@@ -38,19 +66,39 @@ public abstract class SeekingAgent extends GraphTraversingAgent implements Runna
 		
 		super(graphController);
 		
-		// ID according to time of generation
-		ID = "" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime()) + Math.random() * 100;
-		
-		// Record of where hidden items have been found
-		hideLocations = new ArrayList<StringVertex>();
-		
 		// Record of where hidden items have been found (in the whole game)
 		allHideLocations = new ArrayList<StringVertex>();
 		
-		// List of nodes that have been explored
-		exploredNodes = new ArrayList<StringVertex>();
+		//
+		uniqueHideLocations = new HashSet<StringVertex>();
 		
-		name = this.getClass().toString().substring(this.getClass().toString().lastIndexOf('.') + 1, this.getClass().toString().length());
+		//
+		updateNumberOfHideLocationsEstimate();
+		
+	}
+	
+	
+	/**
+	 * Default: changing the number of expected locations each time.
+	 */
+	private int hideLocationEstimateInterval = 1;
+	
+	/** 
+	 * If a seeker is not *permitted* access to the actual number of hide locations
+	 * by the controller, it must estimate this, on a specified basis, based
+	 * upon the number of hide locations most recently recorded.
+	 */
+	private void updateNumberOfHideLocationsEstimate() {
+		
+		if ( graphController.numberOfHideLocations(responsibleAgent) == -1 ) {
+			
+			if ( roundsPassed % hideLocationEstimateInterval == 0 && hideLocations.size() > 0 ) estimatedNumberOfHideLocations = hideLocations.size();
+			
+		} else {
+			
+			estimatedNumberOfHideLocations = graphController.numberOfHideLocations(responsibleAgent);
+			
+		}
 		
 	}
 	
@@ -93,11 +141,13 @@ public abstract class SeekingAgent extends GraphTraversingAgent implements Runna
 	 */
 	public void addHideLocation(StringVertex location) {
 		
-		Utils.talk(this.toString(), "----------------------------------Found " + location);
+		Utils.talk(responsibleAgent.toString(), "----------------------------------Found " + location);
 		
 		hideLocations.add(location); 
 		
 		allHideLocations.add(location);
+		
+		uniqueHideLocations.add(location);
 		
 	}
 	
@@ -110,7 +160,7 @@ public abstract class SeekingAgent extends GraphTraversingAgent implements Runna
 		
 		if ( currentNode != null && currentNode != startNode ) {
 			
-			graphController.walkPathFromVertexToVertex(this, currentNode, startNode);
+			graphController.walkPathFromVertexToVertex(responsibleAgent, currentNode, startNode);
 			
 		} 
 		
@@ -118,9 +168,9 @@ public abstract class SeekingAgent extends GraphTraversingAgent implements Runna
 		
 		StringVertex nextNode = null;
 		
-		while ( hideLocations.size() != graphController.numberOfHideLocations() ) {
+		while ( hideLocations.size() != estimatedNumberOfHideLocations ) {
 			
-			//Utils.talk(this.toString(), "At: " + currentNode);
+			//Utils.talk(responsibleAgent.toString(), "At: " + currentNode);
 			
 			exploredNodes.add(currentNode);
 			
@@ -130,7 +180,7 @@ public abstract class SeekingAgent extends GraphTraversingAgent implements Runna
 	        		
         		addHideLocation(currentNode);
 				
-				if (hideLocations.size() == graphController.numberOfHideLocations()) { break; }
+				if (hideLocations.size() == estimatedNumberOfHideLocations) { break; }
 			
         	}
 			 
@@ -138,9 +188,9 @@ public abstract class SeekingAgent extends GraphTraversingAgent implements Runna
 			
 			addUniquelyVisitedEdge(graphController.getEdge(currentNode, nextNode));
 			
-			if ( !graphController.fromVertexToVertex(this, currentNode, nextNode) ) { 
+			if ( !graphController.fromVertexToVertex(responsibleAgent, currentNode, nextNode) ) { 
 				
-				Utils.talk(this.toString(), "Error traversing supplied path.");
+				Utils.talk(responsibleAgent.toString(), "Error traversing supplied path.");
 				
 			} else {
 			
@@ -151,42 +201,36 @@ public abstract class SeekingAgent extends GraphTraversingAgent implements Runna
 		}
 		
 	}
-	
+
 	/* (non-Javadoc)
-	 * @see HideAndSeek.seeker.SeekerTemplate#printRoundStats()
+	 * @see HideAndSeek.GraphTraversingAgent#printRoundStats()
 	 */
 	@Override
 	public String printRoundStats() {
 		
-		return super.printRoundStats() + "Cost, " + graphController.latestRoundCosts(this, false);
+		return super.printRoundStats() + "Cost, " + graphController.latestRoundCosts(responsibleAgent, false);
 		
 	}
-	
+
 	/* (non-Javadoc)
-	 * @see HideAndSeek.seeker.SeekerTemplate#printGameStats()
+	 * @see HideAndSeek.GraphTraversingAgent#printGameStats()
 	 */
 	@Override
 	public String printGameStats() {
 		
 		return super.printGameStats() +
-			   "Cost, " + graphController.averageGameCosts(this)  +  
-			   ", PathLength, " + graphController.averagePathLength(this);
+			   "Cost, " + graphController.averageGameCosts(responsibleAgent)  +  
+			   ", PathLength, " + graphController.averagePathLength(responsibleAgent);
 		
 	}
-	
-	/**
-	 * Record of the number of rounds passed 
-	 */
-	protected int roundsPassed = 0;
 	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#endOfRound()
 	 */
-	/* (non-Javadoc)
-	 * @see HideAndSeek.seeker.SeekerTemplate#endOfRound()
-	 */
 	@Override
 	public void endOfRound() {
+		
+		updateNumberOfHideLocationsEstimate();
 		
 		super.endOfRound();
 		
@@ -194,25 +238,35 @@ public abstract class SeekingAgent extends GraphTraversingAgent implements Runna
 		
 		hideLocations.clear();
 		
-		roundsPassed++;
-		
 	}
 	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#endOfGame()
-	 */
-	/* (non-Javadoc)
-	 * @see HideAndSeek.seeker.SeekerTemplate#endOfGame()
 	 */
 	@Override
 	public void endOfGame() {
 		
 		super.endOfGame();
 		
-		roundsPassed = 0;
-		
 		allHideLocations.clear();
+		
+		uniqueHideLocations.clear();
 		
 	}
 	
+	/**
+	 * @param traverser
+	 */
+	public void mergeOtherTraverser(Seeker traverser) {
+		
+		super.mergeOtherTraverser(traverser);
+		
+		System.out.println("Seeker merge.");
+		
+		this.allHideLocations.addAll(traverser.allHideLocations());
+		
+		this.uniqueHideLocations.addAll(traverser.uniqueHideLocations());
+		
+	}
+
 }

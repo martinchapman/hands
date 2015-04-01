@@ -10,8 +10,8 @@ import java.util.List;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
+import HideAndSeek.hider.AdaptiveHidingAgent;
 import HideAndSeek.hider.AdaptiveHider;
-import HideAndSeek.hider.AdaptiveHiderStrategy;
 import HideAndSeek.hider.Hider;
 import HideAndSeek.hider.repeatgame.bias.FixedStartVariableBias;
 import HideAndSeek.hider.repeatgame.bias.VariableBias;
@@ -23,8 +23,7 @@ import HideAndSeek.hider.repeatgame.deceptive.GroupedDeceptive;
 import HideAndSeek.hider.repeatgame.deceptive.LeastConnectedDeceptive;
 import HideAndSeek.hider.repeatgame.random.UniqueRandomSet;
 import HideAndSeek.hider.repeatgame.random.UniqueRandomSetRepeat;
-import HideAndSeek.hider.repeatgame.random.adaptable.RandomSetAdaptable;
-import HideAndSeek.hider.repeatgame.random.adaptable.UniqueRandomSetRepeatAdaptable;
+import HideAndSeek.hider.repeatgame.random.automatic.AutomaticUniqueRandomSetRepeat;
 import HideAndSeek.hider.singleshot.cost.FixedStartVariableLowEdgeCost;
 import HideAndSeek.hider.singleshot.cost.VariableLowEdgeCost;
 import HideAndSeek.hider.singleshot.cost.VariableLowEdgeCostStaticBetween;
@@ -49,8 +48,8 @@ import HideAndSeek.hider.singleshot.random.RandomSetStaticBetween;
 import HideAndSeek.hider.singleshot.random.RandomStaticBetween;
 import HideAndSeek.hider.singleshot.random.RandomVariableHidePotential;
 import HideAndSeek.hider.singleshot.staticlocations.StaticLocations;
+import HideAndSeek.seeker.AdaptiveSeekingAgent;
 import HideAndSeek.seeker.AdaptiveSeeker;
-import HideAndSeek.seeker.AdaptiveSeekerStrategy;
 import HideAndSeek.seeker.Seeker;
 import HideAndSeek.seeker.repeatgame.probability.HighProbability;
 import HideAndSeek.seeker.repeatgame.probability.HighProbabilityRepetitionCheck;
@@ -107,7 +106,7 @@ public class Main {
 	/**
 	 * Whether to output a corresponding animation of the search process
 	 */
-	private final boolean OUTPUTJS = false;
+	private final boolean OUTPUT_JS = false;
 	
 	/**
 	 * @param args
@@ -276,6 +275,12 @@ public class Main {
 			if (hiderType.getElement0().equals("UniqueRandomSetRepeat")) {
 				
 				allHidingAgents.add(new UniqueRandomSetRepeat(graphController, numberOfHideLocations));
+			
+			} 
+			
+			if (hiderType.getElement0().equals("AutomaticUniqueRandomSetRepeat")) {
+				
+				allHidingAgents.add(new AutomaticUniqueRandomSetRepeat(graphController, numberOfHideLocations, 3));
 			
 			} 
 			
@@ -656,20 +661,49 @@ public class Main {
 				
 			}
 			
-			// Adaptive:
+			// Unknown:
 			
-			ArrayList<AdaptiveHiderStrategy> strategyPortfolio = new ArrayList<AdaptiveHiderStrategy>();
+			ArrayList<AdaptiveHider> strategyPortfolio = new ArrayList<AdaptiveHider>();
 			
-			if (hiderType.getElement0().equals("AdaptiveRandom")) {
+			if (hiderType.getElement0().equals("UnknownRandom")) {
 				
 				strategyPortfolio.clear();
 				
-				strategyPortfolio.add(new RandomSetAdaptable(graphController, numberOfHideLocations));
+				abstract class RandomSetAnonymous extends RandomSet implements AdaptiveHider {
+					public RandomSetAnonymous(GraphController<StringVertex, StringEdge> graphController, int numberOfHideLocations) {
+						super(graphController, numberOfHideLocations);
+					} 
+					
+				}
 				
-				strategyPortfolio.add(new UniqueRandomSetRepeatAdaptable(graphController, numberOfHideLocations));
+				strategyPortfolio.add(new RandomSetAnonymous(graphController, numberOfHideLocations) {
+					public double relevanceOfStrategy() { return -1; }
+					public double performanceOfOpponent() { return -1; }
+					public double performanceOfSelf() { return -1; }
+					public void stopStrategy() {}
+				});
 				
-				allHidingAgents.add(new AdaptiveHider<AdaptiveHiderStrategy>(graphController, totalRounds, strategyPortfolio.get(1), strategyPortfolio, 0.5, 0.5, 0.5, false));
+				strategyPortfolio.get(strategyPortfolio.size() - 1).setName("RandomSet");
 				
+				abstract class AutomaticUniqueRandomSetRepeatAnonymous extends AutomaticUniqueRandomSetRepeat implements AdaptiveHider {
+					public AutomaticUniqueRandomSetRepeatAnonymous(GraphController<StringVertex, StringEdge> graphController, int numberOfHideLocations, int goodPerformanceRounds) {
+						super(graphController, numberOfHideLocations, goodPerformanceRounds);
+					}
+				}
+				
+				strategyPortfolio.add(new AutomaticUniqueRandomSetRepeatAnonymous(graphController, numberOfHideLocations, 3) {
+					public double relevanceOfStrategy() { return -1; }
+					public double performanceOfOpponent() { return -1; }
+					public double performanceOfSelf() { return -1; }
+					public void stopStrategy() {}
+				});
+				
+				strategyPortfolio.get(strategyPortfolio.size() - 1).setName("AutomaticUniqueRandomSetRepeat");
+				
+				allHidingAgents.add(new AdaptiveHidingAgent<AdaptiveHider>(graphController, strategyPortfolio, totalRounds));
+				
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("UnknownRandom");
+			
 			}
 			
 		}
@@ -815,7 +849,7 @@ public class Main {
 			
 			// Adaptive:
 			
-			ArrayList<AdaptiveSeekerStrategy> strategyPortfolio = new ArrayList<AdaptiveSeekerStrategy>();
+			ArrayList<AdaptiveSeeker> strategyPortfolio = new ArrayList<AdaptiveSeeker>();
 			
 			if (seekerType.getElement0().equals("AdaptiveHighProbability")) {
 				
@@ -825,7 +859,7 @@ public class Main {
 				
 				strategyPortfolio.add(new HighProbabilityAdaptable(graphController));
 				
-				allSeekingAgents.add(new AdaptiveSeeker<AdaptiveSeekerStrategy>(graphController, totalRounds, strategyPortfolio.get(1), strategyPortfolio, 0.5, 0.5, 0.5, false));
+				allSeekingAgents.add(new AdaptiveSeekingAgent<AdaptiveSeeker>(graphController, totalRounds, strategyPortfolio.get(1), strategyPortfolio, 0.5, 0.5, 0.5, false));
 				
 			}
 			
@@ -849,8 +883,8 @@ public class Main {
 	 * Rounds are designed to re-test the same parameter configurations (which may vary between games)
 	 * multiples times AND to allow for patterns or histories to develop
 	 * 
-	 * @param list2
-	 * @param list
+	 * @param hiders
+	 * @param seekers
 	 * @param rounds
 	 * @param recordPerRound
 	 */
@@ -864,7 +898,7 @@ public class Main {
 			
 			mainOutputWriter = new FileWriter(Utils.FILEPREFIX + "/data/" + currentSimulationIdentifier + ".csv", true);
 		
-			if (OUTPUTJS) {
+			if (OUTPUT_JS) {
 				
 				outputJavascript = new FileWriter(Utils.FILEPREFIX + "/data/js/data/" + currentSimulationIdentifier + "-vis.js", true);
 				
@@ -878,7 +912,7 @@ public class Main {
 		
 		}
 		
-		if (OUTPUTJS) Utils.writeToFile(outputJavascript, "var graphNodes = \"" + graphController.edgeSet(this) + "\"; \n var hidden = new Array(); \n var path = new Array(); \n");
+		if (OUTPUT_JS) Utils.writeToFile(outputJavascript, "var graphNodes = \"" + graphController.edgeSet(this) + "\"; \n var hidden = new Array(); \n var path = new Array(); \n");
 		
 		/**************************
     	 * 
@@ -893,13 +927,13 @@ public class Main {
 		for ( Hider hider : hiders ) {
 			
 			// Dramatically affects the size of the output files
-			if (hider.getStrategyOverRounds()) repeatAllRounds = 10; //rounds;
+			if (hider.strategyOverRounds()) repeatAllRounds = 10; //rounds;
 			
 		}
 		
 		for ( Seeker  seeker : seekers ) {
 			
-			if (seeker.getStrategyOverRounds()) repeatAllRounds = 10; //rounds;
+			if (seeker.strategyOverRounds()) repeatAllRounds = 10; //rounds;
 			
 		}
 		
@@ -934,11 +968,11 @@ public class Main {
 					
 					graphController.clearHideLocations(this);
 		    		
-		    		if (OUTPUTJS) {
+		    		if (OUTPUT_JS) {
 		    			
 		    			// Visualise first hider and first seeker, for novelty, mainly.
 		    			
-		    			Utils.writeToFile(outputJavascript, "hidden[" + i + "] = \"" + hiders.get(0).getHideLocations() + "\"; \n");
+		    			Utils.writeToFile(outputJavascript, "hidden[" + i + "] = \"" + hiders.get(0).hideLocations() + "\"; \n");
 		    		
 		    			Utils.writeToFile(outputJavascript, "path[" + i + "] = \"" + graphController.latestRoundPaths(this, seekers.get(0)) + "\"; \n");
 			    		
@@ -979,7 +1013,7 @@ public class Main {
 				
 				//
 		    	
-				if (OUTPUTJS) {
+				if (OUTPUT_JS) {
 					
 			    	ArrayList<String> javascriptOutputTemplate = Utils.readFromFile(Utils.FILEPREFIX + "data/js/vis-template.js");
 			    	
@@ -1057,7 +1091,7 @@ public class Main {
 			
 			mainOutputWriter.close();
 			
-			if (OUTPUTJS) {
+			if (OUTPUT_JS) {
 				
 				outputJavascript.close();
 				

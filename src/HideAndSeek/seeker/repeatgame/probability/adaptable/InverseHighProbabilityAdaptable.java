@@ -1,21 +1,32 @@
 package HideAndSeek.seeker.repeatgame.probability.adaptable;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.seeker.AdaptiveSeekerStrategy;
+import HideAndSeek.seeker.AdaptiveSeeker;
+import HideAndSeek.seeker.Seeker;
 import HideAndSeek.seeker.repeatgame.probability.VariableNodesInverseHighProbability;
+import Utility.AdaptiveUtils;
 import Utility.ScoreMetric;
+import Utility.Utils;
 
 /**
+ * Augmented to provide feedback on its own performance, such that
+ * it may be changed by a parent strategy.
  * 
  * @author Martin
  *
  */
-public class InverseHighProbabilityAdaptable extends VariableNodesInverseHighProbability implements AdaptiveSeekerStrategy {
+public class InverseHighProbabilityAdaptable extends VariableNodesInverseHighProbability implements AdaptiveSeeker {
 
+	/**
+	 * 
+	 */
+	private ArrayList<Double> percentageChanges;
+	
 	/**
 	 * @param graphController
 	 */
@@ -23,14 +34,12 @@ public class InverseHighProbabilityAdaptable extends VariableNodesInverseHighPro
 		
 		super(graphController, predictiveNodes);
 		
-		uniqueHideLocations = new HashSet<StringVertex>();
+		percentageChanges = new ArrayList<Double>();
+		
+		this.name = "InverseHighProbability";
 		
 	}
 
-	/**
-	 * 
-	 */
-	HashSet<StringVertex> uniqueHideLocations;
 	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.seeker.repeatgame.probability.HighProbability#addHideLocation(HideAndSeek.graph.StringVertex)
@@ -38,9 +47,6 @@ public class InverseHighProbabilityAdaptable extends VariableNodesInverseHighPro
 	public void addHideLocation(StringVertex location) {
 		
 		super.addHideLocation(location);
-		
-		uniqueHideLocations.add(location);
-		
 		
 	}
 	
@@ -55,6 +61,8 @@ public class InverseHighProbabilityAdaptable extends VariableNodesInverseHighPro
 	@Override
 	public double relevanceOfStrategy() {
 	
+		System.out.println("uniqueHideLocations.size() " + uniqueHideLocations.size());
+		
 		return (uniqueHideLocations.size() / (double)(graphController.vertexSet().size())); 
 		
 	}
@@ -70,25 +78,44 @@ public class InverseHighProbabilityAdaptable extends VariableNodesInverseHighPro
 	}
 
 	/* (non-Javadoc)
-	 * @see HideAndSeek.seeker.repeatgame.probability.InverseHighProbability#endOfGame()
-	 */
-	@Override
-	public void endOfGame() {
-		
-		uniqueHideLocations.clear();
-		
-		super.endOfGame();
-		
-	}
-
-	/* (non-Javadoc)
 	 * @see HideAndSeek.seeker.AdaptiveSeekerStrategy#performanceOfSelf()
 	 */
 	@Override
 	public double performanceOfSelf() {
 
-		return graphController.latestTraverserRoundPerformance(this, ScoreMetric.COST_CHANGE);
+		percentageChanges.add(graphController.latestTraverserRoundPerformance(responsibleAgent, ScoreMetric.COST_CHANGE_SCORE));
+		
+		if (AdaptiveUtils.containsLowPerformance(percentageChanges)) {
+			
+			Utils.talk(responsibleAgent.toString(), "Consecutive low performance detected.");
+			
+			return 0.0;
+			
+		} else {
+			
+			return 1.0;
+			
+		}
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.seeker.repeatgame.probability.InverseHighProbability#endOfGame()
+	 */
+	@Override
+	public void endOfGame() {
+		
+		super.endOfGame();
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.AdaptiveGraphTraverser#stopStrategy()
+	 */
+	@Override
+	public void stopStrategy() {
+		
+		percentageChanges.clear();
+		
+	}
 }

@@ -6,7 +6,7 @@
 	<classpathentry kind="lib" path="lib/jfreechart-1.0.17.jar"/>
 	<classpathentry kind="lib" path="lib/jgraph-sna.jar"/>
 	<classpathentry kind="lib" path="lib/jgrapht-core-0.9.0.jar"/>
-	<classpathentry kind="lib" path="lib/java-plot.jar">
+	<classpathentry kind="lib" path="lib/java-plot.jar" sourcepath="lib/java-plot-src">
 		<attributes>
 			<attribute name="javadoc_location" value="file:/Users/Martin/Dropbox/workspace/SearchGames/lib/java-plot-doc/"/>
 		</attributes>

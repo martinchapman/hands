@@ -38,7 +38,7 @@ public class VariableLowEdgeCostStaticBetween extends VariableLowEdgeCost {
 	@Override
 	public StringVertex startNode() {
 
-		return getCurrentNode();
+		return currentNode();
 		
 	}
 	

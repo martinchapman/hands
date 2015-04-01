@@ -1,18 +1,31 @@
 package HideAndSeek.seeker;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+
 import HideAndSeek.GraphTraverser;
 import HideAndSeek.graph.StringVertex;
 
 public interface Seeker extends GraphTraverser {
 
 	/**
-	 * @param location
+	 * @return
 	 */
-	public void addHideLocation(StringVertex location);
+	public void search();
 	
 	/**
 	 * @return
 	 */
-	public void search();
+	public HashSet<StringVertex> uniqueHideLocations();
+	
+	/**
+	 * @return
+	 */
+	public ArrayList<StringVertex> allHideLocations();
+	
+	/**
+	 * @param traverser
+	 */
+	public void mergeOtherTraverser(Seeker traverser);
 
 }
