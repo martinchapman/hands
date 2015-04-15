@@ -62,6 +62,15 @@ public class AdaptiveSeekingAgent<E extends Seeker & AdaptiveGraphTraverser> ext
 		currentStrategy.search();
 		
 	}
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.seeker.Seeker#searchCriteria()
+	 */
+	public boolean searchCriteria() {
+		
+		return currentStrategy.searchCriteria();
+		
+	}
 
 	/**
 	 * @param currentNode

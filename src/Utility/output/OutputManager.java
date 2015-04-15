@@ -14,10 +14,6 @@ import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.Map.Entry;
 
-import org.jfree.ui.RefineryUtilities;
-
-import com.panayotis.gnuplot.terminal.PostscriptTerminal;
-
 import Utility.Utils;
 import Utility.output.gnuplot.GNU3DGraph;
 import Utility.output.gnuplot.GNUBarGraph;
@@ -46,175 +42,221 @@ public class OutputManager {
 	/**
 	 * 
 	 */
-	public void processOutput() {
+	public OutputManager() {
 		
 		fileHiderRecords = new ArrayList<ArrayList<HiderRecord>>();
+		
+	}
+	
+	/**
+	 * @return
+	 */
+	public ArrayList<Path> availableFiles() {
 		
 		ArrayList<Path> files = listFilesForFolder(new File(FILEPREFIX + "data"));
 		
 		if (files.size() == 0) {
 			
-			return;
+			return new ArrayList<Path>();
 			
 		}
-
+		
 		// For each file in the directory
 		for ( Path path : files ) {
 			
 			// If it is a .csv file (what we want):
-			if (path.toString().substring(path.toString().length() - 3, path.toString().length()).equals("csv")) {
+			if (!path.toString().substring(path.toString().length() - 3, path.toString().length()).equals("csv")) {
+			
+				files.remove(path);
 				
-				ArrayList<HiderRecord> hiderRecords = new ArrayList<HiderRecord>();
+			}
+			
+		}
+		
+		return files;
+		
+	}
+			
+	/**
+	 * 
+	 */
+	public void processAllOutput() {
+		
+		fileHiderRecords.clear();
+		
+		for ( Path path : availableFiles() ) {
+			
+			processOutput(path);
+			
+		}
+	
+	}
+	
+	/**
+	 * @param path
+	 */
+	public void processIndividualOutput(Path path) {
+		
+		fileHiderRecords.clear();
+		
+		processOutput(path);
+		
+	}
+	
+	/**
+	 * 
+	 */
+	public void processOutput(Path path) {
+		
+		ArrayList<HiderRecord> hiderRecords = new ArrayList<HiderRecord>();
+		
+		ArrayList<String> lines = Utils.readFromFile(path.toString());
+		
+		String parameters = lines.remove(0);
+		
+		String topology = "";
+		
+		for ( String parameter : parameters.split(" ") ) {
+			
+			String[] keyAndValue = parameter.split(",");
+			
+			if ( keyAndValue[0].replace("{", "").equals("Topology") ) {
 				
-				ArrayList<String> lines = Utils.readFromFile(path.toString());
+				topology = keyAndValue[1].replace("}", "");
 				
-				String parameters = lines.remove(0);
+			}
+			
+		}
+		
+		for ( String line : lines ) {
+		
+			if ( Utils.DEBUG ) Utils.printSystemStats();
+			
+			String lastHider = "";
+			
+			String lastSeeker = "";
+			
+			String lastTraverser = "";
+			
+			String lastAttribute = "";
+			
+			String gameOrRound = "";
+			
+			for ( String word : line.split(",")) {
 				
-				String topology = "";
+				word = word.trim();
 				
-				for ( String parameter : parameters.split(" ") ) {
+				try {
 					
-					String[] keyAndValue = parameter.split(",");
+					Double value = Double.parseDouble(word);
 					
-					if ( keyAndValue[0].replace("{", "").equals("Topology") ) {
+					if ( lastTraverser.equals("hider") ) {
+					
+						hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).attribute(gameOrRound, lastAttribute, value);
 						
-						topology = keyAndValue[1].replace("}", "");
+					} else if ( lastTraverser.equals("seeker") ) {
+					
+						hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker(lastSeeker).attribute(gameOrRound, lastAttribute, value);
 						
 					}
-					
-				}
-				
-				for ( String line : lines ) {
-				
-					String lastHider = "";
-					
-					String lastSeeker = "";
-					
-					String lastTraverser = "";
-					
-					String lastAttribute = "";
-					
-					String gameOrRound = "";
-					
-					for ( String word : line.split(",")) {
-						
-						word = word.trim();
-						
-						try {
-							
-							Double value = Double.parseDouble(word);
-							
-							if ( lastTraverser.equals("hider") ) {
-							
-								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).attribute(gameOrRound, lastAttribute, value);
-								
-							} else if ( lastTraverser.equals("seeker") ) {
-							
-								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker(lastSeeker).attribute(gameOrRound, lastAttribute, value);
-								
-							}
 
-						} catch (NumberFormatException e) { 
+				} catch (NumberFormatException e) { 
+					
+					// If we come across an entry for a Hider
+					if ( word.charAt(0) == 'h') {
+					
+						// Mixing, and first time round
+						if ( parameters.contains("{MixHiders,true}") ) {
 							
-							// If we come across an entry for a Hider
-							if ( word.charAt(0) == 'h') {
+							// If mixing, only ever one hide record, for all hiders
+							if ( (hiderRecords.size() == 0) ) {
 							
-								// Mixing, and first time round
-								if ( parameters.contains("{MixHiders,true}") ) {
-									
-									// If mixing, only ever one hide record, for all hiders
-									if ( (hiderRecords.size() == 0) ) {
-									
-										hiderRecords.add(new HiderRecord(path, "MixedHiderStrats"));
-										
-										hiderRecords.get(hiderRecords.size() - 1 ).setTopology(topology);
-										
-										hiderRecords.get(hiderRecords.size() - 1 ).setParameters(parameters);
-										
-									
-									}
-									
-									lastHider = hiderRecords.get(0).getTraverser();
-									
-								} else {
-									
-									// If we do not yet have a record for this hider
-									if (!hiderRecords.contains(new TraverserRecord(word))) {
-										
-										// Create it
-										hiderRecords.add(new HiderRecord(path, word));
-										
-										hiderRecords.get(hiderRecords.size() - 1 ).setTopology(topology);
-										
-										hiderRecords.get(hiderRecords.size() - 1 ).setParameters(parameters);
-										
-									}
-									
-									lastHider = word;
-									
-								}
+								hiderRecords.add(new HiderRecord(path, "MixedHiderStrats"));
 								
-								lastTraverser = "hider";
+								hiderRecords.get(hiderRecords.size() - 1 ).setTopology(topology);
 								
-							// If we come across an entry for a Seeker
-							} else if ( word.charAt(0) == 's' ) {
+								hiderRecords.get(hiderRecords.size() - 1 ).setParameters(parameters);
 								
-								if ( parameters.contains("{MixSeekers,true}") ) { 
-									
-									if ( hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeekersAndAttributes().size() == 0 ) {
-										
-										hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).addSeeker(new TraverserRecord("MixedSeekerStrats"));
-										
-										hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker("MixedSeekerStrats").setTopology(topology);
-									
-									}
-									
-									lastSeeker = hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker("MixedSeekerStrats").getTraverser();
-									
-								} else {
-									
-									// If the last hider doesn't have a record of this seeker, add it
-									if (!hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).containsSeeker(new TraverserRecord(word))) {
-											
-										hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).addSeeker(new TraverserRecord(word));
-										
-										hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker(word).setTopology(topology);
-									
-									}
-									
-									lastSeeker = word;
-									
-								}
-								
-								lastTraverser = "seeker";
 							
-							} else if ( word.equals("G") ) {
+							}
 							
-								gameOrRound = "Game";
-								
-							} else if ( word.equals("R") ) {
-								
-								gameOrRound = "Round";
-								
-							// If we come across an attribute entry
-							} else {
+							lastHider = hiderRecords.get(0).getTraverser();
 							
-								lastAttribute = word;
+						} else {
+							
+							// If we do not yet have a record for this hider
+							if (!hiderRecords.contains(new TraverserRecord(word))) {
+								
+								// Create it
+								hiderRecords.add(new HiderRecord(path, word));
+								
+								hiderRecords.get(hiderRecords.size() - 1 ).setTopology(topology);
+								
+								hiderRecords.get(hiderRecords.size() - 1 ).setParameters(parameters);
 								
 							}
-						
+							
+							lastHider = word;
+							
 						}
 						
-					}
+						lastTraverser = "hider";
+						
+					// If we come across an entry for a Seeker
+					} else if ( word.charAt(0) == 's' ) {
+						
+						if ( parameters.contains("{MixSeekers,true}") ) { 
+							
+							if ( hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeekersAndAttributes().size() == 0 ) {
+								
+								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).addSeeker(new TraverserRecord("MixedSeekerStrats"));
+								
+								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker("MixedSeekerStrats").setTopology(topology);
+							
+							}
+							
+							lastSeeker = hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker("MixedSeekerStrats").getTraverser();
+							
+						} else {
+							
+							// If the last hider doesn't have a record of this seeker, add it
+							if (!hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).containsSeeker(new TraverserRecord(word))) {
+									
+								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).addSeeker(new TraverserRecord(word));
+								
+								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker(word).setTopology(topology);
+							
+							}
+							
+							lastSeeker = word;
+							
+						}
+						
+						lastTraverser = "seeker";
 					
+					} else if ( word.equals("G") ) {
+					
+						gameOrRound = "Game";
+						
+					} else if ( word.equals("R") ) {
+						
+						gameOrRound = "Round";
+						
+					// If we come across an attribute entry
+					} else {
+					
+						lastAttribute = word;
+						
+					}
+				
 				}
 				
-				fileHiderRecords.add(hiderRecords);
-				
-			} // End of CSV If statement
-			 
-		} // End of file loop
+			}
+			
+		}
 		
+		fileHiderRecords.add(hiderRecords);
+	
 	}
 	
 	/**
@@ -264,29 +306,64 @@ public class OutputManager {
 	 * @param traverserRecords
 	 * @return
 	 */
-	private Hashtable<String, Double> maxForAttributeInAllSeries(ArrayList<TraverserRecord> traverserRecords) {
+	private ArrayList<TraverserRecord> expandTraverserRecords( ArrayList<TraverserRecord> traverserRecords ) {
+		
+		ArrayList<TraverserRecord> localTraverserRecords = new ArrayList<TraverserRecord>();
+		
+		for ( TraverserRecord traverserRecord : traverserRecords ) {
+			
+			localTraverserRecords.add(traverserRecord);
+			
+			if ( traverserRecord instanceof HiderRecord ) {
+				
+				localTraverserRecords.addAll(((HiderRecord)traverserRecord).getSeekersAndAttributes());
+				
+			}
+			
+		}
+	
+		return localTraverserRecords;
+			
+	}
+	
+	/**
+	 * @param traverser
+	 * @param gameOrRound
+	 * @return
+	 */
+	private ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>> getTraverserSeries(TraverserRecord traverser, String gameOrRound) {
+		
+		if ( gameOrRound.equals("Game") ) {
+			
+			return traverser.getGameSeries();
+			
+		} else if ( gameOrRound.equals("Round") ) {
+			
+			return traverser.getRoundSeries();
+			
+		} else {
+			
+			return new ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>>();
+			
+		}
+		
+	}
+	
+	/**
+	 * @param traverserRecords
+	 * @return
+	 */
+	private Hashtable<String, Double> maxForAttributeInAllSeries( ArrayList<TraverserRecord> traverserRecords, String gameOrRound ) {
 		
 		Hashtable<String, Double> maxAttributeToValueAllSeries = new Hashtable<String, Double>();
 		
-		ArrayList<TraverserRecord> traverserRecordsLocal = new ArrayList<TraverserRecord>();
+		ArrayList<TraverserRecord> localTraverserRecords = expandTraverserRecords(traverserRecords);
 		
-		traverserRecordsLocal.addAll(traverserRecords);
-		
-		for ( TraverserRecord traverser : traverserRecords ) {
+		for ( TraverserRecord traverserRecord : localTraverserRecords ) {
 			
-			if ( traverser instanceof HiderRecord ) {
+			for ( Entry<AttributeSetIdentifier, Hashtable<String,Double>> seriesEntry : getTraverserSeries(traverserRecord, gameOrRound) ) {
 				
-				traverserRecordsLocal.addAll(((HiderRecord)traverser).getSeekersAndAttributes());
-				
-			}
-				
-		}
-		
-		for ( TraverserRecord traverser : traverserRecordsLocal ) {
-			
-			for ( Entry<AttributeSetIdentifier, Hashtable<String,Double>> series : traverser.getGameSeries() ) {
-				
-				for (Entry<String, Double> attributeToValueEntry : series.getValue().entrySet()) {
+				for (Entry<String, Double> attributeToValueEntry : seriesEntry.getValue().entrySet()) {
 					
 					if ( !maxAttributeToValueAllSeries.containsKey(attributeToValueEntry.getKey()) ) {
 						
@@ -305,7 +382,7 @@ public class OutputManager {
 				}
 				
 			}
-			
+		
 		}
 		
 		return maxAttributeToValueAllSeries;
@@ -316,29 +393,17 @@ public class OutputManager {
 	 * @param traverserRecords
 	 * @return
 	 */
-	private Hashtable<String, Double> minForAttributeInAllSeries(ArrayList<TraverserRecord> traverserRecords) {
+	private Hashtable<String, Double> minForAttributeInAllSeries( ArrayList<TraverserRecord> traverserRecords, String gameOrRound ) {
 		
 		Hashtable<String, Double> minAttributeToValueAllSeries = new Hashtable<String, Double>();
 		
-		ArrayList<TraverserRecord> traverserRecordsLocal = new ArrayList<TraverserRecord>();
+		ArrayList<TraverserRecord> localTraverserRecords = expandTraverserRecords(traverserRecords);
 		
-		traverserRecordsLocal.addAll(traverserRecords);
+		for ( TraverserRecord traverserRecord : localTraverserRecords ) {
 		
-		for ( TraverserRecord traverser : traverserRecords ) {
-			
-			if ( traverser instanceof HiderRecord ) {
+			for ( Entry<AttributeSetIdentifier, Hashtable<String,Double>> seriesEntry : getTraverserSeries(traverserRecord, gameOrRound) ) {
 				
-				traverserRecordsLocal.addAll(((HiderRecord)traverser).getSeekersAndAttributes());
-				
-			}
-				
-		}
-		
-		for ( TraverserRecord traverser : traverserRecordsLocal ) {
-			
-			for ( Entry<AttributeSetIdentifier, Hashtable<String,Double>> series : traverser.getGameSeries() ) {
-				
-				for (Entry<String, Double> attributeToValueEntry : series.getValue().entrySet()) {
+				for (Entry<String, Double> attributeToValueEntry : seriesEntry.getValue().entrySet()) {
 					
 					if (!minAttributeToValueAllSeries.containsKey(attributeToValueEntry.getKey())) {
 						
@@ -357,10 +422,22 @@ public class OutputManager {
 				}
 				
 			}
-			
+		
 		}
 		
 		return minAttributeToValueAllSeries;
+		
+	}
+	
+	/**
+	 * @param entries
+	 * @param minInSeries
+	 * @param maxInSeries
+	 * @return
+	 */
+	private double normaliseEntry(Hashtable<String, Double> entries, Hashtable<String, Double> minInSeries,  Hashtable<String, Double> maxInSeries) {
+		
+		return ( entries.get("Cost") - minInSeries.get("Cost") ) / ( maxInSeries.get("Cost") - minInSeries.get("Cost") );
 		
 	}
 	
@@ -377,9 +454,9 @@ public class OutputManager {
 		
 		if ( title.length() > 200 ) title = title.substring(0, 200);
 		
-		Hashtable<String, Double> maxAttributeToValueAllSeries = maxForAttributeInAllSeries(traverserRecords);
+		Hashtable<String, Double> minForAttributeInAllSeries = minForAttributeInAllSeries(traverserRecords, gameOrRound);
 		
-		Hashtable<String, Double> minAttributeToValueAllSeries = minForAttributeInAllSeries(traverserRecords);
+		Hashtable<String, Double> maxForAttributeInAllSeries = maxForAttributeInAllSeries(traverserRecords, gameOrRound);
 		
 		if (graphType.equals("Line") || graphType.equals("3D")) {
 		
@@ -406,30 +483,39 @@ public class OutputManager {
 				
 				ArrayList<Double> attributeToValues = new ArrayList<Double>();
 				
-				if ( gameOrRound.equals("Game") ) {
+				int seriesNumber = 0;
 				
-					for ( Entry<AttributeSetIdentifier, Hashtable<String,Double>> series : traverser.getGameSeries() ) {
+				for ( Entry<AttributeSetIdentifier, Hashtable<String,Double>> seriesEntry : getTraverserSeries(traverser, gameOrRound) ) {
+					
+					if ( yLabel.contains("Score" ) ) {
 						
-						if ( yLabel.contains("Score" )) {
+						if ( traverser instanceof HiderRecord ) {
 							
-							attributeToValues.add( ( series.getValue().get(yLabel) - minAttributeToValueAllSeries.get(yLabel) ) / ( maxAttributeToValueAllSeries.get(yLabel) - minAttributeToValueAllSeries.get(yLabel) ) );
+							double cumulativeNormalisedSeekerCosts = 0.0;
+							
+							for ( TraverserRecord hidersSeeker : ((HiderRecord)traverser).getSeekersAndAttributes()) {
+								
+								cumulativeNormalisedSeekerCosts += normaliseEntry(getTraverserSeries(hidersSeeker, gameOrRound).get(seriesNumber).getValue(), minForAttributeInAllSeries, maxForAttributeInAllSeries );
+								
+							}
+							
+							// Score = (Average) Seeker(s) cost - Hider cost.
+							attributeToValues.add( ( cumulativeNormalisedSeekerCosts / (double)((HiderRecord)traverser).getSeekersAndAttributes().size() ) - normaliseEntry(seriesEntry.getValue(), minForAttributeInAllSeries, maxForAttributeInAllSeries) );
 							
 						} else {
-						
-							attributeToValues.add( series.getValue().get(yLabel)  );
-						
 							
+							attributeToValues.add( -1 * normaliseEntry(seriesEntry.getValue(), minForAttributeInAllSeries, maxForAttributeInAllSeries) );
+						
 						}
 						
-					}
+					} else {
 					
-				} else if ( gameOrRound.equals("Round") ) {
+						attributeToValues.add( seriesEntry.getValue().get(yLabel)  );
 					
-					for ( Entry<Integer, Hashtable<String,Double>> series : traverser.getRoundSeries() ) {
-						
-						attributeToValues.add( series.getValue().get(yLabel) );
 						
 					}
+					
+					seriesNumber++;
 					
 				}
 				
@@ -437,7 +523,7 @@ public class OutputManager {
 				
 				if (graphType.equals("Line")) {
 					
-					((GNULineGraph) graph).addDataset(traverser.getTraverser(), attributeToValues);
+					((GNULineGraph) graph).addDataset(traverserName, attributeToValues);
 					
 				}
 				
@@ -507,12 +593,16 @@ public class OutputManager {
 			graph = new GNUBarGraph(title);
 			
 			Hashtable<String, Hashtable<String, Double>> categoryToTraverserAndData = new Hashtable<String, Hashtable<String, Double>>();
-			
+		
 			Hashtable<String, Double> traverserAndData = new Hashtable<String, Double>();
 			
 			for ( TraverserRecord traverser : traverserRecords ) {
 				
 				String localCategory = "";
+				
+				String traverserName = "";
+				
+				if (traverser.toString().contains(" ")) traverserName = traverser.toString().substring(0, traverser.toString().indexOf(" "));
 				
 				if ( category.equals("Topology") ) {
 				
@@ -526,26 +616,39 @@ public class OutputManager {
 				
 				if ( yLabel.contains("Score") ) {
 					
-					traverserAndData.put(traverser.toString(), traverser.getAverageGameAttributeValue(yLabel, maxAttributeToValueAllSeries, minAttributeToValueAllSeries));
+					if ( traverser instanceof HiderRecord ) {
+						
+						double cumulativeNormalisedSeekerCost = 0.0;
+						
+						for ( TraverserRecord hidersSeeker : ((HiderRecord)traverser).getSeekersAndAttributes()) {
+							
+							cumulativeNormalisedSeekerCost += hidersSeeker.getAverageGameAttributeValue("Cost", minForAttributeInAllSeries, maxForAttributeInAllSeries );
+							
+						}
+						
+						traverserAndData.put(traverserName, ( cumulativeNormalisedSeekerCost / (double)((HiderRecord)traverser).getSeekersAndAttributes().size() ) - traverser.getAverageGameAttributeValue("Cost", minForAttributeInAllSeries, maxForAttributeInAllSeries ));
+						
+					} else {
+						
+						traverserAndData.put(traverserName, -1 * traverser.getAverageGameAttributeValue("Cost", minForAttributeInAllSeries, maxForAttributeInAllSeries ));
+						
+					}
 					
 				} else {
 					
-
-					System.out.println(traverser.toString() + " " + traverser.getAverageGameAttributeValue(yLabel) + " " + localCategory);
 					
-					traverserAndData.put(traverser.toString().substring(0, traverser.toString().indexOf(" ")), traverser.getAverageGameAttributeValue(yLabel));
+					traverserAndData.put(traverserName, traverser.getAverageGameAttributeValue(yLabel));
+					
 					
 				}
-				
+
 				categoryToTraverserAndData.put(localCategory, new Hashtable<String, Double>(traverserAndData));
-				
+			
 			}
 			
-			for ( Entry<String, Hashtable<String, Double>> traverserAndData2 : categoryToTraverserAndData.entrySet() ) {
+			for ( Entry<String, Hashtable<String, Double>> storedTraverserAndData : categoryToTraverserAndData.entrySet() ) {
 			
-				System.out.println(traverserAndData2.getKey() + ": " + traverserAndData2.getValue());
-				
-				((GNUBarGraph) graph).addBars(traverserAndData2.getValue(), traverserAndData2.getKey());
+				((GNUBarGraph) graph).addBars(storedTraverserAndData.getValue(), storedTraverserAndData.getKey());
 			
 			}
 			
@@ -555,11 +658,11 @@ public class OutputManager {
 		
 		graph.styleGraph();
 
-		String outputPath = "figure" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
+		String outputPath = "figure" + new SimpleDateFormat("yyyyMMddHHmmss").format(Calendar.getInstance().getTime());
 		
 		graph.createChart("", xLabel, yLabel);
 		
-		//graph.exportChartAsEPS(Utils.FILEPREFIX + "data/charts/" + outputPath + ".eps");
+		graph.exportChartAsEPS(Utils.FILEPREFIX + "data/charts/" + outputPath + ".eps");
 		
 		graph.exportChartAsTikz(Utils.FILEPREFIX + "data/charts/" + outputPath + ".tex");
 		
@@ -573,11 +676,11 @@ public class OutputManager {
 		
 		}
 		
-		//graph.pack();
+		/*graph.pack();
 		
-		//RefineryUtilities.centerFrameOnScreen(graph);
+		RefineryUtilities.centerFrameOnScreen(graph);
 		 
-		//graph.setVisible(true);
+		graph.setVisible(true);*/
 		
 	} 
 	

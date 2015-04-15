@@ -11,9 +11,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,7 +26,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jfree.chart.JFreeChart;
+import org.jgrapht.EdgeFactory;
+import org.jgrapht.GraphPath;
+import org.jgrapht.alg.FloydWarshallShortestPaths;
+import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jibble.epsgraphics.EpsGraphics2D;
+
+import HideAndSeek.graph.HiddenObjectGraph;
 
 /**
  * A set of static utility methods.
@@ -44,6 +52,41 @@ public class Utils {
 	 */
 	public static boolean DEBUG = true;
 	
+	/**
+	 * 
+	 */
+	public static void printSystemStats() {
+		
+		System.out.print("\r[");
+		
+		 /* Total number of processors or cores available to the JVM */
+	    // System.out.println("Available processors (cores): " +  Runtime.getRuntime().availableProcessors());
+
+	    /* Total amount of free memory available to the JVM */
+	    System.out.print("Free memory (bytes): " + Runtime.getRuntime().freeMemory());
+
+	    /* This will return Long.MAX_VALUE if there is no preset limit */
+	    // long maxMemory = Runtime.getRuntime().maxMemory();
+	    /* Maximum amount of memory the JVM will attempt to use */
+	    // System.out.println("Maximum memory (bytes): " + (maxMemory == Long.MAX_VALUE ? "no limit" : maxMemory));
+
+	    /* Total memory currently available to the JVM */
+	    // System.out.println("Total memory available to JVM (bytes): " + Runtime.getRuntime().totalMemory());
+
+	    /* Get a list of all filesystem roots on this system */
+	    // File[] roots = File.listRoots();
+
+	    /* For each filesystem root, print some info */
+	    /* for (File root : roots) {
+	      System.out.println("File system root: " + root.getAbsolutePath());
+	      System.out.println("Total space (bytes): " + root.getTotalSpace());
+	      System.out.println("Free space (bytes): " + root.getFreeSpace());
+	      System.out.println("Usable space (bytes): " + root.getUsableSpace());
+	    }*/
+	    
+	    System.out.print("]");
+		
+	}
 	/**
 	 * /http://stackoverflow.com/questions/8119366/sorting-hashmap-by-values
 	 * 
@@ -351,6 +394,189 @@ public class Utils {
 		
 	}
 	
+	/**
+	 * Although an existing diameter value can be obtained from the
+	 * FWSP, this is in terms of edge weights. This finds the number
+	 * of vertices in the greatest path, as an idea of the number
+	 * of hops to achieve the max diameter.
+	 * 
+	 * Could return a rough estimate, for slightly less clear information.
+	 * @param <V>
+	 * 
+	 * @return
+	 */
+	public static <V, E extends DefaultWeightedEdge> int graphDiameter(final HiddenObjectGraph<V, E> graph) {
+		
+		// ~MDC 5/4 Over-complicated as an exercise
+		HiddenObjectGraph<V, E> localGraph = new HiddenObjectGraph<V, E>(new EdgeFactory<V, E>() {
+
+			@Override
+			public E createEdge(V arg0, V arg1) {
+
+				return graph.getEdgeFactory().createEdge(arg0, arg1);
+			
+			}
+			
+		});
+		
+		// Update the local graph from the current node as the Seeker moves
+		for ( V sourceVertex : graph.vertexSet() ) {
+			
+			for ( V targetVertex : graph.vertexSet() ) {
+				
+				if ( graph.containsEdge(sourceVertex, targetVertex) ) {
+					
+					localGraph.addVertexIfNonExistent(sourceVertex);
+					localGraph.addVertexIfNonExistent(targetVertex);
+					
+					localGraph.addEdgeWithWeight(sourceVertex, targetVertex, graph.getEdgeWeight(graph.getEdge(sourceVertex, targetVertex)));
+					
+				}
+				
+			}
+			
+		}
+				
+		FloydWarshallShortestPaths<V, E> FWSP = new FloydWarshallShortestPaths<V, E>(localGraph);
 	
+		for (GraphPath<V, E> GP : FWSP.getShortestPaths()) {
+			
+			// Return the length of the path with the greatest weight
+			if (GP.getWeight() == FWSP.getDiameter()) return GP.getEdgeList().size();
+			
+		}
+		
+		return -1;
+		
+	}
+	
+	/**
+	 * Given a map, where the value requires instantiation if
+	 * currently empty, then this will instantiate, otherwise
+	 * add.
+	 * 
+	 * @param table
+	 * @param key
+	 * @param value
+	 * @param emptyInstance
+	 */
+	public static <K, V, E extends AbstractCollection<V>> void add( Hashtable<K, E> table, K key, V value, E emptyInstance, boolean unique ) {
+		
+		if ( table.containsKey(key) ) {
+			
+			if ( unique ) {
+				
+				if ( !table.get(key).contains(value) ) table.get(key).add(value);
+				
+			} else {
+				
+				table.get(key).add(value);
+				
+			}
+			
+		} else {
+			
+			emptyInstance.add(value);
+			
+			table.put(key, emptyInstance);
+			
+		}
+		
+	}
+	
+	/**
+	 * All possible combinations from N lists.
+	 * 
+	 * @param lists
+	 * @return
+	 */
+	public static <V> ArrayList<ArrayList<V>> combinations(ArrayList<ArrayList<V>> lists) {
+		
+		int[] indices = new int[lists.size()];
+		
+		int maxListSize = Integer.MIN_VALUE;
+		
+		for ( ArrayList<V> list : lists ) {
+			
+			if ( list.size() > maxListSize ) maxListSize = list.size();
+			
+		}
+		
+		ArrayList<ArrayList<V>> combinations = new ArrayList<ArrayList<V>>();
+		
+		do {
+		    
+			ArrayList<V> combination = new ArrayList<V>();
+			
+			for ( int i = 0; i < indices.length; i++ ) {
+				
+				int index = indices[i];
+				
+				if ( index >= lists.get(i).size() ) index = lists.get(i).size() - 1;
+				
+				combination.add(lists.get(i).get(index));
+				
+			}
+			
+			if ( !combinations.contains(combination) ) combinations.add(combination);
+			
+			Utils.advanceIndices( indices, lists.size(), maxListSize );
+	        
+		} while ( !Utils.allMaxed( indices, lists.size(), maxListSize  ) );
+		
+		return combinations;
+		
+	}
+	
+	/**
+	 * Ancillary method for combinations
+	 * 
+	 * @param indices
+	 * @param n
+	 * @param max
+	 */
+	public static void advanceIndices( int[] indices, int n, int max ) {
+
+        for ( int i = n - 1; i >= 0; i-- ) {
+        	
+            if ( indices[i] + 1 == max ) {
+            
+            	indices[i] = 0;
+            	
+            } else {
+            
+            	indices[i]++;
+            	
+            	break;
+            
+            }
+            
+        }
+
+    }
+	
+	/**
+	 * Ancillary method for combiantions
+	 * 
+	 * @param indices
+	 * @param n
+	 * @param max
+	 * @return
+	 */
+	public static boolean allMaxed( int[] indices, int n, int max ) {
+
+        for ( int i = n - 1; i >= 0; i-- ) {
+        	
+            if ( indices[i] != max - 1 ) {
+            
+            	return false;
+            
+            }
+        
+        }
+        
+        return true;
+
+    }
 
 }

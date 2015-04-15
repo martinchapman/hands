@@ -9,7 +9,7 @@ import java.util.Map;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.singleshot.cost.VariableLowEdgeCost;
+import HideAndSeek.hider.singleshot.cost.VariableGreedy;
 import Utility.Utils;
 
 /**
@@ -18,7 +18,7 @@ import Utility.Utils;
  * 
  * @author Martin
  */
-public class VariableBiasStaticBetween extends VariableLowEdgeCost {
+public class VariableBiasStaticBetween extends VariableGreedy {
 
 	public VariableBiasStaticBetween(
 			GraphController <StringVertex, StringEdge> graphController,

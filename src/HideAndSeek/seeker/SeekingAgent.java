@@ -15,6 +15,10 @@ import Utility.Utils;
  * @author Martin
  *
  */
+/**
+ * @author Martin
+ *
+ */
 public abstract class SeekingAgent extends GraphTraversingAgent implements Runnable, Seeker {
 	
 	/**
@@ -73,7 +77,6 @@ public abstract class SeekingAgent extends GraphTraversingAgent implements Runna
 		uniqueHideLocations = new HashSet<StringVertex>();
 		
 		//
-		updateNumberOfHideLocationsEstimate();
 		
 	}
 	
@@ -92,7 +95,7 @@ public abstract class SeekingAgent extends GraphTraversingAgent implements Runna
 		
 		if ( graphController.numberOfHideLocations(responsibleAgent) == -1 ) {
 			
-			if ( roundsPassed % hideLocationEstimateInterval == 0 && hideLocations.size() > 0 ) estimatedNumberOfHideLocations = hideLocations.size();
+			if ( roundsPassed % hideLocationEstimateInterval == 0 && hideLocations().size() > 0 ) estimatedNumberOfHideLocations = hideLocations().size();
 			
 		} else {
 			
@@ -130,6 +133,8 @@ public abstract class SeekingAgent extends GraphTraversingAgent implements Runna
 		
 		Utils.talk(toString(), "Running " + ID + " " + name);
 		
+		updateNumberOfHideLocationsEstimate();
+		
 		search();
 		
 	}
@@ -143,11 +148,20 @@ public abstract class SeekingAgent extends GraphTraversingAgent implements Runna
 		
 		Utils.talk(responsibleAgent.toString(), "----------------------------------Found " + location);
 		
-		hideLocations.add(location); 
+		hideLocations().add(location); 
 		
 		allHideLocations.add(location);
 		
 		uniqueHideLocations.add(location);
+		
+	}
+	
+	/**
+	 * @return
+	 */
+	public boolean searchCriteria() {
+		
+		return hideLocations().size() != estimatedNumberOfHideLocations;
 		
 	}
 	
@@ -168,7 +182,7 @@ public abstract class SeekingAgent extends GraphTraversingAgent implements Runna
 		
 		StringVertex nextNode = null;
 		
-		while ( hideLocations.size() != estimatedNumberOfHideLocations ) {
+		while ( searchCriteria() ) {
 			
 			//Utils.talk(responsibleAgent.toString(), "At: " + currentNode);
 			
@@ -176,16 +190,30 @@ public abstract class SeekingAgent extends GraphTraversingAgent implements Runna
 			
 			addUniquelyVisitedNode(currentNode);
 			
-			 if ( graphController.isHideLocation(currentNode) && !hideLocations.contains(currentNode) ) { 
+			if ( graphController.isHideLocation(currentNode) && !hideLocations().contains(currentNode) ) { 
 	        		
         		addHideLocation(currentNode);
 				
-				if (hideLocations.size() == estimatedNumberOfHideLocations) { break; }
+				if (hideLocations().size() == estimatedNumberOfHideLocations) { break; }
 			
         	}
 			 
 			nextNode = nextNode(currentNode);
 			
+			/* 
+		     * If a connected node contains a location we are looking for, overwrite strategies choice and 
+		     * move there (i.e. 'help it out').
+		     */
+		    for ( StringEdge connectedEdge : getConnectedEdges(currentNode) ) {
+		    	
+		    	if ( AUTOMATIC_MOVE && graphController.isHideLocation( edgeToTarget(connectedEdge, currentNode) ) && !hideLocations().contains( edgeToTarget(connectedEdge, currentNode) ) ) { 
+		    		
+		    		nextNode = edgeToTarget(connectedEdge, currentNode);
+		    	
+		    	}
+		    	
+		    }
+		    
 			addUniquelyVisitedEdge(graphController.getEdge(currentNode, nextNode));
 			
 			if ( !graphController.fromVertexToVertex(responsibleAgent, currentNode, nextNode) ) { 
@@ -208,7 +236,7 @@ public abstract class SeekingAgent extends GraphTraversingAgent implements Runna
 	@Override
 	public String printRoundStats() {
 		
-		return super.printRoundStats() + "Cost, " + graphController.latestRoundCosts(responsibleAgent, false);
+		return super.printRoundStats() + "Cost," + graphController.latestRoundCosts(responsibleAgent, false) + ",Explored," + exploredNodes.size() + ",Path," + exploredNodes.toString().replace(",", "");
 		
 	}
 
@@ -236,7 +264,7 @@ public abstract class SeekingAgent extends GraphTraversingAgent implements Runna
 		
 		exploredNodes.clear();
 		
-		hideLocations.clear();
+		hideLocations().clear();
 		
 	}
 	
@@ -260,8 +288,6 @@ public abstract class SeekingAgent extends GraphTraversingAgent implements Runna
 	public void mergeOtherTraverser(Seeker traverser) {
 		
 		super.mergeOtherTraverser(traverser);
-		
-		System.out.println("Seeker merge.");
 		
 		this.allHideLocations.addAll(traverser.allHideLocations());
 		

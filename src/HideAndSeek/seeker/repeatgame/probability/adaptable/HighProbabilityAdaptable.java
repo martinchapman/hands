@@ -92,8 +92,6 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 	 */
 	public double relevanceOfStrategy() {
 		
-		System.out.println("uniqueHideLocations.size() " + uniqueHideLocations.size());
-		
 		double relevance = 1 - ((uniqueHideLocations.size() / (double)(graphController.vertexSet().size())));
 		
 		if ( uniqueHideLocationsProgression.size() >= ROUND_CONSISTENCY_THRESHOLD ) {

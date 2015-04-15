@@ -27,14 +27,14 @@ public class NodeType extends DepthFirstSearch {
 	 * 
 	 * Visit those edge which lead to a node which connected to three distinct node types first
 	 */
-	protected List<StringEdge> getConnectedEdges(StringVertex currentNode) {
+	public List<StringEdge> getConnectedEdges(StringVertex currentNode) {
 		
 		List<StringEdge> connectedEdges = new ArrayList<StringEdge>();
 		
 		HashSet<Character> types = new HashSet<Character>();
 		
 		// For each outgoing edge of this node:
-		for ( StringEdge edge : graphController.edgesOf(currentNode)) {
+		for ( StringEdge edge : super.getConnectedEdges(currentNode)) {
 			
 			types.clear();
 			

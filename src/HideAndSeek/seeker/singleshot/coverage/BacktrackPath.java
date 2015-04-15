@@ -22,6 +22,7 @@ import Utility.Utils;
  * This backtracking is subject to a maximum backtrack distance value.
  * 
  * @author Martin
+ * @deprecated
  *
  */
 public class BacktrackPath extends SeekerLocalGraph {
@@ -215,9 +216,9 @@ public class BacktrackPath extends SeekerLocalGraph {
 	 * 
 	 *
 	 */
-	protected List<StringEdge> getConnectedEdges(StringVertex currentNode) {
+	public List<StringEdge> getConnectedEdges(StringVertex currentNode) {
 		
-		ArrayList<StringEdge> edges = new ArrayList<StringEdge>(graphController.edgesOf(currentNode));
+		ArrayList<StringEdge> edges = new ArrayList<StringEdge>(super.getConnectedEdges(currentNode));
 		
 		Collections.sort(edges);
 		
@@ -231,7 +232,7 @@ public class BacktrackPath extends SeekerLocalGraph {
 	 * Ensure only unvisited edges are returned according to ordering, otherwise return random
 	 * 
 	 */
-	protected StringEdge getConnectedEdge(StringVertex currentNode, List<StringEdge> connectedEdges) {
+	public StringEdge getConnectedEdge(StringVertex currentNode, List<StringEdge> connectedEdges) {
 		
 		for (StringEdge edge : connectedEdges ) {
 

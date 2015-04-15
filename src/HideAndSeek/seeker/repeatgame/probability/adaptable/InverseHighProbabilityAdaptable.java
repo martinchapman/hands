@@ -61,8 +61,6 @@ public class InverseHighProbabilityAdaptable extends VariableNodesInverseHighPro
 	@Override
 	public double relevanceOfStrategy() {
 	
-		System.out.println("uniqueHideLocations.size() " + uniqueHideLocations.size());
-		
 		return (uniqueHideLocations.size() / (double)(graphController.vertexSet().size())); 
 		
 	}

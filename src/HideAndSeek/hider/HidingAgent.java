@@ -32,6 +32,13 @@ public abstract class HidingAgent extends GraphTraversingAgent implements Runnab
 	}
 
 	/**
+	 * In the case that 'hideHere' is called multiple times,
+	 * after the first time we mark the returned hide location
+	 * as checked.
+	 */
+	private ArrayList<StringVertex> precheckedHideLocations;
+	
+	/**
 	 * @param graph
 	 */
 	public HidingAgent(GraphController <StringVertex, StringEdge> graphController, int numberOfHideLocations) {
@@ -39,6 +46,8 @@ public abstract class HidingAgent extends GraphTraversingAgent implements Runnab
 		super(graphController);
 		
 		this.numberOfHideLocations = numberOfHideLocations;
+		
+		precheckedHideLocations = new ArrayList<StringVertex>();
 		
 	}
 	
@@ -53,6 +62,14 @@ public abstract class HidingAgent extends GraphTraversingAgent implements Runnab
 	}
 	
 	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraversingAgent#hideLocations()
+	 */
+	public ArrayList<StringVertex> hideLocations()
+    {
+        throw new UnsupportedOperationException("Cannot access hide locations directly.");
+    }
+	
+	/* (non-Javadoc)
 	 * @see HideAndSeek.hider.HiderTemplate#addHideLocation(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
@@ -61,7 +78,7 @@ public abstract class HidingAgent extends GraphTraversingAgent implements Runnab
 		Utils.talk(toString(), "---------------------------------- Hiding in " + location);
 		
 		// Hider's local copy of where he has hidden
-		hideLocations.add(location); 
+		super.hideLocations().add(location); 
 		
 		graphController.addHideLocation(responsibleAgent, location);
 		
@@ -105,16 +122,32 @@ public abstract class HidingAgent extends GraphTraversingAgent implements Runnab
 			
 			addUniquelyVisitedNode(currentNode);
 			
-		    if ( !hideLocations.contains(currentNode) && hideHere(currentNode) ) { 
-	        		
+		    if ( !super.hideLocations().contains(currentNode) && hideHere(currentNode) || precheckedHideLocations.contains(currentNode) ) { 
+	        	
         		addHideLocation(currentNode);
 				
 				if (graphController.numberOfHideLocations(responsibleAgent) == numberOfHideLocations) break;
 			
         	}
-			 
-			nextNode = nextNode(currentNode);
-			
+		    
+		    nextNode = nextNode(currentNode);
+		    
+		    /* 
+		     * If a connected node contains a hide location we are looking for, overwrite strategies choice and 
+		     * move there (i.e. 'help it out').
+		     */
+		    for ( StringEdge connectedEdge : getConnectedEdges(currentNode) ) {
+		    	
+		    	if ( AUTOMATIC_MOVE && !super.hideLocations().contains( edgeToTarget(connectedEdge, currentNode) ) && hideHere( edgeToTarget(connectedEdge, currentNode) ) ) {
+		    		
+		    		nextNode = edgeToTarget(connectedEdge, currentNode);
+		    		
+		    		precheckedHideLocations.add(nextNode);
+		    	
+		    	}
+		    	
+		    }
+		    	
 			addUniquelyVisitedEdge(graphController.getEdge(currentNode, nextNode));
 			
 			if ( !graphController.fromVertexToVertex(responsibleAgent, currentNode, nextNode) ) { 
@@ -164,7 +197,7 @@ public abstract class HidingAgent extends GraphTraversingAgent implements Runnab
 		
 		super.endOfRound();
 		
-		hideLocations.clear();
+		super.hideLocations().clear();
 		
 		exploredNodes.clear();
 		

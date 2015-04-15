@@ -40,7 +40,7 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	/**
 	 * 
 	 */
-	protected ArrayList<StringVertex> hideLocations;
+	private ArrayList<StringVertex> hideLocations;
 	
 	/**
 	 * @return
@@ -50,6 +50,16 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 		return hideLocations;
 	
 	}
+	
+	/**
+	 * Although an extending strategy can implement their own
+	 * mechanism to select the next node, this flag allows
+	 * for this choice to be overridden in the case that it is 
+	 * apparent that a connected node exists which is important 
+	 * for the strategy (e.g. for a seeker it contains a hidden
+	 * object). 
+	 */
+	protected final static boolean AUTOMATIC_MOVE = true;
 	
 	/**
 	 * @param graph
@@ -208,7 +218,7 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	 * @param connectedEdges
 	 * @return
 	 */
-	protected StringEdge getConnectedEdge(StringVertex currentNode, List<StringEdge> connectedEdges) {
+	public StringEdge getConnectedEdge(StringVertex currentNode, List<StringEdge> connectedEdges) {
 	
 		return connectedEdges.get((int)(Math.random() * connectedEdges.size()));
 		
@@ -221,7 +231,7 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	 * @param currentNode
 	 * @return
 	 */
-	protected List<StringEdge> getConnectedEdges(StringVertex currentNode) {
+	public List<StringEdge> getConnectedEdges(StringVertex currentNode) {
 		
 		return new ArrayList<StringEdge>(graphController.edgesOf(currentNode));
 		

@@ -17,6 +17,9 @@ import Utility.Utils;
  */
 public class StaticLocations extends RandomSet {
 
+	/**
+	 * 
+	 */
 	private ArrayList<StringVertex> staticSet;
 	
 	/**
@@ -54,8 +57,6 @@ public class StaticLocations extends RandomSet {
 		Utils.talk(this.toString(), "Static set:" + this.staticSet.toString());
 		
 		populateHideSet(new ArrayList<StringVertex>(this.staticSet));
-		
-		
 		
 	}
 

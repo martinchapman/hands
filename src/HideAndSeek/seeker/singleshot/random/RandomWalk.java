@@ -16,10 +16,9 @@ import HideAndSeek.seeker.SeekingAgent;
 public class RandomWalk extends SeekingAgent {
 
 	/**
-	 * @param graph
+	 * @param graphController
 	 */
-	public RandomWalk(
-			GraphController <StringVertex, StringEdge> graphController) {
+	public RandomWalk( GraphController <StringVertex, StringEdge> graphController ) {
 
 		super(graphController);
 

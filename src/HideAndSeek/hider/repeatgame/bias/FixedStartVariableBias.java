@@ -7,7 +7,7 @@ import java.util.List;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.singleshot.cost.VariableLowEdgeCost;
+import HideAndSeek.hider.singleshot.cost.VariableGreedy;
 
 /**
  * @author Martin

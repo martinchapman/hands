@@ -121,9 +121,9 @@ public class GroupedDeceptive extends Deceptive {
 				
 				edgesOfCurrentNode.clear();
 				
-				Utils.talk(this.toString(), "Edges of " + currentNode + " : " + graphController.edgesOf(currentNode));
+				Utils.talk(this.toString(), "Edges of " + currentNode + " : " + getConnectedEdges(currentNode));
 				
-				edgesOfCurrentNode.addAll(graphController.edgesOf(currentNode));
+				edgesOfCurrentNode.addAll(getConnectedEdges(currentNode));
 				
 				for ( StringEdge edge : edgesOfCurrentNode ) {
 					

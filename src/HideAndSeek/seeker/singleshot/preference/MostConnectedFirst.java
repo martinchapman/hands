@@ -30,7 +30,7 @@ public class MostConnectedFirst extends LeastConnectedFirst {
 	 * @see HideAndSeek.seeker.singleshot.LeastConnectedFirst#getConnectedEdges(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
-	protected List<StringEdge> getConnectedEdges(StringVertex currentNode) {
+	public List<StringEdge> getConnectedEdges(StringVertex currentNode) {
 		
 		List<StringEdge> connectedEdges = super.getConnectedEdges(currentNode);
 		

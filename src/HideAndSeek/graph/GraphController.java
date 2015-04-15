@@ -58,6 +58,15 @@ public class GraphController<V, E> {
 	
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString() {
+		
+		return "GraphController";
+		
+	}
+	
 	/**
 	 * @param graph
 	 */
@@ -266,33 +275,19 @@ public class GraphController<V, E> {
 		
 	}
 
-	
-	/////////////////////////////////////////////
-	
 	/**
-	 * Although an existing diameter value can be obtained from the
-	 * FWSP, this is in terms of edge weights. This finds the number
-	 * of vertices in the greatest path, as an idea of the number
-	 * of hops to achieve the max diameter.
-	 * 
-	 * Could return a rough estimate, for slightly less clear information.
-	 * 
 	 * @return
 	 */
-	public double graphDiameter() {
+	public double graphDiameter(Object caller) {
 		
-		FloydWarshallShortestPaths<StringVertex, StringEdge> FWSP = new FloydWarshallShortestPaths<StringVertex, StringEdge>(graph);
-		
-		for (GraphPath<StringVertex, StringEdge> GP : FWSP.getShortestPaths()) {
-			
-			// Return the length of the path with the greatest weight
-			if (GP.getWeight() == FWSP.getDiameter()) return GP.getEdgeList().size();
-			
-		}
-		
-		return -1;
+		if (!(caller instanceof Hider)) return -1;
+				
+		return Utils.graphDiameter(graph);
 		
 	}
+
+	/////////////////////////////////////////////
+	
 	/**
 	 * Let players know the edges of a given node
 	 * 
@@ -311,9 +306,9 @@ public class GraphController<V, E> {
 	 * 
 	 * @return
 	 */
-	public Set<StringVertex> vertexSet() {
+	public ArrayList<StringVertex> vertexSet() {
 		
-		return graph.vertexSet();
+		return new ArrayList<StringVertex>(graph.vertexSet());
 		
 	}
 
@@ -412,7 +407,7 @@ public class GraphController<V, E> {
 		
 		for (StringEdge edge : path) {
 			
-			System.out.println("Walk: " + edge);
+			Utils.talk(this.toString(), "Walk: " + edge);
 			
 			graph.fromVertexToVertex(traverser, edge.getSource(), edge.getTarget());
 			

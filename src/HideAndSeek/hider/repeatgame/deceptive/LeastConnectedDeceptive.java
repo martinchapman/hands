@@ -63,7 +63,7 @@ public class LeastConnectedDeceptive extends Deceptive {
 	 */
 	public boolean hideHere(StringVertex vertex) {
 		
-		leastConnectedMechanism.hideHereInterface(vertex);
+		leastConnectedMechanism.hideHere(vertex);
 		
 		return super.hideHere(vertex);
 		

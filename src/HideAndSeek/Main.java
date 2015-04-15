@@ -10,8 +10,8 @@ import java.util.List;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.AdaptiveHidingAgent;
 import HideAndSeek.hider.AdaptiveHider;
+import HideAndSeek.hider.AdaptiveHidingAgent;
 import HideAndSeek.hider.Hider;
 import HideAndSeek.hider.repeatgame.bias.FixedStartVariableBias;
 import HideAndSeek.hider.repeatgame.bias.VariableBias;
@@ -24,12 +24,12 @@ import HideAndSeek.hider.repeatgame.deceptive.LeastConnectedDeceptive;
 import HideAndSeek.hider.repeatgame.random.UniqueRandomSet;
 import HideAndSeek.hider.repeatgame.random.UniqueRandomSetRepeat;
 import HideAndSeek.hider.repeatgame.random.automatic.AutomaticUniqueRandomSetRepeat;
-import HideAndSeek.hider.singleshot.cost.FixedStartVariableLowEdgeCost;
-import HideAndSeek.hider.singleshot.cost.VariableLowEdgeCost;
-import HideAndSeek.hider.singleshot.cost.VariableLowEdgeCostStaticBetween;
-import HideAndSeek.hider.singleshot.distance.LowEdgeCostRandomFixedDistance;
-import HideAndSeek.hider.singleshot.distance.LowEdgeCostRandomFixedDistanceStaticBetween;
-import HideAndSeek.hider.singleshot.distance.LowEdgeCostVariableFixedDistance;
+import HideAndSeek.hider.singleshot.cost.FixedStartVariableGreedy;
+import HideAndSeek.hider.singleshot.cost.VariableGreedy;
+import HideAndSeek.hider.singleshot.cost.VariableGreedyStaticBetween;
+import HideAndSeek.hider.singleshot.distance.GreedyRandomFixedDistance;
+import HideAndSeek.hider.singleshot.distance.GreedyRandomFixedDistanceStaticBetween;
+import HideAndSeek.hider.singleshot.distance.GreedyVariableFixedDistance;
 import HideAndSeek.hider.singleshot.distance.RandomFixedDistance;
 import HideAndSeek.hider.singleshot.distance.RandomFixedDistanceFixedStart;
 import HideAndSeek.hider.singleshot.distance.RandomFixedDistanceStaticBetween;
@@ -39,8 +39,8 @@ import HideAndSeek.hider.singleshot.distance.VariableFixedDistanceStaticBetween;
 import HideAndSeek.hider.singleshot.preference.LeastConnected;
 import HideAndSeek.hider.singleshot.preference.LeastConnectedStaticBetween;
 import HideAndSeek.hider.singleshot.preference.MaxDistance;
-import HideAndSeek.hider.singleshot.random.LowEdgeCostRandomSet;
-import HideAndSeek.hider.singleshot.random.LowEdgeCostRandomSetStaticBetween;
+import HideAndSeek.hider.singleshot.random.GreedyRandomSet;
+import HideAndSeek.hider.singleshot.random.GreedyRandomSetStaticBetween;
 import HideAndSeek.hider.singleshot.random.Random;
 import HideAndSeek.hider.singleshot.random.RandomFixedStart;
 import HideAndSeek.hider.singleshot.random.RandomSet;
@@ -48,8 +48,8 @@ import HideAndSeek.hider.singleshot.random.RandomSetStaticBetween;
 import HideAndSeek.hider.singleshot.random.RandomStaticBetween;
 import HideAndSeek.hider.singleshot.random.RandomVariableHidePotential;
 import HideAndSeek.hider.singleshot.staticlocations.StaticLocations;
-import HideAndSeek.seeker.AdaptiveSeekingAgent;
 import HideAndSeek.seeker.AdaptiveSeeker;
+import HideAndSeek.seeker.AdaptiveSeekingAgent;
 import HideAndSeek.seeker.Seeker;
 import HideAndSeek.seeker.repeatgame.probability.HighProbability;
 import HideAndSeek.seeker.repeatgame.probability.HighProbabilityRepetitionCheck;
@@ -57,18 +57,20 @@ import HideAndSeek.seeker.repeatgame.probability.InverseHighProbability;
 import HideAndSeek.seeker.repeatgame.probability.VariableHistoryHighProbability;
 import HideAndSeek.seeker.repeatgame.probability.adaptable.HighProbabilityAdaptable;
 import HideAndSeek.seeker.repeatgame.probability.adaptable.InverseHighProbabilityAdaptable;
-import HideAndSeek.seeker.singleshot.cost.LowEdgeCost;
+import HideAndSeek.seeker.singleshot.cost.Greedy;
 import HideAndSeek.seeker.singleshot.coverage.BacktrackPath;
-import HideAndSeek.seeker.singleshot.coverage.BreadthFirstSearch;
-import HideAndSeek.seeker.singleshot.coverage.BreadthFirstSearchLowCost;
-import HideAndSeek.seeker.singleshot.coverage.DepthFirstSearch;
-import HideAndSeek.seeker.singleshot.coverage.DepthFirstSearchLowCost;
 import HideAndSeek.seeker.singleshot.coverage.VariableBacktrackPath;
+import HideAndSeek.seeker.singleshot.coverage.efficiency.BreadthFirstSearch;
+import HideAndSeek.seeker.singleshot.coverage.efficiency.BreadthFirstSearchGreedy;
+import HideAndSeek.seeker.singleshot.coverage.efficiency.DepthFirstSearch;
+import HideAndSeek.seeker.singleshot.coverage.efficiency.DepthFirstSearchGreedy;
+import HideAndSeek.seeker.singleshot.coverage.efficiency.NearestNeighbour;
 import HideAndSeek.seeker.singleshot.preference.LeastConnectedFirst;
 import HideAndSeek.seeker.singleshot.preference.MostConnectedFirst;
-import HideAndSeek.seeker.singleshot.random.ConstrainedRandomWalk;
 import HideAndSeek.seeker.singleshot.random.FixedStartRandomWalk;
 import HideAndSeek.seeker.singleshot.random.RandomWalk;
+import HideAndSeek.seeker.singleshot.random.efficiency.SelfAvoidingRandomWalk;
+import HideAndSeek.seeker.singleshot.random.efficiency.SelfAvoidingRandomWalkGreedy;
 import Utility.Pair;
 import Utility.Utils;
 
@@ -155,7 +157,6 @@ public class Main {
 		
 		int numberOfHideLocations = Integer.parseInt(args[6]);
 		
-		
 		startRounds(initHiders(hiderList, numberOfHideLocations, mixHiders), initSeekers(seekerList, numberOfHideLocations, mixSeekers), rounds, true);
 		
 	}
@@ -230,6 +231,16 @@ public class Main {
 			
 			}
 			
+			if (hiderType.getElement0().equals("FirstNFixedStart")) {
+				
+				allHidingAgents.add(new VariableFixedDistanceFixedStart(graphController, numberOfHideLocations, 0));
+				
+				// Have to set ID manually as identifier and class used are different
+				// allHidingAgents.get(allHidingAgents.size() - 1).setName("RandomDirection");
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("FirstNFixedStart");
+			
+			}
+			
 			if (hiderType.getElement0().equals("FirstNStaticBetween")) {
 				
 				allHidingAgents.add(new VariableFixedDistanceStaticBetween(graphController, numberOfHideLocations, 0));
@@ -256,13 +267,13 @@ public class Main {
 			
 			if (hiderType.getElement0().equals("LowEdgeCostRandomSet")) {
 				
-				allHidingAgents.add(new LowEdgeCostRandomSet(graphController, numberOfHideLocations));
+				allHidingAgents.add(new GreedyRandomSet(graphController, numberOfHideLocations));
 			
 			} 
 			
 			if (hiderType.getElement0().equals("LowEdgeCostRandomSetStaticBetween")) {
 				
-				allHidingAgents.add(new LowEdgeCostRandomSetStaticBetween(graphController, numberOfHideLocations));
+				allHidingAgents.add(new GreedyRandomSetStaticBetween(graphController, numberOfHideLocations));
 			
 			} 
 			
@@ -306,13 +317,13 @@ public class Main {
 			
 			if (hiderType.getElement0().equals("LowEdgeCostRandomFixedDistance")) {
 				
-				allHidingAgents.add(new LowEdgeCostRandomFixedDistance(graphController, numberOfHideLocations));
+				allHidingAgents.add(new GreedyRandomFixedDistance(graphController, numberOfHideLocations));
 			
 			}
 			
 			if (hiderType.getElement0().equals("LowEdgeCostRandomFixedDistanceStaticBetween")) {
 				
-				allHidingAgents.add(new LowEdgeCostRandomFixedDistanceStaticBetween(graphController, numberOfHideLocations));
+				allHidingAgents.add(new GreedyRandomFixedDistanceStaticBetween(graphController, numberOfHideLocations));
 			
 			}
 			
@@ -338,7 +349,7 @@ public class Main {
 			
 			if (hiderType.getElement0().equals("LowEdgeCostVariableFixedDistance")) {
 				
-				allHidingAgents.add(new LowEdgeCostVariableFixedDistance(graphController, numberOfHideLocations, gameNumber));
+				allHidingAgents.add(new GreedyVariableFixedDistance(graphController, numberOfHideLocations, gameNumber));
 			
 			} 
 			
@@ -362,39 +373,45 @@ public class Main {
 			
 			} 
 			
+			if (hiderType.getElement0().equals("VariableGraphKnowledgeMaxDistance")) {
+				
+				allHidingAgents.add(new MaxDistance(graphController, numberOfHideLocations, gameNumber / (double)totalGames, -1));
+			
+			} 
+			
 			if (hiderType.getElement0().equals("LowEdgeCost")) {
 				
-				allHidingAgents.add(new VariableLowEdgeCost(graphController, numberOfHideLocations, 1.0));
+				allHidingAgents.add(new VariableGreedy(graphController, numberOfHideLocations, 1.0));
 			
 			} 
 			
 			if (hiderType.getElement0().equals("LowEdgeCostStaticBetween")) {
 				
-				allHidingAgents.add(new VariableLowEdgeCostStaticBetween(graphController, numberOfHideLocations, 1.0));
+				allHidingAgents.add(new VariableGreedyStaticBetween(graphController, numberOfHideLocations, 1.0));
 			
 			}
 			
 			if (hiderType.getElement0().equals("EqualEdgeCost")) {
 				
-				allHidingAgents.add(new VariableLowEdgeCost(graphController, numberOfHideLocations, 0.0));
+				allHidingAgents.add(new VariableGreedy(graphController, numberOfHideLocations, 0.0));
 			
 			}
 			
 			if (hiderType.getElement0().equals("FixedStartEqualEdgeCost")) {
 				
-				allHidingAgents.add(new FixedStartVariableLowEdgeCost(graphController, numberOfHideLocations, 0.0));
+				allHidingAgents.add(new FixedStartVariableGreedy(graphController, numberOfHideLocations, 0.0));
 			
 			} 
 
 			if (hiderType.getElement0().equals("VariableLowEdgeCost")) {
 				
-				allHidingAgents.add(new VariableLowEdgeCost(graphController, numberOfHideLocations, gameNumber / (float)totalGames));
+				allHidingAgents.add(new VariableGreedy(graphController, numberOfHideLocations, gameNumber / (float)totalGames));
 			
 			} 
 			
 			if (hiderType.getElement0().equals("FixedStartVariableLowEdgeCost")) {
 				
-				allHidingAgents.add(new FixedStartVariableLowEdgeCost(graphController, numberOfHideLocations, gameNumber / (float)totalGames));
+				allHidingAgents.add(new FixedStartVariableGreedy(graphController, numberOfHideLocations, gameNumber / (float)totalGames));
 			
 			} 
 			
@@ -746,9 +763,15 @@ public class Main {
 				
 			}
 			
-			if (seekerType.getElement0().equals("ConstrainedRandomWalk")) {
+			if (seekerType.getElement0().equals("SelfAvoidingRandomWalk")) {
 				
-				allSeekingAgents.add(new ConstrainedRandomWalk(graphController));
+				allSeekingAgents.add(new SelfAvoidingRandomWalk(graphController));
+				
+			}
+			
+			if (seekerType.getElement0().equals("SelfAvoidingRandomWalkLowCost")) {
+				
+				allSeekingAgents.add(new SelfAvoidingRandomWalkGreedy(graphController));
 				
 			}
 			
@@ -760,7 +783,7 @@ public class Main {
 			
 			if (seekerType.getElement0().equals("LowEdgeCost")) {
 				
-				allSeekingAgents.add(new LowEdgeCost(graphController));
+				allSeekingAgents.add(new Greedy(graphController));
 				
 			}
 			
@@ -772,7 +795,7 @@ public class Main {
 			
 			if (seekerType.getElement0().equals("DepthFirstSearchLowCost")) {
 				
-				allSeekingAgents.add(new DepthFirstSearchLowCost(graphController));
+				allSeekingAgents.add(new DepthFirstSearchGreedy(graphController));
 				
 			}
 			
@@ -784,7 +807,7 @@ public class Main {
 			
 			if (seekerType.getElement0().equals("BreadthFirstSearchLowCost")) {
 				
-				allSeekingAgents.add(new BreadthFirstSearchLowCost(graphController));
+				allSeekingAgents.add(new BreadthFirstSearchGreedy(graphController));
 				
 			}
 			
@@ -819,6 +842,12 @@ public class Main {
 				
 				allSeekingAgents.get(allSeekingAgents.size() - 1).setName("OptimalBacktrackPath");
 				
+			}
+			
+			if (seekerType.getElement0().equals("NearestNeighbour")) {
+				
+				allSeekingAgents.add(new NearestNeighbour(graphController));
+			
 			}
 
 			// Repeat-game: 
@@ -871,10 +900,10 @@ public class Main {
 			
 			allSeekingAgents = allSeekingAgents.subList(0, 1);
 			
-			System.out.println("Strat: " + allSeekingAgents);
+			System.out.println("Strategy: " + allSeekingAgents);
 			
 		}
-
+		
 		return allSeekingAgents;
 		
 	}
@@ -954,9 +983,7 @@ public class Main {
 				
 				for (int i = 0; i < rounds; i++) {
 		        	
-		        	Utils.talk("Main", "Game " + gameNumber + " Round " + i);
-		        	
-		        	System.out.println( "Game " + gameNumber + " Round " + i + ": " + ( ( i / ( ( (float) rounds * hiders.size() ) ) ) * 100 ) + "%" );
+		        	System.out.println("Game " + gameNumber + " Round " + i + ": " + ( ( i / ( ( (float) rounds * hiders.size() ) ) ) * totalGames ) + "%");
 		        	
 					hider.run();
 					
@@ -990,7 +1017,7 @@ public class Main {
 		    				
 		    				Utils.writeToFile(mainOutputWriter, seeker.toString() + "," + seeker.printRoundStats() + ",");
 		    				
-		    				Utils.talk("Main ", seeker.toString() + "," + seeker.printRoundStats());
+		    				Utils.talk("Main", seeker.toString() + "," + seeker.printRoundStats());
 		    				
 		    			}
 		    			
@@ -1051,7 +1078,7 @@ public class Main {
 					
 					Utils.talk("Main", "End of game \n------------------------------------------");
 					
-					System.out.println("Main" + hider.toString() + "," + hider.printGameStats());
+					Utils.talk("Main", hider.toString() + "," + hider.printGameStats());
 				
 				}
 				

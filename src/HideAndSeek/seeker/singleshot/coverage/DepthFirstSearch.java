@@ -67,8 +67,20 @@ public class DepthFirstSearch extends SeekingAgent {
 		
 		if ( connectedEdge == null ) {
 			
-			// If all edges have been traversed, move upwards through the current branch
-			return edgeToTarget( currentBranch.remove(currentBranch.size() - 1), currentNode );
+			if ( currentBranch.size() > 0 ) {
+				
+				// If all edges have been traversed, move upwards through the current branch (if it is not empty)
+				return edgeToTarget( currentBranch.remove(currentBranch.size() - 1), currentNode );
+				
+			} else {
+				
+				/* 
+				 * Because there should be no more to explore once all branches have been exhausted,
+				 * this should not be called.
+				 */
+				return connectedNode(currentNode);
+			
+			}
 		
 		} else {
 			
@@ -99,7 +111,7 @@ public class DepthFirstSearch extends SeekingAgent {
 	 */
 	@Override
 	public void endOfRound() {
-		// TODO Auto-generated method stub
+
 		super.endOfRound();
 		
 		currentBranch.clear();

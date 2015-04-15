@@ -9,7 +9,7 @@ import java.util.Map;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.singleshot.cost.VariableLowEdgeCost;
+import HideAndSeek.hider.singleshot.cost.VariableGreedy;
 import Utility.Utils;
 
 /**
@@ -24,7 +24,7 @@ import Utility.Utils;
  * 
  * @author Martin
  */
-public class VariableBias extends VariableLowEdgeCost {
+public class VariableBias extends VariableGreedy {
 
 	/**
 	 * Hider in which the tendency to take pre-traversed edges
@@ -164,7 +164,7 @@ public class VariableBias extends VariableLowEdgeCost {
 	 * @see HideAndSeek.GraphTraverser#getConnectedEdge(HideAndSeek.graph.StringVertex, java.util.List)
 	 */
 	@Override
-	protected StringEdge getConnectedEdge(StringVertex currentNode, List<StringEdge> connectedEdges) {
+	public StringEdge getConnectedEdge(StringVertex currentNode, List<StringEdge> connectedEdges) {
 		
 		for (StringEdge edge : connectedEdges ) {
 
@@ -238,8 +238,9 @@ public class VariableBias extends VariableLowEdgeCost {
 	 */
 	@Override
 	public String printGameStats() {
-		// TODO Auto-generated method stub
+		
 		return super.printGameStats(); //+ ",Score," + graphController.requestAverageHiderScore(this);
+	
 	}
 
 }

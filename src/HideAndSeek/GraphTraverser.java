@@ -2,6 +2,7 @@ package HideAndSeek;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
@@ -12,6 +13,19 @@ public interface GraphTraverser extends Comparable<GraphTraverser>, Runnable {
 	 * @param responsibleAgent
 	 */
 	public abstract void setResponsibleAgent(GraphTraversingAgent responsibleAgent);
+	
+	/**
+	 * @param currentNode
+	 * @param connectedEdges
+	 * @return
+	 */
+	public StringEdge getConnectedEdge(StringVertex currentNode, List<StringEdge> connectedEdges);
+	
+	/**
+	 * @param currentNode
+	 * @return
+	 */
+	public List<StringEdge> getConnectedEdges(StringVertex currentNode);
 	
 	/**
 	 * @return

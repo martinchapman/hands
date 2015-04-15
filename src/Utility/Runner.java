@@ -13,12 +13,14 @@ import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 
 import javax.swing.ButtonGroup;
+import javax.swing.ComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -38,8 +40,6 @@ import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
-import org.jfree.ui.ApplicationFrame;
 
 import Utility.output.HiderRecord;
 import Utility.output.OutputManager;
@@ -69,8 +69,8 @@ public class Runner extends JFrame {
 		  "RandomStaticBetween",
 		  
 		  "RandomSet",
-		  "LowEdgeCostRandomSet",
-		  "LowEdgeCostRandomSetStaticBetween",
+		  "GreedyRandomSet",
+		  "GreedyRandomSetStaticBetween",
 		  "RandomSetStaticBetween",
 		  "UniqueRandomSet",
 		  "UniqueRandomSetRepeat",
@@ -78,18 +78,19 @@ public class Runner extends JFrame {
 		  
 		  "FirstN",
 		  //"RandomDirection",
+		  "FirstNFixedStart",
 		  "FirstNStaticBetween",
 		  
 		  "RandomFixedDistance",
 		  "RandomFixedDistanceFixedStart",
 		  "RandomFixedDistanceStaticBetween",
-		  "LowEdgeCostRandomFixedDistance",
-		  "LowEdgeCostRandomFixedDistanceStaticBetween",
+		  "GreedyRandomFixedDistance",
+		  "GreedyRandomFixedDistanceStaticBetween",
 		  
 		  
 		  "VariableFixedDistance",
 		  "VariableFixedDistanceFixedStart",
-		  "LowEdgeCostVariableFixedDistance",
+		  "GreedyVariableFixedDistance",
 		  "VariableFixedDistanceStaticBetween",
 		  
 		  "LeastConnected",
@@ -97,13 +98,14 @@ public class Runner extends JFrame {
 		  
 		  "MaxDistance",
 		  "MaxDistanceStaticBetween",
+		  "VariableGraphKnowledgeMaxDistance",
 		  
-		  "LowEdgeCost",
-		  "LowEdgeCostStaticBetween",
+		  "Greedy",
+		  "GreedyStaticBetween",
 		  "EqualEdgeCost",
 		  "FixedStartEqualEdgeCost",
-		  "VariableLowEdgeCost",
-		  "FixedStartVariableLowEdgeCost",
+		  "VariableGreedy",
+		  "FixedStartVariableGreedy",
 		  
 		  "FullyBias",
 		  "FullyBiasStaticBetween",
@@ -160,15 +162,18 @@ public class Runner extends JFrame {
 		{ 
 		
 		  "RandomWalk",
-		  "ConstrainedRandomWalk",
-		  "LowEdgeCost",
+		  "SelfAvoidingRandomWalk",
+		  "SelfAvoidingRandomWalkGreedy",
+		  "Greedy",
 		  "DepthFirstSearch",
-          "DepthFirstSearchLowCost",
+          "DepthFirstSearchGreedy",
 	      "BreadthFirstSearch",
-	      "BreadthFirstSearchLowCost",
+	      "BreadthFirstSearchGreedy",
 	      "BacktrackPath",
 	      "VariableBacktrackPath",
 	      "OptimalBacktrackPath",
+	      "NearestNeighbour",
+	      
 	      "LeastConnectedFirst",
 	      "MostConnectedFirst",
 	      
@@ -357,12 +362,24 @@ public class Runner extends JFrame {
 		
 		showTextStats.setEnabled(false);
 		
+		final JComboBox<Path> files = new JComboBox<Path>();
+		
+		files.setEnabled(false);
+		
 		collateOutput.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				
-				outputManager.processOutput();
+				if ( files.isEnabled() ) {
+					
+					outputManager.processIndividualOutput((Path)files.getSelectedItem());
+					
+				} else {
+					
+					outputManager.processAllOutput();
+					
+				}
 				
 				outputFeedback.clear();
 				
@@ -428,6 +445,61 @@ public class Runner extends JFrame {
 		
 		northPane.add(showTextStats);
 		
+		// 
+		
+		final JButton showFiles = new JButton("Show files");
+		
+		showFiles.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				if ( showFiles.getText().equals("Show files") ) {
+			
+					showFiles.setText("Hide files");
+					
+					for ( Path path : outputManager.availableFiles() ) {
+						
+						files.addItem(path);
+						
+					}
+					
+					files.setEnabled(true);
+				
+				} else if ( showFiles.getText().equals("Hide files") ) {
+					
+					showFiles.setText("Show files");
+					
+					files.setEnabled(false);
+					
+					files.removeAllItems();
+					
+				}
+				
+			}
+		
+		});
+		
+		northPane.add(showFiles);
+		
+		//
+		
+		/*files.addMouseListener(new MouseAdapter() {
+		    
+			public void mouseClicked(MouseEvent evt) {
+		        
+		        if (evt.getClickCount() == 2) {
+		       
+		        	outputManager.processOutput((Path)files.getSelectedItem());
+		        	
+		        } 
+		        
+		    }
+			
+		});*/
+		
+		northPane.add(files);
+		
 		////
 		
 		JPanel centerPane = new JPanel();
@@ -458,6 +530,8 @@ public class Runner extends JFrame {
 				if (outputFeedbackList.getSelectedIndex() == -1 || outputFeedbackList.getSelectedValue().toString().equals("-----")) return;
 				
 				measure.removeAllItems();
+				
+				measure.addItem("Score");
 				
 				if ( seekers.isSelected() ) {
 				
@@ -547,6 +621,8 @@ public class Runner extends JFrame {
 				
 				measure.removeAllItems();
 				
+				measure.addItem("Score");
+				
 				for ( String attribute : outputFeedbackList.getSelectedValue().getSeekerAttributes() ) {
 					
 					measure.addItem(attribute);
@@ -565,6 +641,8 @@ public class Runner extends JFrame {
 				if (outputFeedbackList.getSelectedIndex() == -1 || outputFeedbackList.getSelectedValue().toString().equals("-----")) return;
 				
 				measure.removeAllItems();
+				
+				measure.addItem("Score");
 				
 				for ( String attribute : outputFeedbackList.getSelectedValue().getAttributes() ) {
 					
@@ -586,11 +664,11 @@ public class Runner extends JFrame {
 		
 		final JComboBox<String> graphTypes = new JComboBox<String>();
 
-		graphTypes.addItem("3D");
-		
 		graphTypes.addItem("Bar");
 		
 		graphTypes.addItem("Line");
+		
+		graphTypes.addItem("3D");
 		
 		centerPaneRightCenter.add(new JLabel("Graph types:"));
 		
@@ -612,9 +690,9 @@ public class Runner extends JFrame {
 		
 		final JComboBox<String> gameOrRound = new JComboBox<String>();
 		
-		gameOrRound.addItem("Round");
-		
 		gameOrRound.addItem("Game");
+		
+		gameOrRound.addItem("Round");
 		
 		centerPaneRightCenter.add(new JLabel("Average over Game or Round:"));
 		
@@ -640,11 +718,15 @@ public class Runner extends JFrame {
 				
 				for ( HiderRecord hider : outputFeedbackList.getSelectedValuesList()) {
 					
+					if (hider.toString().equals("-----")) continue;
+					
 					selectedHiders.add(hider);
 					
 					title += "Topology: " + hider.getTopology() + " Hider: " + hider;
 					
 					for ( TraverserRecord hidersSeekers : hider.getSeekersAndAttributes() ) {
+						
+						if ( hidersSeekers.toString().contains("(")) hidersSeekers.setTraverser(hidersSeekers.toString().substring(0, hidersSeekers.toString().indexOf(" ")));
 						
 						hidersSeekers.setTraverser(hidersSeekers.getTraverser() + " (" + hider.getTraverser() + ")");
 						
@@ -693,7 +775,7 @@ public class Runner extends JFrame {
 					
 				}
 				
-				collateOutput.doClick();
+				//collateOutput.doClick();
 				
 			}
 		
@@ -1244,7 +1326,6 @@ public class Runner extends JFrame {
 						
 					} catch (IOException e1) {
 					
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					
 					}
@@ -1583,7 +1664,6 @@ public class Runner extends JFrame {
 			
 			} catch (IOException e1) {
 				
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			
 			}
@@ -1604,7 +1684,6 @@ public class Runner extends JFrame {
 				
 			} catch (IOException e1) {
 				
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			
 			}
@@ -1619,7 +1698,6 @@ public class Runner extends JFrame {
 				
 			} catch (IOException e1) {
 				
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			
 			} 

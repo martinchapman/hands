@@ -6,6 +6,10 @@ import java.util.HashSet;
 import HideAndSeek.GraphTraverser;
 import HideAndSeek.graph.StringVertex;
 
+/**
+ * @author Martin
+ *
+ */
 public interface Seeker extends GraphTraverser {
 
 	/**
@@ -28,4 +32,9 @@ public interface Seeker extends GraphTraverser {
 	 */
 	public void mergeOtherTraverser(Seeker traverser);
 
+	/**
+	 * @return
+	 */
+	public boolean searchCriteria();
+	
 }

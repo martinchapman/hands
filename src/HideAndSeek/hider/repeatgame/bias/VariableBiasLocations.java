@@ -53,7 +53,7 @@ public class VariableBiasLocations extends VariableBias {
 	@Override
 	public StringVertex nextNode(StringVertex currentNode) {
 		
-		if ( hideLocations.size() >= numberOfBiasLocations ) {
+		if ( graphController.numberOfHideLocations(responsibleAgent) >= numberOfBiasLocations ) {
 			
 			return connectedNode(currentNode);
 			

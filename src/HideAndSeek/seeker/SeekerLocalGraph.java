@@ -49,7 +49,7 @@ public abstract class SeekerLocalGraph extends SeekingAgent {
 		addUniquelyVisitedNode(currentNode);
 		
 		// Update the local graph from the current node as the Seeker moves
-		for ( StringEdge edge : graphController.edgesOf(currentNode) ) {
+		for ( StringEdge edge : getConnectedEdges(currentNode) ) {
 			
 			localGraph.addVertexIfNonExistent(edge.getSource());
 			

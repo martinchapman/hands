@@ -12,7 +12,7 @@ import Utility.ScoreMetric;
 import Utility.Utils;
 
 /**
- * Alters the size of the hide set if it believes this style
+ * Alters the size of the unique hide set if it believes this style
  * of play is being anticipated too easily by an opponent.
  * 
  * @author Martin

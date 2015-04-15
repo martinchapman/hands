@@ -15,31 +15,14 @@ import HideAndSeek.hider.HiderLocalGraph;
  * 
  * Best is thus leaf nodes.
  * 
+ * NB. Could consider including richer notions of degree centrality, 
+ * such as betweenness centrality. Mechanisms to compute these
+ * metrics are available in the library jar 'jgraph-sna'.
+ * 
  * @author Martin
  *
  */
-public class LeastConnected extends HiderLocalGraph {
-
-	/**
-	 * @param graph
-	 * @param numberOfHideLocations
-	 */
-	public LeastConnected(GraphController <StringVertex, StringEdge> graphController, int numberOfHideLocations) {
-		
-		super(graphController, numberOfHideLocations);
-		
-		triedNodes = new HashSet<StringVertex>();
-		
-		leastConnectedNodes = new ArrayList<StringVertex>();
-		
-		currentPath = new ArrayList<StringEdge>();
-		
-	}
-
-	/**
-	 * 
-	 */
-	private int minConnections = Integer.MAX_VALUE;
+public class LeastConnected extends PreferenceHider {
 	
 	/**
 	 * 
@@ -60,28 +43,116 @@ public class LeastConnected extends HiderLocalGraph {
 	 * can have in order to be considered to have least connectivity.
 	 * (1 = leaf).
 	 */
+	protected static final int MAX_CONNECTIONS = 1;
+	
+	/**
+	 * @param graph
+	 * @param numberOfHideLocations
+	 */
+	public LeastConnected(GraphController <StringVertex, StringEdge> graphController, int numberOfHideLocations) {
+		
+		super(graphController, numberOfHideLocations);
+		
+		triedNodes = new HashSet<StringVertex>();
+		
+		leastConnectedNodes = new ArrayList<StringVertex>();
+		
+	}
+	
+	/**
+	 * @param graphController
+	 * @param numberOfHideLocations
+	 */
+	public LeastConnected( GraphController<StringVertex, StringEdge> graphController, int numberOfHideLocations, double graphPortion ) {
+		
+		super(graphController, numberOfHideLocations, graphPortion);
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.hider.singleshot.preference.PreferenceHider#computeTargetNodes()
+	 */
+	@Override
+	public ArrayList<StringVertex> computeTargetNodes() {
+		
+		int maxConnections = MAX_CONNECTIONS;
+		
+		// Continue until we have complete nodes for the hideset
+		while ( leastConnectedNodes.size() < numberOfHideLocations ) {
+					
+			for ( StringVertex potentialNode : graphController.vertexSet() ) {
+				
+				if ( getConnectedEdges(potentialNode).size() == maxConnections ) {
+					
+					leastConnectedNodes.add(potentialNode);
+					
+				}
+				
+				if ( leastConnectedNodes.size() >= numberOfHideLocations ) return leastConnectedNodes;
+				
+				
+			}
+
+			/* 
+			 * If we haven't found a sufficient number of connected edges at our estimated maximum,
+			 * relaxed this constraint by increasing the maximum, and try again.
+			 */
+			maxConnections++;
+		
+		}
+		
+		return leastConnectedNodes;
+		
+	}
+		
+	/* (non-Javadoc)
+	 * @see HideAndSeek.hider.singleshot.preference.PreferenceHider#nextNode(HideAndSeek.graph.StringVertex)
+	 */
+	public StringVertex nextNode(StringVertex currentNode) {
+		
+		/* If one of the nodes on the other side of an edge connected to this node has 
+		 * a number of edges that we class as minimal, add it to the hide set.
+		 */
+		for ( StringEdge connectedEdge : getConnectedEdges(currentNode) ) {
+			
+			if ( super.getConnectedEdges(edgeToTarget(connectedEdge, currentNode)).size() == MAX_CONNECTIONS ) {
+				
+				leastConnectedNodes.add(edgeToTarget(connectedEdge, currentNode));
+				
+			}
+			
+		}
+		
+		return super.nextNode(currentNode);
+		
+	}
+	
+	/**
+	 * @deprecated
+	 */
 	protected int maxConnections = 1;
 	
 	/**
-	 * 
+	 * @deprecated
+	 */
+	private int minConnections = Integer.MAX_VALUE;
+	
+	/**
+	 * @deprecated
 	 */
 	private HashSet<StringVertex> triedNodes;
 	
 	/**
-	 * 
+	 * @deprecated
+	 * @param vertex
+	 * @return
 	 */
-	ArrayList<StringEdge> currentPath;
-	
-	/* (non-Javadoc)
-	 * @see HideAndSeek.hider.Hider#hideHere(HideAndSeek.graph.StringVertex)
-	 */
-	@Override
-	public boolean hideHere(StringVertex vertex) {
+	public boolean estimateLeastConnected(StringVertex vertex) {
 		
 		triedNodes.add(vertex);
 		
 		// If all nodes have been tried, and we still need more hide locations
-		if (triedNodes.size() == (graphController.vertexSet().size() - hideLocations.size())) { 
+		if (triedNodes.size() == (graphController.vertexSet().size() - graphController.numberOfHideLocations(responsibleAgent))) { 
 			
 			// Increase max connections if not enough exist at pre-set maximum (e.g. we set out 
 			// to find connections of degree 1, but not enough (or none) of these exist).
@@ -93,9 +164,9 @@ public class LeastConnected extends HiderLocalGraph {
 				
 		}
 		
-		if (graphController.edgesOf(vertex).size() < minConnections) minConnections = graphController.degreeOf(vertex);
+		if (getConnectedEdges(vertex).size() < minConnections) minConnections = graphController.degreeOf(vertex);
 		
-		if (graphController.edgesOf(vertex).size() == maxConnections) { 
+		if (getConnectedEdges(vertex).size() == MAX_CONNECTIONS) { 
 			
 			triedNodes.clear(); 
 			
@@ -109,38 +180,6 @@ public class LeastConnected extends HiderLocalGraph {
 		
 	}
 	
-
-	/* (non-Javadoc)
-	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
-	 */
-	@Override
-	public StringVertex nextNode(StringVertex currentNode) {
-		
-		// If we're on a path to a node in the random set, follow this first
-		if ( currentPath.size() > 0 ) {
-			
-			return edgeToTarget(currentPath.remove(0), currentNode);
-			
-		}
-		
-		// Otherwise, try and calculate a path to the next node in the set
-		if ( leastConnectedNodes.size() > 0 && !uniquelyVisitedNodes().contains(leastConnectedNodes.get(0)) && localGraph.containsVertex( leastConnectedNodes.get(0) ) ) {
-			
-			DijkstraShortestPath<StringVertex, StringEdge> dsp = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, leastConnectedNodes.get(0));
-	    	
-			// If no path available, return random connected node
-			if (dsp.getPathEdgeList() == null || dsp.getPathEdgeList().size() == 0) return connectedNode(currentNode);
-			
-			currentPath = new ArrayList<StringEdge>(dsp.getPathEdgeList());
-			
-			return edgeToTarget(currentPath.remove(0), currentNode);
-			
-		}
-				
-		return connectedNode(currentNode);
-		
-	}
-    
 	/* (non-Javadoc)
 	 * @see HideAndSeek.hider.Hider#printGameStats()
 	 */
@@ -155,16 +194,5 @@ public class LeastConnected extends HiderLocalGraph {
 				 ", NumberOfMostConnectedNodes, " + graphController.getTopologyProperties().numberOfMostConnectedNodes() +
 				 "";
 	}
-
-	/* (non-Javadoc)
-	 * @see HideAndSeek.GraphTraverser#startNode()
-	 */
-	@Override
-	public StringVertex startNode() {
-	
-		return randomNode();
-		
-	}
-
 
 }

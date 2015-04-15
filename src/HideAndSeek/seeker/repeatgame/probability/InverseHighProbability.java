@@ -15,7 +15,10 @@ import Utility.Utils;
 /**
  * Does not explore potential hide locations based upon frequency,
  * but instead tracks those nodes which have *not yet been chosen*
- * by a hider as hide locations, and heads to those 
+ * by a hider as hide locations, and heads to those first.
+ * 
+ * Again, a form of Bayesian approach to seeking, as opposed to
+ * simply relying on frequency.
  * 
  * @author Martin
  *

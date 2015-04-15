@@ -10,6 +10,8 @@ import HideAndSeek.seeker.repeatgame.probability.VariableNodesInverseHighProbabi
  * to hide uniquely, is faced with such a hider, it may not always be advantageous
  * to use *all* this information, as it becomes detectable.
  * 
+ * Inspired by: http://stats.stackexchange.com/questions/131299/statistical-analysis-in-the-cryptoanalysis-of-the-enigma-cipher-machine-safegua
+ * 
  * @author Martin
  *
  */

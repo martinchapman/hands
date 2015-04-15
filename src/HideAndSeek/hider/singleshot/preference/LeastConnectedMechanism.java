@@ -22,13 +22,15 @@ public class LeastConnectedMechanism extends LeastConnected implements OpenHider
 		
 		super(graphController, numberOfHideLocations);
 		
+		graphController.deregisterTraversingAgent(responsibleAgent);
+		
 	}
 
 	/**
 	 * @param vertex
 	 * @return
 	 */
-	public boolean hideHereInterface(StringVertex vertex) {
+	public boolean hideHere(StringVertex vertex) {
 		
 		return hideHere(vertex);
 		

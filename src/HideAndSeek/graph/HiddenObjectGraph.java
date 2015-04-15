@@ -42,7 +42,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	/**
 	 * 
 	 */
-	protected ArrayList<V> hideLocations;
+	protected HashSet<V> hideLocations;
 	
 	/**
 	 * 
@@ -630,12 +630,12 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
         super(ef);
         
         setup();
-        
+    
     	traversers = new HashSet<GraphTraverser>();
     	
     	nodeTypes = new HashMap<V, Character>();
     	
-    	hideLocations = new ArrayList<V>();
+    	hideLocations = new HashSet<V>();
         
     }
 
@@ -654,11 +654,11 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
     	
     	nodeTypes = new HashMap<V, Character>();
     	
-    	hideLocations = new ArrayList<V>();
+    	hideLocations = new HashSet<V>();
     	
     }
     
-    /**
+	/**
      * 
      */
     private void setup() {

@@ -18,6 +18,7 @@ import Utility.Utils;
  * that the seeker is prepared to backtrack. 
  * 
  * @author Martin
+ * @deprecated
  *
  */
 public class VariableBacktrackPath extends BacktrackPath {

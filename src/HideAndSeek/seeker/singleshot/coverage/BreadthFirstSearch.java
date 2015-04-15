@@ -88,7 +88,20 @@ public class BreadthFirstSearch extends SeekerLocalGraph {
 
 			pathInProgress = DSP.getPath().getEdgeList();
 
-			return edgeToTarget(pathInProgress.remove(0), currentNode);
+			if ( pathInProgress.size() > 0 ) {
+				
+				return edgeToTarget(pathInProgress.remove(0), currentNode);
+				
+			} else {
+				
+				/* 
+				 * Because there should always be a path through the parent to another child,
+				 * this should never be invoked.
+				 */
+				return connectedNode(currentNode);
+				
+			}
+			
 
 		}
 
@@ -106,7 +119,7 @@ public class BreadthFirstSearch extends SeekerLocalGraph {
 		StringVertex startNode = randomNode();
 		
 		// Add all children of start node
-		for ( StringEdge vertexEdge : graphController.edgesOf(startNode) ) {
+		for ( StringEdge vertexEdge : getConnectedEdges(startNode) ) {
 			
 			toBeVisited.add(edgeToTarget(vertexEdge, startNode));
 			
@@ -142,5 +155,3 @@ public class BreadthFirstSearch extends SeekerLocalGraph {
 	}
 
 }
-
-

@@ -7,7 +7,7 @@ import HideAndSeek.hider.HidingAgent;
 
 /**
  * 
- * Truly random hider, who starts at a random location each time, moves randomly,
+ * Random hider, who starts at a random location each time, moves randomly,
  * and selects, with 50% (changeable) chance, to hide at a node when he lands on it.
  * 
  * @author Martin
@@ -27,7 +27,7 @@ public class Random extends HidingAgent {
 	/**
 	 * 
 	 */
-	protected double HIDEPOTENTIAL = 0.5;
+	protected double hidePotential = 0.5;
 	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.hider.Hider#hideHere(HideAndSeek.graph.StringVertex)
@@ -35,7 +35,7 @@ public class Random extends HidingAgent {
 	@Override
 	public boolean hideHere(StringVertex vertex) {
 		
-		if (Math.random() < HIDEPOTENTIAL) { return true; }
+		if (Math.random() < hidePotential) { return true; }
 		
 		else { return false; }
 		

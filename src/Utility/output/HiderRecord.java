@@ -104,27 +104,6 @@ public class HiderRecord extends TraverserRecord {
 	}
 	
 	/* (non-Javadoc)
-	 * @see Utility.output.TraverserRecord#getAverageGameAttributeValue(java.lang.String, java.util.Hashtable, java.util.Hashtable)
-	 */
-	public double getAverageGameAttributeValue(String attribute, Hashtable<String, Double> maxAttributeToValueAllSeries, Hashtable<String, Double> minAttributeToValueAllSeries) {
-		
-		double hiderCost = super.getAverageGameAttributeValue("Cost", maxAttributeToValueAllSeries, minAttributeToValueAllSeries);
-		
-		double cumulativeRelativisedSeekerCost = 0.0;
-		
-		for ( TraverserRecord hidersSeeker : seekersAndAttributes ) {
-			
-			cumulativeRelativisedSeekerCost += hidersSeeker.getAverageGameAttributeValue("Cost", maxAttributeToValueAllSeries, minAttributeToValueAllSeries);
-			
-		}
-		
-		double seekerCost = cumulativeRelativisedSeekerCost / seekersAndAttributes.size();
-		
-		return seekerCost - hiderCost;
-		
-	}
-	
-	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {

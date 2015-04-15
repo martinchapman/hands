@@ -45,7 +45,7 @@ public class HighProbabilityMinimumConnectivity extends HighProbability {
 		
 		super.addHideLocation(location);
 		
-		leastConnectedMechanism.hideHereInterface(location);
+		leastConnectedMechanism.hideHere(location);
 		
 	}
 

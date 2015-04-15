@@ -86,7 +86,7 @@ public class HighProbability extends SeekerLocalGraph {
 		// Use likely node information if available, and if graph has sufficient information to use:
 		if ( likelyNodes.size() > 0 && localGraph.containsVertex(likelyNodes.get(0)) ) {
 			
-			//Utils.talk(this.toString(), "Heading for: " + likelyNodes.get(0));
+			Utils.talk(responsibleAgent.toString(), "Heading for: " + likelyNodes.get(0));
 			
 			DijkstraShortestPath<StringVertex, StringEdge> dsp = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, likelyNodes.get(0));
 	    	

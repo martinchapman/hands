@@ -11,6 +11,15 @@ import HideAndSeek.seeker.SeekingAgent;
 import Utility.Utils;
 
 /**
+ * This strategy can be viewed as akin to a *BAYESIAN* approach, 
+ * as it does not assume that each node has 1 / N chance of being
+ * hidden in.
+ * 
+ * Instead it uses the PRIOR knowledge that this is a 
+ * competitive game, in which hiders want to obscure themselves,
+ * and thus they will express a higher preference towards more
+ * obscure nodes.
+ * 
  * @author Martin
  *
  */
@@ -28,7 +37,7 @@ public class LeastConnectedFirst extends SeekingAgent {
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#getConnectedEdge(HideAndSeek.graph.StringVertex, java.util.List)
 	 */
-	protected StringEdge getConnectedEdge(StringVertex currentNode, List<StringEdge> connectedEdges) {
+	public StringEdge getConnectedEdge(StringVertex currentNode, List<StringEdge> connectedEdges) {
 		
 		for (StringEdge edge : connectedEdges ) {
 
@@ -46,9 +55,9 @@ public class LeastConnectedFirst extends SeekingAgent {
 	 * @see HideAndSeek.GraphTraverser#getConnectedEdges(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
-	protected List<StringEdge> getConnectedEdges(StringVertex currentNode) {
+	public List<StringEdge> getConnectedEdges(StringVertex currentNode) {
 		
-		List<StringEdge> connections = new ArrayList<StringEdge>(graphController.edgesOf(currentNode));
+		List<StringEdge> connections = new ArrayList<StringEdge>(super.getConnectedEdges(currentNode));
 		
 		ArrayList<ConnectedNodeConnectivity> nodeConnectivity = new ArrayList<ConnectedNodeConnectivity>();
 		

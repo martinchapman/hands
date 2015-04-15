@@ -8,6 +8,8 @@ import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.HidingAgent;
 
 /**
+ * 2/4 Currently unused 
+ * 
  * @author Martin
  *
  */
@@ -34,7 +36,7 @@ public class NodeTypeRestricted extends HidingAgent {
 		
 		/* Permit hide if node is connected to other nodes of all types
 		  (mimics connectivity constraints) */
-		for ( StringEdge edge : graphController.edgesOf(vertex)) {
+		for ( StringEdge edge : getConnectedEdges(vertex)) {
 			
 			if ( !types.contains(graphController.getNodeType(edgeToTarget(edge, vertex))) ) {
 				
