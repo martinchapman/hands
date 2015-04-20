@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
@@ -32,6 +33,7 @@ import org.jgrapht.alg.FloydWarshallShortestPaths;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jibble.epsgraphics.EpsGraphics2D;
 
+import HideAndSeek.GraphTraverser;
 import HideAndSeek.graph.HiddenObjectGraph;
 
 /**
@@ -52,6 +54,103 @@ public class Utils {
 	 */
 	public static boolean DEBUG = true;
 	
+	/**
+	 * 
+	 */
+	public final static void runCommand(String command) {
+		
+		Process proc = null;
+		
+		try {
+			
+			proc = Runtime.getRuntime().exec(command);
+		
+		} catch (IOException e1) {
+			
+			e1.printStackTrace();
+		
+		}
+		
+		BufferedReader outputs = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+		
+		BufferedReader errors = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+		  
+		String line = null;  
+		 
+		try {
+			
+			while ((line = outputs.readLine()) != null) {  
+			
+				System.out.println(line);  
+			
+			}
+			
+		} catch (IOException e1) {
+			
+			e1.printStackTrace();
+		
+		}
+		
+		try {
+		
+			while ((line = errors.readLine()) != null) {  
+				
+				System.out.println(line);  
+			
+			}
+			
+		} catch (IOException e1) {
+			
+			e1.printStackTrace();
+		
+		} 
+		  
+		try {
+		
+			proc.waitFor();
+		
+		} catch (InterruptedException e) { System.out.println(e); }
+	    
+	}
+	
+	/**
+	 * @param traverser
+	 * @return
+	 */
+	public static String shortenTraverserName(GraphTraverser traverser) {
+		
+		if (traverser.toString().contains(" ")) { 
+			
+			return traverser.toString().substring(0, traverser.toString().indexOf(" "));
+		
+		} else {
+			
+			return traverser.toString();
+			
+		}
+		
+	}
+	
+	/**
+	 * @param map
+	 * @return
+	 */
+	public static <A, B> LinkedHashMap<A,B> manualReverse(LinkedHashMap<A, B> map) {
+	
+		List<Entry<A,B>> list = new ArrayList<Entry<A, B>>(map.entrySet());
+	
+		map.clear();
+		
+		for ( int i = list.size() - 1; i >= 0; i-- ){
+			
+		    map.put(list.get(i).getKey(), list.get(i).getValue());
+		
+		}
+		
+		return map;
+	
+	}
+
 	/**
 	 * 
 	 */

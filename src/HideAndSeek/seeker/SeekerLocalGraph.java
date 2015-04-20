@@ -65,6 +65,15 @@ public abstract class SeekerLocalGraph extends SeekingAgent {
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraversingAgent#getStatus()
+	 */
+	protected String getStatus() {
+		
+		return super.getStatus() + "\nKnown edges: " + localGraph.edgeSet().size();
+		
+	}
+
 	/**
 	 * @param currentNode
 	 * @param numberOfNodes Number of nodes to return ordered.

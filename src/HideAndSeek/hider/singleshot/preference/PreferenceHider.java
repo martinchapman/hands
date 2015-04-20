@@ -1,17 +1,18 @@
 package HideAndSeek.hider.singleshot.preference;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.jgrapht.alg.DijkstraShortestPath;
 
 import HideAndSeek.OpenTraverserStrategy;
+import HideAndSeek.VariableTraversalStrategy;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.HiderLocalGraph;
 import HideAndSeek.seeker.singleshot.coverage.NearestNeighbourMechanism;
-import Utility.Utils;
 
 /**
  * These hiders specify a preference for certain nodes
@@ -27,12 +28,12 @@ import Utility.Utils;
  * @author Martin
  *
  */
-public abstract class PreferenceHider extends HiderLocalGraph {
+public abstract class PreferenceHider extends HiderLocalGraph implements VariableTraversalStrategy {
 	
 	/**
 	 * 
 	 */
-	private ArrayList<StringVertex> targetVertices;
+	private LinkedHashSet<StringVertex> targetVertices;
 	
 	/**
 	 * For this strategy to operate to best effect, ideally
@@ -49,7 +50,7 @@ public abstract class PreferenceHider extends HiderLocalGraph {
 	/**
 	 * The mechanism to use when exploring the graph
 	 */
-	private OpenTraverserStrategy explorationMechanism;
+	protected OpenTraverserStrategy explorationMechanism;
 	
 	/**
 	 * @param graphController
@@ -59,11 +60,21 @@ public abstract class PreferenceHider extends HiderLocalGraph {
 		
 		super(graphController, numberOfHideLocations);
 
-		targetVertices = new ArrayList<StringVertex>();
+		targetVertices = new LinkedHashSet<StringVertex>();
+		
+		currentPath = new ArrayList<StringEdge>();
 		
 		graphPortion = 1.0;
 		
-		explorationMechanism = new NearestNeighbourMechanism(graphController);
+		explorationMechanism = getExplorationMechanism();
+		
+		explorationMechanism.setResponsibleAgent(this);
+		
+	}
+	
+	public OpenTraverserStrategy getExplorationMechanism() {
+		
+		return new NearestNeighbourMechanism(graphController);
 		
 	}
 	
@@ -107,7 +118,7 @@ public abstract class PreferenceHider extends HiderLocalGraph {
 	/**
 	 * @return
 	 */
-	public abstract ArrayList<StringVertex> computeTargetNodes();
+	public abstract LinkedHashSet<StringVertex> computeTargetNodes();
 	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.hider.HidingAgent#endOfRound()
@@ -126,6 +137,49 @@ public abstract class PreferenceHider extends HiderLocalGraph {
 	 */
 	private List<StringEdge> currentPath;
 	
+	/**
+	 * @param startNode
+	 */
+	public void atStart(StringVertex startNode) {
+		
+		super.atStart(startNode);
+		
+		explorationMechanism.atStart(currentNode);
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraversingAgent#atNode()
+	 */
+	public void atNode() {
+		
+		super.atNode();
+	
+		explorationMechanism.atNode();
+		
+	}
+	
+	/**
+	 * @param nextNode
+	 */
+	public void atNextNode(StringVertex nextNode) {
+		
+		super.atNextNode(nextNode);
+		
+		explorationMechanism.atNextNode(nextNode);
+		
+	}
+	
+	/**
+	 * @return
+	 */
+	public String getStatus() {
+		
+		return super.getStatus() + "\nTarget Nodes: " + targetVertices + "\n" +
+									"Current Path: " + currentPath;
+		
+	}
+	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
 	 */
@@ -134,35 +188,25 @@ public abstract class PreferenceHider extends HiderLocalGraph {
 		
 		super.nextNode(currentNode);
 		
-		if ( targetVertices.size() == 0 ) {
-			
+		if ( targetVertices.size() < numberOfHideLocations ) {
+
 			return explorationMechanism.nextNode(currentNode);
 			
 		} else {
 			
 			// If we're already on the DSP to a node, continue on it
-			if (currentPath.size() > 0) return edgeToTarget(currentPath.remove(0), currentNode);
+			if ( currentPath.size() > 0 ) return edgeToTarget(currentPath.remove(0), currentNode);
 			
-			DijkstraShortestPath<StringVertex, StringEdge> dsp = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, targetVertices.get(0));
+			DijkstraShortestPath<StringVertex, StringEdge> dsp = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, new ArrayList<StringVertex>(targetVertices).get(0));
 	    	
 			// If no path available, return random connected node
-			if (dsp.getPathEdgeList() == null || dsp.getPathEdgeList().size() == 0) return explorationMechanism.connectedNode(currentNode);
+			if ( dsp.getPathEdgeList() == null || dsp.getPathEdgeList().size() == 0 ) return explorationMechanism.connectedNode(currentNode);
 			
 			currentPath = new ArrayList<StringEdge>(dsp.getPathEdgeList());
 			
 			return edgeToTarget(currentPath.remove(0), currentNode);
 			
 		}
-	
-	}
-	
-	/* (non-Javadoc)
-	 * @see HideAndSeek.hider.Hider#printGameStats()
-	 */
-	@Override
-	public String printGameStats() {
-		
-		return super.printGameStats() + ", GraphDiameter, " + Utils.graphDiameter(localGraph);
 	
 	}
     

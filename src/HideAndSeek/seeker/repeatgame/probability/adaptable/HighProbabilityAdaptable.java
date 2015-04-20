@@ -9,7 +9,7 @@ import HideAndSeek.graph.StringVertex;
 import HideAndSeek.seeker.AdaptiveSeeker;
 import HideAndSeek.seeker.repeatgame.probability.HighProbability;
 import Utility.AdaptiveUtils;
-import Utility.ScoreMetric;
+import Utility.Metric;
 import Utility.Utils;
 
 /**
@@ -140,7 +140,7 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 	@Override
 	public double performanceOfSelf() {
 		
-		percentageChanges.add(graphController.latestTraverserRoundPerformance(responsibleAgent, ScoreMetric.COST_CHANGE_SCORE));
+		percentageChanges.add(graphController.latestTraverserRoundPerformance(responsibleAgent, Metric.COST_CHANGE_SCORE));
 		
 		if (AdaptiveUtils.containsLowPerformance(percentageChanges, INDIVIDUAL_PERFORMANCE_THRESHOLD, INDIVIDUAL_PERFORMANCE_ROUND_THRESHOLD)) {
 			

@@ -7,7 +7,7 @@ import java.util.List;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.seeker.SeekingAgent;
+import HideAndSeek.seeker.SeekerLocalGraph;
 import Utility.Utils;
 
 /**
@@ -20,10 +20,11 @@ import Utility.Utils;
  * and thus they will express a higher preference towards more
  * obscure nodes.
  * 
+ * 
  * @author Martin
  *
  */
-public class LeastConnectedFirst extends SeekingAgent {
+public class LeastConnectedFirst extends SeekerLocalGraph {
 
 	/**
 	 * @param graph
@@ -37,7 +38,7 @@ public class LeastConnectedFirst extends SeekingAgent {
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#getConnectedEdge(HideAndSeek.graph.StringVertex, java.util.List)
 	 */
-	public StringEdge getConnectedEdge(StringVertex currentNode, List<StringEdge> connectedEdges) {
+	protected StringEdge getConnectedEdge(StringVertex currentNode, List<StringEdge> connectedEdges) {
 		
 		for (StringEdge edge : connectedEdges ) {
 
@@ -55,7 +56,7 @@ public class LeastConnectedFirst extends SeekingAgent {
 	 * @see HideAndSeek.GraphTraverser#getConnectedEdges(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
-	public List<StringEdge> getConnectedEdges(StringVertex currentNode) {
+	protected List<StringEdge> getConnectedEdges(StringVertex currentNode) {
 		
 		List<StringEdge> connections = new ArrayList<StringEdge>(super.getConnectedEdges(currentNode));
 		
@@ -63,7 +64,15 @@ public class LeastConnectedFirst extends SeekingAgent {
 		
 		for ( StringEdge edge : connections ) {
 			
-			nodeConnectivity.add(new ConnectedNodeConnectivity(edge, graphController.edgesOf(edgeToTarget(edge, currentNode)).size()));
+			if ( localGraph.vertexSet().contains(edgeToTarget(edge, currentNode)) ) {
+				
+				nodeConnectivity.add(new ConnectedNodeConnectivity(edge, localGraph.edgesOf(edgeToTarget(edge, currentNode)).size()));
+				
+			} else {
+				
+				nodeConnectivity.add(new ConnectedNodeConnectivity(edge, 0));
+				
+			}
 			
 		}
 		
@@ -83,8 +92,6 @@ public class LeastConnectedFirst extends SeekingAgent {
 		
 	}
 	
-	
-
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#startNode()
 	 */
@@ -98,12 +105,14 @@ public class LeastConnectedFirst extends SeekingAgent {
 	@Override
 	public StringVertex nextNode(StringVertex currentNode) {
 		
+		super.nextNode(currentNode);
+		
 		return connectedNode(currentNode);
 		
 	}
 	
 	/**
-	 * Pairs Edges with a figure denoting the number of nodes connected to the vertex
+	 * Pairs edges with a figure denoting the number of nodes connected to the vertex
 	 * at the end of that edge
 	 * 
 	 * @author Martin

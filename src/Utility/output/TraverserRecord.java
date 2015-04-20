@@ -1,17 +1,21 @@
 package Utility.output;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
+import Utility.ComparatorResult;
+import Utility.Metric;
+import Utility.TraverserDataset;
+import Utility.TraverserDatasetMeasure;
+import Utility.Utils;
+
 /**
  * @author Martin
  *
  */
-public class TraverserRecord {
+public class TraverserRecord implements Comparable<TraverserRecord> {
 	
 	/**
 	 * 
@@ -185,8 +189,14 @@ public class TraverserRecord {
 	
 	}
 
+	/**
+	 * 
+	 */
 	private int currentGameNumber = -1;
 	
+	/**
+	 * 
+	 */
 	private int currentRoundNumber = -1;
 	
 	/**
@@ -198,6 +208,7 @@ public class TraverserRecord {
 		// To maintain list of individual attributes
 		attributes.add(attribute);
 		
+		// ~MDC Take the logarithm of the value of effectively scale results. Same achieved with normalisation. 
 		//value = Math.log(value)/Math.log(2);
 		
 		// If we already have an entry for this game / round, and no entry for the given attribute, add it to this entry. 
@@ -230,11 +241,30 @@ public class TraverserRecord {
 		}
 		
 	}
+
+	/**
+	 * @deprecated
+	 * @return
+	 */
+	public LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>> getNormalisedGameSeries() {
+		
+		return getGameSeries(true);
+		
+	}
 	
 	/**
 	 * @return
 	 */
-	protected Hashtable<String, Double> calculateGameAverage(Hashtable<String, Double> minAttributeToValueAllSeries, Hashtable<String, Double> maxAttributeToValueAllSeries) {
+	public LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>> getGameSeries() {
+		
+		return getGameSeries(false);
+		
+	}
+	
+	/**
+	 * @return
+	 */
+	private LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>> getGameSeries(boolean normalise) {
 		
 		LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>> gameEntries = new LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>>();
 		
@@ -248,55 +278,179 @@ public class TraverserRecord {
 			
 		}
 		
-		return calculateAverage(gameEntries, minAttributeToValueAllSeries, maxAttributeToValueAllSeries);
+		if (normalise) {
+			
+			Hashtable<String, Double> minAttributeInSeries = new Hashtable<String, Double>();
+			
+			Hashtable<String, Double> maxAttributeInSeries = new Hashtable<String, Double>();
+		
+			for (Entry<AttributeSetIdentifier, Hashtable<String, Double>> attributeEntry : gameEntries.entrySet() ) {
+				
+				for (Entry<String, Double> attributeToValueEntry : attributeEntry.getValue().entrySet()) {
+					
+					if ( !minAttributeInSeries.containsKey(attributeToValueEntry.getKey()) && !maxAttributeInSeries.containsKey(attributeToValueEntry.getKey()) ) {
+						
+						minAttributeInSeries.put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
+						
+						maxAttributeInSeries.put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
+						
+					} else {
+						
+						if ( attributeToValueEntry.getValue() < minAttributeInSeries.get(attributeToValueEntry.getKey())) {
+							
+							minAttributeInSeries.put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
+							
+						}
+						
+						if ( attributeToValueEntry.getValue() > maxAttributeInSeries.get(attributeToValueEntry.getKey())) {
+							
+							maxAttributeInSeries.put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
+							
+						}
+						
+					}
+					
+				}
+			
+			}
+			
+			LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>> newGameEntries = new LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>>();
+			
+			for ( Entry<AttributeSetIdentifier, Hashtable<String, Double>> attributeEntry : gameEntries.entrySet() ) {
+				
+				Hashtable<String, Double> normalisedAttributeEntry = new Hashtable<String, Double>();
+				
+				for (Entry<String, Double> attributeToValueEntry : attributeEntry.getValue().entrySet()) {
+					
+					normalisedAttributeEntry.put(attributeToValueEntry.getKey(), ( (attributeToValueEntry.getValue() - minAttributeInSeries.get(attributeToValueEntry.getKey())) / (maxAttributeInSeries.get(attributeToValueEntry.getKey()) - minAttributeInSeries.get(attributeToValueEntry.getKey())) ));
+					
+				}
+				
+				newGameEntries.put(attributeEntry.getKey(), normalisedAttributeEntry);
+				
+			}
+			
+			gameEntries = newGameEntries;
+		
+		}
+		
+		return gameEntries;
 		
 	}
 	
 	/**
 	 * @return
 	 */
-	protected Hashtable<String, Double> calculateGameAverage() {
+	protected Hashtable<String, Double> attributeToGameMeasure(TraverserDatasetMeasure traverserDatasetMeasure) {
 		
-		return calculateGameAverage(null, null);
+		return attributeToGameMeasure(null, null, traverserDatasetMeasure);
 		
 	}
 	
 	/**
+	 * @return
+	 */
+	private Hashtable<String, Double> attributeToGameMeasure(Hashtable<String, Double> minAttributeToValueAllSeries, Hashtable<String, Double> maxAttributeToValueAllSeries, TraverserDatasetMeasure traverserDatasetMeasure) {
+		
+		Hashtable<String, TraverserDataset> attributeToDataset = getAttributeToDataset(getGameSeries(), minAttributeToValueAllSeries, maxAttributeToValueAllSeries);
+		
+		Hashtable<String, Double> attributeToMeasure = new Hashtable<String, Double>();
+		
+		for ( Entry<String, TraverserDataset> attributeToDatasetEntry : attributeToDataset.entrySet() ) {
+			
+			if ( traverserDatasetMeasure == TraverserDatasetMeasure.MEAN ) {
+				
+				attributeToMeasure.put(attributeToDatasetEntry.getKey(), attributeToDatasetEntry.getValue().getMean());
+				
+			} else if ( traverserDatasetMeasure == TraverserDatasetMeasure.STANDARD_ERROR ) {
+				
+				attributeToMeasure.put(attributeToDatasetEntry.getKey(), attributeToDatasetEntry.getValue().getStandardError());
+				
+			} else if ( traverserDatasetMeasure == TraverserDatasetMeasure.STANDARD_DEVIATION ) {
+				
+				attributeToMeasure.put(attributeToDatasetEntry.getKey(), attributeToDatasetEntry.getValue().getStandardDeviation());
+				
+			}
+			
+		}
+		
+		return attributeToMeasure;
+		
+	}
+	
+	/**
+	 * @param minAttributeToValueAllSeries
+	 * @param maxAttributeToValueAllSeries
+	 * @return
+	 */
+	public TraverserDataset gameDatasetForScore(Hashtable<String, Double> minAttributeToValueAllSeries, Hashtable<String, Double> maxAttributeToValueAllSeries) {
+		
+		TraverserDataset scoreData = new TraverserDataset();
+		
+		TraverserDataset seekerData = getAttributeToDataset(getGameSeries(), minAttributeToValueAllSeries, maxAttributeToValueAllSeries).get("Cost");
+		
+		for ( int i = 0; i < seekerData.getDataset().size(); i++ ) {
+			
+			Utils.printSystemStats();
+			
+			scoreData.addItemToDataset(-1 * seekerData.getDataset().get(i));
+			
+		}
+		
+		return scoreData;
+		
+	}
+
+	/**
+	 * @param attribute
+	 * @return
+	 */
+	public TraverserDataset gameDatasetForAttribute(String attribute) {
+		
+		return getAttributeToDataset(getGameSeries(), null, null).get(attribute);
+		
+	}
+
+	/**
 	 * 
-	 * Match each measure to an average value over all games
+	 * Match each attribute to a dataset containing values for all games
 	 * 
 	 * @param attributeToValue - a subset of interaction records that we want to take an average of
 	 * @return
 	 */
-	protected Hashtable<String, Double> calculateAverage(LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>> attributeToValue, Hashtable<String, Double> minAttributeToValueAllSeries, Hashtable<String, Double> maxAttributeToValueAllSeries) {
+	public Hashtable<String, TraverserDataset> getAttributeToDataset(LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>> attributeToValue, Hashtable<String, Double> minAttributeToValueAllSeries, Hashtable<String, Double> maxAttributeToValueAllSeries) {
 		
-		Hashtable<String, Double> cumulativeAttributeToValue = new Hashtable<String, Double>();
+		Hashtable<String, TraverserDataset> attributeToDataset = new Hashtable<String, TraverserDataset>();
 		
 		for (Entry<AttributeSetIdentifier, Hashtable<String, Double>> attributeEntry : attributeToValue.entrySet()) {
 		
 			for (Entry<String, Double> attributeToValueEntry : attributeEntry.getValue().entrySet()) {
 				
-				if (cumulativeAttributeToValue.containsKey(attributeToValueEntry.getKey())) {
+				if ( attributeToDataset.containsKey(attributeToValueEntry.getKey()) ) {
 					  
-					if ( minAttributeToValueAllSeries != null && maxAttributeToValueAllSeries != null ) {
+					if ( attributeToValue.size() > 1 && minAttributeToValueAllSeries != null && maxAttributeToValueAllSeries != null ) {
 						
-						cumulativeAttributeToValue.put(attributeToValueEntry.getKey(), cumulativeAttributeToValue.get(attributeToValueEntry.getKey()) + ( (attributeToValueEntry.getValue() - minAttributeToValueAllSeries.get(attributeToValueEntry.getKey())) / (maxAttributeToValueAllSeries.get(attributeToValueEntry.getKey()) - minAttributeToValueAllSeries.get(attributeToValueEntry.getKey())) ));
+						attributeToDataset.get(attributeToValueEntry.getKey()).addItemToDataset( (attributeToValueEntry.getValue() - minAttributeToValueAllSeries.get(attributeToValueEntry.getKey())) / (maxAttributeToValueAllSeries.get(attributeToValueEntry.getKey()) - minAttributeToValueAllSeries.get(attributeToValueEntry.getKey())) );
 						
 					} else {
 						
-						cumulativeAttributeToValue.put(attributeToValueEntry.getKey(), cumulativeAttributeToValue.get(attributeToValueEntry.getKey()) + attributeToValueEntry.getValue());
-					
+						attributeToDataset.get(attributeToValueEntry.getKey()).addItemToDataset(attributeToValueEntry.getValue());
+						
 					}
 					
 				} else {
 					
-					if ( minAttributeToValueAllSeries != null && maxAttributeToValueAllSeries != null ) {
+					if ( attributeToValue.size() > 1 && minAttributeToValueAllSeries != null && maxAttributeToValueAllSeries != null ) {
 						
-						cumulativeAttributeToValue.put(attributeToValueEntry.getKey(), ( attributeToValueEntry.getValue() - minAttributeToValueAllSeries.get(attributeToValueEntry.getKey()) ) / ( maxAttributeToValueAllSeries.get(attributeToValueEntry.getKey()) - minAttributeToValueAllSeries.get(attributeToValueEntry.getKey()) ) );
+						TraverserDataset gameEntriesForAttribute = new TraverserDataset( (attributeToValueEntry.getValue() - minAttributeToValueAllSeries.get(attributeToValueEntry.getKey()) ) / ( maxAttributeToValueAllSeries.get(attributeToValueEntry.getKey()) - minAttributeToValueAllSeries.get(attributeToValueEntry.getKey()) ) );
+						
+						attributeToDataset.put(attributeToValueEntry.getKey(), gameEntriesForAttribute);
 						
 					} else {
 						
-						cumulativeAttributeToValue.put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
+						TraverserDataset gameEntriesForAttribute = new TraverserDataset(attributeToValueEntry.getValue());
+						
+						attributeToDataset.put(attributeToValueEntry.getKey(), gameEntriesForAttribute);
 						
 					}
 					
@@ -306,28 +460,21 @@ public class TraverserRecord {
 			
 		}
 		
-		Hashtable<String, Double> averageAttributeToValue = new Hashtable<String, Double>();
-		
-		for (Entry<String, Double> attribute : cumulativeAttributeToValue.entrySet()) {
-			
-			averageAttributeToValue.put(attribute.getKey(), attribute.getValue() / attributeToValue.size());
-			
-		}
-		
-		return averageAttributeToValue;
+		return attributeToDataset;
 		
 	}
 	
 	
 	/**
-	 * Using calculateAverage(), select a single passed measure
+	 * Using attributeToGameMeasure(), select a single passed measure (and get 
+	 * the average for this measure)
 	 * 
 	 * @param attribute
 	 * @return
 	 */
 	public double getAverageGameAttributeValue(String attribute) {
 		
-		return calculateGameAverage().get(attribute);
+		return attributeToGameMeasure(TraverserDatasetMeasure.MEAN).get(attribute);
 		
 	}
 	
@@ -337,9 +484,76 @@ public class TraverserRecord {
 	 * @param attribute
 	 * @return
 	 */
-	public double getAverageGameAttributeValue(String attribute, Hashtable<String, Double> minAttributeToValueAllSeries, Hashtable<String, Double> maxAttributeToValueAllSeries) {
+	public double getAttributeToGameAverage(String attribute, Hashtable<String, Double> minAttributeToValueAllSeries, Hashtable<String, Double> maxAttributeToValueAllSeries) {
 		
-		return calculateGameAverage(minAttributeToValueAllSeries, maxAttributeToValueAllSeries).get(attribute);
+		return attributeToGameMeasure(minAttributeToValueAllSeries, maxAttributeToValueAllSeries, TraverserDatasetMeasure.MEAN).get(attribute);
+		
+	}
+	
+	/**
+	 * @param attribute
+	 * @return
+	 */
+	public double getStandardErrorGameAttributeValue(String attribute) {
+		
+		return attributeToGameMeasure(TraverserDatasetMeasure.STANDARD_ERROR).get(attribute);
+		
+	}
+	
+	/**
+	 * @param attribute
+	 * @param minAttributeToValueAllSeries
+	 * @param maxAttributeToValueAllSeries
+	 * @return
+	 */
+	public double getStandardErrorGameAttributeValue(String attribute, Hashtable<String, Double> minAttributeToValueAllSeries, Hashtable<String, Double> maxAttributeToValueAllSeries) {
+		
+		return attributeToGameMeasure(minAttributeToValueAllSeries, maxAttributeToValueAllSeries, TraverserDatasetMeasure.STANDARD_ERROR).get(attribute);
+		
+	}
+	
+	/**
+	 * @param traverserRecord
+	 * @return
+	 */
+	public double pValue(TraverserRecord traverserRecord, Metric metric) {
+		
+		return StatisticalTest.getPValue(gameDatasetForAttribute(metric.getText()), traverserRecord.gameDatasetForAttribute(metric.getText()));
+		
+	}
+	
+	/**
+	 * @param traverserRecord
+	 * @param minAttributeToValueAllSeries
+	 * @param maxAttributeToValueAllSeries
+	 * @return
+	 */
+	public double pValue(TraverserRecord traverserRecord, Hashtable<String, Double> minAttributeToValueAllSeries, Hashtable<String, Double> maxAttributeToValueAllSeries) {
+		
+		return StatisticalTest.getPValue(gameDatasetForScore(minAttributeToValueAllSeries, maxAttributeToValueAllSeries), traverserRecord.gameDatasetForScore(minAttributeToValueAllSeries, maxAttributeToValueAllSeries));
+		
+	}
+	
+	/**
+	 * @param traverserRecord
+	 * @param metric
+	 * @return
+	 */
+	public String pGroup(TraverserRecord traverserRecord, Metric metric) {
+	
+		return StatisticalTest.getPGroup(gameDatasetForAttribute(metric.getText()), traverserRecord.gameDatasetForAttribute(metric.getText()));
+		
+	}
+	
+	/**
+	 * @param traverserRecord
+	 * @param minAttributeToValueAllSeries
+	 * @param maxAttributeToValueAllSeries
+	 * @return
+	 */
+	public String pGroup(TraverserRecord traverserRecord, Hashtable<String, Double> minAttributeToValueAllSeries, Hashtable<String, Double> maxAttributeToValueAllSeries) {
+		
+		return StatisticalTest.getPGroup(gameDatasetForScore(minAttributeToValueAllSeries, maxAttributeToValueAllSeries), traverserRecord.gameDatasetForScore(minAttributeToValueAllSeries, maxAttributeToValueAllSeries));
 		
 	}
 	
@@ -350,12 +564,11 @@ public class TraverserRecord {
 		
 		String returner = "";
 		
-		ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>> series = 
-				new ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>>(getGameSeries());
-		
-		Collections.reverse(series);
-		
-		for ( Entry<AttributeSetIdentifier, Hashtable<String,Double>> entry : series ) {
+		LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>> series = getGameSeries();
+			
+		series = Utils.manualReverse(series);
+	
+		for ( Entry<AttributeSetIdentifier, Hashtable<String,Double>> entry : series.entrySet() ) {
 			
 			returner += "\n" + entry; 
 			
@@ -366,20 +579,18 @@ public class TraverserRecord {
 	}
 	
 	/**
-	 * Allow for multiple games with multiple rounds to be run, and the average of all rounds
-	 * over those games to be viewed.
+	 * Allows to see performance in an 'average round'.
 	 * 
-	 * For example, I run 100 games and want to plot the average from round 1, 2, 3 etc. on a graph,
-	 * with the number of points still being equal to the number of games.
+	 * That is Round 0, Game 0 + Round 0, Game 1 + ... / Total games. For each round.
 	 * 
 	 * ~MDC 31/7/14 This could be much neater.
 	 * 
 	 * @return
 	 */
-	public ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>> getRoundSeries() {
+	public LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>> getRoundSeries() {
 	
 		// Create map to hold round numbers to average values for all attributes within that round
-		Hashtable<AttributeSetIdentifier, Hashtable<String, Double>> cumulativeRoundsAttributeToValue = new Hashtable<AttributeSetIdentifier, Hashtable<String, Double>>();
+		LinkedHashMap<AttributeSetIdentifier, Hashtable<String, Double>> cumulativeRoundsAttributeToValue = new LinkedHashMap<AttributeSetIdentifier, Hashtable<String, Double>>();
 		
 		int attributeAdditions = 0; 
 		
@@ -425,7 +636,7 @@ public class TraverserRecord {
 		/* We now have a map from each round number to a map from each attribute to their cumulative values.
 		Complete by creating a new map to the average value: */
 		
-		Hashtable<AttributeSetIdentifier, Hashtable<String, Double>> averageRoundAttributeToValue = new Hashtable<AttributeSetIdentifier, Hashtable<String, Double>>();
+		LinkedHashMap<AttributeSetIdentifier, Hashtable<String, Double>> averageRoundAttributeToValue = new LinkedHashMap<AttributeSetIdentifier, Hashtable<String, Double>>();
 		
 		for (Entry<AttributeSetIdentifier, Hashtable<String, Double>> attribute : cumulativeRoundsAttributeToValue.entrySet()) {
 			
@@ -452,116 +663,9 @@ public class TraverserRecord {
 			
 		}
 		
-		ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>> series = 
-				new ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>>(averageRoundAttributeToValue.entrySet());
+		LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>> series = new LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>>(averageRoundAttributeToValue);
 		
-		Collections.reverse(series);
-		
-		return series;
-		
-	}
-	
-	/**
-	 * @deprecated
-	 * @return
-	 */
-	public ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>> getNormalisedGameSeries() {
-		
-		return gameSeries(true);
-		
-	}
-	
-	/**
-	 * @return
-	 */
-	public ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>> getGameSeries() {
-		
-		return gameSeries(false);
-		
-	}
-	
-	/**
-	 * Return the series for each attribute
-	 * 
-	 * @param attribute
-	 * @return
-	 */
-	private ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>> gameSeries(boolean normalise) {
-
-		ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>> series = 
-				new ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>>();
-		
-		// For each record 
-		for ( Entry<AttributeSetIdentifier, Hashtable<String, Double>> attributeEntry : attributeToValue.entrySet() ) {
-			
-			// If this is a game entry
-			if ( attributeEntry.getKey().getGameOrRound().equals("Game") ) {
-			
-				// Add it to the series
-				series.add(attributeEntry);
-				
-			}
-		
-		}
-		
-		if (normalise) {
-			
-			Hashtable<String, Double> minAttributeInSeries = new Hashtable<String, Double>();
-			
-			Hashtable<String, Double> maxAttributeInSeries = new Hashtable<String, Double>();
-		
-			for (Entry<AttributeSetIdentifier, Hashtable<String, Double>> attributeEntry : series ) {
-				
-				for (Entry<String, Double> attributeToValueEntry : attributeEntry.getValue().entrySet()) {
-					
-					if ( !minAttributeInSeries.containsKey(attributeToValueEntry.getKey()) && !maxAttributeInSeries.containsKey(attributeToValueEntry.getKey()) ) {
-						
-						minAttributeInSeries.put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
-						
-						maxAttributeInSeries.put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
-						
-					} else {
-						
-						if ( attributeToValueEntry.getValue() < minAttributeInSeries.get(attributeToValueEntry.getKey())) {
-							
-							minAttributeInSeries.put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
-							
-						}
-						
-						if ( attributeToValueEntry.getValue() > maxAttributeInSeries.get(attributeToValueEntry.getKey())) {
-							
-							maxAttributeInSeries.put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
-							
-						}
-						
-					}
-					
-				}
-			
-			}
-			
-			ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>> newSeries = 
-					new ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>>();
-			
-			for ( Entry<AttributeSetIdentifier, Hashtable<String, Double>> attributeEntry : series ) {
-				
-				Hashtable<String, Double> normalisedAttributeEntry = new Hashtable<String, Double>();
-				
-				for (Entry<String, Double> attributeToValueEntry : attributeEntry.getValue().entrySet()) {
-					
-					normalisedAttributeEntry.put(attributeToValueEntry.getKey(), ( (attributeToValueEntry.getValue() - minAttributeInSeries.get(attributeToValueEntry.getKey())) / (maxAttributeInSeries.get(attributeToValueEntry.getKey()) - minAttributeInSeries.get(attributeToValueEntry.getKey())) ));
-					
-				}
-				
-				attributeEntry.setValue(normalisedAttributeEntry);
-				
-				newSeries.add(attributeEntry);
-				
-			}
-			
-			series = newSeries;
-		
-		}
+		series = Utils.manualReverse(series);
 		
 		return series;
 		
@@ -572,7 +676,7 @@ public class TraverserRecord {
 	 */
 	public String printGameAverage() {
 	
-		return traverser + " " + calculateGameAverage();
+		return traverser + " " + attributeToGameMeasure(TraverserDatasetMeasure.MEAN);
 		
 	}
 	
@@ -601,6 +705,28 @@ public class TraverserRecord {
 	public String toString() {
 		
 		return traverser;
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	@Override
+	public int compareTo(TraverserRecord o) {
+		
+		if ( getTraverser().substring(1).compareTo(o.getTraverser().substring(1)) >= ComparatorResult.AFTER ) {
+			
+			return ComparatorResult.AFTER;
+			
+		} else if ( getTraverser().substring(1).compareTo(o.getTraverser().substring(1)) <= ComparatorResult.BEFORE ) {
+			
+			return ComparatorResult.BEFORE;
+			
+		} else {
+			
+			return ComparatorResult.EQUAL;
+			
+		}
 		
 	}
 		

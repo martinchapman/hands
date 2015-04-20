@@ -8,12 +8,19 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
+import Utility.ComparatorResult;
+import Utility.Metric;
 import Utility.Utils;
 import Utility.output.gnuplot.GNU3DGraph;
 import Utility.output.gnuplot.GNUBarGraph;
@@ -24,6 +31,11 @@ import Utility.output.gnuplot.GNULineGraph;
  * @author Martin
  */
 public class OutputManager {
+	
+	/**
+	 * 
+	 */
+	private static final boolean OUTPUT_ENABLED = false;
 	
 	/**
 	 * Multiple hiders per file, and multiple files.
@@ -55,6 +67,8 @@ public class OutputManager {
 		
 		ArrayList<Path> files = listFilesForFolder(new File(FILEPREFIX + "data"));
 		
+		ArrayList<Path> availableFiles = new ArrayList<Path>(files);
+		
 		if (files.size() == 0) {
 			
 			return new ArrayList<Path>();
@@ -67,13 +81,13 @@ public class OutputManager {
 			// If it is a .csv file (what we want):
 			if (!path.toString().substring(path.toString().length() - 3, path.toString().length()).equals("csv")) {
 			
-				files.remove(path);
+				availableFiles.remove(path);
 				
 			}
 			
 		}
 		
-		return files;
+		return availableFiles;
 		
 	}
 			
@@ -335,11 +349,11 @@ public class OutputManager {
 		
 		if ( gameOrRound.equals("Game") ) {
 			
-			return traverser.getGameSeries();
+			return new ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>>(traverser.getGameSeries().entrySet());
 			
 		} else if ( gameOrRound.equals("Round") ) {
 			
-			return traverser.getRoundSeries();
+			return new ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>>(traverser.getRoundSeries().entrySet());
 			
 		} else {
 			
@@ -437,7 +451,7 @@ public class OutputManager {
 	 */
 	private double normaliseEntry(Hashtable<String, Double> entries, Hashtable<String, Double> minInSeries,  Hashtable<String, Double> maxInSeries) {
 		
-		return ( entries.get("Cost") - minInSeries.get("Cost") ) / ( maxInSeries.get("Cost") - minInSeries.get("Cost") );
+		return ( entries.get(Metric.COST.getText()) - minInSeries.get(Metric.COST.getText()) ) / ( maxInSeries.get(Metric.COST.getText()) - minInSeries.get(Metric.COST.getText()) );
 		
 	}
 	
@@ -592,23 +606,61 @@ public class OutputManager {
 			
 			graph = new GNUBarGraph(title);
 			
-			Hashtable<String, Hashtable<String, Double>> categoryToTraverserAndData = new Hashtable<String, Hashtable<String, Double>>();
-		
-			Hashtable<String, Double> traverserAndData = new Hashtable<String, Double>();
+			TreeMap<String, ArrayList<Entry<TraverserRecord, Double>>> categoryToTraverserAndData = new TreeMap<String, ArrayList<Entry<TraverserRecord, Double>>>();
+
+			ArrayList<Entry<TraverserRecord, Double>> traverserAndData = new ArrayList<Entry<TraverserRecord, Double>>();
+			
+			/* Sort so that check for new category is accurate (i.e. last category is
+			 * definitely exhausted).
+			 */
+			if ( category.equals("Topology") ) {
+			
+				Collections.sort(traverserRecords, new Comparator<TraverserRecord>() {
+	
+					@Override
+					public int compare(TraverserRecord o1, TraverserRecord o2) {
+						
+						if ( o1.getTopology().compareTo(o2.getTopology()) == ComparatorResult.AFTER ) {
+							
+							return ComparatorResult.AFTER;
+							
+						} else if ( o1.getTopology().compareTo(o2.getTopology()) == ComparatorResult.BEFORE ) {
+							
+							return ComparatorResult.BEFORE;
+							
+						} else {
+							
+							return ComparatorResult.EQUAL;
+							
+						}
+						
+					}
+					
+				});
+			
+			} else {
+				
+				Collections.sort(traverserRecords);
+				
+			}
+			
+			String localCategory = "";
 			
 			for ( TraverserRecord traverser : traverserRecords ) {
 				
-				String localCategory = "";
+				Utils.talk(this.toString(), "Processing " + traverser);
 				
-				String traverserName = "";
-				
-				if (traverser.toString().contains(" ")) traverserName = traverser.toString().substring(0, traverser.toString().indexOf(" "));
+				//if ( traverser instanceof HiderRecord ) ((HiderRecord)traverser).switchShowSeekers();
 				
 				if ( category.equals("Topology") ) {
 				
+					if ( !traverser.getTopology().equals(localCategory) ) traverserAndData.clear(); 
+					
 					localCategory = traverser.getTopology();
 					
 				} else if ( category.equals("Player") ) {
+					
+					if ( !traverser.getCategory().equals(localCategory) ) traverserAndData.clear(); 
 					
 					localCategory = traverser.getCategory();
 					
@@ -616,39 +668,95 @@ public class OutputManager {
 				
 				if ( yLabel.contains("Score") ) {
 					
+					/* 
+					 * May need to calculate score for individual games, and then take average of score,
+					 * rather than calculating score for all games, through average of cost, in order
+					 * to calculate stats. for scores.
+					 */
+					
 					if ( traverser instanceof HiderRecord ) {
 						
 						double cumulativeNormalisedSeekerCost = 0.0;
 						
 						for ( TraverserRecord hidersSeeker : ((HiderRecord)traverser).getSeekersAndAttributes()) {
 							
-							cumulativeNormalisedSeekerCost += hidersSeeker.getAverageGameAttributeValue("Cost", minForAttributeInAllSeries, maxForAttributeInAllSeries );
+							cumulativeNormalisedSeekerCost += hidersSeeker.getAttributeToGameAverage(Metric.COST.getText(), minForAttributeInAllSeries, maxForAttributeInAllSeries );
 							
 						}
 						
-						traverserAndData.put(traverserName, ( cumulativeNormalisedSeekerCost / (double)((HiderRecord)traverser).getSeekersAndAttributes().size() ) - traverser.getAverageGameAttributeValue("Cost", minForAttributeInAllSeries, maxForAttributeInAllSeries ));
+						traverserAndData.add(new AbstractMap.SimpleEntry<TraverserRecord, Double>(traverser, ( cumulativeNormalisedSeekerCost / (double)((HiderRecord)traverser).getSeekersAndAttributes().size() ) - traverser.getAttributeToGameAverage(Metric.COST.getText(), minForAttributeInAllSeries, maxForAttributeInAllSeries )));
 						
 					} else {
 						
-						traverserAndData.put(traverserName, -1 * traverser.getAverageGameAttributeValue("Cost", minForAttributeInAllSeries, maxForAttributeInAllSeries ));
+						traverserAndData.add(new AbstractMap.SimpleEntry<TraverserRecord, Double>(traverser, -1 * traverser.getAttributeToGameAverage(Metric.COST.getText(), minForAttributeInAllSeries, maxForAttributeInAllSeries )));
 						
 					}
 					
 				} else {
-					
-					
-					traverserAndData.put(traverserName, traverser.getAverageGameAttributeValue(yLabel));
-					
+				
+					traverserAndData.add(new AbstractMap.SimpleEntry<TraverserRecord, Double>(traverser, traverser.getAverageGameAttributeValue(yLabel)));	
 					
 				}
 
-				categoryToTraverserAndData.put(localCategory, new Hashtable<String, Double>(traverserAndData));
-			
+				categoryToTraverserAndData.put(localCategory, new ArrayList<Entry<TraverserRecord, Double>>(traverserAndData));
+				
 			}
 			
-			for ( Entry<String, Hashtable<String, Double>> storedTraverserAndData : categoryToTraverserAndData.entrySet() ) {
+			// ~MDC 19/8 Could be neater
+			for ( Entry<String, ArrayList<Entry<TraverserRecord, Double>>> storedTraverserAndData : categoryToTraverserAndData.entrySet() ) {
 			
-				((GNUBarGraph) graph).addBars(storedTraverserAndData.getValue(), storedTraverserAndData.getKey());
+				System.out.println("Adding bar: " + storedTraverserAndData.getValue() + " " + storedTraverserAndData.getKey());
+				
+				Hashtable<TraverserRecord, String> traverserToSignificanceClass = new Hashtable<TraverserRecord, String>();
+				
+				if ( yLabel.equals(Metric.COST.getText()) || yLabel.equals(Metric.SCORE.getText()) ) {
+					
+					outer:
+					for ( Entry<TraverserRecord, Double> traverserA : storedTraverserAndData.getValue() ) {
+				
+						double cumulativeP = 0.0;
+						
+						traverserToSignificanceClass.put(traverserA.getKey(), "");
+						
+						for ( Entry<TraverserRecord, Double> traverserB : storedTraverserAndData.getValue() ) {
+							
+							if ( traverserA.getKey() == traverserB.getKey() ) continue;
+							
+							if ( yLabel.equals(Metric.COST.getText()) ) {
+							
+								if ( traverserA.getKey().pGroup(traverserB.getKey(), Metric.COST).equals("") ) continue outer;
+								
+								double pValue = traverserA.getKey().pValue(traverserB.getKey(), Metric.COST);
+								
+								Utils.talk(this.toString(), traverserA.getKey() + " vs " + traverserB.getKey() + " :" + pValue);
+								
+								cumulativeP += pValue;
+								
+							} else if ( yLabel.equals(Metric.SCORE.getText()) ) {
+								
+								if ( traverserA.getKey().pGroup(traverserB.getKey(), minForAttributeInAllSeries, maxForAttributeInAllSeries ).equals("") ) continue outer;
+								
+								double pValue = traverserA.getKey().pValue(traverserB.getKey(), minForAttributeInAllSeries, maxForAttributeInAllSeries );
+								
+								Utils.talk(this.toString(), traverserA.getKey() + " vs " + traverserB.getKey() + " :" + pValue);
+								
+								cumulativeP += pValue;
+								
+							}
+							
+						}
+						
+						Utils.talk(this.toString(), "Average pValue against other traversers (" + storedTraverserAndData.getValue().size() + "): " + ( cumulativeP / storedTraverserAndData.getValue().size() ));
+								
+						traverserToSignificanceClass.put(traverserA.getKey(), StatisticalTest.getPGroup(cumulativeP / storedTraverserAndData.getValue().size()));
+						
+						Utils.talk(this.toString(), "Significance class of this value: " + traverserToSignificanceClass);
+						
+					}
+				
+				}
+				
+				((GNUBarGraph) graph).addBars(storedTraverserAndData.getValue(), storedTraverserAndData.getKey(), traverserToSignificanceClass);
 			
 			}
 			
@@ -662,9 +770,13 @@ public class OutputManager {
 		
 		graph.createChart("", xLabel, yLabel);
 		
-		graph.exportChartAsEPS(Utils.FILEPREFIX + "data/charts/" + outputPath + ".eps");
+		if ( OUTPUT_ENABLED ) {
 		
-		graph.exportChartAsTikz(Utils.FILEPREFIX + "data/charts/" + outputPath + ".tex");
+			graph.exportChartAsEPS(Utils.FILEPREFIX + "data/charts/" + outputPath + ".eps");
+			
+			graph.exportChartAsTikz(Utils.FILEPREFIX + "data/charts/" + outputPath + ".tex");
+		
+		}
 		
 		try {
 		
@@ -712,8 +824,17 @@ public class OutputManager {
 	 */
 	public void removeAllOutputFiles() {
 		
-		for ( Path path : listFilesForFolder(new File(FILEPREFIX + "/data")) ) deleteFile(path);
+		// Archive instead
+		for ( Path path : listFilesForFolder(new File(FILEPREFIX + "/data")) ) { 
+			
+			File archivedFile = new File(FILEPREFIX + "/dataArchive/" + path.getFileName());
+			
+			moveFile(path, Paths.get(archivedFile.getAbsolutePath()));
 		
+			// deleteFile(path);
+			
+		}
+			
 		for ( Path path : listFilesForFolder(new File(FILEPREFIX + "/data/js/data")) ) deleteFile(path);
 		
 	}
@@ -767,6 +888,24 @@ public class OutputManager {
 	private final static String FILEPREFIX = "Output/";
 	
 	/**
+	 * @param source
+	 * @param target
+	 */
+	public void moveFile(Path source, Path target) {
+		
+		try {
+			
+			Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		
+		}
+		
+	}
+	
+	/**
 	 * @param path
 	 */
 	public void deleteFile(Path path) {
@@ -810,6 +949,15 @@ public class OutputManager {
 	    
 	    return files;
 	    
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString() {
+		
+		return "OutputManager";
+		
 	}
 
 }

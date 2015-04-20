@@ -56,6 +56,16 @@ public class NearestNeighbour extends SeekerLocalGraph {
 	}
 	
 	/* (non-Javadoc)
+	 * @see HideAndSeek.seeker.SeekerLocalGraph#getStatus()
+	 */
+	public String getStatus() {
+		
+		return super.getStatus() + "\nQueued Nodes " + unvisitedNodes + " (" + unvisitedNodes.size() + ")" +
+								   "\nCurrent Path " + currentPath + " (" + currentPath.size() + ")"; 
+		
+	}
+	
+	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
 	 */
 	public StringVertex nextNode(StringVertex currentNode) {
@@ -74,6 +84,14 @@ public class NearestNeighbour extends SeekerLocalGraph {
 				
 			}
 			
+			if ( unvisitedNodes.size() == 0 ) {
+				
+				System.out.println(this.getStatus());
+				
+				return connectedNode(currentNode);
+				
+			}
+			
 			StringVertex closestNode = (StringVertex) unvisitedNodes.toArray()[0];
 			
 			double shortestDistance = Double.MAX_VALUE;
@@ -85,7 +103,7 @@ public class NearestNeighbour extends SeekerLocalGraph {
 				
 				dsp = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, unvisitedNode);
 		    	
-				if ( dsp.getPathLength() < shortestDistance ) { 
+				if ( dsp.getPathLength() <= shortestDistance ) { 
 					
 					closestNode = unvisitedNode;
 				
@@ -111,7 +129,7 @@ public class NearestNeighbour extends SeekerLocalGraph {
 	/* (non-Javadoc)
 	 * @see HideAndSeek.seeker.FixedStartDepthFirstSearch#getConnectedEdges(HideAndSeek.graph.StringVertex)
 	 */
-	public List<StringEdge> getConnectedEdges(StringVertex currentNode) {
+	protected List<StringEdge> getConnectedEdges(StringVertex currentNode) {
 		
 		ArrayList<StringEdge> edges = new ArrayList<StringEdge>(super.getConnectedEdges(currentNode));
 		
@@ -125,7 +143,7 @@ public class NearestNeighbour extends SeekerLocalGraph {
 	 * @see HideAndSeek.GraphTraverser#getConnectedEdge(HideAndSeek.graph.StringVertex, java.util.List)
 	 */
 	@Override
-	public StringEdge getConnectedEdge(StringVertex currentNode, List<StringEdge> connectedEdges) {
+	protected StringEdge getConnectedEdge(StringVertex currentNode, List<StringEdge> connectedEdges) {
 		
 		for (StringEdge edge : connectedEdges ) {
 

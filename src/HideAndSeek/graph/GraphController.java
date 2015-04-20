@@ -1,26 +1,25 @@
 package HideAndSeek.graph;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.jgrapht.GraphPath;
 import org.jgrapht.VertexFactory;
 import org.jgrapht.alg.ConnectivityInspector;
-import org.jgrapht.alg.FloydWarshallShortestPaths;
 import org.jgrapht.generate.CompleteGraphGenerator;
 import org.jgrapht.generate.GraphGenerator;
 import org.jgrapht.generate.RandomGraphGenerator;
 import org.jgrapht.generate.RingGraphGenerator;
 import org.jgrapht.generate.ScaleFreeGraphGenerator;
 import org.jgrapht.graph.ClassBasedVertexFactory;
+import org.jgrapht.graph.DefaultWeightedEdge;
 
 import HideAndSeek.GraphTraverser;
-import HideAndSeek.GraphTraverser;
 import HideAndSeek.Main;
-import HideAndSeek.hider.AdaptiveHider;
 import HideAndSeek.hider.Hider;
 import HideAndSeek.seeker.Seeker;
+import Utility.Metric;
 import Utility.Utils;
 
 /**
@@ -126,8 +125,6 @@ public class GraphController<V, E> {
 			
 		} while ( !con.isGraphConnected() );
 		
-		Utils.talk("Graph Controller", "Graph generated. \n" + graph.edgeSet());
-		
 		topologyProperties = new TopologyProperties<StringVertex, StringEdge>(topology, graph);
 		
 		// Assign nodes types
@@ -156,8 +153,8 @@ public class GraphController<V, E> {
 			}
 			
 		}
-		
-		Utils.talk("Graph Controller", "Graph generated. Edges: " + graph.edgeSet().size());
+
+		Utils.talk("Graph Controller", "Graph generated. Edges: " + graph.edgeSet().size() + "\n" + graph.edgeSet());
 		
 	}
 	
@@ -275,17 +272,6 @@ public class GraphController<V, E> {
 		
 	}
 
-	/**
-	 * @return
-	 */
-	public double graphDiameter(Object caller) {
-		
-		if (!(caller instanceof Hider)) return -1;
-				
-		return Utils.graphDiameter(graph);
-		
-	}
-
 	/////////////////////////////////////////////
 	
 	/**
@@ -294,9 +280,23 @@ public class GraphController<V, E> {
 	 * @param currentNode
 	 * @return
 	 */
-	public Set<? extends StringEdge> edgesOf(StringVertex currentNode) {
+	public Set<? extends StringEdge> edgesOf(GraphTraverser agent, StringVertex vertex) {
 	
-		return graph.edgesOf(currentNode);
+		if ( !agent.currentNode().equals(vertex) ) { 
+			
+			throw new UnsupportedOperationException("At " + agent.currentNode() + " asking for edges of " + vertex);
+			 
+			/*Set<? extends StringEdge> blankSet = new HashSet<StringEdge>(graph.edgesOf(vertex));
+			
+			blankSet.clear();
+			
+			return blankSet; */
+			
+		} else {
+			
+			return graph.edgesOf(vertex);
+			
+		}
 		
 	}
 	
@@ -352,7 +352,7 @@ public class GraphController<V, E> {
 	 * @param roundsPassed
 	 * @return
 	 */
-	public double averageSeekersPerformance(int metric) {
+	public double averageSeekersPerformance(Metric metric) {
 		
 		return graph.averageSeekersPerformance(metric);
 		
@@ -593,7 +593,7 @@ public class GraphController<V, E> {
 	 * @param metric
 	 * @return
 	 */
-	public double latestTraverserRoundPerformance(GraphTraverser traverser, int metric) {
+	public double latestTraverserRoundPerformance(GraphTraverser traverser, Metric metric) {
 		
 		return graph.latestTraverserRoundPerformance(traverser, metric);
 		

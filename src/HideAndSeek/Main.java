@@ -37,6 +37,7 @@ import HideAndSeek.hider.singleshot.distance.VariableFixedDistance;
 import HideAndSeek.hider.singleshot.distance.VariableFixedDistanceFixedStart;
 import HideAndSeek.hider.singleshot.distance.VariableFixedDistanceStaticBetween;
 import HideAndSeek.hider.singleshot.preference.LeastConnected;
+import HideAndSeek.hider.singleshot.preference.LeastConnectedLeastConnectedFirst;
 import HideAndSeek.hider.singleshot.preference.LeastConnectedStaticBetween;
 import HideAndSeek.hider.singleshot.preference.MaxDistance;
 import HideAndSeek.hider.singleshot.random.GreedyRandomSet;
@@ -66,6 +67,7 @@ import HideAndSeek.seeker.singleshot.coverage.efficiency.DepthFirstSearch;
 import HideAndSeek.seeker.singleshot.coverage.efficiency.DepthFirstSearchGreedy;
 import HideAndSeek.seeker.singleshot.coverage.efficiency.NearestNeighbour;
 import HideAndSeek.seeker.singleshot.preference.LeastConnectedFirst;
+import HideAndSeek.seeker.singleshot.preference.LinkedPath;
 import HideAndSeek.seeker.singleshot.preference.MostConnectedFirst;
 import HideAndSeek.seeker.singleshot.random.FixedStartRandomWalk;
 import HideAndSeek.seeker.singleshot.random.RandomWalk;
@@ -221,13 +223,13 @@ public class Main {
 			
 			//
 			
-			if (hiderType.getElement0().equals("FirstN")) {
+			if (hiderType.getElement0().equals("FirstK")) {
 				
 				allHidingAgents.add(new VariableFixedDistance(graphController, numberOfHideLocations, 0));
 				
 				// Have to set ID manually as identifier and class used are different
 				// allHidingAgents.get(allHidingAgents.size() - 1).setName("RandomDirection");
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("FirstN");
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("FirstK");
 			
 			}
 			
@@ -265,13 +267,13 @@ public class Main {
 			
 			} 
 			
-			if (hiderType.getElement0().equals("LowEdgeCostRandomSet")) {
+			if (hiderType.getElement0().equals("GreedyRandomSet")) {
 				
 				allHidingAgents.add(new GreedyRandomSet(graphController, numberOfHideLocations));
 			
 			} 
 			
-			if (hiderType.getElement0().equals("LowEdgeCostRandomSetStaticBetween")) {
+			if (hiderType.getElement0().equals("GreedyRandomSetStaticBetween")) {
 				
 				allHidingAgents.add(new GreedyRandomSetStaticBetween(graphController, numberOfHideLocations));
 			
@@ -315,13 +317,13 @@ public class Main {
 			
 			} 
 			
-			if (hiderType.getElement0().equals("LowEdgeCostRandomFixedDistance")) {
+			if (hiderType.getElement0().equals("GreedyRandomFixedDistance")) {
 				
 				allHidingAgents.add(new GreedyRandomFixedDistance(graphController, numberOfHideLocations));
 			
 			}
 			
-			if (hiderType.getElement0().equals("LowEdgeCostRandomFixedDistanceStaticBetween")) {
+			if (hiderType.getElement0().equals("GreedyRandomFixedDistanceStaticBetween")) {
 				
 				allHidingAgents.add(new GreedyRandomFixedDistanceStaticBetween(graphController, numberOfHideLocations));
 			
@@ -347,7 +349,7 @@ public class Main {
 			
 			} 
 			
-			if (hiderType.getElement0().equals("LowEdgeCostVariableFixedDistance")) {
+			if (hiderType.getElement0().equals("GreedyVariableFixedDistance")) {
 				
 				allHidingAgents.add(new GreedyVariableFixedDistance(graphController, numberOfHideLocations, gameNumber));
 			
@@ -358,6 +360,12 @@ public class Main {
 			if (hiderType.getElement0().equals("LeastConnected")) {
 				
 				allHidingAgents.add(new LeastConnected(graphController, numberOfHideLocations));
+			
+			} 
+			
+			if (hiderType.getElement0().equals("LeastConnectedLeastConnectedFirst")) {
+				
+				allHidingAgents.add(new LeastConnectedLeastConnectedFirst(graphController, numberOfHideLocations));
 			
 			} 
 			
@@ -379,13 +387,13 @@ public class Main {
 			
 			} 
 			
-			if (hiderType.getElement0().equals("LowEdgeCost")) {
+			if (hiderType.getElement0().equals("Greedy")) {
 				
 				allHidingAgents.add(new VariableGreedy(graphController, numberOfHideLocations, 1.0));
 			
 			} 
 			
-			if (hiderType.getElement0().equals("LowEdgeCostStaticBetween")) {
+			if (hiderType.getElement0().equals("GreedyStaticBetween")) {
 				
 				allHidingAgents.add(new VariableGreedyStaticBetween(graphController, numberOfHideLocations, 1.0));
 			
@@ -403,13 +411,13 @@ public class Main {
 			
 			} 
 
-			if (hiderType.getElement0().equals("VariableLowEdgeCost")) {
+			if (hiderType.getElement0().equals("VariableGreedy")) {
 				
 				allHidingAgents.add(new VariableGreedy(graphController, numberOfHideLocations, gameNumber / (float)totalGames));
 			
 			} 
 			
-			if (hiderType.getElement0().equals("FixedStartVariableLowEdgeCost")) {
+			if (hiderType.getElement0().equals("FixedStartVariableGreedy")) {
 				
 				allHidingAgents.add(new FixedStartVariableGreedy(graphController, numberOfHideLocations, gameNumber / (float)totalGames));
 			
@@ -769,7 +777,7 @@ public class Main {
 				
 			}
 			
-			if (seekerType.getElement0().equals("SelfAvoidingRandomWalkLowCost")) {
+			if (seekerType.getElement0().equals("SelfAvoidingRandomWalkGreedy")) {
 				
 				allSeekingAgents.add(new SelfAvoidingRandomWalkGreedy(graphController));
 				
@@ -781,7 +789,7 @@ public class Main {
 				
 			}
 			
-			if (seekerType.getElement0().equals("LowEdgeCost")) {
+			if (seekerType.getElement0().equals("Greedy")) {
 				
 				allSeekingAgents.add(new Greedy(graphController));
 				
@@ -793,7 +801,7 @@ public class Main {
 				
 			}
 			
-			if (seekerType.getElement0().equals("DepthFirstSearchLowCost")) {
+			if (seekerType.getElement0().equals("DepthFirstSearchGreedy")) {
 				
 				allSeekingAgents.add(new DepthFirstSearchGreedy(graphController));
 				
@@ -805,7 +813,7 @@ public class Main {
 				
 			}
 			
-			if (seekerType.getElement0().equals("BreadthFirstSearchLowCost")) {
+			if (seekerType.getElement0().equals("BreadthFirstSearchGreedy")) {
 				
 				allSeekingAgents.add(new BreadthFirstSearchGreedy(graphController));
 				
@@ -820,6 +828,12 @@ public class Main {
 			if (seekerType.getElement0().equals("MostConnectedFirst")) {
 				
 				allSeekingAgents.add(new MostConnectedFirst(graphController));
+				
+			}
+			
+			if (seekerType.getElement0().equals("LinkedPath")) {
+				
+				allSeekingAgents.add(new LinkedPath(graphController, 0));
 				
 			}
 			

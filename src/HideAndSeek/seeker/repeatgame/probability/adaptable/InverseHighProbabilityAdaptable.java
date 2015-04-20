@@ -10,7 +10,7 @@ import HideAndSeek.seeker.AdaptiveSeeker;
 import HideAndSeek.seeker.Seeker;
 import HideAndSeek.seeker.repeatgame.probability.VariableNodesInverseHighProbability;
 import Utility.AdaptiveUtils;
-import Utility.ScoreMetric;
+import Utility.Metric;
 import Utility.Utils;
 
 /**
@@ -81,7 +81,7 @@ public class InverseHighProbabilityAdaptable extends VariableNodesInverseHighPro
 	@Override
 	public double performanceOfSelf() {
 
-		percentageChanges.add(graphController.latestTraverserRoundPerformance(responsibleAgent, ScoreMetric.COST_CHANGE_SCORE));
+		percentageChanges.add(graphController.latestTraverserRoundPerformance(responsibleAgent, Metric.COST_CHANGE_SCORE));
 		
 		if (AdaptiveUtils.containsLowPerformance(percentageChanges)) {
 			

@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
+import java.util.TreeSet;
 
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
+import Utility.ComparatorResult;
 import Utility.Utils;
 
 /**
@@ -62,6 +64,12 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	protected final static boolean AUTOMATIC_MOVE = true;
 	
 	/**
+	 * Used to save those nodes that shoud have been visited,
+	 * if an automatic move is performed.
+	 */
+	protected ArrayList<StringVertex> queuedNodes;
+	
+	/**
 	 * @param graph
 	 */
 	public GraphTraversingAgent(GraphController<StringVertex, StringEdge> graphController) {
@@ -88,6 +96,8 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 		
 		// List of nodes that have been explored
 		exploredNodes = new ArrayList<StringVertex>();
+		
+		queuedNodes = new ArrayList<StringVertex>();
 		
 	}
 	
@@ -210,6 +220,57 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	
 	}
 	
+	/**
+	 * @param startNode
+	 */
+	protected void atStart(StringVertex startNode) {
+		
+		currentNode = startNode;
+		
+	}
+	
+	/**
+	 * 
+	 */
+	protected void atNode() {
+	
+		exploredNodes.add(currentNode);
+		
+		addUniquelyVisitedNode(currentNode);
+		
+	}
+	
+	/**
+	 * @param nextNode
+	 */
+	protected void atNextNode(StringVertex nextNode) {
+	
+		addUniquelyVisitedEdge(graphController.getEdge(currentNode, nextNode));
+		
+		currentNode = nextNode;
+	
+	}
+	
+	/**
+	 * Print all important current attributes for this player.
+	 * @return
+	 */
+	protected String getStatus() {
+		
+		TreeSet<StringVertex> copy_uniquelyVisitedNodes = new TreeSet<StringVertex>(uniquelyVisitedNodes);
+		
+		//copy_uniquelyVisitedNodes.removeAll(new HashSet<StringVertex>(graphController.vertexSet()));
+		
+		return "\n\nTraverser: " + responsibleAgent.toString() + "\n" +
+			   "Nodes in graph: " + graphController.vertexSet().size() + "\n" +
+			   "Explored nodes: " + exploredNodes.size() + "\n" +
+		       "Uniquely visited nodes: " + uniquelyVisitedNodes.size() + "\n" +
+		       "Unvisited nodes: " + copy_uniquelyVisitedNodes + "\n" +
+			   "Hide locations: " + hideLocations + " (" + hideLocations.size() + ")\n" +
+		       "Current node: " + currentNode + "\n" +
+			   "Connected node: " + getConnectedEdges(currentNode) + " (" + getConnectedEdges(currentNode).size() + ")";
+		
+	}
 	
 	/**
 	 * Working with connectedNode in order to determine how nodes
@@ -218,7 +279,7 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	 * @param connectedEdges
 	 * @return
 	 */
-	public StringEdge getConnectedEdge(StringVertex currentNode, List<StringEdge> connectedEdges) {
+	protected StringEdge getConnectedEdge(StringVertex currentNode, List<StringEdge> connectedEdges) {
 	
 		return connectedEdges.get((int)(Math.random() * connectedEdges.size()));
 		
@@ -231,9 +292,9 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	 * @param currentNode
 	 * @return
 	 */
-	public List<StringEdge> getConnectedEdges(StringVertex currentNode) {
+	protected List<StringEdge> getConnectedEdges(StringVertex vertex) {
 		
-		return new ArrayList<StringEdge>(graphController.edgesOf(currentNode));
+		return new ArrayList<StringEdge>(graphController.edgesOf(responsibleAgent, vertex));
 		
 	}
 	
@@ -466,17 +527,13 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 		return "t" + name;
 		
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	public int compareTo(GraphTraverser aThat) {
 		
-	    final int BEFORE = -1;
-	    final int EQUAL = 0;
-	    final int AFTER = 1;
-	    
-	    return EQUAL;
+	    return ComparatorResult.EQUAL;
 	    
 	}
 	

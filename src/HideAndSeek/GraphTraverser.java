@@ -15,19 +15,6 @@ public interface GraphTraverser extends Comparable<GraphTraverser>, Runnable {
 	public abstract void setResponsibleAgent(GraphTraversingAgent responsibleAgent);
 	
 	/**
-	 * @param currentNode
-	 * @param connectedEdges
-	 * @return
-	 */
-	public StringEdge getConnectedEdge(StringVertex currentNode, List<StringEdge> connectedEdges);
-	
-	/**
-	 * @param currentNode
-	 * @return
-	 */
-	public List<StringEdge> getConnectedEdges(StringVertex currentNode);
-	
-	/**
 	 * @return
 	 */
 	public abstract HashSet<StringVertex> uniquelyVisitedNodes();

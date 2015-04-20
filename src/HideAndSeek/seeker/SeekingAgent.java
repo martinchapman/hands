@@ -15,10 +15,6 @@ import Utility.Utils;
  * @author Martin
  *
  */
-/**
- * @author Martin
- *
- */
 public abstract class SeekingAgent extends GraphTraversingAgent implements Runnable, Seeker {
 	
 	/**
@@ -66,7 +62,7 @@ public abstract class SeekingAgent extends GraphTraversingAgent implements Runna
 	/**
 	 * @param graph
 	 */
-	public SeekingAgent(GraphController <StringVertex, StringEdge> graphController) {
+	public SeekingAgent(GraphController<StringVertex, StringEdge> graphController) {
 		
 		super(graphController);
 		
@@ -75,8 +71,6 @@ public abstract class SeekingAgent extends GraphTraversingAgent implements Runna
 		
 		//
 		uniqueHideLocations = new HashSet<StringVertex>();
-		
-		//
 		
 	}
 	
@@ -178,54 +172,68 @@ public abstract class SeekingAgent extends GraphTraversingAgent implements Runna
 			
 		} 
 		
-		currentNode = startNode;
+		atStart(startNode);
 		
 		StringVertex nextNode = null;
 		
 		while ( searchCriteria() ) {
 			
-			//Utils.talk(responsibleAgent.toString(), "At: " + currentNode);
-			
-			exploredNodes.add(currentNode);
-			
-			addUniquelyVisitedNode(currentNode);
+			atNode();
 			
 			if ( graphController.isHideLocation(currentNode) && !hideLocations().contains(currentNode) ) { 
 	        		
         		addHideLocation(currentNode);
 				
-				if (hideLocations().size() == estimatedNumberOfHideLocations) { break; }
+				if (hideLocations().size() == estimatedNumberOfHideLocations) break;
 			
         	}
-			 
-			nextNode = nextNode(currentNode);
+			
+			if ( queuedNodes.size() > 0 ) {
+				
+				nextNode = queuedNodes.remove(0);
+				
+			} else {
+			
+				nextNode = nextNode(currentNode);
+			
+			}
 			
 			/* 
-		     * If a connected node contains a location we are looking for, overwrite strategies choice and 
+		     * If a connected node contains a location we are looking for, overwrite strategy's choice and 
 		     * move there (i.e. 'help it out').
 		     */
 		    for ( StringEdge connectedEdge : getConnectedEdges(currentNode) ) {
 		    	
 		    	if ( AUTOMATIC_MOVE && graphController.isHideLocation( edgeToTarget(connectedEdge, currentNode) ) && !hideLocations().contains( edgeToTarget(connectedEdge, currentNode) ) ) { 
 		    		
+		    		/* Because we are deviating from where we should be add the currentNode, 
+		    		 * and what should have been the next node, to the queue. So we go back
+		    		 * to where we were, and visit what should have been visited next.
+		    		 * 
+		    		 * The '0' index is enforced for correct visitation order.
+		    		 */
+		    		queuedNodes.add(0, nextNode);
+		    		
+		    		queuedNodes.add(0, currentNode);
+		    		
 		    		nextNode = edgeToTarget(connectedEdge, currentNode);
+		    		
+		    		Utils.talk(responsibleAgent.toString(), "Moving automatically to " + nextNode + ". Queued: " + queuedNodes);
 		    	
 		    	}
 		    	
 		    }
 		    
-			addUniquelyVisitedEdge(graphController.getEdge(currentNode, nextNode));
-			
 			if ( !graphController.fromVertexToVertex(responsibleAgent, currentNode, nextNode) ) { 
 				
-				Utils.talk(responsibleAgent.toString(), "Error traversing supplied path.");
+				Utils.talk(responsibleAgent.toString(), "Error traversing supplied path: " + currentNode + " to " + nextNode + getStatus());
 				
 			} else {
-			
-				currentNode = nextNode;
+
+				atNextNode(nextNode);
 				
 			}
-			 
+			
 		}
 		
 	}
@@ -265,6 +273,8 @@ public abstract class SeekingAgent extends GraphTraversingAgent implements Runna
 		exploredNodes.clear();
 		
 		hideLocations().clear();
+		
+		queuedNodes.clear();
 		
 	}
 	

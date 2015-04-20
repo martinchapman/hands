@@ -4,7 +4,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Map.Entry;
+
+import Utility.Metric;
+import Utility.TraverserDataset;
+import Utility.TraverserDatasetMeasure;
+import Utility.Utils;
 
 public class HiderRecord extends TraverserRecord {
 	
@@ -104,11 +108,64 @@ public class HiderRecord extends TraverserRecord {
 	}
 	
 	/* (non-Javadoc)
+	 * @see Utility.output.TraverserRecord#gameDatasetForScore(java.util.Hashtable, java.util.Hashtable)
+	 */
+	public TraverserDataset gameDatasetForScore(Hashtable<String, Double> minAttributeToValueAllSeries, Hashtable<String, Double> maxAttributeToValueAllSeries) {
+		
+		TraverserDataset scoreData = new TraverserDataset();
+		
+		TraverserDataset hiderData = getAttributeToDataset(getGameSeries(), minAttributeToValueAllSeries, maxAttributeToValueAllSeries).get(Metric.COST.getText());
+		
+		for ( int i = 0; i < hiderData.getDataset().size(); i++ ) {
+			
+			double cumulativeSeekerDataEntry = 0.0;
+			
+			for ( TraverserRecord seeker : seekersAndAttributes ) {
+				
+				Utils.printSystemStats();
+				
+				TraverserDataset seekerData = seeker.getAttributeToDataset(seeker.getGameSeries(), minAttributeToValueAllSeries, maxAttributeToValueAllSeries).get(Metric.COST.getText());
+				
+				cumulativeSeekerDataEntry += seekerData.getDataset().get(i);
+				
+			}
+			
+			scoreData.addItemToDataset( ( cumulativeSeekerDataEntry / (double)seekersAndAttributes.size() ) - hiderData.getDataset().get(i) ); 
+			
+		}
+		
+		return scoreData;
+		
+	}
+	
+	/**
+	 * 
+	 */
+	private boolean showSeekers = true;
+	
+	/**
+	 * 
+	 */
+	public void switchShowSeekers() {
+		
+		showSeekers = showSeekers == true ? false : true;
+		
+		
+	}
+	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
 		
-		return traverser + " Seekers: " + seekersAndAttributes.toString().replace("[", "").replace("]", "").replace(",", "");
+		if ( showSeekers ) {
+			
+			return traverser + " Seekers: " + seekersAndAttributes.toString().replace("[", "").replace("]", "").replace(",", "");
+			
+		} else {
+			
+			return traverser;
+			
+		}
 		
 	}
 	
@@ -121,7 +178,7 @@ public class HiderRecord extends TraverserRecord {
 		returner += "\nAverages:\n";
 		returner += "\n-------------------\n";
 		
-		returner += "\n" + traverser + " " + calculateGameAverage() + "\n";
+		returner += "\n" + traverser + " " + attributeToGameMeasure(TraverserDatasetMeasure.MEAN) + "\n";
 		
 		for ( TraverserRecord seeker : seekersAndAttributes ) returner += "\n" + seeker.printGameAverage() + "\n";
 		

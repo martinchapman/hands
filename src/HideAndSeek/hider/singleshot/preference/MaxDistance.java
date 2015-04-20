@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -16,7 +17,6 @@ import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.HiddenObjectGraph;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.HiderLocalGraph;
 import HideAndSeek.hider.singleshot.random.RandomSetMechanism;
 import Utility.Utils;
 
@@ -55,18 +55,19 @@ public class MaxDistance extends PreferenceHider {
 	 * The minimum distance to look for between nodes (if -1, default is 
 	 * set to local graph diameter)
 	 */
-	private int minDistance;
+	private int minDistance = -1;
 	
 	@Override
-	public ArrayList<StringVertex> computeTargetNodes() {
+	public LinkedHashSet<StringVertex> computeTargetNodes() {
 		
 		DijkstraShortestPath<StringVertex, StringEdge> DSP = null;
 
 		RandomSetMechanism randomSet = new RandomSetMechanism(graphController, numberOfHideLocations);
 		
-		ArrayList<StringVertex> targetVertices = new ArrayList<StringVertex>();
+		LinkedHashSet<StringVertex> targetVertices = new LinkedHashSet<StringVertex>();
 		
-		/* For a node to be considered as a candidate for the kth position in the hide set, it must be at a 
+		/* 
+		 * For a node to be considered as a candidate for the kth position in the hide set, it must be at a 
 		 * certain distance from the other nodes in the hide set. There may be multiple nodes that fulfil this 
 		 * requirement for each kth position, so we store these. As a result of this, this recursively introduces 
 		 * another requirement for each kth position: a node must be at a certain given distance, or greater, than all 
@@ -159,7 +160,7 @@ public class MaxDistance extends PreferenceHider {
 				}
 				
 				/* Otherwise, add this as a potential node, if it is greater than all previous
-				 * permutations.
+				 * permutations and if we do not already have enough candidates for this position.
 				 * 
 				 * ~MDC: Todo: relax this constraint such that a potential node is added
 				 * if it is greater than just ONE permutation. This will increase the likelihood
@@ -167,7 +168,14 @@ public class MaxDistance extends PreferenceHider {
 				 * permutations. In current mechanism, we do not need to do this as a node is
 				 * only added if it is greater than all permutations. 
 				 */
-				Utils.add(kthPositionCandidates, kth, potentialNode, new ArrayList<StringVertex>(), true);
+				
+				int MAX_CANDIDATES = 5;
+				
+				if ( !kthPositionCandidates.containsKey(kth) || kthPositionCandidates.containsKey(kth) && kthPositionCandidates.get(kth).size() < MAX_CANDIDATES ) {
+				
+					Utils.add(kthPositionCandidates, kth, potentialNode, new ArrayList<StringVertex>(), true);
+				
+				}
 				
 			}
 			
@@ -202,6 +210,16 @@ public class MaxDistance extends PreferenceHider {
 		
 		return targetVertices;
 		
+	}
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.hider.Hider#printGameStats()
+	 */
+	@Override
+	public String printGameStats() {
+		
+		return super.printGameStats() + ", GraphDiameter, " + Utils.graphDiameter(localGraph);
+	
 	}
 	
 	/**

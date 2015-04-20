@@ -12,5 +12,10 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/jcommon-1.0.21.jar"/>
+	<classpathentry kind="lib" path="lib/commons-math3-3.4.1.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/Users/Martin/Dropbox/workspace/SearchGames/lib/commons-math-doc/apidocs/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

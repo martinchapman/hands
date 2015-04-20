@@ -8,6 +8,7 @@ import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.seeker.SeekingAgent;
+import Utility.Utils;
 
 /**
  * 
@@ -22,8 +23,7 @@ public class DepthFirstSearch extends SeekingAgent {
 	/**
 	 * @param graph
 	 */
-	public DepthFirstSearch(
-			GraphController <StringVertex, StringEdge> graphController) {
+	public DepthFirstSearch( GraphController <StringVertex, StringEdge> graphController ) {
 
 		super(graphController);
 		
@@ -69,6 +69,8 @@ public class DepthFirstSearch extends SeekingAgent {
 			
 			if ( currentBranch.size() > 0 ) {
 				
+				Utils.talk(responsibleAgent.toString(), "Going back up through branch from " + currentNode + " to " + edgeToTarget( currentBranch.get(currentBranch.size() - 1), currentNode ));
+				
 				// If all edges have been traversed, move upwards through the current branch (if it is not empty)
 				return edgeToTarget( currentBranch.remove(currentBranch.size() - 1), currentNode );
 				
@@ -78,6 +80,8 @@ public class DepthFirstSearch extends SeekingAgent {
 				 * Because there should be no more to explore once all branches have been exhausted,
 				 * this should not be called.
 				 */
+				System.err.println("Error: No backtrack branch: " + getStatus());
+				
 				return connectedNode(currentNode);
 			
 			}
@@ -92,7 +96,18 @@ public class DepthFirstSearch extends SeekingAgent {
 			
 		currentBranch.add(connectedEdge);
 		
+		Utils.talk(responsibleAgent.toString(), "Next node in DFS: " + target);
+		
 		return target;
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraversingAgent#getStatus()
+	 */
+	public String getStatus() {
+		
+		return super.getStatus() + "\nCurrent branch: " + currentBranch;
 		
 	}
 	

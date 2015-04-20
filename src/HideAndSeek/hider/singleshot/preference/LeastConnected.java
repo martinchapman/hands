@@ -2,13 +2,11 @@ package HideAndSeek.hider.singleshot.preference;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-
-import org.jgrapht.alg.DijkstraShortestPath;
+import java.util.LinkedHashSet;
 
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.HiderLocalGraph;
 
 /**
  * Attempts to hide nodes with the least possible connectivity.
@@ -27,14 +25,14 @@ public class LeastConnected extends PreferenceHider {
 	/**
 	 * 
 	 */
-	private ArrayList<StringVertex> leastConnectedNodes;
+	private LinkedHashSet<StringVertex> leastConnectedNodes;
 	
 	/**
 	 * @return
 	 */
 	public ArrayList<StringVertex> getMinimumConnectivityNodes() {
 		
-		return leastConnectedNodes;
+		return new ArrayList<StringVertex>(leastConnectedNodes);
 	
 	}
 
@@ -51,12 +49,8 @@ public class LeastConnected extends PreferenceHider {
 	 */
 	public LeastConnected(GraphController <StringVertex, StringEdge> graphController, int numberOfHideLocations) {
 		
-		super(graphController, numberOfHideLocations);
-		
-		triedNodes = new HashSet<StringVertex>();
-		
-		leastConnectedNodes = new ArrayList<StringVertex>();
-		
+		this(graphController, numberOfHideLocations, 1.0);
+	
 	}
 	
 	/**
@@ -67,22 +61,26 @@ public class LeastConnected extends PreferenceHider {
 		
 		super(graphController, numberOfHideLocations, graphPortion);
 		
+		triedNodes = new HashSet<StringVertex>();
+		
+		leastConnectedNodes = new LinkedHashSet<StringVertex>();
+		
 	}
 	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.hider.singleshot.preference.PreferenceHider#computeTargetNodes()
 	 */
 	@Override
-	public ArrayList<StringVertex> computeTargetNodes() {
+	public LinkedHashSet<StringVertex> computeTargetNodes() {
 		
 		int maxConnections = MAX_CONNECTIONS;
 		
 		// Continue until we have complete nodes for the hideset
 		while ( leastConnectedNodes.size() < numberOfHideLocations ) {
-					
-			for ( StringVertex potentialNode : graphController.vertexSet() ) {
+			
+			for ( StringVertex potentialNode : localGraph.vertexSet() ) {
 				
-				if ( getConnectedEdges(potentialNode).size() == maxConnections ) {
+				if ( localGraph.edgesOf(potentialNode).size() == maxConnections ) {
 					
 					leastConnectedNodes.add(potentialNode);
 					
@@ -106,25 +104,15 @@ public class LeastConnected extends PreferenceHider {
 	}
 		
 	/* (non-Javadoc)
-	 * @see HideAndSeek.hider.singleshot.preference.PreferenceHider#nextNode(HideAndSeek.graph.StringVertex)
+	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
 	 */
+	@Override
 	public StringVertex nextNode(StringVertex currentNode) {
 		
-		/* If one of the nodes on the other side of an edge connected to this node has 
-		 * a number of edges that we class as minimal, add it to the hide set.
-		 */
-		for ( StringEdge connectedEdge : getConnectedEdges(currentNode) ) {
-			
-			if ( super.getConnectedEdges(edgeToTarget(connectedEdge, currentNode)).size() == MAX_CONNECTIONS ) {
-				
-				leastConnectedNodes.add(edgeToTarget(connectedEdge, currentNode));
-				
-			}
-			
-		}
+		if ( getConnectedEdges(currentNode).size() == MAX_CONNECTIONS && !leastConnectedNodes.contains(currentNode)) leastConnectedNodes.add(currentNode);
 		
 		return super.nextNode(currentNode);
-		
+	
 	}
 	
 	/**

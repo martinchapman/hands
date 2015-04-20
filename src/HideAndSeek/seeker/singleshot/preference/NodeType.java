@@ -39,7 +39,7 @@ public class NodeType extends DepthFirstSearch {
 			types.clear();
 			
 			// Find the node at the end of this edge, and look at all the outgoing edges from this
-			for ( StringEdge targetEdge : graphController.edgesOf(edgeToTarget(edge, currentNode)) ) {
+			for ( StringEdge targetEdge : getConnectedEdges(edgeToTarget(edge, currentNode)) ) {
 				
 				/* If a node, connected to an outgoing edge of the current node, is linked to another node
 				   whose type has not yet been listed, list it; determine all unique types heading

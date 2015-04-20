@@ -1,16 +1,9 @@
 package HideAndSeek;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
-import org.jgrapht.alg.DijkstraShortestPath;
-
-import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.seeker.SeekerLocalGraph;
 
 /**
  * The methods that a traverser strategy must expose
@@ -19,10 +12,47 @@ import HideAndSeek.seeker.SeekerLocalGraph;
  * 
  * @author Martin
  */
-public interface OpenTraverserStrategy  {
+public interface OpenTraverserStrategy extends GraphTraverser  {
 
+	/**
+	 * @param currentNode
+	 * @return
+	 */
 	public StringVertex nextNode(StringVertex currentNode);
 
+	/**
+	 * @param currentNode
+	 * @return
+	 */
 	public StringVertex connectedNode(StringVertex currentNode);
+	
+	/**
+	 * @param currentNode
+	 * @param connectedEdges
+	 * @return
+	 */
+	public StringEdge getConnectedEdge(StringVertex currentNode, List<StringEdge> connectedEdges);
+	
+	/**
+	 * @param currentNode
+	 * @return
+	 */
+	public List<StringEdge> getConnectedEdges(StringVertex currentNode);
+	
+	/**
+	 * 
+	 */
+	public void atNode();
+	
+	/**
+	 * 
+	 */
+	public void atNextNode(StringVertex nextNode);
+	
+	/**
+	 * @param startNode
+	 */
+	public void atStart(StringVertex startNode);
+	
 	
 }

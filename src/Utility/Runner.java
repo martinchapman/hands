@@ -76,7 +76,7 @@ public class Runner extends JFrame {
 		  "UniqueRandomSetRepeat",
 		  "AutomaticUniqueRandomSetRepeat",
 		  
-		  "FirstN",
+		  "FirstK",
 		  //"RandomDirection",
 		  "FirstNFixedStart",
 		  "FirstNStaticBetween",
@@ -94,6 +94,7 @@ public class Runner extends JFrame {
 		  "VariableFixedDistanceStaticBetween",
 		  
 		  "LeastConnected",
+		  "LeastConnectedLeastConnectedFirst",
 		  "LeastConnectedStaticBetween",
 		  
 		  "MaxDistance",
@@ -169,13 +170,14 @@ public class Runner extends JFrame {
           "DepthFirstSearchGreedy",
 	      "BreadthFirstSearch",
 	      "BreadthFirstSearchGreedy",
-	      "BacktrackPath",
+	      /*"BacktrackPath",
 	      "VariableBacktrackPath",
-	      "OptimalBacktrackPath",
+	      "OptimalBacktrackPath",*/
 	      "NearestNeighbour",
 	      
 	      "LeastConnectedFirst",
 	      "MostConnectedFirst",
+	      "LinkedPath",
 	      
           "HighProbability",
           "VariableHistoryHighProbability",
@@ -728,7 +730,7 @@ public class Runner extends JFrame {
 						
 						if ( hidersSeekers.toString().contains("(")) hidersSeekers.setTraverser(hidersSeekers.toString().substring(0, hidersSeekers.toString().indexOf(" ")));
 						
-						hidersSeekers.setTraverser(hidersSeekers.getTraverser() + " (" + hider.getTraverser() + ")");
+						hidersSeekers.setTraverser(hidersSeekers.getTraverser()); // + " (" + hider.getTraverser() + ")");
 						
 						//if (selectedSeekers.contains(hidersSeekers)) {
 							
@@ -1656,59 +1658,12 @@ public class Runner extends JFrame {
 		    
 			/***********/
 			
-			Process proc = null;
-			
-			try {
-				
-				proc = Runtime.getRuntime().exec("java -classpath bin:lib/jgrapht-core-0.9.0.jar:lib/epsgraphics.jar:lib/jcommon-1.0.21.jar:lib/jfreechart-1.0.17.jar HideAndSeek.Main " + i + " " + GAMES + " " + paramString);
-			
-			} catch (IOException e1) {
-				
-				e1.printStackTrace();
-			
-			}
-			
-			BufferedReader outputs = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-			
-			BufferedReader errors = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
-			  
-			String line = null;  
-			 
-			try {
-				
-				while ((line = outputs.readLine()) != null) {  
-				
-					System.out.println(line);  
-				
-				}
-				
-			} catch (IOException e1) {
-				
-				e1.printStackTrace();
-			
-			}
-			
-			try {
-			
-				while ((line = errors.readLine()) != null) {  
-					
-					System.out.println(line);  
-				
-				}
-				
-			} catch (IOException e1) {
-				
-				e1.printStackTrace();
-			
-			} 
-			  
-			try {
-			
-				proc.waitFor();
-			
-			} catch (InterruptedException e) { System.out.println(e); }
+			Utils.runCommand("java -classpath bin:lib/jgrapht-core-0.9.0.jar:lib/epsgraphics.jar:lib/jcommon-1.0.21.jar:lib/jfreechart-1.0.17.jar HideAndSeek.Main " + i + " " + GAMES + " " + paramString);
 			 
 			System.out.println("-----------------------------------------------------------------");
+			
+			Utils.runCommand("clear");
+			Utils.runCommand("printf '\\\\e[3J'");
 			
 	    } // End of game run loop
 		

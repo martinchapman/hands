@@ -8,7 +8,7 @@ import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.repeatgame.random.UniqueRandomSetRepeat;
 import Utility.AdaptiveUtils;
-import Utility.ScoreMetric;
+import Utility.Metric;
 import Utility.Utils;
 
 /**
@@ -64,7 +64,7 @@ public class AutomaticUniqueRandomSetRepeat extends UniqueRandomSetRepeat {
 		
 		super.endOfRound();
 		
-		costChangeValues.add(graphController.averageSeekersPerformance(ScoreMetric.COST_CHANGE));
+		costChangeValues.add(graphController.averageSeekersPerformance(Metric.COST_CHANGE));
 		
 		if ( AdaptiveUtils.containsHighPerformance(costChangeValues, 0.5, goodPerformanceRounds) ) {
 			

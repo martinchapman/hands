@@ -98,6 +98,11 @@ public abstract class HidingAgent extends GraphTraversingAgent implements Runnab
 		
 	}
 	
+	public String getStatus() {
+		
+		return super.getStatus() + "\nprecheckedHideLocations: " +  precheckedHideLocations + "\n";
+		
+	}
 	/**
 	 * @param searchPath
 	 * @return
@@ -112,17 +117,15 @@ public abstract class HidingAgent extends GraphTraversingAgent implements Runnab
 			
 		} 
 		
-		currentNode = startNode;
+		atStart(startNode);
 		
 		StringVertex nextNode = null;
 		
 		while (graphController.numberOfHideLocations(responsibleAgent) != numberOfHideLocations) {
 			
-			exploredNodes.add(currentNode);
+			atNode();
 			
-			addUniquelyVisitedNode(currentNode);
-			
-		    if ( !super.hideLocations().contains(currentNode) && hideHere(currentNode) || precheckedHideLocations.contains(currentNode) ) { 
+		    if ( !super.hideLocations().contains(currentNode) && ( hideHere(currentNode) || precheckedHideLocations.contains(currentNode) ) ) { 
 	        	
         		addHideLocation(currentNode);
 				
@@ -130,7 +133,17 @@ public abstract class HidingAgent extends GraphTraversingAgent implements Runnab
 			
         	}
 		    
-		    nextNode = nextNode(currentNode);
+		    if ( queuedNodes.size() > 0 ) {
+				
+				nextNode = queuedNodes.remove(0);
+				
+				Utils.talk(responsibleAgent.toString(), "Going to queued node: " + nextNode);
+				
+			} else {
+				
+			    nextNode = nextNode(currentNode);
+			
+			}
 		    
 		    /* 
 		     * If a connected node contains a hide location we are looking for, overwrite strategies choice and 
@@ -140,7 +153,14 @@ public abstract class HidingAgent extends GraphTraversingAgent implements Runnab
 		    	
 		    	if ( AUTOMATIC_MOVE && !super.hideLocations().contains( edgeToTarget(connectedEdge, currentNode) ) && hideHere( edgeToTarget(connectedEdge, currentNode) ) ) {
 		    		
+		    		// To move back to where the agent was, and then to proceed where the agent was going to go.
+		    		queuedNodes.add(0, nextNode);
+		    		
+		    		queuedNodes.add(0, currentNode);
+		    		
 		    		nextNode = edgeToTarget(connectedEdge, currentNode);
+		    		
+		    		Utils.talk(responsibleAgent.toString(), "Moving automatically to " + nextNode + ". Queued: " + queuedNodes);
 		    		
 		    		precheckedHideLocations.add(nextNode);
 		    	
@@ -152,7 +172,7 @@ public abstract class HidingAgent extends GraphTraversingAgent implements Runnab
 			
 			if ( !graphController.fromVertexToVertex(responsibleAgent, currentNode, nextNode) ) { 
 				
-				Utils.talk(responsibleAgent.toString(), "Error traversing supplied path.");
+				Utils.talk(responsibleAgent.toString(), "Error traversing supplied path from " + currentNode + " to " + nextNode);
 				
 				return false; 
 				
@@ -200,6 +220,8 @@ public abstract class HidingAgent extends GraphTraversingAgent implements Runnab
 		super.hideLocations().clear();
 		
 		exploredNodes.clear();
+		
+		precheckedHideLocations.clear();
 		
 	}
 	

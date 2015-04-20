@@ -15,6 +15,9 @@ import Utility.Utils;
  * Standard BFS implementation tailored to potentially return to a parent
  * as no assumptions can be made about connectivity between siblings.
  * 
+ * Note: There may be more efficient library implementations of these algorithms,
+ * but these are tailored to the platform.
+ * 
  * @author Martin
  *
  */
@@ -49,41 +52,38 @@ public class BreadthFirstSearch extends SeekerLocalGraph {
 	public StringVertex nextNode(StringVertex currentNode) {
 
 		super.nextNode(currentNode);
+	
+		// Add all children of the current node to the end of the list
+		for ( StringEdge vertexEdge : getConnectedEdges(currentNode) ) {
+			
+			StringVertex child = edgeToTarget(vertexEdge, currentNode);
+			
+			if (!toBeVisited.contains(child)) toBeVisited.add(edgeToTarget(vertexEdge, currentNode));
+			
+		}
 		
-		//toBeVisited.removeAll(uniquelyVisitedNodes());
-
 		// If we are currently on a path back to a next breadth node, do this first:
 		if ( pathInProgress.size() > 1 ) { 
 
 			return edgeToTarget(pathInProgress.remove(0), currentNode);
 
 		}
-
-		Utils.talk(toString(), "" + getConnectedEdges(toBeVisited.get(0)));
 		
-		// Add all the children of the item on the top of the search list to the search list also
-		for ( StringEdge vertexEdge : getConnectedEdges(toBeVisited.get(0)) ) {
+		if ( toBeVisited.size() == 0 ) return connectedNode(currentNode);
 
-			StringVertex child = edgeToTarget(vertexEdge, toBeVisited.get(0));
-
-			if (!toBeVisited.contains(child)) toBeVisited.add(child);
-
-		}
-
-		// If we cannot move directly to the next node (i.e. from sibling to sibling) we must find the path to our next node
+		// If we cannot move directly to the next node (i.e. from sibling to sibling) we must find the path to this sibling
 		if (!graphController.containsEdge(currentNode, toBeVisited.get(0))) {
 
-			/* This should rarely happen as there will be a path to the child via the parent,
-			 * which will be added to the local graph
-			 */
+		
 			if (!localGraph.vertexSet().contains(toBeVisited.get(0))) {
 				
-				System.out.println("Going random"); 
+				System.err.println("Error: Sibling not in graph: " + toBeVisited.get(0) + getStatus());
 				
 				return connectedNode(currentNode);
 				
 			}
 			
+			// This should be the path through the parent node, unless this is the last sibling.
 			DijkstraShortestPath<StringVertex, StringEdge> DSP = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, toBeVisited.get(0));
 
 			pathInProgress = DSP.getPath().getEdgeList();
@@ -98,16 +98,29 @@ public class BreadthFirstSearch extends SeekerLocalGraph {
 				 * Because there should always be a path through the parent to another child,
 				 * this should never be invoked.
 				 */
+				
+				System.err.println("Error: No path to sibling.\n Target: " + toBeVisited.get(0) + getStatus());
+				
 				return connectedNode(currentNode);
 				
 			}
-			
 
 		}
 
+		Utils.talk(responsibleAgent.toString(), "Next node in BFS: " + toBeVisited.get(0));
+		
 		// Otherwise, freely move to the next thing to be visited
 		return toBeVisited.remove(0);
 
+	}
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraversingAgent#getStatus()
+	 */
+	public String getStatus() {
+		
+		return super.getStatus() + "\nNodes to visit: " + toBeVisited;
+		
 	}
 
 	/* (non-Javadoc)
@@ -116,16 +129,7 @@ public class BreadthFirstSearch extends SeekerLocalGraph {
 	@Override
 	public StringVertex startNode() {
 		
-		StringVertex startNode = randomNode();
-		
-		// Add all children of start node
-		for ( StringEdge vertexEdge : getConnectedEdges(startNode) ) {
-			
-			toBeVisited.add(edgeToTarget(vertexEdge, startNode));
-			
-		}
-		
-		return startNode;
+		return randomNode();
 		
 	}
 
@@ -134,7 +138,7 @@ public class BreadthFirstSearch extends SeekerLocalGraph {
 	 */
 	@Override
 	public void endOfRound() {
-		// TODO Auto-generated method stub
+	
 		super.endOfRound();
 		
 		toBeVisited.clear();

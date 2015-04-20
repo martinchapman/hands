@@ -20,7 +20,7 @@ import HideAndSeek.GraphTraverser;
 import HideAndSeek.hider.Hider;
 import HideAndSeek.hider.Hider;
 import HideAndSeek.seeker.Seeker;
-import Utility.ScoreMetric;
+import Utility.Metric;
 import Utility.Utils;
 
 /**
@@ -78,7 +78,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
     	calculateRealtimeHiderScores();
 		
 		// Calculate average seeker round performance for access by adaptive Hiders
-    	recordAverageSeekersRoundPerformance(ScoreMetric.COST);
+    	recordAverageSeekersRoundPerformance(Metric.COST);
 		
 		roundNumber++;
 		
@@ -193,8 +193,8 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 						
 						opponents++;
 						
-						scoreAgainstEach += latestTraverserRoundPerformance((Hider)agent, ScoreMetric.COST) -
-											latestTraverserRoundPerformance((Seeker)seeker, ScoreMetric.COST);
+						scoreAgainstEach += latestTraverserRoundPerformance((Hider)agent, Metric.COST) -
+											latestTraverserRoundPerformance((Seeker)seeker, Metric.COST);
 										   
 					}
 				
@@ -223,7 +223,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 			 
 			if ( traverser instanceof Seeker ) {
 				 
-				seekerRoundScores.get(roundNumber).put(traverser, latestTraverserRoundPerformance((Seeker)traverser, ScoreMetric.COST_CHANGE));
+				seekerRoundScores.get(roundNumber).put(traverser, latestTraverserRoundPerformance((Seeker)traverser, Metric.COST_CHANGE));
 				
 			}
 			 
@@ -236,7 +236,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	 * @param metric
 	 * @return
 	 */
-	public double latestTraverserRoundPerformance(GraphTraverser traverser, int metric) {
+	public double latestTraverserRoundPerformance(GraphTraverser traverser, Metric metric) {
 		
 		return latestTraverserRoundPerformance(traverser, metric, false);
 		
@@ -248,25 +248,25 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	 * @param traverser
 	 * @return
 	 */
-	public double latestTraverserRoundPerformance(GraphTraverser traverser, int metric, boolean normalised) {
+	public double latestTraverserRoundPerformance(GraphTraverser traverser, Metric metric, boolean normalised) {
 		
-		if ( metric == ScoreMetric.COST ) {
+		if ( metric == Metric.COST ) {
 			
 			return performanceMetricCost(traverser, normalised);
 			
-		} else if ( metric == ScoreMetric.PATH ) {
+		} else if ( metric == Metric.PATH ) {
 			
 			return performanceMetricPath(traverser);
 			
-		} else if ( metric == ScoreMetric.COST_CHANGE ) {
+		} else if ( metric == Metric.COST_CHANGE ) {
 			
 			return performanceMetricCostChange(traverser);
 			
-		} else if ( metric == ScoreMetric.COST_CHANGE_SCORE ) {
+		} else if ( metric == Metric.COST_CHANGE_SCORE ) {
 			
 			return performanceMetricCostChangeScore(traverser); 
 		
-		} else if ( metric == ScoreMetric.RELATIVE_COST ) {
+		} else if ( metric == Metric.RELATIVE_COST ) {
 			
 			return performanceMetricRelativeCost(traverser); 
 			
@@ -339,10 +339,10 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	public double performanceMetricCostChangeScore(GraphTraverser traverser) {
 		
 		// -1 indicates that not enough information is available to calculate change (for example, if it is an early round).
-		if ( latestTraverserRoundPerformance(traverser, ScoreMetric.COST_CHANGE) == -1 ) return 1.0; 
+		if ( latestTraverserRoundPerformance(traverser, Metric.COST_CHANGE) == -1 ) return 1.0; 
 		
 		// Any improvement in cost score is seen as wholly positive
-		if ( latestTraverserRoundPerformance(traverser, ScoreMetric.COST_CHANGE) > 0 ) { 
+		if ( latestTraverserRoundPerformance(traverser, Metric.COST_CHANGE) > 0 ) { 
 			
 			return 1.0;
 			
@@ -351,10 +351,10 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 		 * by 40% is not as bad as, say, -60%, which would indicate 40% (0.4) performance.
 		 */
 			
-		} else if ( latestTraverserRoundPerformance(traverser, ScoreMetric.COST_CHANGE) < 0 &&
-				    latestTraverserRoundPerformance(traverser, ScoreMetric.COST_CHANGE) > -100) {
+		} else if ( latestTraverserRoundPerformance(traverser, Metric.COST_CHANGE) < 0 &&
+				    latestTraverserRoundPerformance(traverser, Metric.COST_CHANGE) > -100) {
 			
-			return 1.0 - (Math.abs(latestTraverserRoundPerformance(traverser, ScoreMetric.COST_CHANGE)) / 100);
+			return 1.0 - (Math.abs(latestTraverserRoundPerformance(traverser, Metric.COST_CHANGE)) / 100);
 		
 		// Anything else must be greater than an increase in double of cost, and should thus indicate that change is necessary.
 		} else {
@@ -393,7 +393,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	/**
 	 * 
 	 */
-	private void recordAverageSeekersRoundPerformance(int metric) {
+	private void recordAverageSeekersRoundPerformance(Metric metric) {
 		 
 		averageSeekersRoundPerformance.add(averageSeekersPerformance(metric));
 		 
@@ -421,7 +421,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	 * 
 	 * @param metric
 	 */
-	public double averageSeekersPerformance(int metric) {
+	public double averageSeekersPerformance(Metric metric) {
 		
 		double performance = 0;
 		 
