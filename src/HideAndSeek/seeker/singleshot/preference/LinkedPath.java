@@ -22,13 +22,23 @@ public class LinkedPath extends SeekerLocalGraph {
 	/**
 	 * 
 	 */
-	private int specifiedNodeGap = 1;
+	private int specifiedNodeGap;
 	
 	/**
 	 * 
 	 */
 	OpenTraverserStrategy explorationMechanism;
 	
+	/**
+	 * @param graphController
+	 * @param specifiedNodeGap
+	 */
+	public LinkedPath(GraphController<StringVertex, StringEdge> graphController) {
+		
+		this(graphController, 1);
+		
+	}
+
 	/**
 	 * @param graphController
 	 */

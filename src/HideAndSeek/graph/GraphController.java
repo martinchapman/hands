@@ -56,6 +56,34 @@ public class GraphController<V, E> {
 		return fixedOrUpperValue;
 	
 	}
+	
+	/**
+	 * 
+	 */
+	private String fixedOrUpperBound;
+	
+	/**
+	 * @return
+	 */
+	public String getFixedOrUpperBound() {
+		
+		return fixedOrUpperBound;
+	
+	}
+	
+	/**
+	 * 
+	 */
+	private int edgeTraversalValue;
+	
+	/**
+	 * @return
+	 */
+	public int getEdgeTraversalValue() {
+		
+		return edgeTraversalValue;
+	
+	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -72,6 +100,10 @@ public class GraphController<V, E> {
 	public GraphController(String topology, int numberOfVertices, String fixedOrUpperBound, double fixedOrUpperValue, int edgeTraversalDecrement) {
 		
 		this.fixedOrUpperValue = fixedOrUpperValue;
+		
+		this.fixedOrUpperBound = fixedOrUpperBound;
+		
+		this.edgeTraversalValue = edgeTraversalDecrement;
 		
 		/**************************
     	 * 
@@ -154,7 +186,7 @@ public class GraphController<V, E> {
 			
 		}
 
-		Utils.talk("Graph Controller", "Graph generated. Edges: " + graph.edgeSet().size() + "\n" + graph.edgeSet());
+		Utils.talk("Graph Controller", "Graph generated (" + topology + "). Edges: " + graph.edgeSet().size() + "\n" + graph.edgeSet());
 		
 	}
 	
@@ -562,7 +594,7 @@ public class GraphController<V, E> {
 	/**
 	 * @return
 	 */
-	public double getEdgeTraverselDecrement() {
+	public double getEdgeTraversalDecrement() {
 		
 		return graph.getEdgeTraversalDecrement();
 		

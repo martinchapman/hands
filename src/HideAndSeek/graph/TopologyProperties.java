@@ -42,6 +42,8 @@ public class TopologyProperties<V, E extends DefaultWeightedEdge> {
 	 */
 	public TopologyProperties(String type, HiddenObjectGraph<V, E> graph) {
 		
+		this.type = type;
+		
 		this.graph = graph;
 		
 		nodeConnectivity = new ArrayList<NodeConnectionCount>();

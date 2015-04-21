@@ -78,8 +78,8 @@ public class Runner extends JFrame {
 		  
 		  "FirstK",
 		  //"RandomDirection",
-		  "FirstNFixedStart",
-		  "FirstNStaticBetween",
+		  "FirstKFixedStart",
+		  "FirstKStaticBetween",
 		  
 		  "RandomFixedDistance",
 		  "RandomFixedDistanceFixedStart",
@@ -96,6 +96,7 @@ public class Runner extends JFrame {
 		  "LeastConnected",
 		  "LeastConnectedLeastConnectedFirst",
 		  "LeastConnectedStaticBetween",
+		  "VariableGraphKnowledgeLeastConnected",
 		  
 		  "MaxDistance",
 		  "MaxDistanceStaticBetween",
@@ -248,6 +249,8 @@ public class Runner extends JFrame {
 	private JCheckBox mixSeekers;
 
 	private JCheckBox mixHiders;
+	
+	private JCheckBox resetPerRound;
 	
 	/**
 	 * Helper interface for specifying different actions
@@ -972,7 +975,7 @@ public class Runner extends JFrame {
 		
 		JPanel simulationParameters = new JPanel();
 		
-		simulationParameters.setLayout(new GridLayout(2, 2));
+		simulationParameters.setLayout(new GridLayout(3, 2));
 		
 		simulationParameters.setBorder(new TitledBorder("Simulation Parameters"));
 		
@@ -985,6 +988,16 @@ public class Runner extends JFrame {
 		numberOfRounds.setPreferredSize(new Dimension(100, 10));
 		
 		simulationParameters.add(numberOfRounds);
+		
+		//
+		
+		// Blank space in grid layout
+		simulationParameters.add(new JPanel());
+		
+		resetPerRound = new JCheckBox("Reset per round");
+		
+		simulationParameters.add(resetPerRound);
+		
 		
 		//
 		
@@ -1425,6 +1438,18 @@ public class Runner extends JFrame {
 					
 					} 
 					
+				} else if (paramPair.getElement0().equals("ResetPerRound")) {
+					
+					if ( Boolean.parseBoolean(paramPair.getElement1()) ) { 
+						
+						resetPerRound.setSelected(true); 
+						
+					} else { 
+						
+						resetPerRound.setSelected(false); 
+					
+					} 
+					
 				}
 	  
 			} else if (param.indexOf('[') != -1) {
@@ -1501,7 +1526,9 @@ public class Runner extends JFrame {
 		  	
 			"{MixHiders," + mixHiders.isSelected() + "}",
 			
-			"{MixSeekers," + mixSeekers.isSelected() + "}"
+			"{MixSeekers," + mixSeekers.isSelected() + "}",
+			
+			"{ResetPerRound," + resetPerRound.isSelected() + "}"
 			
 		};  
 		
@@ -1551,7 +1578,8 @@ public class Runner extends JFrame {
   				  "FixedOrUpperWeight", // whether cost supplied is static value or the upper bound of a distribution
   				  "EdgeTraversalDecrement", // % discount gained by an agent for having traversed an edge before (100 = no discount; < 100 = discount)
   				  "MixHiders", // Mix equally between the hide strategies
-  				  "MixSeekers" // Mix equally between the search strategies
+  				  "MixSeekers", // Mix equally between the search strategies
+  				  "ResetPerRound" // Whether players knowledge should persist through rounds
 				  };
   				  
 		String[] defaultParameters = { simulationParameters[1],
@@ -1564,7 +1592,8 @@ public class Runner extends JFrame {
 				 "upper", // whether cost supplied is static value or the upper bound of a distribution
 				 "0",// % discount gained by an agent for having traversed an edge before (1.0 = no discount; < 1.0 = discount),
 				 "false", // Mix equally between the hide strategies
-				 "false" // Mix equally between the search strategies
+				 "false", // Mix equally between the search strategies
+				 "true" // Whether players knowledge should persist through rounds
 		  		  };
 			
 		/***********/
@@ -1577,6 +1606,8 @@ public class Runner extends JFrame {
 		String[] simulationParametersUnchanged = Arrays.copyOf(simulationParameters, simulationParameters.length);
 		
 		// Run 'games' of simulation by repeat running program
+		
+		String startTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
 		
 		System.out.println("-----------------------------------------------------------------");
 		
@@ -1601,7 +1632,7 @@ public class Runner extends JFrame {
 														            		   Utils.startIndexOf(simulationParametersUnchanged[j], "(i\\*([0-9]+))") + 2, 
 														            		   Utils.endIndexOf(simulationParametersUnchanged[j], "(i\\*([0-9]+))")
 														            		   )
-	    													            		  
+	    													         	  
 	    													      		)
 	    													)
 	    	    									   );
@@ -1662,11 +1693,18 @@ public class Runner extends JFrame {
 			 
 			System.out.println("-----------------------------------------------------------------");
 			
-			Utils.runCommand("clear");
-			Utils.runCommand("printf '\\\\e[3J'");
+			if ( i < GAMES - 1); {
+			
+				Utils.runCommand("clear");
+			
+				Utils.runCommand("printf '\\\\e[3J'");
+			
+			}
 			
 	    } // End of game run loop
 		
+	    System.out.println("Started: " + startTime + " and ended: " + new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime()));
+	    
 	}
 	
 	/**

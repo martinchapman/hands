@@ -157,4 +157,18 @@ public class NearestNeighbour extends SeekerLocalGraph {
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.seeker.SeekingAgent#endOfRound()
+	 */
+	public void endOfRound() {
+		
+		super.endOfRound();
+		
+		// Need to clear in this instance for this mechanism.
+		exploredNodes.clear();
+		
+		currentPath.clear();
+		
+	}
+	
 }

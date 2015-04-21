@@ -57,6 +57,21 @@ public class Utils {
 	/**
 	 * 
 	 */
+	public static boolean MEMORY_CHECK = true;
+	
+	/**
+	 * @return
+	 */
+	public final static double percentageChane(double A, double B) {
+		
+		System.out.println("Percentage change from " + A + " to " + B);
+		
+		return ( ( B - A ) / ( Math.abs(A) ) ) * 100;
+		
+	}
+	/**
+	 * 
+	 */
 	public final static void runCommand(String command) {
 		
 		Process proc = null;
@@ -155,6 +170,8 @@ public class Utils {
 	 * 
 	 */
 	public static void printSystemStats() {
+		
+		if ( !MEMORY_CHECK ) return;
 		
 		System.out.print("\r[");
 		
@@ -559,7 +576,7 @@ public class Utils {
 	 * @param value
 	 * @param emptyInstance
 	 */
-	public static <K, V, E extends AbstractCollection<V>> void add( Hashtable<K, E> table, K key, V value, E emptyInstance, boolean unique ) {
+	public static <K, V, E extends AbstractCollection<V>> void add( Map<K, E> table, K key, V value, E emptyInstance, boolean unique ) {
 		
 		if ( table.containsKey(key) ) {
 			

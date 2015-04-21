@@ -25,6 +25,15 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	protected GraphController<StringVertex, StringEdge> graphController;
 	
 	/**
+	 * @return
+	 */
+	public GraphController<StringVertex, StringEdge> getGraphController() {
+		
+		return graphController;
+		
+	}
+
+	/**
 	 * 
 	 */
 	protected GraphTraversingAgent responsibleAgent = this;
@@ -410,13 +419,13 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 		
 		if (uniquelyVisitedNodes != null) {
 			
-			uniquelyVisitedNodes.clear();
+			//uniquelyVisitedNodes.clear();
 			
 		}
 		
 		if (uniquelyVisitedEdges != null) {
 			
-			uniquelyVisitedEdges.clear();
+			//uniquelyVisitedEdges.clear();
 			
 		}
 		

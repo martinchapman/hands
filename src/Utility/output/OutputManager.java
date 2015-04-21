@@ -35,7 +35,7 @@ public class OutputManager {
 	/**
 	 * 
 	 */
-	private static final boolean OUTPUT_ENABLED = false;
+	private static final boolean OUTPUT_ENABLED = true;
 	
 	/**
 	 * Multiple hiders per file, and multiple files.
@@ -191,7 +191,8 @@ public class OutputManager {
 								
 								hiderRecords.get(hiderRecords.size() - 1 ).setParameters(parameters);
 								
-							
+								hiderRecords.get(hiderRecords.size() - 1 ).setDatafile(path);
+								
 							}
 							
 							lastHider = hiderRecords.get(0).getTraverser();
@@ -207,6 +208,8 @@ public class OutputManager {
 								hiderRecords.get(hiderRecords.size() - 1 ).setTopology(topology);
 								
 								hiderRecords.get(hiderRecords.size() - 1 ).setParameters(parameters);
+								
+								hiderRecords.get(hiderRecords.size() - 1 ).setDatafile(path);
 								
 							}
 							
@@ -226,6 +229,8 @@ public class OutputManager {
 								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).addSeeker(new TraverserRecord("MixedSeekerStrats"));
 								
 								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker("MixedSeekerStrats").setTopology(topology);
+								
+								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker("MixedSeekerStrats").setDatafile(path);
 							
 							}
 							
@@ -239,6 +244,8 @@ public class OutputManager {
 								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).addSeeker(new TraverserRecord(word));
 								
 								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker(word).setTopology(topology);
+								
+								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker(word).setDatafile(path);
 							
 							}
 							
@@ -728,7 +735,7 @@ public class OutputManager {
 								
 								double pValue = traverserA.getKey().pValue(traverserB.getKey(), Metric.COST);
 								
-								Utils.talk(this.toString(), traverserA.getKey() + " vs " + traverserB.getKey() + " :" + pValue);
+								Utils.talk(this.toString(), traverserA.getKey() + " vs " + traverserB.getKey() + " : Percentage Difference - " + ( Utils.percentageChane(traverserB.getValue(), traverserA.getValue()) ) + " PValue - " + pValue);
 								
 								cumulativeP += pValue;
 								
@@ -738,7 +745,7 @@ public class OutputManager {
 								
 								double pValue = traverserA.getKey().pValue(traverserB.getKey(), minForAttributeInAllSeries, maxForAttributeInAllSeries );
 								
-								Utils.talk(this.toString(), traverserA.getKey() + " vs " + traverserB.getKey() + " :" + pValue);
+								Utils.talk(this.toString(), traverserA.getKey() + " vs " + traverserB.getKey() + " : Percentage Difference - " + ( Utils.percentageChane(traverserB.getValue(), traverserA.getValue()) ) + " PValue - " + pValue);
 								
 								cumulativeP += pValue;
 								
@@ -775,6 +782,18 @@ public class OutputManager {
 			graph.exportChartAsEPS(Utils.FILEPREFIX + "data/charts/" + outputPath + ".eps");
 			
 			graph.exportChartAsTikz(Utils.FILEPREFIX + "data/charts/" + outputPath + ".tex");
+			
+			for ( TraverserRecord traverser : traverserRecords ) {
+				
+				String graphedSuffix = "";
+				
+				if ( !traverser.getDatafile().toString().contains("GRAPHED ") ) graphedSuffix += "_GRAPHED";
+				
+				graphedSuffix += ( "_" + outputPath );
+				
+				traverser.getDatafile().toFile().renameTo(new File(traverser.getDatafile().toString().substring(0, traverser.getDatafile().toString().length() - 4) + graphedSuffix + ".csv"));
+				
+			}
 		
 		}
 		

@@ -28,6 +28,11 @@ public abstract class SeekerLocalGraph extends SeekingAgent {
 	protected HiddenObjectGraph<StringVertex, StringEdge> localGraph;
 	
 	/**
+	 * 
+	 */
+	protected static final boolean KNOWS_VERTICES = true;
+	
+	/**
 	 * @param graph
 	 */
 	public SeekerLocalGraph(GraphController <StringVertex, StringEdge> graphController) {
@@ -35,6 +40,12 @@ public abstract class SeekerLocalGraph extends SeekingAgent {
 		super(graphController);
 		
 		localGraph = new HiddenObjectGraph<StringVertex, StringEdge>(StringEdge.class);
+		
+		for ( StringVertex vertex : graphController.vertexSet() ) {
+			
+			if ( KNOWS_VERTICES ) localGraph.addVertex(vertex);
+			
+		}
 		
 	}
 

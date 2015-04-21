@@ -3,10 +3,13 @@ package HideAndSeek.hider.singleshot.preference;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.TreeMap;
 
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
+import Utility.Utils;
 
 /**
  * Attempts to hide nodes with the least possible connectivity.
@@ -73,33 +76,49 @@ public class LeastConnected extends PreferenceHider {
 	@Override
 	public LinkedHashSet<StringVertex> computeTargetNodes() {
 		
-		int maxConnections = MAX_CONNECTIONS;
+		TreeMap<Integer, ArrayList<StringVertex>> nodesToConnections = new TreeMap<Integer, ArrayList<StringVertex>>();
 		
-		// Continue until we have complete nodes for the hideset
-		while ( leastConnectedNodes.size() < numberOfHideLocations ) {
+		for ( StringVertex potentialNode : localGraph.vertexSet() ) {
 			
-			for ( StringVertex potentialNode : localGraph.vertexSet() ) {
-				
-				if ( localGraph.edgesOf(potentialNode).size() == maxConnections ) {
-					
-					leastConnectedNodes.add(potentialNode);
-					
-				}
-				
-				if ( leastConnectedNodes.size() >= numberOfHideLocations ) return leastConnectedNodes;
-				
-				
-			}
-
-			/* 
-			 * If we haven't found a sufficient number of connected edges at our estimated maximum,
-			 * relaxed this constraint by increasing the maximum, and try again.
-			 */
-			maxConnections++;
+			Utils.add(nodesToConnections, localGraph.edgesOf(potentialNode).size(), potentialNode, new ArrayList<StringVertex>(), true);
 		
 		}
 		
+		for ( Map.Entry<Integer, ArrayList<StringVertex>> nodeToConnections : nodesToConnections.entrySet() ) {
+			
+			if ( nodeToConnections.getValue().size() >= numberOfHideLocations ) {
+				
+				leastConnectedNodes.clear();
+				
+				for ( StringVertex minimallyConnectedNode : nodeToConnections.getValue() ) {
+					
+					leastConnectedNodes.add(minimallyConnectedNode);
+					
+				}
+				
+			}
+			
+		}
+
+		/* 
+		 * If we haven't found a sufficient number of connected edges at our estimated maximum,
+		 * relaxed this constraint by increasing the maximum, and try again.
+		 */
+		
 		return leastConnectedNodes;
+		
+	}
+	
+	/**
+	 * 
+	 */
+	public void endOfRound() {
+		
+		super.endOfRound();
+		
+		leastConnectedNodes.clear();
+		
+		maxConnections = 1;
 		
 	}
 		

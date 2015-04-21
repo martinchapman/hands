@@ -23,6 +23,11 @@ public abstract class HiderLocalGraph extends HidingAgent {
 	protected HiddenObjectGraph<StringVertex, StringEdge> localGraph;
 	
 	/**
+	 * 
+	 */
+	protected static final boolean KNOWS_VERTICES = true;
+	
+	/**
 	 * @param graph
 	 */
 	public HiderLocalGraph(GraphController <StringVertex, StringEdge> graphController, int numberOfHideLocations) {
@@ -30,6 +35,12 @@ public abstract class HiderLocalGraph extends HidingAgent {
 		super(graphController, numberOfHideLocations);
 		
 		localGraph = new HiddenObjectGraph<StringVertex, StringEdge>(StringEdge.class);
+		
+		for ( StringVertex vertex : graphController.vertexSet() ) {
+			
+			if ( KNOWS_VERTICES ) localGraph.addVertex(vertex);
+			
+		}
 		
 	}
 	

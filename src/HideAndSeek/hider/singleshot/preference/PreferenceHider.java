@@ -96,8 +96,8 @@ public abstract class PreferenceHider extends HiderLocalGraph implements Variabl
 	@Override
 	public boolean hideHere(StringVertex vertex) {
 		
-		// Only attempt this computation with complete knowledge of the graph, and if it has not be done before
-		if ( uniquelyVisitedNodes().size() >= ( graphController.vertexSet().size() * graphPortion ) && targetVertices.size() == 0 ) {
+		// Only attempt this computation with specified knowledge of the graph, and if it has not be done before
+		if ( uniquelyVisitedNodes().size() >= ( graphController.vertexSet().size() * graphPortion ) && ( targetVertices.size() + graphController.numberOfHideLocations(responsibleAgent) ) == 0 ) {
 			
 			targetVertices = computeTargetNodes();
 			
@@ -129,6 +129,10 @@ public abstract class PreferenceHider extends HiderLocalGraph implements Variabl
 		super.endOfRound();
 		
 		targetVertices.clear();
+		
+		currentPath.clear();
+		
+		explorationMechanism.endOfRound();
 		
 	}
 
@@ -188,7 +192,11 @@ public abstract class PreferenceHider extends HiderLocalGraph implements Variabl
 		
 		super.nextNode(currentNode);
 		
-		if ( targetVertices.size() < numberOfHideLocations ) {
+		// Relax to start searching for target nodes earlier
+		final int TARGET_VERTICES_SIZE = numberOfHideLocations;
+		
+		// Number of hide locations ensure that we don't re-explore after targets have been removed
+		if ( ( targetVertices.size() + graphController.numberOfHideLocations(responsibleAgent) ) < TARGET_VERTICES_SIZE ) {
 
 			return explorationMechanism.nextNode(currentNode);
 			

@@ -66,7 +66,7 @@ public class VariableBias extends VariableGreedy {
 		for ( StringEdge edge : connectedEdges ) {
 			
 			// If no edge traversal decrement has been set 
-			if ( graphController.getEdgeTraverselDecrement() == 1.0 ) {
+			if ( graphController.getEdgeTraversalDecrement() == 1.0 ) {
 				
 				// Simply return a random connected node
 				return connectedNode(currentNode);
@@ -97,7 +97,7 @@ public class VariableBias extends VariableGreedy {
 		
 		// If there is no information on the proportion of biased edges, or no edge traversal decrement 
 		// (i.e. no info on explorative) select node at random
-		if ( biasEdgesToCost.size() == 0 || graphController.getEdgeTraverselDecrement() == 1.0) {
+		if ( biasEdgesToCost.size() == 0 || graphController.getEdgeTraversalDecrement() == 1.0) {
 			
 			return connectedNode(currentNode);
 		

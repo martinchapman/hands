@@ -48,7 +48,7 @@ public class MaxDistance extends PreferenceHider {
 		super(graphController, numberOfHideLocations, graphPortion);
 		
 		this.minDistance = minDistance;
-		
+
 	}
 	
 	/**
@@ -97,6 +97,7 @@ public class MaxDistance extends PreferenceHider {
 					
 					for ( StringVertex candidate : candidates ) {
 						
+						// Prevents adding the reverse of the diameter
 						if ( candidate.equals(GP.getStartVertex()) || candidate.equals(GP.getEndVertex())) continue outerGP;
 						
 					}
@@ -111,8 +112,8 @@ public class MaxDistance extends PreferenceHider {
 			
 		}
 		
-		// If, for whatever reason, the diameter is empty:
-		if ( kthPositionCandidates.size() == 0) targetVertices.addAll(randomSet.createRandomSet(numberOfHideLocations, new TreeSet<StringVertex>()));
+		// If, for whatever reason, the diameter is empty, cannot proceed with this strategy:
+		if ( kthPositionCandidates.size() == 0 ) targetVertices.addAll(randomSet.createRandomSet(numberOfHideLocations, new TreeSet<StringVertex>()));
 		
 		int diameter = (int)FWSP.getDiameter();
 		
@@ -124,9 +125,11 @@ public class MaxDistance extends PreferenceHider {
 		// Continue until we have complete nodes for the hideset
 		while ( targetVertices.size() < numberOfHideLocations ) {
 			
+			System.out.println(localGraph.edgeSet());
+			
 			// For each node in the graph
 			outer:
-			for ( StringVertex potentialNode : graphController.vertexSet() ) {
+			for ( StringVertex potentialNode : localGraph.vertexSet() ) {
 			
 				// For all combinations of previous kth nodes
 				for ( ArrayList<StringVertex> candidates : Utils.combinations(new ArrayList<ArrayList<StringVertex>>(kthPositionCandidates.values())) ) {
@@ -162,7 +165,7 @@ public class MaxDistance extends PreferenceHider {
 				/* Otherwise, add this as a potential node, if it is greater than all previous
 				 * permutations and if we do not already have enough candidates for this position.
 				 * 
-				 * ~MDC: Todo: relax this constraint such that a potential node is added
+				 * ~MDC: TODO: relax this constraint such that a potential node is added
 				 * if it is greater than just ONE permutation. This will increase the likelihood
 				 * of finding a result. However, must track which nodes are added for which
 				 * permutations. In current mechanism, we do not need to do this as a node is

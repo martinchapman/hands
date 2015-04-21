@@ -1,5 +1,6 @@
 package Utility.output;
 
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
@@ -97,6 +98,29 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 	public String getTopology() {
 		
 		return topology;
+		
+	}
+	
+	/**
+	 * 
+	 */
+	private Path datafile;
+	
+	/**
+	 * @param datafile
+	 */
+	public void setDatafile(Path datafile) {
+		
+		this.datafile = datafile;
+		
+	}
+	
+	/**
+	 * @param datafile
+	 */
+	public Path getDatafile() {
+		
+		return datafile;
 		
 	}
 	

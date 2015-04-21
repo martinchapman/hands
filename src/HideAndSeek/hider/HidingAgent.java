@@ -174,8 +174,6 @@ public abstract class HidingAgent extends GraphTraversingAgent implements Runnab
 				
 				Utils.talk(responsibleAgent.toString(), "Error traversing supplied path from " + currentNode + " to " + nextNode);
 				
-				return false; 
-				
 			} else {
 				
 				currentNode = nextNode;
@@ -222,6 +220,8 @@ public abstract class HidingAgent extends GraphTraversingAgent implements Runnab
 		exploredNodes.clear();
 		
 		precheckedHideLocations.clear();
+		
+		queuedNodes.clear();
 		
 	}
 	

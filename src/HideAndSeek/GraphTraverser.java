@@ -2,13 +2,14 @@ package HideAndSeek;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 
+import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 
 public interface GraphTraverser extends Comparable<GraphTraverser>, Runnable {
 
+	public GraphController<?, ?> getGraphController();
 	/**
 	 * @param responsibleAgent
 	 */

@@ -2,6 +2,8 @@ package HideAndSeek;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,6 +42,7 @@ import HideAndSeek.hider.singleshot.preference.LeastConnected;
 import HideAndSeek.hider.singleshot.preference.LeastConnectedLeastConnectedFirst;
 import HideAndSeek.hider.singleshot.preference.LeastConnectedStaticBetween;
 import HideAndSeek.hider.singleshot.preference.MaxDistance;
+import HideAndSeek.hider.singleshot.preference.MaxDistanceStaticBetween;
 import HideAndSeek.hider.singleshot.random.GreedyRandomSet;
 import HideAndSeek.hider.singleshot.random.GreedyRandomSetStaticBetween;
 import HideAndSeek.hider.singleshot.random.Random;
@@ -145,6 +148,8 @@ public class Main {
 		
 		boolean mixSeekers = Boolean.parseBoolean(args[12]);
 		
+		boolean resetPerRound = Boolean.parseBoolean(args[13]);
+		
 		//
 		
 		String agentList;
@@ -159,7 +164,7 @@ public class Main {
 		
 		int numberOfHideLocations = Integer.parseInt(args[6]);
 		
-		startRounds(initHiders(hiderList, numberOfHideLocations, mixHiders), initSeekers(seekerList, numberOfHideLocations, mixSeekers), rounds, true);
+		startRounds(initHiders(hiderList, numberOfHideLocations, mixHiders), initSeekers(seekerList, numberOfHideLocations, mixSeekers), rounds, true, resetPerRound);
 		
 	}
 	
@@ -233,13 +238,13 @@ public class Main {
 			
 			}
 			
-			if (hiderType.getElement0().equals("FirstNFixedStart")) {
+			if (hiderType.getElement0().equals("FirstKFixedStart")) {
 				
 				allHidingAgents.add(new VariableFixedDistanceFixedStart(graphController, numberOfHideLocations, 0));
 				
 				// Have to set ID manually as identifier and class used are different
 				// allHidingAgents.get(allHidingAgents.size() - 1).setName("RandomDirection");
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("FirstNFixedStart");
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("FirstKFixedStart");
 			
 			}
 			
@@ -374,6 +379,14 @@ public class Main {
 				allHidingAgents.add(new LeastConnectedStaticBetween(graphController, numberOfHideLocations));
 			
 			} 
+			
+			if (hiderType.getElement0().equals("VariableGraphKnowledgeLeastConnected")) {
+				
+				allHidingAgents.add(new LeastConnected(graphController, numberOfHideLocations, gameNumber / (double)totalGames));
+			
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("VariableGraphKnowledgeLeastConnected");
+				
+			} 
 
 			if (hiderType.getElement0().equals("MaxDistance")) {
 				
@@ -381,10 +394,18 @@ public class Main {
 			
 			} 
 			
+			if (hiderType.getElement0().equals("MaxDistanceStaticBetween")) {
+				
+				allHidingAgents.add(new MaxDistanceStaticBetween(graphController, numberOfHideLocations));
+			
+			} 
+			
 			if (hiderType.getElement0().equals("VariableGraphKnowledgeMaxDistance")) {
 				
 				allHidingAgents.add(new MaxDistance(graphController, numberOfHideLocations, gameNumber / (double)totalGames, -1));
 			
+				allHidingAgents.get(allHidingAgents.size() - 1).setName("VariableGraphKnowledgeMaxDistance");
+				
 			} 
 			
 			if (hiderType.getElement0().equals("Greedy")) {
@@ -931,7 +952,7 @@ public class Main {
 	 * @param rounds
 	 * @param recordPerRound
 	 */
-	private void startRounds(List<Hider> hiders, List<Seeker> seekers, int rounds, boolean recordPerRound) {
+	private void startRounds(List<Hider> hiders, List<Seeker> seekers, int rounds, boolean recordPerRound, boolean resetPerRound) {
 		
 		// Pre-round outputting
 		
@@ -986,20 +1007,50 @@ public class Main {
 			Utils.talk("Main", hiders.toString());
 			
 			/* If changes occur over a set of rounds (over a game), by nature of the strategy,
-			 * this process must repeat.
+			 * this process must repeat (i.e. to check how a strategy evolves over different 
+			 * rounds under a given parameter).
 			 */
 			for (int roundRepeat = 0; roundRepeat < repeatAllRounds; roundRepeat++) {
 				
 				hider.startPlaying();
 				
 				boolean lastRoundRepeat = false;
+				
 				if (roundRepeat == (repeatAllRounds - 1)) lastRoundRepeat = true;
 				
 				for (int i = 0; i < rounds; i++) {
 		        	
 		        	System.out.println("Game " + gameNumber + " Round " + i + ": " + ( ( i / ( ( (float) rounds * hiders.size() ) ) ) * totalGames ) + "%");
 		        	
+		        	if ( resetPerRound ) {
+		        	
+		        		graphController = new GraphController<StringVertex, StringEdge>(graphController.getTopologyProperties().getType(), graphController.vertexSet().size(), graphController.getFixedOrUpperBound(), graphController.getFixedOrUpperValue(), graphController.getEdgeTraversalValue());
+		        		
+		        		Utils.talk("Main", "Resetting " + hider);
+		        		
+		        		hider = newHiderObject(hider);
+		        		
+		        		hider.startPlaying();
+		        	
+		        	}
+		        	
 					hider.run();
+					
+					ArrayList<Seeker> newSeekers = new ArrayList<Seeker>();
+					
+					if ( resetPerRound ) { 
+						
+						for ( Seeker seeker : seekers ) {
+							
+							Utils.talk("Main", "Resetting " + seeker);
+							
+							newSeekers.add(newSeekerObject(seeker));
+							
+						}
+					
+						seekers = newSeekers;
+						
+					}
 					
 					for ( Seeker seeker : seekers ) {
 						
@@ -1148,12 +1199,108 @@ public class Main {
 	}
 	
 	/**
+	 * @param originalHider
+	 * @return
+	 */
+	private Hider newHiderObject(Hider originalHider) {
+		
+		String hiderName = originalHider.toString().substring(1);
+		
+		try {
+			
+			Constructor<?> ctor = originalHider.getClass().getConstructor(GraphController.class, int.class);
+			
+			Object object = ctor.newInstance(new Object[] { graphController, originalHider.numberOfHideLocations() });
+		
+			((Hider)object).setName(hiderName);
+			
+			return (Hider)object;
+			
+		} catch (InstantiationException e) {
+			
+			e.printStackTrace();
+		
+		} catch (IllegalAccessException e) {
+
+			e.printStackTrace();
+		
+		} catch (IllegalArgumentException e) {
+
+			e.printStackTrace();
+		
+		} catch (InvocationTargetException e) {
+
+			e.printStackTrace();
+		
+		} catch (NoSuchMethodException e) {
+
+			e.printStackTrace();
+		
+		} catch (SecurityException e) {
+
+			e.printStackTrace();
+		
+		}
+		
+		return null;
+		
+	}
+	
+	/**
+	 * @param originalHider
+	 * @return
+	 */
+	private Seeker newSeekerObject(Seeker originalSeeker) {
+		
+		String seekerName = originalSeeker.toString().substring(1);
+			
+		try {
+			
+			Constructor<?> ctor = originalSeeker.getClass().getConstructor(GraphController.class);
+			
+			Object object = ctor.newInstance(new Object[] { graphController });
+		
+			((Seeker)object).setName(seekerName);
+			
+			return (Seeker)object;
+			
+		} catch (InstantiationException e) {
+			
+			e.printStackTrace();
+		
+		} catch (IllegalAccessException e) {
+
+			e.printStackTrace();
+		
+		} catch (IllegalArgumentException e) {
+
+			e.printStackTrace();
+		
+		} catch (InvocationTargetException e) {
+
+			e.printStackTrace();
+		
+		} catch (NoSuchMethodException e) {
+
+			e.printStackTrace();
+		
+		} catch (SecurityException e) {
+
+			e.printStackTrace();
+		
+		}
+		
+		return null;
+		
+	}
+	
+	/**
 	 * @param hiders
 	 * @param seekers
 	 * @return
 	 */
 	private ArrayList<GraphTraverser> allTraversers(ArrayList<Hider> hiders, ArrayList<Seeker> seekers) {
-		
+	
 		ArrayList<GraphTraverser> traversers = new ArrayList<GraphTraverser>();
 		
 		for (Hider hider : hiders) {
