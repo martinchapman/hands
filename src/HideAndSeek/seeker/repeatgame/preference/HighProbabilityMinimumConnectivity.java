@@ -29,12 +29,11 @@ public class HighProbabilityMinimumConnectivity extends HighProbability {
 	/**
 	 * @param graph
 	 */
-	public HighProbabilityMinimumConnectivity(
-			GraphController <StringVertex, StringEdge> graphController) {
+	public HighProbabilityMinimumConnectivity(GraphController <StringVertex, StringEdge> graphController) {
 		
 		super(graphController);
 		
-		leastConnectedMechanism = new LeastConnectedMechanism(graphController, 0);
+		leastConnectedMechanism = new LeastConnectedMechanism(graphController, 0, this);
 		
 	}
 	

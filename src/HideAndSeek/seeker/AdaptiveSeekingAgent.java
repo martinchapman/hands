@@ -98,7 +98,7 @@ public class AdaptiveSeekingAgent<E extends Seeker & AdaptiveGraphTraverser> ext
 	 */
 	public String toString() {
 		
-		return "s" + name;
+		return "s" + getName();
 		
 	}
 

@@ -16,16 +16,19 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import Utility.ComparatorResult;
 import Utility.Metric;
+import Utility.TraverserDataset;
 import Utility.Utils;
 import Utility.output.gnuplot.GNU3DGraph;
 import Utility.output.gnuplot.GNUBarGraph;
 import Utility.output.gnuplot.GNUGraph;
 import Utility.output.gnuplot.GNULineGraph;
+import Utility.output.gnuplot.GraphType;
 
 /**
  * @author Martin
@@ -35,7 +38,7 @@ public class OutputManager {
 	/**
 	 * 
 	 */
-	private static final boolean OUTPUT_ENABLED = true;
+	private static final boolean OUTPUT_ENABLED = false;
 	
 	/**
 	 * Multiple hiders per file, and multiple files.
@@ -352,19 +355,19 @@ public class OutputManager {
 	 * @param gameOrRound
 	 * @return
 	 */
-	private ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>> getTraverserSeries(TraverserRecord traverser, String gameOrRound) {
+	private LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>> getTraverserSeries(TraverserRecord traverser, String gameOrRound) {
 		
 		if ( gameOrRound.equals("Game") ) {
 			
-			return new ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>>(traverser.getGameSeries().entrySet());
+			return new LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>>(traverser.getGameSeries());
 			
 		} else if ( gameOrRound.equals("Round") ) {
 			
-			return new ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>>(traverser.getRoundSeries().entrySet());
+			return new LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>>(traverser.getRoundSeries());
 			
 		} else {
 			
-			return new ArrayList<Entry<AttributeSetIdentifier, Hashtable<String,Double>>>();
+			return new LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>>();
 			
 		}
 		
@@ -374,7 +377,7 @@ public class OutputManager {
 	 * @param traverserRecords
 	 * @return
 	 */
-	private Hashtable<String, Double> maxForAttributeInAllSeries( ArrayList<TraverserRecord> traverserRecords, String gameOrRound ) {
+	private Hashtable<String, Double> maxForAttributeInAllSeries( ArrayList<TraverserRecord> traverserRecords, String gameOrRound, GraphType graphType ) {
 		
 		Hashtable<String, Double> maxAttributeToValueAllSeries = new Hashtable<String, Double>();
 		
@@ -382,24 +385,34 @@ public class OutputManager {
 		
 		for ( TraverserRecord traverserRecord : localTraverserRecords ) {
 			
-			for ( Entry<AttributeSetIdentifier, Hashtable<String,Double>> seriesEntry : getTraverserSeries(traverserRecord, gameOrRound) ) {
+			for ( Entry<String, TraverserDataset> attributeToDataset : traverserRecord.getAttributeToDataset(getTraverserSeries(traverserRecord, gameOrRound), null, null).entrySet() ) {
 				
-				for (Entry<String, Double> attributeToValueEntry : seriesEntry.getValue().entrySet()) {
+				ArrayList<Double> valuesInSeriesForAttribute = attributeToDataset.getValue().getDataset();
+				
+				if ( graphType == GraphType.BAR ) {
 					
-					if ( !maxAttributeToValueAllSeries.containsKey(attributeToValueEntry.getKey()) ) {
+					valuesInSeriesForAttribute = new ArrayList<Double>();
+					
+					valuesInSeriesForAttribute.add(attributeToDataset.getValue().getMean());
+					
+				}
+		
+				for ( double valueInSeriesForAttribute : valuesInSeriesForAttribute ) {
+				
+					if ( !maxAttributeToValueAllSeries.containsKey(attributeToDataset.getKey()) ) {
 						
-						maxAttributeToValueAllSeries.put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
+						maxAttributeToValueAllSeries.put(attributeToDataset.getKey(), valueInSeriesForAttribute);
 						
 					} else {
 						
-						if ( attributeToValueEntry.getValue() > maxAttributeToValueAllSeries.get(attributeToValueEntry.getKey())) {
+						if ( valueInSeriesForAttribute > maxAttributeToValueAllSeries.get(attributeToDataset.getKey())) {
 							
-							maxAttributeToValueAllSeries.put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
+							maxAttributeToValueAllSeries.put(attributeToDataset.getKey(), valueInSeriesForAttribute);
 							
 						}
 						
 					}
-					
+				
 				}
 				
 			}
@@ -414,27 +427,37 @@ public class OutputManager {
 	 * @param traverserRecords
 	 * @return
 	 */
-	private Hashtable<String, Double> minForAttributeInAllSeries( ArrayList<TraverserRecord> traverserRecords, String gameOrRound ) {
+	private Hashtable<String, Double> minForAttributeInAllSeries( ArrayList<TraverserRecord> traverserRecords, String gameOrRound, GraphType graphType ) {
 		
 		Hashtable<String, Double> minAttributeToValueAllSeries = new Hashtable<String, Double>();
 		
 		ArrayList<TraverserRecord> localTraverserRecords = expandTraverserRecords(traverserRecords);
 		
 		for ( TraverserRecord traverserRecord : localTraverserRecords ) {
-		
-			for ( Entry<AttributeSetIdentifier, Hashtable<String,Double>> seriesEntry : getTraverserSeries(traverserRecord, gameOrRound) ) {
+			
+			for ( Entry<String, TraverserDataset> attributeToDataset : traverserRecord.getAttributeToDataset(getTraverserSeries(traverserRecord, gameOrRound), null, null).entrySet() ) {
 				
-				for (Entry<String, Double> attributeToValueEntry : seriesEntry.getValue().entrySet()) {
+				ArrayList<Double> valuesInSeriesForAttribute = attributeToDataset.getValue().getDataset();
+				
+				if ( graphType == GraphType.BAR ) {
+
+					valuesInSeriesForAttribute = new ArrayList<Double>();
+				
+					valuesInSeriesForAttribute.add(attributeToDataset.getValue().getMean());
 					
-					if (!minAttributeToValueAllSeries.containsKey(attributeToValueEntry.getKey())) {
+				}
+				
+				for ( double valueInSeriesForAttribute : valuesInSeriesForAttribute ) {
+					
+					if (!minAttributeToValueAllSeries.containsKey(attributeToDataset.getKey())) {
 						
-						minAttributeToValueAllSeries.put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
+						minAttributeToValueAllSeries.put(attributeToDataset.getKey(), valueInSeriesForAttribute);
 						
 					} else {
 						
-						if ( attributeToValueEntry.getValue() < minAttributeToValueAllSeries.get(attributeToValueEntry.getKey())) {
+						if ( valueInSeriesForAttribute < minAttributeToValueAllSeries.get(attributeToDataset.getKey())) {
 							
-							minAttributeToValueAllSeries.put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
+							minAttributeToValueAllSeries.put(attributeToDataset.getKey(), valueInSeriesForAttribute);
 							
 						}
 						
@@ -470,17 +493,23 @@ public class OutputManager {
 	 */
 	public void showGraphForAttribute(ArrayList<TraverserRecord> traverserRecords, String gameOrRound, String title, String graphType, String xLabel, String yLabel, String category) {
 		
+		for ( TraverserRecord hiderRecord : traverserRecords ) hiderRecord.switchShowSeekers();
+		
 		//TraverserGraph graph = null;
 		GNUGraph graph = null;
 		
 		if ( title.length() > 200 ) title = title.substring(0, 200);
 		
-		Hashtable<String, Double> minForAttributeInAllSeries = minForAttributeInAllSeries(traverserRecords, gameOrRound);
+		Hashtable<String, Double> minForAttributeInAllSeries;
 		
-		Hashtable<String, Double> maxForAttributeInAllSeries = maxForAttributeInAllSeries(traverserRecords, gameOrRound);
+		Hashtable<String, Double> maxForAttributeInAllSeries;
 		
 		if (graphType.equals("Line") || graphType.equals("3D")) {
-		
+			
+			minForAttributeInAllSeries = minForAttributeInAllSeries(traverserRecords, gameOrRound, GraphType.LINE);
+			
+			maxForAttributeInAllSeries = maxForAttributeInAllSeries(traverserRecords, gameOrRound, GraphType.LINE);
+			
 			if (graphType.equals("Line")) {
 			
 				//graph = new LineGraph(title);
@@ -506,9 +535,9 @@ public class OutputManager {
 				
 				int seriesNumber = 0;
 				
-				for ( Entry<AttributeSetIdentifier, Hashtable<String,Double>> seriesEntry : getTraverserSeries(traverser, gameOrRound) ) {
+				for ( Entry<AttributeSetIdentifier, Hashtable<String,Double>> seriesEntry : getTraverserSeries(traverser, gameOrRound).entrySet() ) {
 					
-					if ( yLabel.contains("Score" ) ) {
+					if ( yLabel.contains("Payoff" ) ) {
 						
 						if ( traverser instanceof HiderRecord ) {
 							
@@ -516,11 +545,11 @@ public class OutputManager {
 							
 							for ( TraverserRecord hidersSeeker : ((HiderRecord)traverser).getSeekersAndAttributes()) {
 								
-								cumulativeNormalisedSeekerCosts += normaliseEntry(getTraverserSeries(hidersSeeker, gameOrRound).get(seriesNumber).getValue(), minForAttributeInAllSeries, maxForAttributeInAllSeries );
+								cumulativeNormalisedSeekerCosts += normaliseEntry(new ArrayList<Hashtable<String, Double>>(getTraverserSeries(hidersSeeker, gameOrRound).values()).get(seriesNumber), minForAttributeInAllSeries, maxForAttributeInAllSeries );
 								
 							}
 							
-							// Score = (Average) Seeker(s) cost - Hider cost.
+							// Payoff = (Average) Seeker(s) cost - Hider cost.
 							attributeToValues.add( ( cumulativeNormalisedSeekerCosts / (double)((HiderRecord)traverser).getSeekersAndAttributes().size() ) - normaliseEntry(seriesEntry.getValue(), minForAttributeInAllSeries, maxForAttributeInAllSeries) );
 							
 						} else {
@@ -557,6 +586,7 @@ public class OutputManager {
 				// Extrapolate those values that will not 'fill' the entire 3D area to do so.
 				
 				int maxRows = Integer.MIN_VALUE;
+				
 				ArrayList<ArrayList<ArrayList<Double>>> datasets = new ArrayList<ArrayList<ArrayList<Double>>>();
 				
 				for ( Entry<String, ArrayList<ArrayList<Double>>> individualAttributeToValues : multipleAttributeToValues.entrySet()) {
@@ -617,6 +647,10 @@ public class OutputManager {
 
 			ArrayList<Entry<TraverserRecord, Double>> traverserAndData = new ArrayList<Entry<TraverserRecord, Double>>();
 			
+			minForAttributeInAllSeries = minForAttributeInAllSeries(traverserRecords, gameOrRound, GraphType.BAR);
+			
+			maxForAttributeInAllSeries = maxForAttributeInAllSeries(traverserRecords, gameOrRound, GraphType.BAR);
+			
 			/* Sort so that check for new category is accurate (i.e. last category is
 			 * definitely exhausted).
 			 */
@@ -655,7 +689,7 @@ public class OutputManager {
 			
 			for ( TraverserRecord traverser : traverserRecords ) {
 				
-				Utils.talk(this.toString(), "Processing " + traverser);
+				Utils.talk(toString(), "Processing " + traverser);
 				
 				//if ( traverser instanceof HiderRecord ) ((HiderRecord)traverser).switchShowSeekers();
 				
@@ -673,13 +707,7 @@ public class OutputManager {
 					
 				}
 				
-				if ( yLabel.contains("Score") ) {
-					
-					/* 
-					 * May need to calculate score for individual games, and then take average of score,
-					 * rather than calculating score for all games, through average of cost, in order
-					 * to calculate stats. for scores.
-					 */
+				if ( yLabel.contains("Payoff") ) {
 					
 					if ( traverser instanceof HiderRecord ) {
 						
@@ -735,7 +763,7 @@ public class OutputManager {
 								
 								double pValue = traverserA.getKey().pValue(traverserB.getKey(), Metric.COST);
 								
-								Utils.talk(this.toString(), traverserA.getKey() + " vs " + traverserB.getKey() + " : Percentage Difference - " + ( Utils.percentageChane(traverserB.getValue(), traverserA.getValue()) ) + " PValue - " + pValue);
+								Utils.talk(toString(), traverserA.getKey() + " vs " + traverserB.getKey() + " : Percentage Difference - " + ( Utils.percentageChane(traverserB.getValue(), traverserA.getValue()) ) + " PValue - " + pValue);
 								
 								cumulativeP += pValue;
 								
@@ -745,7 +773,7 @@ public class OutputManager {
 								
 								double pValue = traverserA.getKey().pValue(traverserB.getKey(), minForAttributeInAllSeries, maxForAttributeInAllSeries );
 								
-								Utils.talk(this.toString(), traverserA.getKey() + " vs " + traverserB.getKey() + " : Percentage Difference - " + ( Utils.percentageChane(traverserB.getValue(), traverserA.getValue()) ) + " PValue - " + pValue);
+								Utils.talk(toString(), traverserA.getKey() + " vs " + traverserB.getKey() + " : Percentage Difference - " + ( Utils.percentageChane(traverserB.getValue(), traverserA.getValue()) ) + " PValue - " + pValue);
 								
 								cumulativeP += pValue;
 								
@@ -753,11 +781,11 @@ public class OutputManager {
 							
 						}
 						
-						Utils.talk(this.toString(), "Average pValue against other traversers (" + storedTraverserAndData.getValue().size() + "): " + ( cumulativeP / storedTraverserAndData.getValue().size() ));
+						Utils.talk(toString(), "Average pValue against other traversers (" + storedTraverserAndData.getValue().size() + "): " + ( cumulativeP / storedTraverserAndData.getValue().size() ));
 								
 						traverserToSignificanceClass.put(traverserA.getKey(), StatisticalTest.getPGroup(cumulativeP / storedTraverserAndData.getValue().size()));
 						
-						Utils.talk(this.toString(), "Significance class of this value: " + traverserToSignificanceClass);
+						Utils.talk(toString(), "Significance class of this value: " + traverserToSignificanceClass);
 						
 					}
 				
@@ -787,14 +815,14 @@ public class OutputManager {
 				
 				String graphedSuffix = "";
 				
-				if ( !traverser.getDatafile().toString().contains("GRAPHED ") ) graphedSuffix += "_GRAPHED";
+				if ( !traverser.getDatafile().toString().contains("GRAPHED") ) graphedSuffix += "_GRAPHED";
 				
 				graphedSuffix += ( "_" + outputPath );
 				
 				traverser.getDatafile().toFile().renameTo(new File(traverser.getDatafile().toString().substring(0, traverser.getDatafile().toString().length() - 4) + graphedSuffix + ".csv"));
 				
 			}
-		
+			
 		}
 		
 		try {
@@ -806,6 +834,8 @@ public class OutputManager {
 			e.printStackTrace();
 		
 		}
+		
+		for ( TraverserRecord hiderRecord : traverserRecords ) hiderRecord.switchShowSeekers();
 		
 		/*graph.pack();
 		

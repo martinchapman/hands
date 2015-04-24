@@ -20,7 +20,7 @@ import Utility.Utils;
  * and thus they will express a higher preference towards more
  * obscure nodes.
  * 
- * 
+ * @deprecated Not viable with graph exploration
  * @author Martin
  *
  */

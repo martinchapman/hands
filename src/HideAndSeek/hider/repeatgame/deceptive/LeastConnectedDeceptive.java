@@ -29,13 +29,11 @@ public class LeastConnectedDeceptive extends Deceptive {
 	 * @param deceptiveNodes
 	 * @param deceptionDuration
 	 */
-	public LeastConnectedDeceptive(
-			GraphController <StringVertex, StringEdge> graphController,
-			int numberOfHideLocations, int deceptiveNodes, int deceptionDuration) {
+	public LeastConnectedDeceptive( GraphController <StringVertex, StringEdge> graphController, int numberOfHideLocations, int deceptiveNodes, int deceptionDuration) {
 		
 		super(graphController, numberOfHideLocations, deceptiveNodes, deceptionDuration);
 		
-		leastConnectedMechanism = new LeastConnectedMechanism(graphController, numberOfHideLocations);
+		leastConnectedMechanism = new LeastConnectedMechanism(graphController, numberOfHideLocations, this);
 
 	}
 	
@@ -48,13 +46,11 @@ public class LeastConnectedDeceptive extends Deceptive {
 	 * @param startRound
 	 * @param refreshDeceptiveSet
 	 */
-	public LeastConnectedDeceptive(
-			GraphController <StringVertex, StringEdge> graphController,
-			int numberOfHideLocations, int deceptiveNodes, int deceptionDuration, int repeatInterval, int repeatDuration, boolean refreshDeceptiveSet) {
+	public LeastConnectedDeceptive( GraphController <StringVertex, StringEdge> graphController, int numberOfHideLocations, int deceptiveNodes, int deceptionDuration, int repeatInterval, int repeatDuration, boolean refreshDeceptiveSet) {
 		
 		super(graphController, numberOfHideLocations, deceptiveNodes, deceptionDuration, repeatInterval, repeatDuration, refreshDeceptiveSet);
 		
-		leastConnectedMechanism = new LeastConnectedMechanism(graphController, numberOfHideLocations);
+		leastConnectedMechanism = new LeastConnectedMechanism(graphController, numberOfHideLocations, this);
 		
 	}
 	
@@ -85,13 +81,13 @@ public class LeastConnectedDeceptive extends Deceptive {
 		
 		ArrayList<StringVertex> minimumConnectivityNodes = leastConnectedMechanism.getMinimumConnectivityNodes();
 		
-		Utils.talk(this.toString(), "Minimum connected nodes: " + minimumConnectivityNodes);
+		Utils.talk(toString(), "Minimum connected nodes: " + minimumConnectivityNodes);
 		
 		if (minimumConnectivityNodes.size() > 0) {
 			
 			Collections.shuffle(minimumConnectivityNodes);
 			
-			for (StringVertex vertex : minimumConnectivityNodes) Utils.talk(this.toString(), vertex + " connections: " + graphController.degreeOf(vertex));
+			for (StringVertex vertex : minimumConnectivityNodes) Utils.talk(toString(), vertex + " connections: " + graphController.degreeOf(vertex));
 			
 			int maxIndex = deceptiveNodes > minimumConnectivityNodes.size() ? minimumConnectivityNodes.size() : deceptiveNodes; 
 			

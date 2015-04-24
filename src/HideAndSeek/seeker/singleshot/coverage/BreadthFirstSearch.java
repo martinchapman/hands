@@ -107,7 +107,7 @@ public class BreadthFirstSearch extends SeekerLocalGraph {
 
 		}
 
-		Utils.talk(responsibleAgent.toString(), "Next node in BFS: " + toBeVisited.get(0));
+		Utils.talk(toString(), "Next node in BFS: " + toBeVisited.get(0));
 		
 		// Otherwise, freely move to the next thing to be visited
 		return toBeVisited.remove(0);

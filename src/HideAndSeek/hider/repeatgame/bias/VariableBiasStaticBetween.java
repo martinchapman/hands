@@ -20,12 +20,31 @@ import Utility.Utils;
  */
 public class VariableBiasStaticBetween extends VariableGreedy {
 
+	/**
+	 * @param graphController
+	 * @param name
+	 * @param numberOfHideLocations
+	 * @param bias
+	 */
 	public VariableBiasStaticBetween(
-			GraphController <StringVertex, StringEdge> graphController,
+			GraphController <StringVertex, StringEdge> graphController, String name,
 			int numberOfHideLocations, double bias) {
 		super(graphController, numberOfHideLocations, bias);
 		
 	}
+
+	/**
+	 * @param graphController
+	 * @param numberOfHideLocations
+	 * @param bias
+	 */
+	public VariableBiasStaticBetween(
+			GraphController <StringVertex, StringEdge> graphController,
+			int numberOfHideLocations, double bias) {
+		this(graphController, "", numberOfHideLocations, bias);
+		
+	}
+	
 
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#startNode()

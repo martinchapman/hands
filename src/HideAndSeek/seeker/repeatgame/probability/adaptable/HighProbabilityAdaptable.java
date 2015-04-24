@@ -51,15 +51,22 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 	 */
 	public HighProbabilityAdaptable(GraphController<StringVertex, StringEdge> graphController) {
 		
-		super(graphController);
+		this(graphController, "");
+		
+	}
+	
+	/**
+	 * @param graphController
+	 */
+	public HighProbabilityAdaptable(GraphController<StringVertex, StringEdge> graphController, String name) {
+		
+		super(graphController, name);
 		
 		uniqueHideLocations = new HashSet<StringVertex>();
 		
 		uniqueHideLocationsProgression = new ArrayList<Integer>();
 		
 		percentageChanges = new ArrayList<Double>();
-		
-		this.name = "HighProbability";
 		
 	}
 	
@@ -109,7 +116,7 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 				
 			}
 			
-			Utils.talk(this.toString(), "Increments are consistent, strategy change needed for this.");
+			Utils.talk(toString(), "Increments are consistent, strategy change needed for this.");
 			
 			return 0.0;
 			
@@ -144,7 +151,7 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 		
 		if (AdaptiveUtils.containsLowPerformance(percentageChanges, INDIVIDUAL_PERFORMANCE_THRESHOLD, INDIVIDUAL_PERFORMANCE_ROUND_THRESHOLD)) {
 			
-			Utils.talk(responsibleAgent.toString(), "Consecutive low performance detected.");
+			Utils.talk(toString(), "Consecutive low performance detected.");
 			
 			return 0.0;
 			

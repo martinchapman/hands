@@ -30,9 +30,9 @@ public class BacktrackPath extends SeekerLocalGraph {
 	/**
 	 * @param graphController
 	 */
-	public BacktrackPath(GraphController <StringVertex, StringEdge> graphController) {
+	public BacktrackPath(GraphController <StringVertex, StringEdge> graphController, String name) {
 		
-		super(graphController);
+		super(graphController, name);
 		
 		pathInProgress = new ArrayList<StringEdge>();
 		
@@ -40,6 +40,17 @@ public class BacktrackPath extends SeekerLocalGraph {
 		
 	}
 	
+	/**
+	 * @param graphController
+	 */
+	public BacktrackPath(GraphController <StringVertex, StringEdge> graphController) {
+		
+		this(graphController, "");
+		
+	}
+	
+	
+
 	/**
 	 * 
 	 */

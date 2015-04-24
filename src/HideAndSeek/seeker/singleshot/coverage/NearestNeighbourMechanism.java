@@ -1,12 +1,8 @@
 package HideAndSeek.seeker.singleshot.coverage;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
-import org.jgrapht.alg.DijkstraShortestPath;
-
+import HideAndSeek.GraphTraverser;
 import HideAndSeek.OpenTraverserStrategy;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
@@ -19,10 +15,14 @@ import HideAndSeek.graph.StringVertex;
  */
 public class NearestNeighbourMechanism extends NearestNeighbour implements OpenTraverserStrategy {
 
-	public NearestNeighbourMechanism(GraphController<StringVertex, StringEdge> graphController) {
+	/**
+	 * @param graphController
+	 * @param name
+	 */
+	public NearestNeighbourMechanism(GraphController<StringVertex, StringEdge> graphController, GraphTraverser responsibleAgent) {
 		
-		super(graphController);
-
+		super(graphController, responsibleAgent);
+		
 	}
 	
 	/* (non-Javadoc)

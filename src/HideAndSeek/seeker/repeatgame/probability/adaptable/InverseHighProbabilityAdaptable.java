@@ -30,16 +30,23 @@ public class InverseHighProbabilityAdaptable extends VariableNodesInverseHighPro
 	/**
 	 * @param graphController
 	 */
-	public InverseHighProbabilityAdaptable(GraphController<StringVertex, StringEdge> graphController, int predictiveNodes) {
+	public InverseHighProbabilityAdaptable(GraphController<StringVertex, StringEdge> graphController, String name, int predictiveNodes) {
 		
-		super(graphController, predictiveNodes);
+		super(graphController, name, predictiveNodes);
 		
 		percentageChanges = new ArrayList<Double>();
 		
-		this.name = "InverseHighProbability";
-		
 	}
 
+	
+	/**
+	 * @param graphController
+	 */
+	public InverseHighProbabilityAdaptable(GraphController<StringVertex, StringEdge> graphController, int predictiveNodes) {
+		
+		this(graphController, "", predictiveNodes);
+		
+	}
 	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.seeker.repeatgame.probability.HighProbability#addHideLocation(HideAndSeek.graph.StringVertex)
@@ -85,7 +92,7 @@ public class InverseHighProbabilityAdaptable extends VariableNodesInverseHighPro
 		
 		if (AdaptiveUtils.containsLowPerformance(percentageChanges)) {
 			
-			Utils.talk(responsibleAgent.toString(), "Consecutive low performance detected.");
+			Utils.talk(toString(), "Consecutive low performance detected.");
 			
 			return 0.0;
 			

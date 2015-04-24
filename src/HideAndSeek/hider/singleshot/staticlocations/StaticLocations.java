@@ -32,7 +32,7 @@ public class StaticLocations extends RandomSet {
 		
 		this.staticSet = new ArrayList<StringVertex>(getHideSet());
 		
-		Utils.talk(this.toString(), "Constructor static set:" + staticSet.toString());
+		Utils.talk(toString(), "Constructor static set:" + staticSet.toString());
 		
 	}
 	
@@ -54,7 +54,7 @@ public class StaticLocations extends RandomSet {
 		
 		super.endOfRound();
 		
-		Utils.talk(this.toString(), "Static set:" + this.staticSet.toString());
+		Utils.talk(toString(), "Static set:" + this.staticSet.toString());
 		
 		populateHideSet(new ArrayList<StringVertex>(this.staticSet));
 		

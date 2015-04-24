@@ -22,9 +22,23 @@ import Utility.Utils;
 public class GroupedDeceptive extends Deceptive {
 
 	/**
-	 * @param graph
+	 * @param graphController
+	 * @param name
 	 * @param numberOfHideLocations
-	 * @param numberOfBiasLocations
+	 * @param deceptiveNodes
+	 * @param deceptionDuration
+	 */
+	public GroupedDeceptive(
+			GraphController <StringVertex, StringEdge> graphController,  String name,
+			int numberOfHideLocations, int deceptiveNodes, int deceptionDuration) {
+		
+		super(graphController, name, numberOfHideLocations, deceptiveNodes, deceptionDuration);
+		
+	}
+	
+	/**
+	 * @param graphController
+	 * @param numberOfHideLocations
 	 * @param deceptiveNodes
 	 * @param deceptionDuration
 	 */
@@ -32,7 +46,25 @@ public class GroupedDeceptive extends Deceptive {
 			GraphController <StringVertex, StringEdge> graphController,
 			int numberOfHideLocations, int deceptiveNodes, int deceptionDuration) {
 		
-		super(graphController, numberOfHideLocations, deceptiveNodes, deceptionDuration);
+		this(graphController, "", numberOfHideLocations, deceptiveNodes, deceptionDuration);
+		
+	}
+	
+	/**
+	 * @param graphController
+	 * @param name
+	 * @param numberOfHideLocations
+	 * @param deceptiveNodes
+	 * @param deceptionDuration
+	 * @param repeatInterval
+	 * @param repeatDuration
+	 * @param refreshDeceptiveSet
+	 */
+	public GroupedDeceptive(
+			GraphController <StringVertex, StringEdge> graphController, String name,
+			int numberOfHideLocations, int deceptiveNodes, int deceptionDuration, int repeatInterval, int repeatDuration, boolean refreshDeceptiveSet) {
+		
+		super(graphController, numberOfHideLocations, deceptiveNodes, deceptionDuration, repeatInterval, repeatDuration, refreshDeceptiveSet);
 		
 	}
 	
@@ -42,14 +74,34 @@ public class GroupedDeceptive extends Deceptive {
 	 * @param deceptiveNodes
 	 * @param deceptionDuration
 	 * @param repeatInterval
-	 * @param startRound
+	 * @param repeatDuration
 	 * @param refreshDeceptiveSet
 	 */
 	public GroupedDeceptive(
 			GraphController <StringVertex, StringEdge> graphController,
 			int numberOfHideLocations, int deceptiveNodes, int deceptionDuration, int repeatInterval, int repeatDuration, boolean refreshDeceptiveSet) {
 		
-		super(graphController, numberOfHideLocations, deceptiveNodes, deceptionDuration, repeatInterval, repeatDuration, refreshDeceptiveSet);
+		this(graphController, "", numberOfHideLocations, deceptiveNodes, deceptionDuration, repeatInterval, repeatDuration, refreshDeceptiveSet);
+		
+	}
+
+	/**
+	 * @param graphController
+	 * @param name
+	 * @param numberOfHideLocations
+	 * @param deceptiveNodes
+	 * @param deceptionDuration
+	 * @param repeatInterval
+	 * @param repeatDuration
+	 * @param deceptiveSets
+	 */
+	public GroupedDeceptive(
+			GraphController <StringVertex, StringEdge> graphController, String name,
+			int numberOfHideLocations, int deceptiveNodes, int deceptionDuration, 
+			int repeatInterval, int repeatDuration, int deceptiveSets) {
+		
+		super(graphController, numberOfHideLocations, deceptiveNodes, deceptionDuration, repeatInterval, repeatDuration, deceptiveSets);
+		
 		
 	}
 	
@@ -67,11 +119,14 @@ public class GroupedDeceptive extends Deceptive {
 			int numberOfHideLocations, int deceptiveNodes, int deceptionDuration, 
 			int repeatInterval, int repeatDuration, int deceptiveSets) {
 		
-		super(graphController, numberOfHideLocations, deceptiveNodes, deceptionDuration, repeatInterval, repeatDuration, deceptiveSets);
+		this(graphController, "", numberOfHideLocations, deceptiveNodes, deceptionDuration, repeatInterval, repeatDuration, deceptiveSets);
 		
 		
 	}
-	
+
+	/**
+	 * 
+	 */
 	private ArrayList<StringVertex> groupedNodesUsed;
 	
 	/* (non-Javadoc)
@@ -99,11 +154,11 @@ public class GroupedDeceptive extends Deceptive {
 			outerloop:
 			while ( deceptiveSet.size() < deceptiveNodes ) {
 				
-				Utils.talk(this.toString(), "Trying: " + currentNode);
+				Utils.talk(toString(), "Trying: " + currentNode);
 				
 				if ( !deceptiveSet.contains(currentNode) && !groupedNodesUsed.contains(currentNode) ) {
 					
-					Utils.talk(this.toString(), "Adding: " + currentNode);
+					Utils.talk(toString(), "Adding: " + currentNode);
 					
 					deceptiveSet.add(currentNode);
 					
@@ -113,7 +168,7 @@ public class GroupedDeceptive extends Deceptive {
 					
 					deceptiveSet.clear();
 					
-					Utils.talk(this.toString(), currentNode + " already used, or already chosen in this set, exiting.");
+					Utils.talk(toString(), currentNode + " already used, or already chosen in this set, exiting.");
 					
 					continue;
 					
@@ -121,7 +176,7 @@ public class GroupedDeceptive extends Deceptive {
 				
 				edgesOfCurrentNode.clear();
 				
-				Utils.talk(this.toString(), "Edges of " + currentNode + " : " + getConnectedEdges(currentNode));
+				Utils.talk(toString(), "Edges of " + currentNode + " : " + getConnectedEdges(currentNode));
 				
 				edgesOfCurrentNode.addAll(getConnectedEdges(currentNode));
 				
@@ -131,11 +186,11 @@ public class GroupedDeceptive extends Deceptive {
 					
 					StringVertex child = edge.getSource() == currentNode ? edge.getTarget() : edge.getSource();
 					
-					Utils.talk(this.toString(), "Trying child: " + child);
+					Utils.talk(toString(), "Trying child: " + child);
 					
 					if ( !deceptiveSet.contains(child) && !groupedNodesUsed.contains(child) ) {
 					
-						Utils.talk(this.toString(), "Adding child: " + child);
+						Utils.talk(toString(), "Adding child: " + child);
 						
 						deceptiveSet.add(child);
 						
@@ -145,7 +200,7 @@ public class GroupedDeceptive extends Deceptive {
 						
 						deceptiveSet.clear();
 						
-						Utils.talk(this.toString(), child + " already used, or already chosen in this set, exiting.");
+						Utils.talk(toString(), child + " already used, or already chosen in this set, exiting.");
 						
 						continue outerloop;
 						
@@ -167,11 +222,11 @@ public class GroupedDeceptive extends Deceptive {
 				
 				}
 				
-				if ( deceptiveSet.size() != deceptiveNodes ) Utils.talk(this.toString(), "Now going to: " + currentNode);
+				if ( deceptiveSet.size() != deceptiveNodes ) Utils.talk(toString(), "Now going to: " + currentNode);
 				
 			}
 			
-			Utils.talk(this.toString(), "Final set: " + deceptiveSet);
+			Utils.talk(toString(), "Final set: " + deceptiveSet);
 	
 			groupedNodesUsed.addAll(deceptiveSet);
 			

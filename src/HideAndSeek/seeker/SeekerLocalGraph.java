@@ -6,6 +6,7 @@ import java.util.TreeMap;
 
 import org.jgrapht.alg.DijkstraShortestPath;
 
+import HideAndSeek.GraphTraverser;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.HiddenObjectGraph;
 import HideAndSeek.graph.StringEdge;
@@ -33,11 +34,38 @@ public abstract class SeekerLocalGraph extends SeekingAgent {
 	protected static final boolean KNOWS_VERTICES = true;
 	
 	/**
-	 * @param graph
+	 * @param graphController
+	 */
+	public SeekerLocalGraph(GraphController <StringVertex, StringEdge> graphController, GraphTraverser responsibleAgent) {
+		
+		this(graphController, "", responsibleAgent);
+		
+	}
+	
+	/**
+	 * @param graphController
+	 */
+	public SeekerLocalGraph(GraphController <StringVertex, StringEdge> graphController, String name) {
+		
+		this(graphController, name, null);
+		
+	}
+	
+	/**
+	 * @param graphController
 	 */
 	public SeekerLocalGraph(GraphController <StringVertex, StringEdge> graphController) {
 		
-		super(graphController);
+		this(graphController, "", null);
+		
+	}
+	
+	/**
+	 * @param graph
+	 */
+	public SeekerLocalGraph(GraphController <StringVertex, StringEdge> graphController, String name, GraphTraverser responsibleAgent) {
+		
+		super(graphController, name, responsibleAgent);
 		
 		localGraph = new HiddenObjectGraph<StringVertex, StringEdge>(StringEdge.class);
 		
@@ -48,6 +76,8 @@ public abstract class SeekerLocalGraph extends SeekingAgent {
 		}
 		
 	}
+
+	
 
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)

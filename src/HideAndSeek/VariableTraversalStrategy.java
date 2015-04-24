@@ -12,7 +12,7 @@ import HideAndSeek.hider.HiderLocalGraph;
  */
 public interface VariableTraversalStrategy {
 	
-	public OpenTraverserStrategy getExplorationMechanism();
+	public OpenTraverserStrategy getExplorationMechanism(GraphTraverser responsibleAgent);
 	
 	public void atStart(StringVertex startNode);
 		

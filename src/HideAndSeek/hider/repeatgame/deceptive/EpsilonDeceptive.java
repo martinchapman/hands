@@ -65,18 +65,18 @@ public class EpsilonDeceptive extends Deceptive {
 		
 		double randomValue = Math.random() ;
 		
-		Utils.talk(this.toString(), "Random value: " + randomValue + " | " + "Epsilon: " + epsilon);
+		Utils.talk(toString(), "Random value: " + randomValue + " | " + "Epsilon: " + epsilon);
 		
 		// If random value falls under epsilon, play the deceptive set
 		if (randomValue < epsilon) {
 			
-			Utils.talk(this.toString(), "Using deceptive set.");
+			Utils.talk(toString(), "Using deceptive set.");
 			
 			populateDeceptiveSet(deceptiveSet);
 			
 		} else {
 			
-			Utils.talk(this.toString(), "Hiding randomly.");
+			Utils.talk(toString(), "Hiding randomly.");
 			
 			if ( refreshDeceptiveSet ) createDeceptiveSet(deceptiveNodes);
 			

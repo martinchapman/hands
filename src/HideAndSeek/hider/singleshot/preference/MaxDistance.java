@@ -13,6 +13,7 @@ import org.jgrapht.alg.DijkstraShortestPath;
 import org.jgrapht.alg.FloydWarshallShortestPaths;
 import org.jgrapht.alg.KruskalMinimumSpanningTree;
 
+import HideAndSeek.GraphTraverser;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.HiddenObjectGraph;
 import HideAndSeek.graph.StringEdge;
@@ -35,7 +36,18 @@ public class MaxDistance extends PreferenceHider {
 	 */
 	public MaxDistance( GraphController<StringVertex, StringEdge> graphController, int numberOfHideLocations) {
 		
-		super(graphController, numberOfHideLocations);
+		this(graphController, "", numberOfHideLocations, 1.0, -1, null);
+		
+	}
+	
+	/**
+	 * @param graphController
+	 * @param name
+	 * @param numberOfHideLocations
+	 */
+	public MaxDistance( GraphController<StringVertex, StringEdge> graphController, String name, int numberOfHideLocations) {
+		
+		this(graphController, name, numberOfHideLocations, 1.0, -1, null);
 		
 	}
 	
@@ -43,13 +55,60 @@ public class MaxDistance extends PreferenceHider {
 	 * @param graphController
 	 * @param numberOfHideLocations
 	 */
+	public MaxDistance( GraphController<StringVertex, StringEdge> graphController, int numberOfHideLocations, GraphTraverser responsibleAgent) {
+		
+		this(graphController, "", numberOfHideLocations, 1.0, -1, responsibleAgent);
+		
+	}
+	
+	/**
+	 * @param graphController
+	 * @param name
+	 * @param numberOfHideLocations
+	 * @param responsibleAgent
+	 */
+	public MaxDistance( GraphController<StringVertex, StringEdge> graphController, String name, int numberOfHideLocations, GraphTraverser responsibleAgent) {
+		
+		this(graphController, name, numberOfHideLocations, 1.0, -1, responsibleAgent);
+		
+	}
+	
+	/**
+	 * @param graphController
+	 * @param numberOfHideLocations
+	 * @param graphPortion
+	 * @param minDistance
+	 */
 	public MaxDistance( GraphController<StringVertex, StringEdge> graphController, int numberOfHideLocations, double graphPortion, int minDistance ) {
 		
-		super(graphController, numberOfHideLocations, graphPortion);
+		this(graphController, "", numberOfHideLocations, graphPortion, minDistance, null);
+		
+	}
+	
+	public MaxDistance( GraphController<StringVertex, StringEdge> graphController, String name, int numberOfHideLocations, double graphPortion, int minDistance ) {
+		
+		this(graphController, name, numberOfHideLocations, graphPortion, minDistance, null);
+		
+	}
+	
+	/**
+	 * @param graphController
+	 * @param numberOfHideLocations
+	 */
+	public MaxDistance( GraphController<StringVertex, StringEdge> graphController, String name, int numberOfHideLocations, double graphPortion, int minDistance, GraphTraverser responsibleAgent ) {
+		
+		super(graphController, name, numberOfHideLocations, graphPortion, responsibleAgent);
 		
 		this.minDistance = minDistance;
+		
+		maxDistanceNodes = new LinkedHashSet<StringVertex>();
 
 	}
+	
+	/**
+	 * Local copy of max distance nodes
+	 */
+	private LinkedHashSet<StringVertex> maxDistanceNodes;
 	
 	/**
 	 * The minimum distance to look for between nodes (if -1, default is 
@@ -62,8 +121,6 @@ public class MaxDistance extends PreferenceHider {
 		
 		DijkstraShortestPath<StringVertex, StringEdge> DSP = null;
 
-		RandomSetMechanism randomSet = new RandomSetMechanism(graphController, numberOfHideLocations);
-		
 		LinkedHashSet<StringVertex> targetVertices = new LinkedHashSet<StringVertex>();
 		
 		/* 
@@ -113,7 +170,13 @@ public class MaxDistance extends PreferenceHider {
 		}
 		
 		// If, for whatever reason, the diameter is empty, cannot proceed with this strategy:
-		if ( kthPositionCandidates.size() == 0 ) targetVertices.addAll(randomSet.createRandomSet(numberOfHideLocations, new TreeSet<StringVertex>()));
+		if ( kthPositionCandidates.size() == 0 ) { 
+			
+			Utils.talk(toString(), "Cannot determine two nodes at diameter");
+			
+			targetVertices.addAll(randomSet.createRandomSet(numberOfHideLocations, new TreeSet<StringVertex>()));
+			
+		}
 		
 		int diameter = (int)FWSP.getDiameter();
 		
@@ -124,8 +187,6 @@ public class MaxDistance extends PreferenceHider {
 		
 		// Continue until we have complete nodes for the hideset
 		while ( targetVertices.size() < numberOfHideLocations ) {
-			
-			System.out.println(localGraph.edgeSet());
 			
 			// For each node in the graph
 			outer:
@@ -142,7 +203,7 @@ public class MaxDistance extends PreferenceHider {
 						
 						DSP = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, potentialNode, candidate);
 						
-						if ( DSP.getPathLength() < diameter ) continue outer;
+						if ( DSP.getPathEdgeList() == null || DSP.getPathEdgeList().size() == 0 || DSP.getPathLength() < diameter ) continue outer;
 					
 					}
 				
@@ -174,7 +235,7 @@ public class MaxDistance extends PreferenceHider {
 				
 				int MAX_CANDIDATES = 5;
 				
-				if ( !kthPositionCandidates.containsKey(kth) || kthPositionCandidates.containsKey(kth) && kthPositionCandidates.get(kth).size() < MAX_CANDIDATES ) {
+				if ( !kthPositionCandidates.containsKey(kth) || ( kthPositionCandidates.containsKey(kth) && kthPositionCandidates.get(kth).size() < MAX_CANDIDATES ) ) {
 				
 					Utils.add(kthPositionCandidates, kth, potentialNode, new ArrayList<StringVertex>(), true);
 				
@@ -197,9 +258,11 @@ public class MaxDistance extends PreferenceHider {
 					
 					diameter--;
 					
-					Utils.talk(responsibleAgent.toString(), "Reducing diameter to: " + diameter);
+					Utils.talk(toString(), "Reducing diameter to: " + diameter);
 					
 				} else {
+					
+					Utils.talk(toString(), "Cannot compute max distance, returning " + ( numberOfHideLocations - targetVertices.size() ) + " random.");
 					
 					targetVertices.addAll(randomSet.createRandomSet(numberOfHideLocations - targetVertices.size(), new TreeSet<StringVertex>(targetVertices)));
 					
@@ -209,9 +272,18 @@ public class MaxDistance extends PreferenceHider {
 		
 		}
 
-		Utils.talk(responsibleAgent.toString(), "MaxDistance nodes: " + targetVertices);
+		maxDistanceNodes = targetVertices;
 		
 		return targetVertices;
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.hider.HidingAgent#printGameStats()
+	 */
+	public String printGameStats() {
+		
+		return super.printGameStats() + ",GraphDiameter," +  Utils.graphDiameter(localGraph);
 		
 	}
 	
@@ -219,10 +291,38 @@ public class MaxDistance extends PreferenceHider {
 	 * @see HideAndSeek.hider.Hider#printGameStats()
 	 */
 	@Override
-	public String printGameStats() {
+	public String getStatus() {
 		
-		return super.printGameStats() + ", GraphDiameter, " + Utils.graphDiameter(localGraph);
-	
+		String stats = super.getStatus() + "\nGraphDiameter: " + Utils.graphDiameter(localGraph);
+		
+		if ( maxDistanceNodes.size() > 0 ) {
+			
+			stats += "\nDistance between hide locations:\n";
+			
+			DijkstraShortestPath<StringVertex, StringEdge> DSP;
+			
+			for ( StringVertex nodeAAtDistance : maxDistanceNodes ) {
+				
+				for ( StringVertex nodeBAtDistance : maxDistanceNodes ) {
+				
+					DSP = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, nodeAAtDistance, nodeBAtDistance);
+					
+					if ( DSP.getPathEdgeList() == null || DSP.getPathEdgeList().size() == 0 ) { 
+						
+						continue;
+						
+					}
+					
+					stats += ( nodeAAtDistance + " -> " + nodeBAtDistance + " (" + DSP.getPathLength() + " = " + DSP.getPathEdgeList().size() + " hops)\n" );
+					
+				}
+				
+			}
+				
+		}
+		
+		return stats;
+		
 	}
 	
 	/**
@@ -271,7 +371,7 @@ public class MaxDistance extends PreferenceHider {
 			
 		} else {
 			
-			RandomSetMechanism randomSet = new RandomSetMechanism(graphController, numberOfHideLocations);
+			RandomSetMechanism randomSet = new RandomSetMechanism(graphController, numberOfHideLocations, responsibleAgent);
 			
 			targetVertices.addAll(MSTLeaves);
 			

@@ -7,10 +7,12 @@ import java.util.List;
 
 import org.jgrapht.alg.DijkstraShortestPath;
 
+import HideAndSeek.GraphTraverser;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.seeker.SeekerLocalGraph;
+import Utility.Utils;
 
 /**
  * A 'greedy' strategy, which chooses the locally closest
@@ -37,7 +39,16 @@ public class NearestNeighbour extends SeekerLocalGraph {
 	 */
 	public NearestNeighbour(GraphController<StringVertex, StringEdge> graphController) {
 		
-		super(graphController);
+		this(graphController, null);
+		
+	}
+	
+	/**
+	 * @param graphController
+	 */
+	public NearestNeighbour(GraphController<StringVertex, StringEdge> graphController, GraphTraverser responsibleAgent) {
+		
+		super(graphController, responsibleAgent);
 		
 		unvisitedNodes = new HashSet<StringVertex>();
 		
@@ -65,6 +76,15 @@ public class NearestNeighbour extends SeekerLocalGraph {
 		
 	}
 	
+	/**
+	 * @return
+	 */
+	public boolean backtracks() {
+		
+		return true;
+		
+	}
+	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
 	 */
@@ -86,7 +106,7 @@ public class NearestNeighbour extends SeekerLocalGraph {
 			
 			if ( unvisitedNodes.size() == 0 ) {
 				
-				System.out.println(this.getStatus());
+				Utils.talk(toString(), "\nNo unvisited nodes.\n" + this.getStatus());
 				
 				return connectedNode(currentNode);
 				
@@ -105,6 +125,8 @@ public class NearestNeighbour extends SeekerLocalGraph {
 		    	
 				if ( dsp.getPathLength() <= shortestDistance ) { 
 					
+					if ( dsp.getPathEdgeList().size() > 1 && !backtracks() ) continue;
+					
 					closestNode = unvisitedNode;
 				
 					shortestDistance = dsp.getPathLength();
@@ -115,10 +137,13 @@ public class NearestNeighbour extends SeekerLocalGraph {
 			
 			dsp = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, closestNode);
 			
+			
 			// If no path can be found, return adjacent node on lowest cost edge (ordered by methods below).
 			if ( dsp.getPathEdgeList().size() == 0 ) return connectedNode(currentNode);
 			
 			currentPath = dsp.getPathEdgeList();
+			
+			if ( dsp.getPathEdgeList().size() > 1 ) Utils.talk(toString(), "Backtracking further than to a neighbour\nCurrent path: " + currentPath);
 			
 		} 
 		

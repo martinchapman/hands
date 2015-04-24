@@ -1,5 +1,6 @@
 package HideAndSeek.hider.singleshot.preference;
 
+import HideAndSeek.GraphTraverser;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
@@ -18,11 +19,9 @@ public class LeastConnectedMechanism extends LeastConnected implements OpenHider
 	 * @param graph
 	 * @param numberOfHideLocations
 	 */
-	public LeastConnectedMechanism(GraphController <StringVertex, StringEdge> graphController, int numberOfHideLocations) {
+	public LeastConnectedMechanism(GraphController <StringVertex, StringEdge> graphController, int numberOfHideLocations, GraphTraverser responsibleAgent) {
 		
-		super(graphController, numberOfHideLocations);
-		
-		graphController.deregisterTraversingAgent(responsibleAgent);
+		super(graphController, numberOfHideLocations, responsibleAgent);
 		
 	}
 

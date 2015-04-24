@@ -9,11 +9,15 @@ import HideAndSeek.graph.StringVertex;
 
 public interface GraphTraverser extends Comparable<GraphTraverser>, Runnable {
 
+	/**
+	 * @return
+	 */
 	public GraphController<?, ?> getGraphController();
+	
 	/**
 	 * @param responsibleAgent
 	 */
-	public abstract void setResponsibleAgent(GraphTraversingAgent responsibleAgent);
+	public abstract void setResponsibleAgent(GraphTraverser responsibleAgent);
 	
 	/**
 	 * @return
@@ -75,11 +79,6 @@ public interface GraphTraverser extends Comparable<GraphTraverser>, Runnable {
 	 * @return
 	 */
 	public abstract String printRoundStats();
-
-	/**
-	 * @param name
-	 */
-	public void setName(String name);
 	
 	/**
 	 * @return
@@ -99,7 +98,7 @@ public interface GraphTraverser extends Comparable<GraphTraverser>, Runnable {
 	/**
 	 * @return
 	 */
-	public ArrayList<StringVertex> hideLocations();
+	public ArrayList<StringVertex> requestHideLocations(GraphTraverser caller);
 	
 	/**
 	 * @param location
@@ -110,5 +109,10 @@ public interface GraphTraverser extends Comparable<GraphTraverser>, Runnable {
 	 * 
 	 */
 	public void mergeOtherTraverser(GraphTraverser traverser);
+	
+	/**
+	 * @return
+	 */
+	public String getName();
 	
 }

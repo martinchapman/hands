@@ -5,6 +5,7 @@ import java.util.TreeSet;
 
 import org.jgrapht.alg.DijkstraShortestPath;
 
+import HideAndSeek.GraphTraverser;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
@@ -27,14 +28,16 @@ public class RandomSet extends HiderLocalGraph {
 	 * 
 	 */
 	private ArrayList<StringVertex> hideSet;
-	
+
 	/**
 	 * @param graphController
+	 * @param name
 	 * @param numberOfHideLocations
+	 * @param responsibleAgent
 	 */
-	public RandomSet(GraphController<StringVertex, StringEdge> graphController, int numberOfHideLocations) {
+	public RandomSet(GraphController<StringVertex, StringEdge> graphController, String name, int numberOfHideLocations, GraphTraverser responsibleAgent) {
 		
-		super(graphController, numberOfHideLocations);
+		super(graphController, name, numberOfHideLocations, responsibleAgent);
 		
 		populateHideSet(createRandomSet(numberOfHideLocations, new TreeSet<StringVertex>()));
 		
@@ -43,7 +46,39 @@ public class RandomSet extends HiderLocalGraph {
 	}
 	
 	/**
-	 * @param set
+	 * @param graphController
+	 * @param numberOfHideLocations
+	 */
+	public RandomSet(GraphController<StringVertex, StringEdge> graphController, int numberOfHideLocations) {
+		
+		this(graphController, "", numberOfHideLocations, null);
+		
+	}
+	
+	/**
+	 * @param graphController
+	 * @param numberOfHideLocations
+	 * @param responsibleAgent
+	 */
+	public RandomSet(GraphController<StringVertex, StringEdge> graphController, int numberOfHideLocations, GraphTraverser responsibleAgent) {
+		
+		this(graphController, "", numberOfHideLocations, responsibleAgent);
+		
+	}
+	
+	/**
+	 * @param graphController
+	 * @param name
+	 * @param numberOfHideLocations
+	 */
+	public RandomSet(GraphController<StringVertex, StringEdge> graphController, String name, int numberOfHideLocations) {
+		
+		this(graphController, name, numberOfHideLocations, null);
+		
+	}
+	
+	/**
+	 * @param hideSet
 	 */
 	protected void populateHideSet(ArrayList<StringVertex> hideSet) {
 		
@@ -61,7 +96,9 @@ public class RandomSet extends HiderLocalGraph {
 	}
 	
 	/**
-	 * 
+	 * @param size
+	 * @param ignoreSet
+	 * @return
 	 */
 	protected ArrayList<StringVertex> createRandomSet(int size, TreeSet<StringVertex> ignoreSet) {
 		
@@ -69,7 +106,7 @@ public class RandomSet extends HiderLocalGraph {
 		
 		if (ignoreSet.size() > (graphController.vertexSet().size() - size)) { 
 			
-			Utils.talk(this.toString(), "Too many nodes to disregard supplied. Hiding completely randomly.");
+			Utils.talk(toString(), "Too many nodes to disregard supplied. Hiding completely randomly.");
 			
 			ignoreSet = new TreeSet<StringVertex>();
 			

@@ -3,13 +3,10 @@ package HideAndSeek.hider.singleshot.random;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
-import org.jgrapht.alg.DijkstraShortestPath;
-
+import HideAndSeek.GraphTraverser;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.HiderLocalGraph;
-import Utility.Utils;
 
 public class RandomSetMechanism extends RandomSet {
 
@@ -17,11 +14,9 @@ public class RandomSetMechanism extends RandomSet {
 	 * @param graphController
 	 * @param numberOfHideLocations
 	 */
-	public RandomSetMechanism( GraphController<StringVertex, StringEdge> graphController, int numberOfHideLocations) {
+	public RandomSetMechanism( GraphController<StringVertex, StringEdge> graphController, int numberOfHideLocations, GraphTraverser responsibleAgent) {
 		
-		super(graphController, numberOfHideLocations);
-	
-		graphController.deregisterTraversingAgent(responsibleAgent);
+		super(graphController, numberOfHideLocations, responsibleAgent);
 		
 	}
 

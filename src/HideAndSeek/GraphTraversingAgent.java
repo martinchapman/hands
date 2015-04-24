@@ -10,6 +10,7 @@ import java.util.TreeSet;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
+import HideAndSeek.seeker.Seeker;
 import Utility.ComparatorResult;
 import Utility.Utils;
 
@@ -36,15 +37,20 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	/**
 	 * 
 	 */
-	protected GraphTraversingAgent responsibleAgent = this;
+	protected GraphTraverser responsibleAgent;
 	
-	/**
-	 * Set the agent that will incur the costs for this strategy.
-	 * (Default it self).
-	 */
-	public void setResponsibleAgent(GraphTraversingAgent responsibleAgent) {
+	public void setResponsibleAgent(GraphTraverser responsibleAgent) {
 		
 		this.responsibleAgent = responsibleAgent;
+		
+	}
+	
+	/**
+	 * @return
+	 */
+	public GraphTraverser getResponsibleAgent() {
+		
+		return this.responsibleAgent;
 		
 	}
 	
@@ -56,21 +62,30 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	/**
 	 * @return
 	 */
-	public ArrayList<StringVertex> hideLocations() {
+	protected ArrayList<StringVertex> hideLocations() {
 		
 		return hideLocations;
 	
 	}
 	
 	/**
-	 * Although an extending strategy can implement their own
-	 * mechanism to select the next node, this flag allows
-	 * for this choice to be overridden in the case that it is 
-	 * apparent that a connected node exists which is important 
-	 * for the strategy (e.g. for a seeker it contains a hidden
-	 * object). 
+	 * @param caller
+	 * @return
 	 */
-	protected final static boolean AUTOMATIC_MOVE = true;
+	public ArrayList<StringVertex> requestHideLocations(GraphTraverser caller) {
+
+		return hideLocations();
+		
+	}
+	
+	/**
+	 * @return
+	 */
+	protected boolean automaticMove() {
+		
+		return true;
+		
+	}
 	
 	/**
 	 * Used to save those nodes that shoud have been visited,
@@ -79,9 +94,48 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	protected ArrayList<StringVertex> queuedNodes;
 	
 	/**
-	 * @param graph
+	 * 
 	 */
-	public GraphTraversingAgent(GraphController<StringVertex, StringEdge> graphController) {
+	private String ID;
+	
+	/**
+	 * @return
+	 */
+	public String getID() {
+		
+		return name;
+		
+	}
+
+	/**
+	 * 
+	 */
+	private String name;
+	
+	/**
+	 * @return
+	 */
+	public String getName() {
+		
+		return name;
+		
+	}
+
+	/**
+	 * @param name
+	 */
+	private void setName(String name) {
+		
+		this.name = name;
+	
+	}
+	
+	/**
+	 * @param graphController
+	 * @param responsibleAgent
+	 * @param name
+	 */
+	public GraphTraversingAgent(GraphController<StringVertex, StringEdge> graphController, String name, GraphTraverser responsibleAgent) {
 		
 		this.graphController = graphController;
 		
@@ -93,12 +147,35 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 			
 		}
 		
-		name = responsibleAgent.getClass().toString().substring(responsibleAgent.getClass().toString().lastIndexOf('.') + 1, responsibleAgent.getClass().toString().length());
+		// If a responsible agent is not supplied, check with a name has been,
+		// otherwise default to the name of this class.
+		if ( responsibleAgent == null ) { 
+			
+			this.responsibleAgent = this;
+			
+			if ( name.equals("") ) {
+				
+				setName(this.getClass().toString().substring(this.getClass().toString().lastIndexOf('.') + 1, this.getClass().toString().length()));
+			
+			} else {
+				
+				setName(name);
+				
+			}
+		
+		// Otherwise name this class after the responsble agent
+		} else {
+			
+			this.responsibleAgent = responsibleAgent;
+			
+			setName(this.responsibleAgent.getClass().toString().substring(this.responsibleAgent.getClass().toString().lastIndexOf('.') + 1, this.responsibleAgent.getClass().toString().length()));
+			
+		}
 		
 		// ID according to time of generation
 		ID = "" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime()) + Math.random() * 100;
 
-		graphController.registerTraversingAgent(this);
+		graphController.registerTraversingAgent(this.responsibleAgent);
 		
 		// Record of where hidden items have been found
 		hideLocations = new ArrayList<StringVertex>();
@@ -111,23 +188,33 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	}
 	
 	/**
-	 * 
+	 * @param graphController
+	 * @param responsibleAgent
 	 */
-	protected String ID;
+	public GraphTraversingAgent(GraphController<StringVertex, StringEdge> graphController, GraphTraverser responsibleAgent) {
+		
+		this(graphController,  "", responsibleAgent);
+		
+	}
 	
 	/**
-	 * 
+	 * @param graphController
+	 * @param name
 	 */
-	protected String name;
-	
-	/* (non-Javadoc)
-	 * @see HideAndSeek.seeker.SeekerTemplate#setName(java.lang.String)
-	 */
-	@Override
-	public void setName(String name) {
+	public GraphTraversingAgent(GraphController<StringVertex, StringEdge> graphController, String name) {
 		
-		this.name = name;
+		this(graphController, name, null);
+		
+	}
 	
+	/**
+	 * @param graphController
+	 * @param name
+	 */
+	public GraphTraversingAgent(GraphController<StringVertex, StringEdge> graphController) {
+		
+		this(graphController, "", null);
+		
 	}
 	
 	/**
@@ -243,6 +330,8 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	 */
 	protected void atNode() {
 	
+		Utils.talk(toString(), "At node " + currentNode);
+		
 		exploredNodes.add(currentNode);
 		
 		addUniquelyVisitedNode(currentNode);
@@ -270,7 +359,7 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 		
 		//copy_uniquelyVisitedNodes.removeAll(new HashSet<StringVertex>(graphController.vertexSet()));
 		
-		return "\n\nTraverser: " + responsibleAgent.toString() + "\n" +
+		return "\n\nTraverser: " + toString() + "\n" +
 			   "Nodes in graph: " + graphController.vertexSet().size() + "\n" +
 			   "Explored nodes: " + exploredNodes.size() + "\n" +
 		       "Uniquely visited nodes: " + uniquelyVisitedNodes.size() + "\n" +
@@ -533,7 +622,54 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	@Override
 	public String toString() {
 		
-		return "t" + name;
+		return "t" + getName();
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		
+		final int prime = 31;
+		
+		int result = 1;
+		
+		result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
+		
+		return result;
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		
+		// If a class equals itself, clearly all fields will be equal
+		if (responsibleAgent == obj) return true;
+		
+		if (obj == null) return false;
+		
+		if (responsibleAgent.getClass() != obj.getClass()) return false;
+		
+		GraphTraversingAgent other = (GraphTraversingAgent) obj;
+		
+		if (responsibleAgent.getName() == null) {
+			
+			if (other.getResponsibleAgent().getName() != null)
+			
+				return false;
+			
+		} else if (!getName().equals(other.getResponsibleAgent().getName())) {
+			
+			return false;
+			
+		}
+			
+		return true;
 		
 	}
 
@@ -545,7 +681,7 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	    return ComparatorResult.EQUAL;
 	    
 	}
-	
+
 	/**
 	 * Allows for the data from another strategy to be merged 
 	 * into this one.
@@ -564,7 +700,7 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 		
 		this.exploredNodes.addAll(traverser.exploredNodes());
 		
-		this.hideLocations.addAll(traverser.hideLocations());
+		this.hideLocations.addAll(traverser.requestHideLocations(responsibleAgent));
 		
 	}
 

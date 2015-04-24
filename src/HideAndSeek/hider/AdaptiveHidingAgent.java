@@ -41,6 +41,33 @@ public class AdaptiveHidingAgent<E extends Hider & AdaptiveGraphTraverser> exten
 		// TODO Auto-generated constructor stub
 	}
 
+	public AdaptiveHidingAgent(
+			GraphController<StringVertex, StringEdge> graphController,
+			String name, ArrayList<E> strategyPortfolio, int totalRounds,
+			E currentStrategy) {
+		super(graphController, name, strategyPortfolio, totalRounds, currentStrategy);
+		// TODO Auto-generated constructor stub
+	}
+
+	public AdaptiveHidingAgent(
+			GraphController<StringVertex, StringEdge> graphController,
+			String name, ArrayList<E> strategyPortfolio, int totalRounds) {
+		super(graphController, name, strategyPortfolio, totalRounds);
+		// TODO Auto-generated constructor stub
+	}
+
+	public AdaptiveHidingAgent(
+			GraphController<StringVertex, StringEdge> graphController,
+			String name, int totalRounds, E initialStrategy,
+			ArrayList<E> strategyPortfolio, double strategyRelevanceThreshold,
+			double opponentPerformanceThreshold,
+			double ownPerformanceThreshold, boolean canReuse) {
+		super(graphController, name, totalRounds, initialStrategy, strategyPortfolio,
+				strategyRelevanceThreshold, opponentPerformanceThreshold,
+				ownPerformanceThreshold, canReuse);
+		// TODO Auto-generated constructor stub
+	}
+
 	/**
 	 * @param location
 	 */
@@ -88,7 +115,7 @@ public class AdaptiveHidingAgent<E extends Hider & AdaptiveGraphTraverser> exten
 	 */
 	public String toString() {
 		
-		return "h" + name;
+		return "h" + getName();
 		
 	}
 

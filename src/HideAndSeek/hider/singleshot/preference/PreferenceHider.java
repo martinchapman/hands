@@ -6,13 +6,16 @@ import java.util.List;
 
 import org.jgrapht.alg.DijkstraShortestPath;
 
+import HideAndSeek.GraphTraverser;
 import HideAndSeek.OpenTraverserStrategy;
 import HideAndSeek.VariableTraversalStrategy;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.HiderLocalGraph;
+import HideAndSeek.hider.singleshot.random.RandomSetMechanism;
 import HideAndSeek.seeker.singleshot.coverage.NearestNeighbourMechanism;
+import Utility.Utils;
 
 /**
  * These hiders specify a preference for certain nodes
@@ -53,28 +56,37 @@ public abstract class PreferenceHider extends HiderLocalGraph implements Variabl
 	protected OpenTraverserStrategy explorationMechanism;
 	
 	/**
+	 * Mechanism likely to be used if preference nodes cannot be computed
+	 */
+	protected RandomSetMechanism randomSet;
+	
+	/**
+	 * @param graphController
+	 * @param numberOfHideLocations
+	 */
+	public PreferenceHider( GraphController<StringVertex, StringEdge> graphController, String name, int numberOfHideLocations) {
+		
+		this(graphController, name, numberOfHideLocations, 1.0, null);
+		
+	}
+
+	/**
 	 * @param graphController
 	 * @param numberOfHideLocations
 	 */
 	public PreferenceHider( GraphController<StringVertex, StringEdge> graphController, int numberOfHideLocations) {
 		
-		super(graphController, numberOfHideLocations);
-
-		targetVertices = new LinkedHashSet<StringVertex>();
-		
-		currentPath = new ArrayList<StringEdge>();
-		
-		graphPortion = 1.0;
-		
-		explorationMechanism = getExplorationMechanism();
-		
-		explorationMechanism.setResponsibleAgent(this);
+		this(graphController, "", numberOfHideLocations, 1.0, null);
 		
 	}
 	
-	public OpenTraverserStrategy getExplorationMechanism() {
+	/**
+	 * @param graphController
+	 * @param numberOfHideLocations
+	 */
+	public PreferenceHider( GraphController<StringVertex, StringEdge> graphController, String name, int numberOfHideLocations, double graphPortion ) {
 		
-		return new NearestNeighbourMechanism(graphController);
+		this(graphController, name, numberOfHideLocations, graphPortion, null);
 		
 	}
 	
@@ -84,11 +96,51 @@ public abstract class PreferenceHider extends HiderLocalGraph implements Variabl
 	 */
 	public PreferenceHider( GraphController<StringVertex, StringEdge> graphController, int numberOfHideLocations, double graphPortion ) {
 		
-		this(graphController, numberOfHideLocations);
+		this(graphController, "", numberOfHideLocations, graphPortion, null);
+		
+	}
+	
+	/**
+	 * @param graphController
+	 * @param numberOfHideLocations
+	 */
+	public PreferenceHider( GraphController<StringVertex, StringEdge> graphController, String name, int numberOfHideLocations, double graphPortion, GraphTraverser responsibleAgent) {
+		
+		super(graphController, name, numberOfHideLocations, responsibleAgent);
+
+		currentPath = new ArrayList<StringEdge>();
 		
 		this.graphPortion = graphPortion;
 		
+		Utils.talk(toString(), "Graph portion: " + graphPortion);
+		
+		targetVertices = new LinkedHashSet<StringVertex>();
+		
+		explorationMechanism = getExplorationMechanism(this.responsibleAgent);
+		
+		targetsGenerated = false;
+		
+		randomSet = new RandomSetMechanism(graphController, numberOfHideLocations, this.responsibleAgent);
+		
 	}
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.VariableTraversalStrategy#getExplorationMechanism(HideAndSeek.GraphTraverser)
+	 */
+	public OpenTraverserStrategy getExplorationMechanism(GraphTraverser responsibleAgent) {
+		
+		return new NearestNeighbourMechanism(graphController, responsibleAgent);
+		
+	}
+	
+	/**
+	 * ~MDC Doesn't feel neat, but because target nodes are
+	 * removed, but may be necessary to avoid unnecessary regeneration
+	 * 
+	 * @param vertex
+	 * @return
+	 */
+	private boolean targetsGenerated;
 	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.hider.HidingAgent#hideHere(HideAndSeek.graph.StringVertex)
@@ -97,9 +149,11 @@ public abstract class PreferenceHider extends HiderLocalGraph implements Variabl
 	public boolean hideHere(StringVertex vertex) {
 		
 		// Only attempt this computation with specified knowledge of the graph, and if it has not be done before
-		if ( uniquelyVisitedNodes().size() >= ( graphController.vertexSet().size() * graphPortion ) && ( targetVertices.size() + graphController.numberOfHideLocations(responsibleAgent) ) == 0 ) {
+		if ( uniquelyVisitedNodes().size() >= ( graphController.vertexSet().size() * graphPortion ) && !targetsGenerated ) {
 			
 			targetVertices = computeTargetNodes();
+			
+			targetsGenerated = true;
 			
 		}
 		
@@ -189,13 +243,13 @@ public abstract class PreferenceHider extends HiderLocalGraph implements Variabl
 	 */
 	@Override
 	public StringVertex nextNode(StringVertex currentNode) {
-		
+	
 		super.nextNode(currentNode);
 		
 		// Relax to start searching for target nodes earlier
 		final int TARGET_VERTICES_SIZE = numberOfHideLocations;
 		
-		// Number of hide locations ensure that we don't re-explore after targets have been removed
+		// Number of hide locations ensures that we do not re-explore after targets have been removed
 		if ( ( targetVertices.size() + graphController.numberOfHideLocations(responsibleAgent) ) < TARGET_VERTICES_SIZE ) {
 
 			return explorationMechanism.nextNode(currentNode);
@@ -208,7 +262,11 @@ public abstract class PreferenceHider extends HiderLocalGraph implements Variabl
 			DijkstraShortestPath<StringVertex, StringEdge> dsp = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, new ArrayList<StringVertex>(targetVertices).get(0));
 	    	
 			// If no path available, return random connected node
-			if ( dsp.getPathEdgeList() == null || dsp.getPathEdgeList().size() == 0 ) return explorationMechanism.connectedNode(currentNode);
+			if ( dsp.getPathEdgeList() == null || dsp.getPathEdgeList().size() == 0 ) { 
+			
+				return explorationMechanism.connectedNode(currentNode);
+			
+			}
 			
 			currentPath = new ArrayList<StringEdge>(dsp.getPathEdgeList());
 			

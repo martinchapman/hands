@@ -407,9 +407,9 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 	 * @param maxAttributeToValueAllSeries
 	 * @return
 	 */
-	public TraverserDataset gameDatasetForScore(Hashtable<String, Double> minAttributeToValueAllSeries, Hashtable<String, Double> maxAttributeToValueAllSeries) {
+	public TraverserDataset gameDatasetForPayoff(Hashtable<String, Double> minAttributeToValueAllSeries, Hashtable<String, Double> maxAttributeToValueAllSeries) {
 		
-		TraverserDataset scoreData = new TraverserDataset();
+		TraverserDataset payoffData = new TraverserDataset();
 		
 		TraverserDataset seekerData = getAttributeToDataset(getGameSeries(), minAttributeToValueAllSeries, maxAttributeToValueAllSeries).get("Cost");
 		
@@ -417,11 +417,11 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 			
 			Utils.printSystemStats();
 			
-			scoreData.addItemToDataset(-1 * seekerData.getDataset().get(i));
+			payoffData.addItemToDataset(-1 * seekerData.getDataset().get(i));
 			
 		}
 		
-		return scoreData;
+		return payoffData;
 		
 	}
 
@@ -437,7 +437,7 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 
 	/**
 	 * 
-	 * Match each attribute to a dataset containing values for all games
+	 * Match each attribute to a dataset containing values for all games (effectively switches attributeToValue).
 	 * 
 	 * @param attributeToValue - a subset of interaction records that we want to take an average of
 	 * @return
@@ -554,7 +554,7 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 	 */
 	public double pValue(TraverserRecord traverserRecord, Hashtable<String, Double> minAttributeToValueAllSeries, Hashtable<String, Double> maxAttributeToValueAllSeries) {
 		
-		return StatisticalTest.getPValue(gameDatasetForScore(minAttributeToValueAllSeries, maxAttributeToValueAllSeries), traverserRecord.gameDatasetForScore(minAttributeToValueAllSeries, maxAttributeToValueAllSeries));
+		return StatisticalTest.getPValue(gameDatasetForPayoff(minAttributeToValueAllSeries, maxAttributeToValueAllSeries), traverserRecord.gameDatasetForPayoff(minAttributeToValueAllSeries, maxAttributeToValueAllSeries));
 		
 	}
 	
@@ -577,7 +577,7 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 	 */
 	public String pGroup(TraverserRecord traverserRecord, Hashtable<String, Double> minAttributeToValueAllSeries, Hashtable<String, Double> maxAttributeToValueAllSeries) {
 		
-		return StatisticalTest.getPGroup(gameDatasetForScore(minAttributeToValueAllSeries, maxAttributeToValueAllSeries), traverserRecord.gameDatasetForScore(minAttributeToValueAllSeries, maxAttributeToValueAllSeries));
+		return StatisticalTest.getPGroup(gameDatasetForPayoff(minAttributeToValueAllSeries, maxAttributeToValueAllSeries), traverserRecord.gameDatasetForPayoff(minAttributeToValueAllSeries, maxAttributeToValueAllSeries));
 		
 	}
 	
@@ -720,6 +720,21 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 	public boolean equals(Object obj) {
 		
 		return getTraverser().equals(((TraverserRecord) obj).getTraverser());
+		
+	}
+	
+	/**
+	 * Actually used in a subclass, but put here for ease.
+	 */
+	protected boolean showSeekers = true;
+	
+	/**
+	 * 
+	 */
+	public void switchShowSeekers() {
+		
+		showSeekers = showSeekers == true ? false : true;
+		
 		
 	}
 	

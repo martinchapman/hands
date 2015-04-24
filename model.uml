@@ -5306,7 +5306,7 @@ only downwards if the performance of the opposition is too good
 			
 			if ( !graphController.fromVertexToVertex(this, currentNode, nextNode) ) { 
 				
-				Utils.talk(this.toString(), &quot;Error traversing supplied path.&quot;);
+				Utils.talk(toString(), &quot;Error traversing supplied path.&quot;);
 				
 				return false; 
 				
@@ -7051,7 +7051,7 @@ that the seeker is prepared to backtrack.
           <ownedBehavior xmi:type="uml:OpaqueBehavior" xmi:id="_ObPSoG_-EeSZspfDsrt_Bg" name="addHideLocation" specification="_OXNHMG_-EeSZspfDsrt_Bg">
             <ownedParameter xmi:id="_ObPSoW_-EeSZspfDsrt_Bg" name="location" type="_MlD0IG_-EeSZspfDsrt_Bg"/>
             <language>java</language>
-            <body>Utils.talk(this.toString(), &quot;----------------------------------Found &quot; + location);
+            <body>Utils.talk(toString(), &quot;----------------------------------Found &quot; + location);
 		
 		hideLocations.add(location); 
 		
@@ -7083,7 +7083,7 @@ that the seeker is prepared to backtrack.
 			
 			if ( !graphController.fromVertexToVertex(this, currentNode, nextNode) ) { 
 				
-				Utils.talk(this.toString(), &quot;Error traversing supplied path.&quot;);
+				Utils.talk(toString(), &quot;Error traversing supplied path.&quot;);
 				
 			} else {
 			

@@ -36,6 +36,13 @@ public class HiderRecord extends TraverserRecord {
 	 */
 	public ArrayList<TraverserRecord> getSeekersAndAttributes() {
 		
+		if ( seekersAndAttributes.size() > 1 ) {
+			
+			// ~MDC Temp TODO ok if mixed
+			// throw new UnsupportedOperationException("Should be a one hider to one seeker relationship, in this configuration.");
+			
+		}
+		
 		return seekersAndAttributes;
 	
 	}
@@ -108,11 +115,11 @@ public class HiderRecord extends TraverserRecord {
 	}
 	
 	/* (non-Javadoc)
-	 * @see Utility.output.TraverserRecord#gameDatasetForScore(java.util.Hashtable, java.util.Hashtable)
+	 * @see Utility.output.TraverserRecord#gameDatasetForPayoff(java.util.Hashtable, java.util.Hashtable)
 	 */
-	public TraverserDataset gameDatasetForScore(Hashtable<String, Double> minAttributeToValueAllSeries, Hashtable<String, Double> maxAttributeToValueAllSeries) {
+	public TraverserDataset gameDatasetForPayoff(Hashtable<String, Double> minAttributeToValueAllSeries, Hashtable<String, Double> maxAttributeToValueAllSeries) {
 		
-		TraverserDataset scoreData = new TraverserDataset();
+		TraverserDataset payoffData = new TraverserDataset();
 		
 		TraverserDataset hiderData = getAttributeToDataset(getGameSeries(), minAttributeToValueAllSeries, maxAttributeToValueAllSeries).get(Metric.COST.getText());
 		
@@ -130,28 +137,14 @@ public class HiderRecord extends TraverserRecord {
 				
 			}
 			
-			scoreData.addItemToDataset( ( cumulativeSeekerDataEntry / (double)seekersAndAttributes.size() ) - hiderData.getDataset().get(i) ); 
+			payoffData.addItemToDataset( ( cumulativeSeekerDataEntry / (double)seekersAndAttributes.size() ) - hiderData.getDataset().get(i) ); 
 			
 		}
 		
-		return scoreData;
+		return payoffData;
 		
 	}
 	
-	/**
-	 * 
-	 */
-	private boolean showSeekers = true;
-	
-	/**
-	 * 
-	 */
-	public void switchShowSeekers() {
-		
-		showSeekers = showSeekers == true ? false : true;
-		
-		
-	}
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */

@@ -26,11 +26,20 @@ public class VariableBacktrackPath extends BacktrackPath {
 	/**
 	 * @param graphController
 	 */
-	public VariableBacktrackPath(GraphController <StringVertex, StringEdge> graphController, int maxbacktrackdistance) {
+	public VariableBacktrackPath(GraphController <StringVertex, StringEdge> graphController, String name, int maxbacktrackdistance) {
 		
-		super(graphController);
+		super(graphController, name);
 		
 		MAXBACKTRACKDISTANCE = maxbacktrackdistance;
+		
+	}
+	
+	/**
+	 * @param graphController
+	 */
+	public VariableBacktrackPath(GraphController <StringVertex, StringEdge> graphController, int maxbacktrackdistance) {
+		
+		this(graphController, "", maxbacktrackdistance);
 		
 	}
 	

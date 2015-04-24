@@ -11,6 +11,7 @@ import HideAndSeek.seeker.singleshot.coverage.NearestNeighbourMechanism;
 import HideAndSeek.seeker.singleshot.preference.LeastConnectedFirstMechanism;
 
 /**
+ * @deprecated Not viable with graph exploration.
  * @author Martin
  *
  */

@@ -9,6 +9,7 @@ import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 
 /**
+ * @deprecated Not viable with graph exploration
  * @author Martin
  *
  */

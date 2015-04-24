@@ -97,6 +97,7 @@ public class Runner extends JFrame {
 		  "LeastConnectedLeastConnectedFirst",
 		  "LeastConnectedStaticBetween",
 		  "VariableGraphKnowledgeLeastConnected",
+		  "VariableGraphKnowledgeLeastConnectedDFS",
 		  
 		  "MaxDistance",
 		  "MaxDistanceStaticBetween",
@@ -175,6 +176,8 @@ public class Runner extends JFrame {
 	      "VariableBacktrackPath",
 	      "OptimalBacktrackPath",*/
 	      "NearestNeighbour",
+	      "NearestNeighbourWithoutBacktracking",
+	      "RandomTarry",
 	      
 	      "LeastConnectedFirst",
 	      "MostConnectedFirst",
@@ -469,6 +472,8 @@ public class Runner extends JFrame {
 						
 					}
 					
+					files.setPreferredSize(new Dimension(150, 50));
+					
 					files.setEnabled(true);
 				
 				} else if ( showFiles.getText().equals("Hide files") ) {
@@ -536,7 +541,7 @@ public class Runner extends JFrame {
 				
 				measure.removeAllItems();
 				
-				measure.addItem("Score");
+				measure.addItem("Payoff");
 				
 				if ( seekers.isSelected() ) {
 				
@@ -626,7 +631,7 @@ public class Runner extends JFrame {
 				
 				measure.removeAllItems();
 				
-				measure.addItem("Score");
+				measure.addItem("Payoff");
 				
 				for ( String attribute : outputFeedbackList.getSelectedValue().getSeekerAttributes() ) {
 					
@@ -647,7 +652,7 @@ public class Runner extends JFrame {
 				
 				measure.removeAllItems();
 				
-				measure.addItem("Score");
+				measure.addItem("Payoff");
 				
 				for ( String attribute : outputFeedbackList.getSelectedValue().getAttributes() ) {
 					
@@ -733,7 +738,7 @@ public class Runner extends JFrame {
 						
 						if ( hidersSeekers.toString().contains("(")) hidersSeekers.setTraverser(hidersSeekers.toString().substring(0, hidersSeekers.toString().indexOf(" ")));
 						
-						hidersSeekers.setTraverser(hidersSeekers.getTraverser()); // + " (" + hider.getTraverser() + ")");
+						hidersSeekers.setTraverser(hidersSeekers.getTraverser() + " (" + hider.getTraverser() + ")");
 						
 						//if (selectedSeekers.contains(hidersSeekers)) {
 							
@@ -1698,6 +1703,8 @@ public class Runner extends JFrame {
 				Utils.runCommand("clear");
 			
 				Utils.runCommand("printf '\\\\e[3J'");
+				
+				Utils.runCommand("printf '\\\\ec'");
 			
 			}
 			

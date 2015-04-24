@@ -11,7 +11,7 @@ import HideAndSeek.graph.StringVertex;
  *
  */
 public class VariableFixedDistance extends RandomFixedDistance implements Runnable {
-	
+
 	/**
 	 * @param graphController
 	 * @param numberOfHideLocations
@@ -19,7 +19,7 @@ public class VariableFixedDistance extends RandomFixedDistance implements Runnab
 	 */
 	public VariableFixedDistance(GraphController <StringVertex, StringEdge> graphController, int numberOfHideLocations) {
 		
-		this(graphController, numberOfHideLocations, 1);
+		this(graphController, "", numberOfHideLocations, 1);
 
 	}
 	
@@ -28,12 +28,32 @@ public class VariableFixedDistance extends RandomFixedDistance implements Runnab
 	 */
 	public VariableFixedDistance(GraphController <StringVertex, StringEdge> graphController, int numberOfHideLocations, int minHideDistance) {
 	
-		super(graphController, numberOfHideLocations);
+		this(graphController, "", numberOfHideLocations);
+
+	}
+	
+	/**
+	 * @param graphController
+	 * @param numberOfHideLocations
+	 * @param minHideDistance
+	 */
+	public VariableFixedDistance(GraphController <StringVertex, StringEdge> graphController, String name, int numberOfHideLocations) {
+		
+		this(graphController, name, numberOfHideLocations, 1);
+
+	}
+	
+	/**
+	 * @param graph
+	 */
+	public VariableFixedDistance(GraphController <StringVertex, StringEdge> graphController, String name, int numberOfHideLocations, int minHideDistance) {
+	
+		super(graphController, name, numberOfHideLocations);
 		
 		this.minHideDistance = minHideDistance;
 
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see HideAndSeek.hider.Hider#endOfRound()
 	 */

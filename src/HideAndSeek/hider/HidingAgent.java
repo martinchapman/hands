@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import HideAndSeek.GraphTraverser;
 import HideAndSeek.GraphTraversingAgent;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
@@ -11,6 +12,10 @@ import HideAndSeek.graph.StringVertex;
 import HideAndSeek.seeker.Seeker;
 import Utility.Utils;
 
+/**
+ * @author Martin
+ *
+ */
 /**
  * @author Martin
  *
@@ -39,11 +44,44 @@ public abstract class HidingAgent extends GraphTraversingAgent implements Runnab
 	private ArrayList<StringVertex> precheckedHideLocations;
 	
 	/**
-	 * @param graph
+	 * @param graphController
+	 * @param name
+	 * @param numberOfHideLocations
+	 */
+	public HidingAgent(GraphController <StringVertex, StringEdge> graphController, String name, int numberOfHideLocations) {
+		
+		this(graphController, name, numberOfHideLocations, null);
+		
+	}
+	
+	/**
+	 * @param graphController
+	 * @param numberOfHideLocations
+	 * @param responsibleAgent
+	 */
+	public HidingAgent(GraphController <StringVertex, StringEdge> graphController, int numberOfHideLocations, GraphTraverser responsibleAgent) {
+		
+		this(graphController, "", numberOfHideLocations, responsibleAgent);
+		
+	}
+	
+	
+	/**
+	 * @param graphController
+	 * @param numberOfHideLocations
 	 */
 	public HidingAgent(GraphController <StringVertex, StringEdge> graphController, int numberOfHideLocations) {
+		
+		this(graphController, "", numberOfHideLocations, null);
+		
+	}
+
+	/**
+	 * @param graph
+	 */
+	public HidingAgent(GraphController <StringVertex, StringEdge> graphController, String name, int numberOfHideLocations, GraphTraverser responsibleAgent) {
 	
-		super(graphController);
+		super(graphController, name, responsibleAgent);
 		
 		this.numberOfHideLocations = numberOfHideLocations;
 		
@@ -57,17 +95,22 @@ public abstract class HidingAgent extends GraphTraversingAgent implements Runnab
 	@Override
 	public String toString() {
 		
-		return "h" + name;
+		return "h" + getName();
 		
 	}
 	
-	/* (non-Javadoc)
+	/* 
+	 * Because it has to be public in the interface, but
+	 * we do not want it to be queried by Seekers.
+	 * 
+	 * (non-Javadoc)
 	 * @see HideAndSeek.GraphTraversingAgent#hideLocations()
 	 */
-	public ArrayList<StringVertex> hideLocations()
-    {
-        throw new UnsupportedOperationException("Cannot access hide locations directly.");
-    }
+	protected ArrayList<StringVertex> hideLocations() {
+		
+		return super.hideLocations();
+    
+	}
 	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.hider.HiderTemplate#addHideLocation(HideAndSeek.graph.StringVertex)
@@ -90,7 +133,7 @@ public abstract class HidingAgent extends GraphTraversingAgent implements Runnab
 	@Override
 	public void run() {
 		
-		Utils.talk(toString(), "Running " + ID + " " + responsibleAgent.getClass());
+		Utils.talk(toString(), "Running " + getID() + " " + getClass());
 		
 		startPlaying();
 		
@@ -98,11 +141,32 @@ public abstract class HidingAgent extends GraphTraversingAgent implements Runnab
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraversingAgent#getStatus()
+	 */
 	public String getStatus() {
 		
 		return super.getStatus() + "\nprecheckedHideLocations: " +  precheckedHideLocations + "\n";
 		
 	}
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraversingAgent#requestHideLocations(HideAndSeek.GraphTraverser)
+	 */
+	public ArrayList<StringVertex> requestHideLocations(GraphTraverser caller) {
+		
+		if ( caller instanceof Seeker ) {
+			
+			throw new UnsupportedOperationException("Cannot access hide locations directly.");
+			
+		} else {
+			
+			return hideLocations();
+			
+		}
+		
+	}
+	
 	/**
 	 * @param searchPath
 	 * @return
@@ -137,12 +201,10 @@ public abstract class HidingAgent extends GraphTraversingAgent implements Runnab
 				
 				nextNode = queuedNodes.remove(0);
 				
-				Utils.talk(responsibleAgent.toString(), "Going to queued node: " + nextNode);
-				
 			} else {
 				
 			    nextNode = nextNode(currentNode);
-			
+			    
 			}
 		    
 		    /* 
@@ -151,7 +213,7 @@ public abstract class HidingAgent extends GraphTraversingAgent implements Runnab
 		     */
 		    for ( StringEdge connectedEdge : getConnectedEdges(currentNode) ) {
 		    	
-		    	if ( AUTOMATIC_MOVE && !super.hideLocations().contains( edgeToTarget(connectedEdge, currentNode) ) && hideHere( edgeToTarget(connectedEdge, currentNode) ) ) {
+		    	if ( automaticMove() && ( nextNode != edgeToTarget(connectedEdge, currentNode) ) && !hideLocations().contains( edgeToTarget(connectedEdge, currentNode) ) && hideHere( edgeToTarget(connectedEdge, currentNode) ) ) {
 		    		
 		    		// To move back to where the agent was, and then to proceed where the agent was going to go.
 		    		queuedNodes.add(0, nextNode);
@@ -159,10 +221,12 @@ public abstract class HidingAgent extends GraphTraversingAgent implements Runnab
 		    		queuedNodes.add(0, currentNode);
 		    		
 		    		nextNode = edgeToTarget(connectedEdge, currentNode);
-		    		
-		    		Utils.talk(responsibleAgent.toString(), "Moving automatically to " + nextNode + ". Queued: " + queuedNodes);
+
+		    		Utils.talk(toString(), "Moving to " + nextNode + " automatically.");
 		    		
 		    		precheckedHideLocations.add(nextNode);
+		    		
+		    		break;
 		    	
 		    	}
 		    	
@@ -172,7 +236,7 @@ public abstract class HidingAgent extends GraphTraversingAgent implements Runnab
 			
 			if ( !graphController.fromVertexToVertex(responsibleAgent, currentNode, nextNode) ) { 
 				
-				Utils.talk(responsibleAgent.toString(), "Error traversing supplied path from " + currentNode + " to " + nextNode);
+				Utils.talk(toString(), "Error traversing supplied path from " + currentNode + " to " + nextNode);
 				
 			} else {
 				

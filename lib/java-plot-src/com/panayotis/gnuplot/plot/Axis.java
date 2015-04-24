@@ -28,14 +28,14 @@ import com.panayotis.gnuplot.*;
  */
 public class Axis extends PropertiesHolder {
 
-    private String name;
+    private GraphTraverser responsibleAgent;
 
     /**
      * Creates a new instance of Axis.
      *
      * @param name The name of the axis
      */
-    Axis(String name) {
+    Axis(GraphTraverser responsibleAgent) {
         this.name = name;
     }
 

@@ -12,6 +12,7 @@ import Utility.Utils;
  * Switches functionality of parent to head to most connected node
  * first.
  * 
+ * @deprecated Not viable with graph exploration
  * @author Martin
  *
  */

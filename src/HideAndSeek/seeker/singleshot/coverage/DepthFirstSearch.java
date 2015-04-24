@@ -69,7 +69,7 @@ public class DepthFirstSearch extends SeekingAgent {
 			
 			if ( currentBranch.size() > 0 ) {
 				
-				Utils.talk(responsibleAgent.toString(), "Going back up through branch from " + currentNode + " to " + edgeToTarget( currentBranch.get(currentBranch.size() - 1), currentNode ));
+				Utils.talk(toString(), "Going back up through branch from " + currentNode + " to " + edgeToTarget( currentBranch.get(currentBranch.size() - 1), currentNode ));
 				
 				// If all edges have been traversed, move upwards through the current branch (if it is not empty)
 				return edgeToTarget( currentBranch.remove(currentBranch.size() - 1), currentNode );
@@ -96,7 +96,7 @@ public class DepthFirstSearch extends SeekingAgent {
 			
 		currentBranch.add(connectedEdge);
 		
-		Utils.talk(responsibleAgent.toString(), "Next node in DFS: " + target);
+		Utils.talk(toString(), "Next node in DFS: " + target);
 		
 		return target;
 		

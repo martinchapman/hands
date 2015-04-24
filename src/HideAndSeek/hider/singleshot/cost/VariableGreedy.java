@@ -20,6 +20,20 @@ import HideAndSeek.hider.HidingAgent;
  */
 public class VariableGreedy extends HidingAgent {
 
+	/**
+	 * @param graphController
+	 * @param name
+	 * @param numberOfHideLocations
+	 * @param bias
+	 */
+	public VariableGreedy(
+			GraphController <StringVertex, StringEdge> graphController, String name,
+			int numberOfHideLocations, double bias) {
+		super(graphController, numberOfHideLocations);
+		
+		setBias(bias);
+		
+	}
 	
 	/**
 	 * @param graphController
@@ -29,11 +43,11 @@ public class VariableGreedy extends HidingAgent {
 	public VariableGreedy(
 			GraphController <StringVertex, StringEdge> graphController,
 			int numberOfHideLocations, double bias) {
-		super(graphController, numberOfHideLocations);
-		
-		setBias(bias);
+		this(graphController, "", numberOfHideLocations, bias);
 		
 	}
+
+	
 
 	/* (non-Javadoc)
 	 * @see HideAndSeek.hider.Hider#hideHere(HideAndSeek.graph.StringVertex)
@@ -191,7 +205,7 @@ public class VariableGreedy extends HidingAgent {
 	@Override
 	public String printGameStats() {
 		// TODO Auto-generated method stub
-		return super.printGameStats(); //+ ",Score," + graphController.requestAverageHiderScore(this);
+		return super.printGameStats(); //+ ",Payoff," + graphController.requestAverageHiderPayoff(this);
 	}
 
 }

@@ -1,7 +1,7 @@
 package HideAndSeek.graph;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -31,7 +31,7 @@ import Utility.Utils;
  * @param <V>
  * @param <E>
  */
-public class GraphController<V, E> {
+public class GraphController<V , E> {
 
 	/**
 	 * 
@@ -111,16 +111,32 @@ public class GraphController<V, E> {
     	 * 
     	 * * * * * * * * * * * * */
 		
+		graph = new HiddenObjectGraph<StringVertex, StringEdge>(StringEdge.class);
+		
+		graph.setEdgeTraversalDecrement(edgeTraversalDecrement);
+		
+		generateGraph(topology, numberOfVertices);
+		
+	}
+	
+	/**
+	 * Reset (or create) the graph
+	 * 
+	 * @param topology
+	 * @param numberOfVertices
+	 */
+	public void generateGraph(String topology, int numberOfVertices) {
+		
 		ConnectivityInspector<StringVertex, StringEdge> con;
 		
 		do {
 			
+			removeAllEdges(graph);
+			
+			removeAllVertices(graph);
+			
 			// ~MDC 22/1/15 Messy?
 			StringVertex.resetNodes();
-			
-			graph = new HiddenObjectGraph<StringVertex, StringEdge>(StringEdge.class);
-			
-			graph.setEdgeTraversalDecrement(edgeTraversalDecrement);
 			
 			GraphGenerator<StringVertex, StringEdge, StringVertex> generator = null;
 			
@@ -143,7 +159,6 @@ public class GraphController<V, E> {
 	    		generator = new CompleteGraphGenerator<StringVertex, StringEdge>(numberOfVertices);
 	    		
 	    	}
-			
 			
 			// Generate graph
 			
@@ -188,6 +203,40 @@ public class GraphController<V, E> {
 
 		Utils.talk("Graph Controller", "Graph generated (" + topology + "). Edges: " + graph.edgeSet().size() + "\n" + graph.edgeSet());
 		
+	}
+	
+	/**
+	 * @param graph
+	 */
+	public void removeAllEdges(HiddenObjectGraph<StringVertex, StringEdge> graph) {
+		
+		LinkedList<StringEdge> copy = new LinkedList<StringEdge>();
+		
+		for ( StringEdge e : graph.edgeSet() ) {
+		
+			copy.add(e);
+		
+		}
+		
+		graph.removeAllEdges(copy);
+	
+	}
+
+	/**
+	 * @param graph
+	 */
+	public void removeAllVertices(HiddenObjectGraph<StringVertex, StringEdge> graph) {
+		
+		LinkedList<StringVertex> copy = new LinkedList<StringVertex>();
+		
+		for ( StringVertex v : graph.vertexSet() ) {
+		
+			copy.add(v);
+	
+		}
+		
+		graph.removeAllVertices(copy);
+	
 	}
 	
 	/**
@@ -243,11 +292,11 @@ public class GraphController<V, E> {
 	 * @param hider
 	 * @return
 	 */
-	public double latestHiderRoundScores(Object caller, Hider hider) {
+	public double latestHiderRoundPayoffs(Object caller, Hider hider) {
 		
 		if (!(caller instanceof Main)) return -1;
 		
-		return graph.latestHiderRoundScores(hider);
+		return graph.latestHiderRoundPayoffs(hider);
 		
 	}
 
@@ -406,9 +455,19 @@ public class GraphController<V, E> {
 	 * @param currentNode
 	 * @return
 	 */
-	public boolean isHideLocation(StringVertex currentNode) {
+	public boolean isHideLocation(GraphTraverser caller, StringVertex requestedNode) {
 		
-		return graph.isHideLocation(currentNode);
+		if ( caller instanceof Hider ) { 
+			
+			return graph.isHideLocation(requestedNode);
+		
+		} else {
+			
+			if (caller.currentNode() != requestedNode ) throw new UnsupportedOperationException(caller + " trying to check for an object in a node they are not currently at.");
+			
+			return graph.isHideLocation(requestedNode);
+			
+		}
 		
 	}
 
@@ -435,11 +494,11 @@ public class GraphController<V, E> {
 	 */
 	public void walkPathFromVertexToVertex(GraphTraverser traverser, StringVertex sourceVertex, StringVertex targetVertex) {
 		
-		List<StringEdge> path = graph.pathFromVertexToVertex(traverser, sourceVertex, targetVertex);
+		List<StringEdge> path = graph.pathFromVertexToVertex(sourceVertex, targetVertex);
 		
 		for (StringEdge edge : path) {
 			
-			Utils.talk(this.toString(), "Walk: " + edge);
+			Utils.talk(toString(), "Walk: " + edge);
 			
 			graph.fromVertexToVertex(traverser, edge.getSource(), edge.getTarget());
 			
@@ -494,9 +553,9 @@ public class GraphController<V, E> {
 	 * @param hider
 	 * @return
 	 */
-	public double averageHiderScore(Hider hider) {
+	public double averageHiderPayoff(Hider hider) {
 		
-		return graph.averageHiderScore(hider);
+		return graph.averageHiderPayoff(hider);
 		
 	}
 
@@ -575,9 +634,9 @@ public class GraphController<V, E> {
 	 * @param seeker
 	 * @return
 	 */
-	public double averageSeekerScore(Seeker seeker) {
+	public double averageSeekerPayoff(Seeker seeker) {
 		
-		return graph.averageSeekerScore(seeker);
+		return graph.averageSeekerPayoff(seeker);
 		
 	}
 
@@ -604,9 +663,9 @@ public class GraphController<V, E> {
 	 * @param hider
 	 * @return
 	 */
-	public double latestHiderRoundScores(Hider hider) {
+	public double latestHiderRoundPayoffs(Hider hider) {
 		
-		return graph.latestHiderRoundScores(hider);
+		return graph.latestHiderRoundPayoffs(hider);
 		
 	}
 	

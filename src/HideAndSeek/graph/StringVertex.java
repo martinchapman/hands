@@ -1,5 +1,7 @@
 package HideAndSeek.graph;
 
+import Utility.ComparatorResult;
+
 public class StringVertex implements Comparable<StringVertex> {
 
 	private static int nodes = -1;
@@ -43,29 +45,59 @@ public class StringVertex implements Comparable<StringVertex> {
 		return "v" + node;
 		
 	}
-	
-	public boolean equals(Object arg0) {
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
 		
-		//System.out.println("Comparing " + "v" + node + " and " + arg0.toString());
+		final int prime = 31;
 		
-		return ("v" + node).equals(arg0.toString());
+		int result = 1;
+		
+		result = prime * result + node;
+		
+		return result;
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		
+		if (this == obj) return true;
+		
+		if (obj == null) return false;
+		
+		if (getClass() != obj.getClass()) return false;
+		
+		StringVertex other = (StringVertex) obj;
+		
+		if (node != other.getNode()) return false;
+		
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
 	@Override
 	public int compareTo(StringVertex o) {
 		
 		if (node < o.getNode()) { 
 			
-			return -1;
+			return ComparatorResult.BEFORE;
 		
 		} else if (node > o.getNode()) {
 		
-			return 1;
+			return ComparatorResult.AFTER;
 		
 		} else {
 		
-			return 0;
+			return ComparatorResult.EQUAL;
 		
 		}
 		

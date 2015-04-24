@@ -1,30 +1,49 @@
-package HideAndSeek.seeker.singleshot.preference;
+package HideAndSeek.seeker.singleshot.coverage;
 
-import java.util.Collections;
 import java.util.List;
 
+import HideAndSeek.GraphTraverser;
 import HideAndSeek.OpenTraverserStrategy;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 
 /**
- * @deprecated Not viable with graph exploration.
  * @author Martin
  *
  */
-public class LeastConnectedFirstMechanism extends LeastConnectedFirst implements OpenTraverserStrategy {
-
+public class DepthFirstSearchMechanism extends DepthFirstSearch implements OpenTraverserStrategy {
 
 	/**
 	 * @param graphController
+	 * @param responsibleAgent
 	 */
-	public LeastConnectedFirstMechanism( GraphController<StringVertex, StringEdge> graphController ) {
+	public DepthFirstSearchMechanism( GraphController<StringVertex, StringEdge> graphController, GraphTraverser responsibleAgent ) {
 		
 		super(graphController);
+
+	}
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.seeker.singleshot.coverage.NearestNeighbour#nextNode(HideAndSeek.graph.StringVertex)
+	 */
+	public StringVertex nextNode(StringVertex currentNode) {
+		
+		this.currentNode = currentNode;
+		
+		return super.nextNode(currentNode);
 		
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraversingAgent#connectedNode(HideAndSeek.graph.StringVertex)
+	 */
+	public StringVertex connectedNode(StringVertex currentNode) {
+		
+		return super.connectedNode(currentNode);
+	
+	}
+	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.seeker.singleshot.LeastConnectedFirst#getConnectedEdges(HideAndSeek.graph.StringVertex)
 	 */
@@ -42,15 +61,6 @@ public class LeastConnectedFirstMechanism extends LeastConnectedFirst implements
 	public StringEdge getConnectedEdge(StringVertex currentNode, List<StringEdge> connectedEdges) {
 		
 		return super.getConnectedEdge(currentNode, connectedEdges);
-	
-	}
-	
-	/* (non-Javadoc)
-	 * @see HideAndSeek.GraphTraversingAgent#connectedNode(HideAndSeek.graph.StringVertex)
-	 */
-	public StringVertex connectedNode(StringVertex currentNode) {
-		
-		return super.connectedNode(currentNode);
 	
 	}
 	
@@ -77,5 +87,5 @@ public class LeastConnectedFirstMechanism extends LeastConnectedFirst implements
 		super.atNextNode(nextNode);
 		
 	}
-	
+
 }

@@ -111,13 +111,13 @@ public class LinkedPath extends SeekerLocalGraph {
 			
 			/* 
 			 * If we now have an appropriate gap, look for the next hide location.
-			 * If found, move to it.
+			 * If found, move to it. (~MDC 24/4 will not work with new constraints).
 			 */
 			} else {
 			
 				for ( StringEdge connectedEdge : getConnectedEdges(currentNode) ) {
 					
-					if ( graphController.isHideLocation(edgeToTarget(connectedEdge, currentNode)) && !hideLocations().contains(edgeToTarget(connectedEdge, currentNode)) ) {
+					if ( graphController.isHideLocation(responsibleAgent, edgeToTarget(connectedEdge, currentNode)) && !hideLocations().contains(edgeToTarget(connectedEdge, currentNode)) ) {
 						
 						return edgeToTarget(connectedEdge, currentNode);
 						

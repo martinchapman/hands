@@ -15,15 +15,25 @@ import Utility.Utils;
  */
 public class RandomFixedDistance extends HidingAgent {
 	
+
+	/**
+	 * @param graph
+	 */
+	public RandomFixedDistance(GraphController <StringVertex, StringEdge> graphController, String name, int numberOfHideLocations) {
+	
+		super(graphController, name, numberOfHideLocations);
+		
+		setRandomMinHideDistance();
+
+	}
+	
 	/**
 	 * @param graph
 	 */
 	public RandomFixedDistance(GraphController <StringVertex, StringEdge> graphController, int numberOfHideLocations) {
 	
-		super(graphController, numberOfHideLocations);
+		this(graphController, "", numberOfHideLocations);
 		
-		setRandomMinHideDistance();
-
 	}
 	
 	/**

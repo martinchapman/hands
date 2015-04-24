@@ -29,10 +29,10 @@ public class Deceptive extends RandomSet {
 	 * @param deceptionDuration
 	 */
 	public Deceptive(
-			GraphController <StringVertex, StringEdge> graphController,
+			GraphController <StringVertex, StringEdge> graphController, String name,
 			int numberOfHideLocations, int deceptiveNodes, int deceptionDuration) {
 		
-		super(graphController, numberOfHideLocations);
+		super(graphController, name, numberOfHideLocations);
 		
 		// ~MDC Change back to true for more reliable results (currently added manually in 'main' for some strategies).
 		strategyOverRounds = true;
@@ -44,6 +44,45 @@ public class Deceptive extends RandomSet {
 		nodesUsedDeceptively = new TreeSet<StringVertex>();
 		
 		createDeceptiveSet(deceptiveNodes);
+		
+	}
+
+	/**
+	 * @param graphController
+	 * @param numberOfHideLocations
+	 * @param deceptiveNodes
+	 * @param deceptionDuration
+	 */
+	public Deceptive(
+			GraphController <StringVertex, StringEdge> graphController,
+			int numberOfHideLocations, int deceptiveNodes, int deceptionDuration) {
+		
+		this(graphController, "", numberOfHideLocations, deceptiveNodes, deceptionDuration);
+
+	}
+	
+	/**
+	 * @param graphController
+	 * @param name
+	 * @param numberOfHideLocations
+	 * @param deceptiveNodes
+	 * @param deceptionDuration
+	 * @param repeatInterval
+	 * @param repeatDuration
+	 * @param refreshDeceptiveSet
+	 */
+	public Deceptive(
+			GraphController <StringVertex, StringEdge> graphController, String name,
+			int numberOfHideLocations, int deceptiveNodes, int deceptionDuration, 
+			int repeatInterval, int repeatDuration, boolean refreshDeceptiveSet) {
+		
+		this(graphController, name, numberOfHideLocations, deceptiveNodes, deceptionDuration);
+		
+		this.repeatInterval = repeatInterval;
+	
+		this.repeatDuration = repeatDuration;
+		
+		this.refreshDeceptiveSet = refreshDeceptiveSet;
 		
 	}
 	
@@ -61,13 +100,30 @@ public class Deceptive extends RandomSet {
 			int numberOfHideLocations, int deceptiveNodes, int deceptionDuration, 
 			int repeatInterval, int repeatDuration, boolean refreshDeceptiveSet) {
 		
-		this(graphController, numberOfHideLocations, deceptiveNodes, deceptionDuration);
+		this(graphController, "", numberOfHideLocations, deceptiveNodes, deceptionDuration, repeatInterval, repeatDuration, refreshDeceptiveSet);
 		
-		this.repeatInterval = repeatInterval;
+	}
 	
-		this.repeatDuration = repeatDuration;
+	/**
+	 * @param graphController
+	 * @param name
+	 * @param numberOfHideLocations
+	 * @param deceptiveNodes
+	 * @param deceptionDuration
+	 * @param repeatInterval
+	 * @param repeatDuration
+	 * @param refreshDeceptiveSet
+	 * @param doNotRevisit
+	 */
+	public Deceptive(
+			GraphController <StringVertex, StringEdge> graphController, String name,
+			int numberOfHideLocations, int deceptiveNodes, int deceptionDuration, 
+			int repeatInterval, int repeatDuration, boolean refreshDeceptiveSet,
+			boolean doNotRevisit) {
 		
-		this.refreshDeceptiveSet = refreshDeceptiveSet;
+		this(graphController, name, numberOfHideLocations, deceptiveNodes, deceptionDuration, repeatInterval, repeatDuration, refreshDeceptiveSet);
+		
+		this.doNotRevisit = doNotRevisit;
 		
 	}
 	
@@ -87,9 +143,30 @@ public class Deceptive extends RandomSet {
 			int repeatInterval, int repeatDuration, boolean refreshDeceptiveSet,
 			boolean doNotRevisit) {
 		
-		this(graphController, numberOfHideLocations, deceptiveNodes, deceptionDuration, repeatInterval, repeatDuration, refreshDeceptiveSet);
+		this(graphController, "", numberOfHideLocations, deceptiveNodes, deceptionDuration, repeatInterval, repeatDuration, refreshDeceptiveSet, doNotRevisit);
 		
-		this.doNotRevisit = doNotRevisit;
+	}
+	
+	
+	/**
+	 * @param graphController
+	 * @param numberOfHideLocations
+	 * @param deceptiveNodes
+	 * @param deceptionDuration
+	 * @param repeatInterval
+	 * @param repeatDuration
+	 * @param deceptiveSets
+	 */
+	public Deceptive(
+			GraphController <StringVertex, StringEdge> graphController, String name,
+			int numberOfHideLocations, int deceptiveNodes, int deceptionDuration, 
+			int repeatInterval, int repeatDuration, int deceptiveSets) {
+		
+		this(graphController, name, numberOfHideLocations, deceptiveNodes, deceptionDuration, repeatInterval, repeatDuration, false);
+		
+		this.deceptiveSets = deceptiveSets;
+		
+		createDeceptiveSet(deceptiveNodes);
 		
 	}
 	
@@ -107,11 +184,7 @@ public class Deceptive extends RandomSet {
 			int numberOfHideLocations, int deceptiveNodes, int deceptionDuration, 
 			int repeatInterval, int repeatDuration, int deceptiveSets) {
 		
-		this(graphController, numberOfHideLocations, deceptiveNodes, deceptionDuration, repeatInterval, repeatDuration, false);
-		
-		this.deceptiveSets = deceptiveSets;
-		
-		createDeceptiveSet(deceptiveNodes);
+		this(graphController, "", numberOfHideLocations, deceptiveNodes, deceptionDuration, repeatInterval, repeatDuration, false);
 		
 	}
 		
@@ -203,7 +276,7 @@ public class Deceptive extends RandomSet {
 				List<StringVertex> deceptive = hideSet.subList(0, deceptiveSet.size() );
 				List<StringVertex> random = hideSet.subList(deceptiveSet.size() , hideSet.size());
 			
-				Utils.talk(this.toString(), "Complete set: " + deceptive + "|" + random);
+				Utils.talk(toString(), "Complete set: " + deceptive + "|" + random);
 				
 				List<StringVertex> common = new ArrayList<StringVertex>(deceptive);
 				common.retainAll(random);
@@ -274,7 +347,7 @@ public class Deceptive extends RandomSet {
 			
 			if ( ( refreshDeceptiveSet && (roundsPassed % (deceptionDuration + repeatInterval) == 0) ) ) {
 				
-				Utils.talk(this.toString(), "Refreshing Deceptive Set.");
+				Utils.talk(toString(), "Refreshing Deceptive Set.");
 				
 				createDeceptiveSet(deceptiveNodes);
 				
@@ -282,7 +355,7 @@ public class Deceptive extends RandomSet {
 			
 			if ( deceptiveSetList != null && deceptiveSetList.size() > 1 ) {
 				
-				Utils.talk(this.toString(), "Selecting from deceptive sets: " + deceptiveSetList);
+				Utils.talk(toString(), "Selecting from deceptive sets: " + deceptiveSetList);
 				
 				setDeceptiveSet(deceptiveSetList.get((int)(Math.random() * deceptiveSet.size())));
 				
@@ -310,15 +383,15 @@ public class Deceptive extends RandomSet {
 		
 		if (shouldPlayDeceptive()) {
 			
-			Utils.talk(this.toString(), "Round: " + roundsPassed + " -- Hiding Deceptively");
+			Utils.talk(toString(), "Round: " + roundsPassed + " -- Hiding Deceptively");
 			
-			Utils.talk(this.toString(), "Deceptive Nodes: " + deceptiveSet);
+			Utils.talk(toString(), "Deceptive Nodes: " + deceptiveSet);
 			
 			populateDeceptiveSet(deceptiveSet);
 		
 		} else {
 			
-			Utils.talk(this.toString(), "End of deception duration");
+			Utils.talk(toString(), "End of deception duration");
 			
 			if ( doNotRevisit ) {
 				

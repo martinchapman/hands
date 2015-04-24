@@ -38,9 +38,21 @@ public class VariableBias extends VariableGreedy {
 	 * @param bias
 	 */
 	public VariableBias(
+			GraphController <StringVertex, StringEdge> graphController, String name,
+			int numberOfHideLocations, double bias) {
+		super(graphController, name, numberOfHideLocations, bias);
+		
+	}
+	
+	/**
+	 * @param graphController
+	 * @param numberOfHideLocations
+	 * @param bias
+	 */
+	public VariableBias(
 			GraphController <StringVertex, StringEdge> graphController,
 			int numberOfHideLocations, double bias) {
-		super(graphController, numberOfHideLocations, bias);
+		this(graphController, "", numberOfHideLocations, bias);
 		
 	}
 
@@ -90,10 +102,8 @@ public class VariableBias extends VariableGreedy {
 		
 		
 		explorativeEdgesToCost = Utils.sortByValue(explorativeEdgesToCost, true);
-		biasEdgesToCost = Utils.sortByValue(biasEdgesToCost, true);
 		
-		System.out.println(explorativeEdgesToCost);
-		System.out.println(biasEdgesToCost);
+		biasEdgesToCost = Utils.sortByValue(biasEdgesToCost, true);
 		
 		// If there is no information on the proportion of biased edges, or no edge traversal decrement 
 		// (i.e. no info on explorative) select node at random
@@ -117,8 +127,6 @@ public class VariableBias extends VariableGreedy {
 					
 					ArrayList<StringEdge> biasEdges = new ArrayList<StringEdge>(biasEdgesToCost.keySet());
 					
-					System.out.println("Max: " + Collections.max(biasEdgesToCost.values()));
-					
 					int firstIndexOfMax = new ArrayList<Double>(biasEdgesToCost.values()).indexOf(Collections.max(biasEdgesToCost.values()));
 					
 					int lastIndexOfMax = new ArrayList<Double>(biasEdgesToCost.values()).lastIndexOf(Collections.max(biasEdgesToCost.values()));
@@ -137,8 +145,6 @@ public class VariableBias extends VariableGreedy {
 						leastBias = new ArrayList<StringEdge>(biasEdges.subList(firstIndexOfMax, lastIndexOfMax + 1));
 					
 					}
-					
-					System.out.println("Least Bias: " + leastBias);
 					
 					return exploreEdges(currentNode, leastBias);
 				
@@ -184,8 +190,6 @@ public class VariableBias extends VariableGreedy {
 	 * @return
 	 */
 	private StringVertex exploreEdges(StringVertex currentNode, ArrayList<StringEdge> edges) {
-		
-		System.out.println("Chosen edges: " + edges);
 		
 		StringVertex target;
 		
@@ -239,7 +243,7 @@ public class VariableBias extends VariableGreedy {
 	@Override
 	public String printGameStats() {
 		
-		return super.printGameStats(); //+ ",Score," + graphController.requestAverageHiderScore(this);
+		return super.printGameStats(); //+ ",Payoff," + graphController.requestAverageHiderPayoff(this);
 	
 	}
 

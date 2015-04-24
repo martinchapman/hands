@@ -48,7 +48,7 @@ public class AutomaticUniqueRandomSetRepeat extends UniqueRandomSetRepeat {
 	 * @param numberOfHideLocations
 	 * @param goodPerformanceRounds
 	 */
-	public AutomaticUniqueRandomSetRepeat(GraphController<StringVertex, StringEdge> graphController, int numberOfHideLocations, int goodPerformanceRoundsThreshold) {
+	public AutomaticUniqueRandomSetRepeat(GraphController<StringVertex, StringEdge> graphController, String name, int numberOfHideLocations, int goodPerformanceRoundsThreshold) {
 		
 		super(graphController, numberOfHideLocations);
 		
@@ -60,6 +60,17 @@ public class AutomaticUniqueRandomSetRepeat extends UniqueRandomSetRepeat {
 		
 	}
 	
+	/**
+	 * @param graphController
+	 * @param numberOfHideLocations
+	 * @param goodPerformanceRoundsThreshold
+	 */
+	public AutomaticUniqueRandomSetRepeat(GraphController<StringVertex, StringEdge> graphController, int numberOfHideLocations, int goodPerformanceRoundsThreshold) {
+		
+		this(graphController, "", numberOfHideLocations, goodPerformanceRoundsThreshold);
+		
+	}
+
 	public void endOfRound() {
 		
 		super.endOfRound();
@@ -92,13 +103,13 @@ public class AutomaticUniqueRandomSetRepeat extends UniqueRandomSetRepeat {
 			 */
 			goodPerformanceRounds = 0;
 			
-			Utils.talk(responsibleAgent.toString(), "Changing unique hide set size to: " + setSize);
+			Utils.talk(toString(), "Changing unique hide set size to: " + setSize);
 		
 		} else if ( goodPerformanceRounds < goodPerformanceRoundsThreshold ) {
 			
 			setSize = setSize < numberOfHideLocations ? setSize + 1 : numberOfHideLocations;
 			
-			Utils.talk(responsibleAgent.toString(), "Changing unique hide set size to: " + setSize);
+			Utils.talk(toString(), "Changing unique hide set size to: " + setSize);
 			
 		}
 		

@@ -17,7 +17,16 @@ public class VariableFixedDistanceFixedStart extends VariableFixedDistance {
 	 */
 	public VariableFixedDistanceFixedStart(GraphController <StringVertex, StringEdge> graphController, int numberOfHideLocations, int minHideDistance) {
 	
-		super(graphController, numberOfHideLocations, minHideDistance);
+		this(graphController, "", numberOfHideLocations, minHideDistance);
+		
+	}
+	
+	/**
+	 * @param graph
+	 */
+	public VariableFixedDistanceFixedStart(GraphController <StringVertex, StringEdge> graphController, String name, int numberOfHideLocations, int minHideDistance) {
+	
+		super(graphController, name, numberOfHideLocations, minHideDistance);
 		
 	}
 	

@@ -4,11 +4,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import HideAndSeek.GraphTraverser;
 import HideAndSeek.GraphTraversingAgent;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.HiddenObjectGraph;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
+import HideAndSeek.seeker.Seeker;
 import Utility.Utils;
 
 /**
@@ -28,11 +30,36 @@ public abstract class HiderLocalGraph extends HidingAgent {
 	protected static final boolean KNOWS_VERTICES = true;
 	
 	/**
-	 * @param graph
+	 * @param graphController
+	 * @param numberOfHideLocations
+	 * @param responsibleAgent
 	 */
-	public HiderLocalGraph(GraphController <StringVertex, StringEdge> graphController, int numberOfHideLocations) {
+	public HiderLocalGraph(GraphController <StringVertex, StringEdge> graphController, int numberOfHideLocations, GraphTraverser responsibleAgent) {
+		
+		this(graphController, "", numberOfHideLocations, responsibleAgent);
+		
+	}
 	
-		super(graphController, numberOfHideLocations);
+	/**
+	 * @param graphController
+	 * @param name
+	 * @param numberOfHideLocations
+	 */
+	public HiderLocalGraph(GraphController <StringVertex, StringEdge> graphController, String name, int numberOfHideLocations) {
+		
+		this(graphController, name, numberOfHideLocations, null);
+		
+	}
+	
+	/**
+	 * @param graphController
+	 * @param name
+	 * @param numberOfHideLocations
+	 * @param responsibleAgent
+	 */
+	public HiderLocalGraph(GraphController <StringVertex, StringEdge> graphController, String name, int numberOfHideLocations, GraphTraverser responsibleAgent) {
+	
+		super(graphController, name, numberOfHideLocations, responsibleAgent);
 		
 		localGraph = new HiddenObjectGraph<StringVertex, StringEdge>(StringEdge.class);
 		
@@ -43,7 +70,7 @@ public abstract class HiderLocalGraph extends HidingAgent {
 		}
 		
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
 	 */

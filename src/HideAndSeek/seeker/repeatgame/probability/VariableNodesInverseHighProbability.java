@@ -25,11 +25,20 @@ public class VariableNodesInverseHighProbability extends InverseHighProbability 
 	/**
 	 * @param graphController
 	 */
-	public VariableNodesInverseHighProbability(GraphController<StringVertex, StringEdge> graphController, int predictiveNodes) {
+	public VariableNodesInverseHighProbability(GraphController<StringVertex, StringEdge> graphController, String name, int predictiveNodes) {
 		
-		super(graphController);
+		super(graphController, name);
 		
 		this.predictiveNodes = predictiveNodes;
+		
+	}
+	
+	/**
+	 * @param graphController
+	 */
+	public VariableNodesInverseHighProbability(GraphController<StringVertex, StringEdge> graphController, int predictiveNodes) {
+		
+		this(graphController, "", predictiveNodes);
 		
 	}
 	

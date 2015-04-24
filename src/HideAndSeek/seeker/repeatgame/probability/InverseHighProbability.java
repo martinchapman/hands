@@ -27,12 +27,22 @@ public class InverseHighProbability extends HighProbability {
 
 	/**
 	 * @param graphController
+	 * @param name
+	 */
+	public InverseHighProbability(GraphController<StringVertex, StringEdge> graphController, String name) {
+		
+		super(graphController, name);
+		
+		likelyNodes = new ArrayList<StringVertex>(graphController.vertexSet());
+		
+	}
+	
+	/**
+	 * @param graphController
 	 */
 	public InverseHighProbability(GraphController<StringVertex, StringEdge> graphController) {
 		
-		super(graphController);
-		
-		likelyNodes = new ArrayList<StringVertex>(graphController.vertexSet());
+		this(graphController, "");
 		
 	}
 	

@@ -63,6 +63,8 @@ import HideAndSeek.seeker.repeatgame.probability.adaptable.HighProbabilityAdapta
 import HideAndSeek.seeker.repeatgame.probability.adaptable.InverseHighProbabilityAdaptable;
 import HideAndSeek.seeker.singleshot.cost.Greedy;
 import HideAndSeek.seeker.singleshot.coverage.BacktrackPath;
+import HideAndSeek.seeker.singleshot.coverage.DepthFirstSearchMechanism;
+import HideAndSeek.seeker.singleshot.coverage.RandomTarry;
 import HideAndSeek.seeker.singleshot.coverage.VariableBacktrackPath;
 import HideAndSeek.seeker.singleshot.coverage.efficiency.BreadthFirstSearch;
 import HideAndSeek.seeker.singleshot.coverage.efficiency.BreadthFirstSearchGreedy;
@@ -116,6 +118,31 @@ public class Main {
 	private final boolean OUTPUT_JS = false;
 	
 	/**
+	 * 
+	 */
+	private String hiderList;
+	
+	/**
+	 * 
+	 */
+	private String seekerList;
+	
+	/**
+	 * 
+	 */
+	private int numberOfHideLocations;
+	
+	/**
+	 * 
+	 */
+	private boolean mixHiders;
+	
+	/**
+	 * 
+	 */
+	private boolean mixSeekers;
+	
+	/**
 	 * @param args
 	 */
 	public Main(String[] args) {
@@ -144,9 +171,9 @@ public class Main {
 		
 		initGraph(topology, numberOfVertices, fixedOrUpperBound, fixedOrUpperValue, edgeTraversalDecrement);
 		
-		boolean mixHiders = Boolean.parseBoolean(args[11]);
+		mixHiders = Boolean.parseBoolean(args[11]);
 		
-		boolean mixSeekers = Boolean.parseBoolean(args[12]);
+		mixSeekers = Boolean.parseBoolean(args[12]);
 		
 		boolean resetPerRound = Boolean.parseBoolean(args[13]);
 		
@@ -158,11 +185,11 @@ public class Main {
 		
 		this.totalRounds = rounds;
 		
-		String hiderList = args[2];
+		hiderList = args[2];
 		
-		String seekerList = args[3];
+		seekerList = args[3];
 		
-		int numberOfHideLocations = Integer.parseInt(args[6]);
+		numberOfHideLocations = Integer.parseInt(args[6]);
 		
 		startRounds(initHiders(hiderList, numberOfHideLocations, mixHiders), initSeekers(seekerList, numberOfHideLocations, mixSeekers), rounds, true, resetPerRound);
 		
@@ -230,32 +257,21 @@ public class Main {
 			
 			if (hiderType.getElement0().equals("FirstK")) {
 				
-				allHidingAgents.add(new VariableFixedDistance(graphController, numberOfHideLocations, 0));
+				allHidingAgents.add(new VariableFixedDistance(graphController, "FirstK", numberOfHideLocations, 0));
 				
-				// Have to set ID manually as identifier and class used are different
-				// allHidingAgents.get(allHidingAgents.size() - 1).setName("RandomDirection");
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("FirstK");
-			
 			}
 			
 			if (hiderType.getElement0().equals("FirstKFixedStart")) {
 				
-				allHidingAgents.add(new VariableFixedDistanceFixedStart(graphController, numberOfHideLocations, 0));
+				allHidingAgents.add(new VariableFixedDistanceFixedStart(graphController, "FirstKFixedStart", numberOfHideLocations, 0));
 				
-				// Have to set ID manually as identifier and class used are different
-				// allHidingAgents.get(allHidingAgents.size() - 1).setName("RandomDirection");
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("FirstKFixedStart");
 			
 			}
 			
 			if (hiderType.getElement0().equals("FirstNStaticBetween")) {
 				
-				allHidingAgents.add(new VariableFixedDistanceStaticBetween(graphController, numberOfHideLocations, 0));
-				
-				// Have to set ID manually as identifier and class used are different
-				// allHidingAgents.get(allHidingAgents.size() - 1).setName("RandomDirection");
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("FirstNStaticBetween");
-			
+				allHidingAgents.add(new VariableFixedDistanceStaticBetween(graphController, "FirstNStaticBetween", numberOfHideLocations, 0));
+
 			}
 			
 			//
@@ -368,6 +384,28 @@ public class Main {
 			
 			} 
 			
+			if (hiderType.getElement0().equals("VariableGraphKnowledgeLeastConnectedDFS")) {
+				
+				final class VariableGraphKnowledgeLeastConnectedDFS extends LeastConnected {
+					
+					public VariableGraphKnowledgeLeastConnectedDFS(GraphController <StringVertex, StringEdge> graphController, int numberOfHideLocations, double graphPortion) {
+					
+						super(graphController, numberOfHideLocations, graphPortion);
+				
+					}
+					
+					public OpenTraverserStrategy getExplorationMechanism(GraphTraverser responsibleAgent) {
+						
+						return new DepthFirstSearchMechanism(graphController, responsibleAgent);
+						
+					}
+					
+				}
+				
+				allHidingAgents.add(new VariableGraphKnowledgeLeastConnectedDFS(graphController, numberOfHideLocations, gameNumber / (double)totalGames));
+			
+			} 
+			
 			if (hiderType.getElement0().equals("LeastConnectedLeastConnectedFirst")) {
 				
 				allHidingAgents.add(new LeastConnectedLeastConnectedFirst(graphController, numberOfHideLocations));
@@ -382,9 +420,7 @@ public class Main {
 			
 			if (hiderType.getElement0().equals("VariableGraphKnowledgeLeastConnected")) {
 				
-				allHidingAgents.add(new LeastConnected(graphController, numberOfHideLocations, gameNumber / (double)totalGames));
-			
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("VariableGraphKnowledgeLeastConnected");
+				allHidingAgents.add(new LeastConnected(graphController, "VariableGraphKnowledgeLeastConnected", numberOfHideLocations, gameNumber / (double)totalGames));
 				
 			} 
 
@@ -402,9 +438,7 @@ public class Main {
 			
 			if (hiderType.getElement0().equals("VariableGraphKnowledgeMaxDistance")) {
 				
-				allHidingAgents.add(new MaxDistance(graphController, numberOfHideLocations, gameNumber / (double)totalGames, -1));
-			
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("VariableGraphKnowledgeMaxDistance");
+				allHidingAgents.add(new MaxDistance(graphController, "VariableGraphKnowledgeMaxDistance", numberOfHideLocations, gameNumber / (double)totalGames, -1));
 				
 			} 
 			
@@ -448,33 +482,25 @@ public class Main {
 			
 			if (hiderType.getElement0().equals("FullyBias")) {
 				
-				allHidingAgents.add(new VariableBias(graphController, numberOfHideLocations, 1.0));
-				
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("FullyBias");
+				allHidingAgents.add(new VariableBias(graphController, "FullyBias", numberOfHideLocations, 1.0));
 			
 			}
 			
 			if (hiderType.getElement0().equals("FullyBiasStaticBetween")) {
 				
-				allHidingAgents.add(new VariableBiasStaticBetween(graphController, numberOfHideLocations, 1.0));
+				allHidingAgents.add(new VariableBiasStaticBetween(graphController, "FullyBiasStaticBetween", numberOfHideLocations, 1.0));
 				
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("FullyBiasStaticBetween");
-			
 			}
 			
 			if (hiderType.getElement0().equals("FullyExplorative")) {
 				
-				allHidingAgents.add(new VariableBias(graphController, numberOfHideLocations, 0.0));
-				
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("FullyExplorative");
+				allHidingAgents.add(new VariableBias(graphController, "FullyExplorative", numberOfHideLocations, 0.0));
 			
 			}
 			
 			if (hiderType.getElement0().equals("LooselyBias")) {
 				
-				allHidingAgents.add(new VariableBias(graphController, numberOfHideLocations, 0.5));
-				
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("LooselyBias");
+				allHidingAgents.add(new VariableBias(graphController, "LooselyBias", numberOfHideLocations, 0.5));
 			
 			} 
 			
@@ -492,17 +518,13 @@ public class Main {
 			
 			if (hiderType.getElement0().equals("FixedStartFullyBias")) {
 				
-				allHidingAgents.add(new FixedStartVariableBias(graphController, numberOfHideLocations, 1.0));
-				
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("FixedStartFullyBias");
+				allHidingAgents.add(new FixedStartVariableBias(graphController, "FixedStartFullyBias", numberOfHideLocations, 1.0));
 			
 			} 
 			
 			if (hiderType.getElement0().equals("FixedStartFullyExplorative")) {
 				
-				allHidingAgents.add(new FixedStartVariableBias(graphController, numberOfHideLocations, 0.0));
-				
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("FixedStartFullyExplorative");
+				allHidingAgents.add(new FixedStartVariableBias(graphController, "FixedStartFullyExplorative", numberOfHideLocations, 0.0));
 			
 			} 
 			
@@ -525,17 +547,13 @@ public class Main {
 			
 			if (hiderType.getElement0().equals("SetDeceptiveNodes")) {
 				
-				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, (int)(totalRounds / 2)));
+				allHidingAgents.add(new Deceptive(graphController, "SetDeceptiveNodes", numberOfHideLocations, numberOfHideLocations, (int)(totalRounds / 2)));
 			
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptiveNodes");
-				
 			}
 	
 			if (hiderType.getElement0().equals("VariableDeceptiveNodes")) {
 				
-				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, gameNumber, (int)(Math.random() * totalGames)));
-			
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("VariableDeceptiveNodes");
+				allHidingAgents.add(new Deceptive(graphController, "VariableDeceptiveNodes", numberOfHideLocations, gameNumber, (int)(Math.random() * totalGames)));
 				
 			}
 			
@@ -543,25 +561,19 @@ public class Main {
 			
 			if (hiderType.getElement0().equals("SetDeceptionDuration")) {
 				
-				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, (int)(totalRounds / 2)));
-				
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptionDuration");
+				allHidingAgents.add(new Deceptive(graphController, "SetDeceptionDuration", numberOfHideLocations, numberOfHideLocations, (int)(totalRounds / 2)));
 				
 			}
 			
 			if (hiderType.getElement0().equals("VariableDeceptionDuration")) {
 				
-				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, gameNumber));
-				
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("VariableDeceptionDuration");
+				allHidingAgents.add(new Deceptive(graphController, "VariableDeceptionDuration", numberOfHideLocations, numberOfHideLocations, gameNumber));
 			
 			}
 
 			if (hiderType.getElement0().equals("SetDeceptionDurationVariableDeceptiveNodes")) {
 				
-				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, gameNumber, (int)(totalRounds / 2)));
-				
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptionDurationVariableDeceptiveNodes");
+				allHidingAgents.add(new Deceptive(graphController, "SetDeceptionDurationVariableDeceptiveNodes", numberOfHideLocations, gameNumber, (int)(totalRounds / 2)));
 				
 			}
 			
@@ -569,9 +581,7 @@ public class Main {
 				
 				for ( int a = 1; a <= numberOfHideLocations; a++) {
 					
-					allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, a, gameNumber));
-					
-					allHidingAgents.get(allHidingAgents.size() - 1).setName("VariableDeceptionDurationVariableDeceptiveNodes-" + a);
+					allHidingAgents.add(new Deceptive(graphController, "VariableDeceptionDurationVariableDeceptiveNodes-" + a, numberOfHideLocations, a, gameNumber));
 					
 				}
 				
@@ -592,25 +602,19 @@ public class Main {
 			// ~MDC Values (deception duration and repeat interval) considered to be 'optimal' via experimentation
 			if (hiderType.getElement0().equals("SetDeceptionDurationSetDeceptionIntervalSetRepeatDuration")) {
 				
-				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, 1, 0, (int)(totalRounds / 2), refreshDeceptiveNodes));
-				
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptionDurationSetDeceptionIntervalSetRepeatDuration");
+				allHidingAgents.add(new Deceptive(graphController, "SetDeceptionDurationSetDeceptionIntervalSetRepeatDuration", numberOfHideLocations, numberOfHideLocations, 1, 0, (int)(totalRounds / 2), refreshDeceptiveNodes));
 				
 			}
 			
 			if (hiderType.getElement0().equals("SetDeceptionDurationVariableDeceptionIntervalSetRepeatDuration")) {
 				
-				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, 1, gameNumber, totalRounds, refreshDeceptiveNodes));
-			
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptionDurationVariableDeceptionIntervalSetRepeatDuration");
+				allHidingAgents.add(new Deceptive(graphController, "SetDeceptionDurationVariableDeceptionIntervalSetRepeatDuration", numberOfHideLocations, numberOfHideLocations, 1, gameNumber, totalRounds, refreshDeceptiveNodes));
 				
 			}
 			
 			if (hiderType.getElement0().equals("VariableDeceptionDurationSetDeceptionIntervalSetRepeatDuration")) {
 				
-				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, gameNumber, 0, totalRounds, refreshDeceptiveNodes));
-			
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("VariableDeceptionDurationSetDeceptionIntervalSetRepeatDuration");
+				allHidingAgents.add(new Deceptive(graphController, "VariableDeceptionDurationSetDeceptionIntervalSetRepeatDuration", numberOfHideLocations, numberOfHideLocations, gameNumber, 0, totalRounds, refreshDeceptiveNodes));
 				
 			}
 			
@@ -620,9 +624,7 @@ public class Main {
 				
 				for ( int interval = 0; interval < MAXINTERVAL; interval++) {
 					
-					allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, gameNumber, MAXINTERVAL, totalRounds, refreshDeceptiveNodes));
-					
-					allHidingAgents.get(allHidingAgents.size() - 1).setName("VariableDeceptionDurationVariableDeceptionInterval-" + interval);
+					allHidingAgents.add(new Deceptive(graphController, "VariableDeceptionDurationVariableDeceptionInterval-" + interval, numberOfHideLocations, numberOfHideLocations, gameNumber, MAXINTERVAL, totalRounds, refreshDeceptiveNodes));
 					
 				}
 				
@@ -632,25 +634,19 @@ public class Main {
 			
 			if (hiderType.getElement0().equals("SetDeceptionDurationSetDeceptionIntervalVariableRepeatDuration")) {
 				
-				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, 1, 0, gameNumber, refreshDeceptiveNodes));
-				
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptionDurationSetDeceptionIntervalVariableRepeatDuration");
+				allHidingAgents.add(new Deceptive(graphController, "SetDeceptionDurationSetDeceptionIntervalVariableRepeatDuration", numberOfHideLocations, numberOfHideLocations, 1, 0, gameNumber, refreshDeceptiveNodes));
 				
 			}
 			
 			if (hiderType.getElement0().equals("SetDeceptionDurationSetDeceptionIntervalVariableRepeatDuration-NonUniqueRandom")) {
 				
-				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, 1, 0, gameNumber, refreshDeceptiveNodes, false));
-				
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptionDurationSetDeceptionIntervalVariableRepeatDuration");
+				allHidingAgents.add(new Deceptive(graphController, "SetDeceptionDurationSetDeceptionIntervalVariableRepeatDuration", numberOfHideLocations, numberOfHideLocations, 1, 0, gameNumber, refreshDeceptiveNodes, false));
 				
 			}
 
 			if (hiderType.getElement0().equals("VariableDeceptiveNodesSetDeceptionDurationSetDeceptionIntervalSetRepeatDuration")) {
 				
-				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, gameNumber, 1, 0, totalRounds, refreshDeceptiveNodes));
-				
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("SetDeceptionDurationSetDeceptionIntervalVariableDeceptiveNodes");
+				allHidingAgents.add(new Deceptive(graphController, "SetDeceptionDurationSetDeceptionIntervalVariableDeceptiveNodes", numberOfHideLocations, gameNumber, 1, 0, totalRounds, refreshDeceptiveNodes));
 				
 			}
 			
@@ -670,9 +666,7 @@ public class Main {
 			
 			if (hiderType.getElement0().equals("GroupedDeceptiveSetDuration")) {
 				
-				allHidingAgents.add(new GroupedDeceptive(graphController, numberOfHideLocations, numberOfHideLocations,  (int)(totalRounds / 2)));
-				
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("GroupedDeceptiveSetDuration");
+				allHidingAgents.add(new GroupedDeceptive(graphController, "GroupedDeceptiveSetDuration", numberOfHideLocations, numberOfHideLocations,  (int)(totalRounds / 2)));
 				
 			}
 			
@@ -684,26 +678,20 @@ public class Main {
 			
 			if (hiderType.getElement0().equals("GroupedDeceptiveVariableDeceptionDuration")) {
 				
-				allHidingAgents.add(new GroupedDeceptive(graphController, numberOfHideLocations, numberOfHideLocations, 11));
-				
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("GroupedDeceptiveVariableDeceptionDuration");
+				allHidingAgents.add(new GroupedDeceptive(graphController, "GroupedDeceptiveVariableDeceptionDuration", numberOfHideLocations, numberOfHideLocations, 11));
 				
 			}
 			
 			if (hiderType.getElement0().equals("VariableDeceptiveSets")) {
 				
 				// ~MDC Choice of repeat duration here is arbitrary
-				allHidingAgents.add(new Deceptive(graphController, numberOfHideLocations, numberOfHideLocations, (int)(totalRounds / 2), 0, (int)(totalRounds / 2), 10));
-				
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("VariableDeceptiveSets");
+				allHidingAgents.add(new Deceptive(graphController, "VariableDeceptiveSets", numberOfHideLocations, numberOfHideLocations, (int)(totalRounds / 2), 0, (int)(totalRounds / 2), 10));
 				
 			}
 			
 			if (hiderType.getElement0().equals("VariableGroupedDeceptiveSets")) {
 				
-				allHidingAgents.add(new GroupedDeceptive(graphController, numberOfHideLocations, numberOfHideLocations, (int)(totalRounds / 2), 0, (int)(totalRounds / 2), 10));
-				
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("VariableDeceptiveSets");
+				allHidingAgents.add(new GroupedDeceptive(graphController, "VariableDeceptiveSets", numberOfHideLocations, numberOfHideLocations, (int)(totalRounds / 2), 0, (int)(totalRounds / 2), 10));
 				
 			}
 			
@@ -716,40 +704,34 @@ public class Main {
 				strategyPortfolio.clear();
 				
 				abstract class RandomSetAnonymous extends RandomSet implements AdaptiveHider {
-					public RandomSetAnonymous(GraphController<StringVertex, StringEdge> graphController, int numberOfHideLocations) {
-						super(graphController, numberOfHideLocations);
+					public RandomSetAnonymous(GraphController<StringVertex, StringEdge> graphController, String name, int numberOfHideLocations) {
+						super(graphController, name, numberOfHideLocations);
 					} 
 					
 				}
 				
-				strategyPortfolio.add(new RandomSetAnonymous(graphController, numberOfHideLocations) {
+				strategyPortfolio.add(new RandomSetAnonymous(graphController, "RandomSet", numberOfHideLocations) {
 					public double relevanceOfStrategy() { return -1; }
 					public double performanceOfOpponent() { return -1; }
 					public double performanceOfSelf() { return -1; }
 					public void stopStrategy() {}
 				});
 				
-				strategyPortfolio.get(strategyPortfolio.size() - 1).setName("RandomSet");
-				
 				abstract class AutomaticUniqueRandomSetRepeatAnonymous extends AutomaticUniqueRandomSetRepeat implements AdaptiveHider {
-					public AutomaticUniqueRandomSetRepeatAnonymous(GraphController<StringVertex, StringEdge> graphController, int numberOfHideLocations, int goodPerformanceRounds) {
-						super(graphController, numberOfHideLocations, goodPerformanceRounds);
+					public AutomaticUniqueRandomSetRepeatAnonymous(GraphController<StringVertex, StringEdge> graphController, String name, int numberOfHideLocations, int goodPerformanceRounds) {
+						super(graphController, name, numberOfHideLocations, goodPerformanceRounds);
 					}
 				}
 				
-				strategyPortfolio.add(new AutomaticUniqueRandomSetRepeatAnonymous(graphController, numberOfHideLocations, 3) {
+				strategyPortfolio.add(new AutomaticUniqueRandomSetRepeatAnonymous(graphController, "AutomaticUniqueRandomSetRepeat", numberOfHideLocations, 3) {
 					public double relevanceOfStrategy() { return -1; }
 					public double performanceOfOpponent() { return -1; }
 					public double performanceOfSelf() { return -1; }
 					public void stopStrategy() {}
 				});
 				
-				strategyPortfolio.get(strategyPortfolio.size() - 1).setName("AutomaticUniqueRandomSetRepeat");
+				allHidingAgents.add(new AdaptiveHidingAgent<AdaptiveHider>(graphController, "UnknownRandom", strategyPortfolio, totalRounds));
 				
-				allHidingAgents.add(new AdaptiveHidingAgent<AdaptiveHider>(graphController, strategyPortfolio, totalRounds));
-				
-				allHidingAgents.get(allHidingAgents.size() - 1).setName("UnknownRandom");
-			
 			}
 			
 		}
@@ -759,8 +741,6 @@ public class Main {
 			Collections.shuffle(allHidingAgents);
 			
 			allHidingAgents = allHidingAgents.subList(0, 1);
-			
-			System.out.println("Strategy: " + allHidingAgents);
 			
 		}
 		
@@ -873,15 +853,30 @@ public class Main {
 			// Optimal backtrack path -- found by experimentation
 			if (seekerType.getElement0().equals("OptimalBacktrackPath")) {
 				
-				allSeekingAgents.add(new VariableBacktrackPath(graphController, 1));
-				
-				allSeekingAgents.get(allSeekingAgents.size() - 1).setName("OptimalBacktrackPath");
+				allSeekingAgents.add(new VariableBacktrackPath(graphController, "OptimalBacktrackPath", 1));
 				
 			}
 			
 			if (seekerType.getElement0().equals("NearestNeighbour")) {
 				
 				allSeekingAgents.add(new NearestNeighbour(graphController));
+			
+			}
+			
+			if (seekerType.getElement0().equals("NearestNeighbourWithoutBacktracking")) {
+		
+				final class NearestNeighbourWithoutBacktracking extends NearestNeighbour {
+					public NearestNeighbourWithoutBacktracking(GraphController<StringVertex, StringEdge> graphController) { super(graphController); }
+					public boolean backtracks() { return false; }
+				}
+				
+				allSeekingAgents.add(new NearestNeighbourWithoutBacktracking(graphController));
+			
+			}
+			
+			if (seekerType.getElement0().equals("RandomTarry")) {
+				
+				allSeekingAgents.add(new RandomTarry(graphController));
 			
 			}
 
@@ -919,9 +914,9 @@ public class Main {
 				
 				strategyPortfolio.clear();
 				
-				strategyPortfolio.add(new InverseHighProbabilityAdaptable(graphController, Integer.MAX_VALUE));
+				strategyPortfolio.add(new InverseHighProbabilityAdaptable(graphController, "Inverse High Probability", Integer.MAX_VALUE));
 				
-				strategyPortfolio.add(new HighProbabilityAdaptable(graphController));
+				strategyPortfolio.add(new HighProbabilityAdaptable(graphController, "High Probability"));
 				
 				allSeekingAgents.add(new AdaptiveSeekingAgent<AdaptiveSeeker>(graphController, totalRounds, strategyPortfolio.get(1), strategyPortfolio, 0.5, 0.5, 0.5, false));
 				
@@ -934,8 +929,6 @@ public class Main {
 			Collections.shuffle(allSeekingAgents);
 			
 			allSeekingAgents = allSeekingAgents.subList(0, 1);
-			
-			System.out.println("Strategy: " + allSeekingAgents);
 			
 		}
 		
@@ -1022,13 +1015,25 @@ public class Main {
 		        	
 		        	System.out.println("Game " + gameNumber + " Round " + i + ": " + ( ( i / ( ( (float) rounds * hiders.size() ) ) ) * totalGames ) + "%");
 		        	
+		        	/* 
+		        	 * Allows rounds to act as individual games. Useful for varying parameters per a set
+		        	 * of games, automatically
+		        	 */
 		        	if ( resetPerRound ) {
 		        	
-		        		graphController = new GraphController<StringVertex, StringEdge>(graphController.getTopologyProperties().getType(), graphController.vertexSet().size(), graphController.getFixedOrUpperBound(), graphController.getFixedOrUpperValue(), graphController.getEdgeTraversalValue());
+		        		graphController.generateGraph(graphController.getTopologyProperties().getType(), graphController.vertexSet().size());
 		        		
 		        		Utils.talk("Main", "Resetting " + hider);
 		        		
-		        		hider = newHiderObject(hider);
+		        		for ( Hider newHiderObject : initHiders(hiderList, numberOfHideLocations, mixHiders) ) {
+		        			
+		        			if ( newHiderObject.toString().equals(hider.toString()) ) {
+		        				
+		        				hider = newHiderObject;
+		        				
+		        			}
+		        			
+		        		}
 		        		
 		        		hider.startPlaying();
 		        	
@@ -1044,7 +1049,17 @@ public class Main {
 							
 							Utils.talk("Main", "Resetting " + seeker);
 							
-							newSeekers.add(newSeekerObject(seeker));
+							for ( Seeker newSeekerObject : initSeekers(seekerList, numberOfHideLocations, mixSeekers) ) {
+			        			
+			        			if ( newSeekerObject.toString().equals(seeker.toString()) ) {
+			        				
+			        				seeker = newSeekerObject;
+			        				
+			        			}
+			        			
+			        		}
+							
+							newSeekers.add(seeker);
 							
 						}
 					
@@ -1064,7 +1079,7 @@ public class Main {
 		    			
 		    			// Visualise first hider and first seeker, for novelty, mainly.
 		    			
-		    			Utils.writeToFile(outputJavascript, "hidden[" + i + "] = \"" + hiders.get(0).hideLocations() + "\"; \n");
+		    			Utils.writeToFile(outputJavascript, "hidden[" + i + "] = \"" + hiders.get(0).requestHideLocations(hiders.get(0)) + "\"; \n");
 		    		
 		    			Utils.writeToFile(outputJavascript, "path[" + i + "] = \"" + graphController.latestRoundPaths(this, seekers.get(0)) + "\"; \n");
 			    		
@@ -1098,7 +1113,7 @@ public class Main {
 		    			
 		    		}
 		    		
-		    		// Must be notified before hider and seeker are if these two agents wish to print latest score information
+		    		// Must be notified before hider and seeker are if these two agents wish to print latest payoff information
 		    		graphController.notifyEndOfRound(this);
 		    		
 				}
@@ -1212,8 +1227,6 @@ public class Main {
 			
 			Object object = ctor.newInstance(new Object[] { graphController, originalHider.numberOfHideLocations() });
 		
-			((Hider)object).setName(hiderName);
-			
 			return (Hider)object;
 			
 		} catch (InstantiationException e) {
@@ -1260,8 +1273,6 @@ public class Main {
 			
 			Object object = ctor.newInstance(new Object[] { graphController });
 		
-			((Seeker)object).setName(seekerName);
-			
 			return (Seeker)object;
 			
 		} catch (InstantiationException e) {

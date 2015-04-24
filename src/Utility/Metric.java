@@ -14,7 +14,7 @@ public enum Metric {
 	/**
 	 * 
 	 */
-	SCORE("Score"),
+	SCORE("Payoff"),
 	
 	/**
 	 * 
@@ -29,7 +29,7 @@ public enum Metric {
 	/**
 	 * 
 	 */
-	COST_CHANGE_SCORE("Cost change score"), 
+	COST_CHANGE_SCORE("Cost change payoff"), 
 	
 	/**
 	 * 
