@@ -4,19 +4,21 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,6 +44,10 @@ import HideAndSeek.graph.HiddenObjectGraph;
  * @author Martin
  *
  */
+/**
+ * @author Martin
+ *
+ */
 public class Utils {
 
 	/**
@@ -60,19 +66,39 @@ public class Utils {
 	public static boolean MEMORY_CHECK = true;
 	
 	/**
+	 * 
+	 */
+	public static String KEY = "trFdcuAh"; 
+	
+	/**
 	 * @return
 	 */
 	public final static double percentageChane(double A, double B) {
 		
-		System.out.println("Percentage change from " + A + " to " + B);
+		talk("", "Percentage change from " + A + " to " + B);
 		
 		return ( ( B - A ) / ( Math.abs(A) ) ) * 100;
 		
 	}
+	
+	public final static void runCommand(String command) {
+		
+		ArrayList<String> returnLines = runCommandWithReturn(command);
+		
+		for ( String line : returnLines ) {
+			
+			System.out.println(line);
+			
+		}
+		
+	}
+	
 	/**
 	 * 
 	 */
-	public final static void runCommand(String command) {
+	public final static ArrayList<String> runCommandWithReturn(String command) {
+		
+		ArrayList<String> returnLines = new ArrayList<String>();
 		
 		Process proc = null;
 		
@@ -96,7 +122,7 @@ public class Utils {
 			
 			while ((line = outputs.readLine()) != null) {  
 			
-				System.out.println(line);  
+				returnLines.add(line);  
 			
 			}
 			
@@ -110,7 +136,7 @@ public class Utils {
 		
 			while ((line = errors.readLine()) != null) {  
 				
-				System.out.println(line);  
+				returnLines.add(line);  
 			
 			}
 			
@@ -124,8 +150,10 @@ public class Utils {
 		
 			proc.waitFor();
 		
-		} catch (InterruptedException e) { System.out.println(e); }
+		} catch (InterruptedException e) { returnLines.add(e.getMessage()); }
 	    
+		return returnLines;
+		
 	}
 	
 	/**
@@ -210,22 +238,22 @@ public class Utils {
 	 * @param order
 	 * @return
 	 */
-	public static <K> Map<K, Double> sortByValue(Map<K, Double> unsortMap, final boolean order) {
+	public static <K, V extends Number> Map<K, V> sortByValue(Map<K, V> unsortMap, final boolean order) {
 
-        List<Entry<K, Double>> list = new LinkedList<Entry<K, Double>>(unsortMap.entrySet());
+        List<Entry<K, V>> list = new LinkedList<Entry<K, V>>(unsortMap.entrySet());
 
         // Sorting the list based on values
-        Collections.sort(list, new Comparator<Entry<K, Double>>() {
+        Collections.sort(list, new Comparator<Entry<K, V>>() {
         	
-            public int compare(Entry<K, Double> o1, Entry<K, Double> o2) {
+            public int compare(Entry<K, V> o1, Entry<K, V> o2) {
             	
                 if (order) {
                 
-                	return o1.getValue().compareTo(o2.getValue());
+                	return new Double(o1.getValue().doubleValue()).compareTo(new Double(o2.getValue().doubleValue()));
                 
                 } else {
                     
-                	return o2.getValue().compareTo(o1.getValue());
+                	return new Double(o2.getValue().doubleValue()).compareTo(new Double(o1.getValue().doubleValue()));
 
                 }
                 
@@ -234,9 +262,9 @@ public class Utils {
         });
 
         // Maintaining insertion order with the help of LinkedList
-        Map<K, Double> sortedMap = new LinkedHashMap<K, Double>();
+        Map<K, V> sortedMap = new LinkedHashMap<K, V>();
         
-        for (Entry<K, Double> entry : list) {
+        for (Entry<K, V> entry : list) {
         	
             sortedMap.put(entry.getKey(), entry.getValue());
         
@@ -294,6 +322,48 @@ public class Utils {
 	 * @param url
 	 * @return
 	 */
+	public static String readFirstLineFromFile(String url) {
+		
+		BufferedReader br = null;
+	       
+  		try {
+   
+  			String sCurrentLine;
+   
+  			br = new BufferedReader(new FileReader(url));
+   
+  			while ((sCurrentLine = br.readLine()) != null) {
+  				
+  				return sCurrentLine;
+  				
+  			}
+   
+  		} catch (IOException e) {
+  			
+  			e.printStackTrace();
+  		
+  		} finally {
+  		
+  			try {
+  			
+  				if (br != null) br.close();
+  			
+  			} catch (IOException ex) {
+  			
+  				ex.printStackTrace();
+  			
+  			}
+  		
+  		}
+  		
+  		return "";
+  		
+	}
+	
+	/**
+	 * @param url
+	 * @return
+	 */
 	public static ArrayList<String> readFromFile(String url) {
 		
 		ArrayList<String> lines = new ArrayList<String>();
@@ -332,6 +402,23 @@ public class Utils {
   		
   		return lines;
   		
+	}
+	
+	/**
+	 * 
+	 */
+	public static void clearFile(String URL) {
+		
+		PrintWriter writer = null;
+		try {
+			writer = new PrintWriter(new File(URL));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		writer.print("");
+		writer.close();
+		
 	}
 	
 	/**

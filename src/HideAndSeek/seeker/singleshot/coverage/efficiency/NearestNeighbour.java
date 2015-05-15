@@ -7,13 +7,13 @@ import org.jgrapht.alg.DijkstraShortestPath;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.seeker.SeekerLocalGraph;
+import HideAndSeek.seeker.SeekingAgent;
 
 /**
  * @author Martin
  *
  */
-public class NearestNeighbour extends HideAndSeek.seeker.singleshot.coverage.NearestNeighbour {
+public class NearestNeighbour extends HideAndSeek.seeker.singleshot.coverage.BacktrackGreedy {
 
 	/**
 	 * @param graphController

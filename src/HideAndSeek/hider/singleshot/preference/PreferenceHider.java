@@ -12,9 +12,9 @@ import HideAndSeek.VariableTraversalStrategy;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.HiderLocalGraph;
+import HideAndSeek.hider.HidingAgent;
 import HideAndSeek.hider.singleshot.random.RandomSetMechanism;
-import HideAndSeek.seeker.singleshot.coverage.NearestNeighbourMechanism;
+import HideAndSeek.seeker.singleshot.coverage.BacktrackGreedyMechanism;
 import Utility.Utils;
 
 /**
@@ -31,12 +31,21 @@ import Utility.Utils;
  * @author Martin
  *
  */
-public abstract class PreferenceHider extends HiderLocalGraph implements VariableTraversalStrategy {
+public abstract class PreferenceHider extends HidingAgent implements VariableTraversalStrategy {
 	
 	/**
 	 * 
 	 */
 	private LinkedHashSet<StringVertex> targetVertices;
+	
+	/**
+	 * @param vertex
+	 */
+	protected void addTargetVertex(StringVertex vertex) {
+		
+		targetVertices.add(vertex);
+		
+	}
 	
 	/**
 	 * For this strategy to operate to best effect, ideally
@@ -129,7 +138,7 @@ public abstract class PreferenceHider extends HiderLocalGraph implements Variabl
 	 */
 	public OpenTraverserStrategy getExplorationMechanism(GraphTraverser responsibleAgent) {
 		
-		return new NearestNeighbourMechanism(graphController, responsibleAgent);
+		return new BacktrackGreedyMechanism(graphController, responsibleAgent);
 		
 	}
 	
@@ -186,7 +195,20 @@ public abstract class PreferenceHider extends HiderLocalGraph implements Variabl
 		
 		currentPath.clear();
 		
+		targetsGenerated = false;
+		
 		explorationMechanism.endOfRound();
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraversingAgent#endOfGame()
+	 */
+	public void endOfGame() {
+
+		super.endOfGame();
+		
+		explorationMechanism.endOfGame();
 		
 	}
 
@@ -211,9 +233,9 @@ public abstract class PreferenceHider extends HiderLocalGraph implements Variabl
 	 */
 	public void atNode() {
 		
-		super.atNode();
-	
 		explorationMechanism.atNode();
+		
+		super.atNode();
 		
 	}
 	
@@ -244,8 +266,6 @@ public abstract class PreferenceHider extends HiderLocalGraph implements Variabl
 	@Override
 	public StringVertex nextNode(StringVertex currentNode) {
 	
-		super.nextNode(currentNode);
-		
 		// Relax to start searching for target nodes earlier
 		final int TARGET_VERTICES_SIZE = numberOfHideLocations;
 		
@@ -264,7 +284,7 @@ public abstract class PreferenceHider extends HiderLocalGraph implements Variabl
 			// If no path available, return random connected node
 			if ( dsp.getPathEdgeList() == null || dsp.getPathEdgeList().size() == 0 ) { 
 			
-				return explorationMechanism.connectedNode(currentNode);
+				return explorationMechanism.nextNode(currentNode);
 			
 			}
 			

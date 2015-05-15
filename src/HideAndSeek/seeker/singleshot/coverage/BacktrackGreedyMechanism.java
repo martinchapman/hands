@@ -13,13 +13,13 @@ import HideAndSeek.graph.StringVertex;
  * @author Martin
  *
  */
-public class NearestNeighbourMechanism extends NearestNeighbour implements OpenTraverserStrategy {
+public class BacktrackGreedyMechanism extends BacktrackGreedy implements OpenTraverserStrategy {
 
 	/**
 	 * @param graphController
 	 * @param name
 	 */
-	public NearestNeighbourMechanism(GraphController<StringVertex, StringEdge> graphController, GraphTraverser responsibleAgent) {
+	public BacktrackGreedyMechanism(GraphController<StringVertex, StringEdge> graphController, GraphTraverser responsibleAgent) {
 		
 		super(graphController, responsibleAgent);
 		

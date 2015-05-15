@@ -9,7 +9,7 @@ import org.jgrapht.alg.EulerianCircuit;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.seeker.SeekerLocalGraph;
+import HideAndSeek.seeker.SeekingAgent;
 
 /**
  * If a Hamiltonian circuit exists in the graph, follow it

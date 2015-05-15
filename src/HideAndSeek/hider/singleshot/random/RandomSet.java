@@ -6,10 +6,13 @@ import java.util.TreeSet;
 import org.jgrapht.alg.DijkstraShortestPath;
 
 import HideAndSeek.GraphTraverser;
+import HideAndSeek.OpenTraverserStrategy;
+import HideAndSeek.VariableTraversalStrategy;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.HiderLocalGraph;
+import HideAndSeek.hider.HidingAgent;
+import HideAndSeek.seeker.singleshot.coverage.BacktrackGreedyMechanism;
 import Utility.Utils;
 
 /**
@@ -22,8 +25,23 @@ import Utility.Utils;
  * @author Martin
  *
  */
-public class RandomSet extends HiderLocalGraph {
-
+public class RandomSet extends HidingAgent implements VariableTraversalStrategy {
+	
+	/**
+	 * 
+	 */
+	private OpenTraverserStrategy explorationMechanism;
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.VariableTraversalStrategy#getExplorationMechanism(HideAndSeek.GraphTraverser)
+	 */
+	@Override
+	public OpenTraverserStrategy getExplorationMechanism(GraphTraverser responsibleAgent) {
+		
+		return new BacktrackGreedyMechanism(graphController, responsibleAgent);
+		
+	}
+	
 	/**
 	 * 
 	 */
@@ -42,6 +60,8 @@ public class RandomSet extends HiderLocalGraph {
 		populateHideSet(createRandomSet(numberOfHideLocations, new TreeSet<StringVertex>()));
 		
 		currentPath = new ArrayList<StringEdge>();
+		
+		explorationMechanism = getExplorationMechanism(responsibleAgent);
 		
 	}
 	
@@ -160,12 +180,10 @@ public class RandomSet extends HiderLocalGraph {
 	ArrayList<StringEdge> currentPath;
 	
 	/* (non-Javadoc)
-	 * @see HideAndSeek.hider.HiderLocalGraph#nextNode(HideAndSeek.graph.StringVertex)
+	 * @see HideAndSeek.hider.HidingAgent#nextNode(HideAndSeek.graph.StringVertex)
 	 */
 	@Override
 	public StringVertex nextNode(StringVertex currentNode) {
-		
-		super.nextNode(currentNode);
 		
 		// If we're on a path to a node in the random set, follow this first
 		if ( currentPath.size() > 0 ) {
@@ -191,6 +209,15 @@ public class RandomSet extends HiderLocalGraph {
 		return connectedNode(currentNode);
 		
 	}
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraversingAgent#connectedNode(HideAndSeek.graph.StringVertex)
+	 */
+	public StringVertex connectedNode(StringVertex currentNode) {
+		
+		return explorationMechanism.nextNode(currentNode);
+		
+	}
 
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#startNode()
@@ -202,6 +229,17 @@ public class RandomSet extends HiderLocalGraph {
 		
 	}
 
+	/**
+	 * 
+	 */
+	public void endOfGame() {
+		
+		super.endOfGame();
+		
+		explorationMechanism.endOfGame();
+		
+	}
+	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.hider.Hider#endOfRound()
 	 */
@@ -212,6 +250,41 @@ public class RandomSet extends HiderLocalGraph {
 		
 		populateHideSet(createRandomSet(numberOfHideLocations, new TreeSet<StringVertex>()));
 		
+		explorationMechanism.endOfRound();
+		
 	}
 
+	/**
+	 * @param startNode
+	 */
+	public void atStart(StringVertex startNode) {
+		
+		super.atStart(startNode);
+		
+		explorationMechanism.atStart(currentNode);
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraversingAgent#atNode()
+	 */
+	public void atNode() {
+		
+		super.atNode();
+		
+		explorationMechanism.atNode();
+		
+	}
+	
+	/**
+	 * @param nextNode
+	 */
+	public void atNextNode(StringVertex nextNode) {
+		
+		super.atNextNode(nextNode);
+		
+		explorationMechanism.atNextNode(nextNode);
+		
+	}
+	
 }

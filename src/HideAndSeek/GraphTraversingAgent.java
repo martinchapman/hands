@@ -321,6 +321,8 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	 */
 	protected void atStart(StringVertex startNode) {
 		
+		Utils.talk(toString(), "Start node: " + startNode);
+		
 		currentNode = startNode;
 		
 	}
@@ -581,6 +583,16 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 		playing = false;
 		
 		roundsPassed = 0;
+		
+		uniquelyVisitedNodes.clear();
+		
+		uniquelyVisitedEdges.clear();
+		
+		hideLocations.clear();
+		
+		exploredNodes.clear();
+		
+		queuedNodes.clear();
 		
 	}
 

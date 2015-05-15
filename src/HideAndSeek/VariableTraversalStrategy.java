@@ -1,7 +1,7 @@
 package HideAndSeek;
 
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.HiderLocalGraph;
+import HideAndSeek.hider.HidingAgent;
 
 /**
  * Implement to have a player (hider or seeker) who 
@@ -19,5 +19,9 @@ public interface VariableTraversalStrategy {
 	public void atNode();
 			
 	public void atNextNode(StringVertex nextNode);
-
+	
+	public void endOfRound();
+	
+	public void endOfGame();
+	
 }

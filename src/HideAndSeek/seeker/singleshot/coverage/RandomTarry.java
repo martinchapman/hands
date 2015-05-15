@@ -10,7 +10,7 @@ import HideAndSeek.GraphTraverser;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.seeker.SeekerLocalGraph;
+import HideAndSeek.seeker.SeekingAgent;
 import Utility.Utils;
 
 /**
@@ -19,17 +19,17 @@ import Utility.Utils;
  * @author Martin
  *
  */
-public class RandomTarry extends SeekerLocalGraph {
+public class RandomTarry extends SeekingAgent {
 
 	/**
 	 * 
 	 */
-	Hashtable<StringVertex, StringEdge> entryEdges;
+	Hashtable<StringVertex, StringVertex> entryEdges;
 	
 	/**
 	 * 
 	 */
-	Hashtable<StringVertex, LinkedHashMap<StringEdge, Boolean>> exitEdges;
+	Hashtable<StringVertex, ArrayList<StringVertex>> exitEdges;
 	
 	/**
 	 * 
@@ -57,9 +57,9 @@ public class RandomTarry extends SeekerLocalGraph {
 		
 		super(graphController, responsibleAgent);
 
-		entryEdges = new Hashtable<StringVertex, StringEdge>();
+		entryEdges = new Hashtable<StringVertex, StringVertex>();
 
-		exitEdges = new Hashtable<StringVertex, LinkedHashMap<StringEdge, Boolean>>();
+		exitEdges = new Hashtable<StringVertex, ArrayList<StringVertex>>();
 		
 	}
 
@@ -80,10 +80,22 @@ public class RandomTarry extends SeekerLocalGraph {
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.seeker.SeekingAgent#printGameStats()
+	 */
+	public String printGameStats() {
+		
+		return super.printGameStats() + ",Total Edge Cost," + graphController.totalEdgeWeight();
+		
+	}
+	
+	/**
+	 * 
+	 */
 	private int backtracks = 0;
 	
 	/* (non-Javadoc)
-	 * @see HideAndSeek.seeker.SeekerLocalGraph#nextNode(HideAndSeek.graph.StringVertex)
+	 * @see HideAndSeek.seeker.SeekingAgent#nextNode(HideAndSeek.graph.StringVertex)
 	 */
 	public StringVertex nextNode(StringVertex currentNode) {
 	
@@ -93,12 +105,12 @@ public class RandomTarry extends SeekerLocalGraph {
 			
 			Utils.talk(toString(), "First time at this node, adding all edges.");
 			
-			LinkedHashMap<StringEdge, Boolean> exitEdges = new LinkedHashMap<StringEdge, Boolean>();
+			ArrayList<StringVertex> exitEdges = new ArrayList<StringVertex>();
 			
 			for (StringEdge edge : this.getConnectedEdges(currentNode)) {
 				
 				// Do not add the 'yellow' entry edge
-				if ( this.entryEdges.contains(currentNode) && edge == this.entryEdges.get(currentNode) ) { 
+				if ( entryEdges.containsKey(currentNode) && edgeToTarget(edge,currentNode).equals(entryEdges.get(currentNode)) ) { 
 					
 					Utils.talk(toString(), "Skipping " + edge + " because it is a leaving edge (Check, leaving edge shoudl be: " + this.entryEdges.get(currentNode) + ")");
 					
@@ -107,60 +119,41 @@ public class RandomTarry extends SeekerLocalGraph {
 				
 				Utils.talk(toString(), "Setting " + edge + " as new edge leaving " + currentNode + " marking as not followed.");
 				
-				exitEdges.put(edge, false);
+				exitEdges.add(edgeToTarget(edge, currentNode));
 				
 			}
 			
-			// Applies fixed permutation
-			ArrayList<Entry<StringEdge, Boolean>> listOfExitEdges = new ArrayList<Entry<StringEdge, Boolean>>(exitEdges.entrySet());
+			Collections.shuffle(exitEdges);
 			
-			Collections.shuffle(listOfExitEdges);
-			
-			exitEdges.clear();
-			
-			// Messily adds them back to main list
-			for ( Entry<StringEdge, Boolean> edgeEntry : listOfExitEdges ) {
-				
-				exitEdges.put(edgeEntry.getKey(), edgeEntry.getValue());
-				
-			}
+			Utils.talk(toString(), "First time permuation: " + exitEdges);
 			
 			this.exitEdges.put(currentNode, exitEdges);
 			
 		}
 		
 		// Go to the first unvisited (shuffled) edge
-		for ( Entry<StringEdge, Boolean> edge : this.exitEdges.get(currentNode).entrySet() ) {
+		for ( StringVertex vertex : this.exitEdges.get(currentNode) ) {
 			
-			if ( edge.getValue() == false ) { 
-				
-				Utils.talk(toString(), edge + " of " + currentNode + " is not visited. Going to this.");
-				
-				return edgeToTarget(edge.getKey(), currentNode);
+			Utils.talk(toString(), vertex + " of " + currentNode + " is not visited. Going to this.");
 			
-			} else {
-				
-				Utils.talk(toString(), edge + " of " + currentNode + " is visited. Cannot go to this.");
-				
-			}
+			return vertex;
 			
 		}
 		
 		Utils.talk(toString(), "All edges of " + currentNode + " already traversed");
 		
 		// If we are here, no 'uncoloured' edges left, check if a yellow edge exists, which has not been coloured red previously
-		if ( this.entryEdges.contains(currentNode) && !this.exitEdges.get(currentNode).containsKey(entryEdges.get(currentNode)) ) {
+		if ( this.entryEdges.containsKey(currentNode) ) {
 			
 			Utils.talk(toString(), "Yellow edge " + this.entryEdges.get(currentNode) + " leaving " + currentNode + " still not re-traversed, taking this.");
 			
 			backtracks++;
 			
-			// Add the yellow edge to red
-			this.exitEdges.get(currentNode).put(entryEdges.get(currentNode), true);
-		
 			Utils.talk(toString(), "Marking " + this.entryEdges.get(currentNode) + " as visited (turning it red).");
 			
-			return edgeToTarget(entryEdges.get(currentNode), currentNode);
+			StringVertex yellowTarget = entryEdges.remove(currentNode);
+			
+			return yellowTarget;
 			
 		}
 		
@@ -179,17 +172,17 @@ public class RandomTarry extends SeekerLocalGraph {
 		
 		Utils.talk(toString(), "At (atNextNode) " + nextNode + " come from " + currentNode);
 		
-		LinkedHashMap<StringEdge, Boolean> lastNodeExistEdges = exitEdges.get(currentNode);
+		ArrayList<StringVertex> lastNodeExistEdges = exitEdges.get(currentNode);
 		
 		Utils.talk(toString(), "Setting the edge " + graphController.getEdge(currentNode, nextNode) + " as visited in " + currentNode);
 		
-		lastNodeExistEdges.put(graphController.getEdge(currentNode, nextNode), true);
+		lastNodeExistEdges.remove(nextNode);
 		
-		if ( !entryEdges.containsKey(nextNode) ) { //&& !(nextNode == startNode) ) {
+		if ( !entryEdges.containsKey(nextNode) && !(nextNode == startNode) ) {
 			
 			Utils.talk(toString(), "First time visiting this node. Exit edge is the one just traversed " + graphController.getEdge(currentNode, nextNode));
 			
-			entryEdges.put(nextNode, graphController.getEdge(currentNode, nextNode));
+			entryEdges.put(nextNode, currentNode);
 			
 		} else if ( !(nextNode == startNode) ) {
 			

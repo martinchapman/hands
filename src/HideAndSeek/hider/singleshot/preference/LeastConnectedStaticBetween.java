@@ -8,7 +8,7 @@ import org.jgrapht.alg.DijkstraShortestPath;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.HiderLocalGraph;
+import HideAndSeek.hider.HidingAgent;
 
 /**
  * Attempts to hide nodes with the least possible connectivity.

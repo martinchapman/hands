@@ -8,7 +8,7 @@ import org.jgrapht.alg.DijkstraShortestPath;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.seeker.SeekerLocalGraph;
+import HideAndSeek.seeker.SeekingAgent;
 import Utility.Utils;
 
 /**
@@ -21,7 +21,7 @@ import Utility.Utils;
  * @author Martin
  *
  */
-public class BreadthFirstSearch extends SeekerLocalGraph {
+public class BreadthFirstSearch extends SeekingAgent {
 
 	/**
 	 * @param graph
@@ -51,8 +51,6 @@ public class BreadthFirstSearch extends SeekerLocalGraph {
 	 */
 	public StringVertex nextNode(StringVertex currentNode) {
 
-		super.nextNode(currentNode);
-	
 		// Add all children of the current node to the end of the list
 		for ( StringEdge vertexEdge : getConnectedEdges(currentNode) ) {
 			

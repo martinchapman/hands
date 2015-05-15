@@ -127,7 +127,13 @@ public class GraphController<V , E> {
 	 */
 	public void generateGraph(String topology, int numberOfVertices) {
 		
-		ConnectivityInspector<StringVertex, StringEdge> con;
+		ConnectivityInspector<StringVertex, StringEdge> con = null;
+		
+		int edges = numberOfVertices * 3;
+		
+		int vertices = numberOfVertices;
+		
+		boolean incrementingEdges = false;
 		
 		do {
 			
@@ -141,22 +147,21 @@ public class GraphController<V , E> {
 			GraphGenerator<StringVertex, StringEdge, StringVertex> generator = null;
 			
 			// Select generator
-			
 			if (	topology.equals("ring")	  ) {
 		    	
-		        generator = new RingGraphGenerator<StringVertex, StringEdge>(numberOfVertices);
+		        generator = new RingGraphGenerator<StringVertex, StringEdge>(vertices);
 		        
 	    	} else if (	   topology.equals("random")    ) {
 	    		
-	    		generator = new RandomGraphGenerator<StringVertex, StringEdge>(numberOfVertices, numberOfVertices * 3);
-	    		
+		    	generator = new RandomGraphGenerator<StringVertex, StringEdge>(vertices, edges);
+			    
 	    	} else if (    topology.equals("scalefree")    ) {
 	    		
-	    		generator = new ScaleFreeGraphGenerator<StringVertex, StringEdge>(numberOfVertices);
+	    		generator = new ScaleFreeGraphGenerator<StringVertex, StringEdge>(vertices);
 	    		
 	    	} else if (    topology.equals("complete") ) {
 	    		
-	    		generator = new CompleteGraphGenerator<StringVertex, StringEdge>(numberOfVertices);
+	    		generator = new CompleteGraphGenerator<StringVertex, StringEdge>(vertices);
 	    		
 	    	}
 			
@@ -166,11 +171,37 @@ public class GraphController<V , E> {
 			
 			VertexFactory<StringVertex> factory = new ClassBasedVertexFactory<StringVertex>(StringVertex.class);
 			
-			con = new ConnectivityInspector<StringVertex, StringEdge>(graph);
-			
-			generator.generateGraph(graph, factory, null);
-			
-		} while ( !con.isGraphConnected() );
+    		try {
+    			
+    			Utils.talk(toString(), "Trying graph generator with " + edges + " edges");
+    			
+    			generator.generateGraph(graph, factory, null);
+    			
+    			con = new ConnectivityInspector<StringVertex, StringEdge>(graph);
+    			
+    			if ( !con.isGraphConnected() && incrementingEdges ) throw new IllegalArgumentException();
+    			
+    		} catch (IllegalArgumentException e) {
+    			
+    			edges = incrementingEdges == false ? 1 : edges + 1;
+    			
+    			if ( edges > 100 ) {
+    				
+    				edges = 1;
+    				
+    				vertices++;
+
+        			Utils.talk(toString(), "Incrementing vertices");
+        			
+    			}
+    			
+    			incrementingEdges = true;
+    			
+    			continue;
+    			
+    		}
+    		
+		} while ( con == null || !con.isGraphConnected() );
 		
 		topologyProperties = new TopologyProperties<StringVertex, StringEdge>(topology, graph);
 		
@@ -323,6 +354,18 @@ public class GraphController<V , E> {
 		
 	}
 	
+	/**
+	 * @param key
+	 * @return
+	 */
+	public Set<StringEdge> edgeSet(String key) {
+		
+		if (key.equals(Utils.KEY)) return graph.edgeSet();
+		
+		return null;
+		
+	}
+	
 	/* Hider only methods */
 	
 	/**
@@ -381,6 +424,24 @@ public class GraphController<V , E> {
 		
 	}
 	
+	/**
+	 * @param key
+	 * @param vertex
+	 * @return
+	 */
+	public Set<? extends StringEdge> edgesOf(String key, StringVertex vertex) {
+		
+		if ( key.equals(Utils.KEY) ) {
+			
+			return graph.edgesOf(vertex);
+			
+		} else {
+			
+			throw new UnsupportedOperationException(":(");
+			
+		}
+		
+	}
 	
 	/**
 	 * Let players know size of topology
@@ -448,6 +509,23 @@ public class GraphController<V , E> {
 	public double getEdgeWeight(StringEdge edge) {
 		
 		return graph.getEdgeWeight(edge);
+		
+	}
+	
+	/**
+	 * @return
+	 */
+	public double totalEdgeWeight() {
+		
+		double totalWeight = 0.0;
+		
+		for ( StringEdge edge : graph.edgeSet() ) {
+			
+			totalWeight += edge.getWeight();
+			
+		}
+		
+		return totalWeight;
 		
 	}
 

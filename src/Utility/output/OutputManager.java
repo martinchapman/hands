@@ -38,7 +38,7 @@ public class OutputManager {
 	/**
 	 * 
 	 */
-	private static final boolean OUTPUT_ENABLED = false;
+	//private static final boolean OUTPUT_ENABLED = true;
 	
 	/**
 	 * Multiple hiders per file, and multiple files.
@@ -66,15 +66,15 @@ public class OutputManager {
 	/**
 	 * @return
 	 */
-	public ArrayList<Path> availableFiles() {
+	public ArrayList<Datafile> availableFiles() {
 		
 		ArrayList<Path> files = listFilesForFolder(new File(FILEPREFIX + "data"));
 		
-		ArrayList<Path> availableFiles = new ArrayList<Path>(files);
+		ArrayList<Datafile> availableFiles = new ArrayList<Datafile>();
 		
 		if (files.size() == 0) {
 			
-			return new ArrayList<Path>();
+			return new ArrayList<Datafile>();
 			
 		}
 		
@@ -82,9 +82,9 @@ public class OutputManager {
 		for ( Path path : files ) {
 			
 			// If it is a .csv file (what we want):
-			if (!path.toString().substring(path.toString().length() - 3, path.toString().length()).equals("csv")) {
+			if (path.toString().substring(path.toString().length() - 3, path.toString().length()).equals("csv")) {
 			
-				availableFiles.remove(path);
+				availableFiles.add(new Datafile(Utils.readFirstLineFromFile(path.toString()), path));
 				
 			}
 			
@@ -101,9 +101,9 @@ public class OutputManager {
 		
 		fileHiderRecords.clear();
 		
-		for ( Path path : availableFiles() ) {
+		for ( Datafile path : availableFiles() ) {
 			
-			processOutput(path);
+			processOutput(path.getPath());
 			
 		}
 	
@@ -288,15 +288,15 @@ public class OutputManager {
 	 * @param title
 	 * @param attribute
 	 */
-	public void showLineGraphForAttribute(ArrayList<TraverserRecord> traversers, String gameOrRound, String title, String attribute) {
+	public void showLineGraphForAttribute(ArrayList<TraverserRecord> traversers, String gameOrRound, String title, String attribute, boolean outputEnabled) {
 		
 		if ( gameOrRound.equals("Game") ) {
 			
-			showGraphForAttribute(traversers, gameOrRound, title, "Line", "Game Number", attribute, "");
+			showGraphForAttribute(traversers, gameOrRound, title, "Line", "Game Number", attribute, "", outputEnabled);
 			
 		} else if ( gameOrRound.equals("Round") ) {
 			
-			showGraphForAttribute(traversers, gameOrRound, title, "Line", "Round Number", attribute, "");
+			showGraphForAttribute(traversers, gameOrRound, title, "Line", "Round Number", attribute, "", outputEnabled);
 			
 		}
 		
@@ -307,9 +307,9 @@ public class OutputManager {
 	 * @param title
 	 * @param attribute
 	 */
-	public void showBarGraphForAttribute(ArrayList<TraverserRecord> traversers, String gameOrRound, String title, String attribute, String category) {
+	public void showBarGraphForAttribute(ArrayList<TraverserRecord> traversers, String gameOrRound, String title, String attribute, String category, boolean outputEnabled) {
 		
-		showGraphForAttribute(traversers, gameOrRound, title, "Bar", "Game Number", attribute, category);
+		showGraphForAttribute(traversers, gameOrRound, title, "Bar", "Game Number", attribute, category, outputEnabled);
 		
 	}
 	
@@ -320,9 +320,9 @@ public class OutputManager {
 	 * @param attribute
 	 * @param category
 	 */
-	public void show3DGraphForAttribute(ArrayList<TraverserRecord> traversers, String gameOrRound, String title, String attribute, String category) {
+	public void show3DGraphForAttribute(ArrayList<TraverserRecord> traversers, String gameOrRound, String title, String attribute, String category, boolean outputEnabled) {
 		
-		showGraphForAttribute(traversers, gameOrRound, title, "3D", "Game Number", attribute, category);
+		showGraphForAttribute(traversers, gameOrRound, title, "3D", "Game Number", attribute, category, outputEnabled);
 		
 	}
 	
@@ -345,7 +345,6 @@ public class OutputManager {
 			}
 			
 		}
-	
 		return localTraverserRecords;
 			
 	}
@@ -486,14 +485,70 @@ public class OutputManager {
 	}
 	
 	/**
+	 * 
+	 * Gets payoff information out of class.
+	 * 
+	 * @param traverserRecords
+	 * @return
+	 */
+	public Hashtable<TraverserRecord, Double> matrixPayoff(ArrayList<TraverserRecord> traverserRecords) {
+		
+		Hashtable<TraverserRecord, Double> matrixPayoffValues = new Hashtable<TraverserRecord, Double>();
+		
+		for ( TraverserRecord traverser : traverserRecords ) {
+			
+			matrixPayoffValues.put(traverser, (double)Math.round(traverserPayoff(traverser, minForAttributeInAllSeries(traverserRecords, "Game", GraphType.BAR), maxForAttributeInAllSeries(traverserRecords, "Game", GraphType.BAR)).getValue() * 10));
+			
+		}
+		
+		return matrixPayoffValues;
+		
+	}
+	
+	
+	/**
+	 * @param traverser
+	 * @param minForAttributeInAllSeries
+	 * @param maxForAttributeInAllSeries
+	 * @return
+	 */
+	public AbstractMap.SimpleEntry<TraverserRecord, Double> traverserPayoff(TraverserRecord traverser, Hashtable<String, Double> minForAttributeInAllSeries, Hashtable<String, Double> maxForAttributeInAllSeries) {
+		
+		if ( traverser instanceof HiderRecord ) {
+			
+			if ( ((HiderRecord)traverser).getSeekersAndAttributes().size() > 1 ) System.err.println("WARNING: A Hider is matched to more than one seeking agent. Taking an average of the performance of these seekers in order to calculate payoff.");
+			
+			for ( TraverserRecord hidersSeeker : ((HiderRecord)traverser).getSeekersAndAttributes()) {
+				
+				double normalisedSeekerCost = hidersSeeker.getAttributeToGameAverage(Metric.COST.getText(), minForAttributeInAllSeries, maxForAttributeInAllSeries );
+				
+				Utils.talk(toString(), traverser + " vs " + hidersSeeker + " payoff: " + ( ( normalisedSeekerCost / (double)((HiderRecord)traverser).getSeekersAndAttributes().size() ) - traverser.getAttributeToGameAverage(Metric.COST.getText(), minForAttributeInAllSeries, maxForAttributeInAllSeries) ) );
+
+				return new AbstractMap.SimpleEntry<TraverserRecord, Double>(traverser, ( normalisedSeekerCost / (double)((HiderRecord)traverser).getSeekersAndAttributes().size() ) - traverser.getAttributeToGameAverage(Metric.COST.getText(), minForAttributeInAllSeries, maxForAttributeInAllSeries ));
+				
+			}
+			
+		} else {
+			
+			return new AbstractMap.SimpleEntry<TraverserRecord, Double>(traverser, -1 * traverser.getAttributeToGameAverage(Metric.COST.getText(), minForAttributeInAllSeries, maxForAttributeInAllSeries ));
+			
+		}
+		
+		return new AbstractMap.SimpleEntry<TraverserRecord, Double>(traverser, 0.0);
+		
+	}
+	
+	/**
 	 * @param traverserRecords
 	 * @param title
 	 * @param graphType
 	 * @param attribute
 	 */
-	public void showGraphForAttribute(ArrayList<TraverserRecord> traverserRecords, String gameOrRound, String title, String graphType, String xLabel, String yLabel, String category) {
+	public void showGraphForAttribute(ArrayList<TraverserRecord> traverserRecords, String gameOrRound, String title, String graphType, String xLabel, String yLabel, String category, boolean outputEnabled) {
 		
-		for ( TraverserRecord hiderRecord : traverserRecords ) hiderRecord.switchShowSeekers();
+		//for ( TraverserRecord record : expandTraverserRecords(traverserRecords) ) record.switchShowOpponents();
+			
+		Collections.sort(traverserRecords);
 		
 		//TraverserGraph graph = null;
 		GNUGraph graph = null;
@@ -542,6 +597,8 @@ public class OutputManager {
 						if ( traverser instanceof HiderRecord ) {
 							
 							double cumulativeNormalisedSeekerCosts = 0.0;
+
+							if ( ((HiderRecord)traverser).getSeekersAndAttributes().size() > 1 ) System.err.println("WARNING: A Hider is matched to more than one seeking agent. Taking an average of the performance of these seekers in order to calculate payoff.");
 							
 							for ( TraverserRecord hidersSeeker : ((HiderRecord)traverser).getSeekersAndAttributes()) {
 								
@@ -661,11 +718,11 @@ public class OutputManager {
 					@Override
 					public int compare(TraverserRecord o1, TraverserRecord o2) {
 						
-						if ( o1.getTopology().compareTo(o2.getTopology()) == ComparatorResult.AFTER ) {
+						if ( o1.getTopology().compareTo(o2.getTopology()) > ComparatorResult.EQUAL ) {
 							
 							return ComparatorResult.AFTER;
 							
-						} else if ( o1.getTopology().compareTo(o2.getTopology()) == ComparatorResult.BEFORE ) {
+						} else if ( o1.getTopology().compareTo(o2.getTopology()) < ComparatorResult.EQUAL ) {
 							
 							return ComparatorResult.BEFORE;
 							
@@ -679,9 +736,30 @@ public class OutputManager {
 					
 				});
 			
-			} else {
+			} else if ( category.equals("Opponent") ) {
 				
-				Collections.sort(traverserRecords);
+				Collections.sort(traverserRecords, new Comparator<TraverserRecord>() {
+					
+					@Override
+					public int compare(TraverserRecord o1, TraverserRecord o2) {
+						
+						if ( o1.getOpponents().substring(1).compareTo(o2.getOpponents().substring(1)) < ComparatorResult.EQUAL ) {
+							
+							return ComparatorResult.AFTER;
+							
+						} else if ( o1.getOpponents().substring(1).compareTo(o2.getOpponents().substring(1)) > ComparatorResult.EQUAL ) {
+							
+							return ComparatorResult.BEFORE;
+							
+						} else {
+							
+							return ComparatorResult.EQUAL;
+							
+						}
+						
+					}
+					
+				});
 				
 			}
 			
@@ -699,37 +777,21 @@ public class OutputManager {
 					
 					localCategory = traverser.getTopology();
 					
-				} else if ( category.equals("Player") ) {
+				} else if ( category.equals("Opponent") ) {
 					
-					if ( !traverser.getCategory().equals(localCategory) ) traverserAndData.clear(); 
+					if ( !traverser.getOpponents().equals(localCategory) ) traverserAndData.clear(); 
 					
-					localCategory = traverser.getCategory();
+					localCategory = traverser.getOpponents();
 					
 				}
 				
 				if ( yLabel.contains("Payoff") ) {
 					
-					if ( traverser instanceof HiderRecord ) {
-						
-						double cumulativeNormalisedSeekerCost = 0.0;
-						
-						for ( TraverserRecord hidersSeeker : ((HiderRecord)traverser).getSeekersAndAttributes()) {
-							
-							cumulativeNormalisedSeekerCost += hidersSeeker.getAttributeToGameAverage(Metric.COST.getText(), minForAttributeInAllSeries, maxForAttributeInAllSeries );
-							
-						}
-						
-						traverserAndData.add(new AbstractMap.SimpleEntry<TraverserRecord, Double>(traverser, ( cumulativeNormalisedSeekerCost / (double)((HiderRecord)traverser).getSeekersAndAttributes().size() ) - traverser.getAttributeToGameAverage(Metric.COST.getText(), minForAttributeInAllSeries, maxForAttributeInAllSeries )));
-						
-					} else {
-						
-						traverserAndData.add(new AbstractMap.SimpleEntry<TraverserRecord, Double>(traverser, -1 * traverser.getAttributeToGameAverage(Metric.COST.getText(), minForAttributeInAllSeries, maxForAttributeInAllSeries )));
-						
-					}
+					traverserAndData.add(traverserPayoff(traverser, minForAttributeInAllSeries, maxForAttributeInAllSeries));
 					
 				} else {
 				
-					traverserAndData.add(new AbstractMap.SimpleEntry<TraverserRecord, Double>(traverser, traverser.getAverageGameAttributeValue(yLabel)));	
+					traverserAndData.add(new AbstractMap.SimpleEntry<TraverserRecord, Double>(traverser, traverser.getAttributeToGameAverage(yLabel)));	
 					
 				}
 
@@ -740,7 +802,7 @@ public class OutputManager {
 			// ~MDC 19/8 Could be neater
 			for ( Entry<String, ArrayList<Entry<TraverserRecord, Double>>> storedTraverserAndData : categoryToTraverserAndData.entrySet() ) {
 			
-				System.out.println("Adding bar: " + storedTraverserAndData.getValue() + " " + storedTraverserAndData.getKey());
+				Utils.talk(this.toString(), "Adding bar: " + storedTraverserAndData.getValue() + " " + storedTraverserAndData.getKey());
 				
 				Hashtable<TraverserRecord, String> traverserToSignificanceClass = new Hashtable<TraverserRecord, String>();
 				
@@ -805,7 +867,7 @@ public class OutputManager {
 		
 		graph.createChart("", xLabel, yLabel);
 		
-		if ( OUTPUT_ENABLED ) {
+		if ( outputEnabled ) {
 		
 			graph.exportChartAsEPS(Utils.FILEPREFIX + "data/charts/" + outputPath + ".eps");
 			
@@ -823,19 +885,19 @@ public class OutputManager {
 				
 			}
 			
-		}
-		
-		try {
-		
-			Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "/data/charts/figures.bib", true), "\n @FIG{" + outputPath + ", main = {}, add = { " + title + " }, file = {/Users/Martin/Dropbox/workspace/SearchGames/output/data/charts/" + outputPath + "}, source = {}}");
-		
-		} catch (IOException e) {
+			try {
+				
+				Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "/data/charts/figures.bib", true), "\n @FIG{" + outputPath + ", main = {}, add = { " + title + " }, file = {/Users/Martin/Dropbox/workspace/SearchGames/output/data/charts/" + outputPath + "}, source = {}}");
 			
-			e.printStackTrace();
-		
+			} catch (IOException e) {
+				
+				e.printStackTrace();
+			
+			}
+			
 		}
 		
-		for ( TraverserRecord hiderRecord : traverserRecords ) hiderRecord.switchShowSeekers();
+		//for ( TraverserRecord record : expandTraverserRecords(traverserRecords) ) record.switchShowOpponents();
 		
 		/*graph.pack();
 		

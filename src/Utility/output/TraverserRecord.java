@@ -31,6 +31,38 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 		this.traverser = traverser;
 	
 	}
+	
+	/**
+	 * 
+	 */
+	protected String opponents;
+	
+	/**
+	 * @return
+	 */
+	public String getOpponents() {
+	
+		return opponents;
+	
+	}
+
+	/**
+	 * @param opponents
+	 */
+	public void setOpponents(String opponents) {
+		
+		this.opponents = opponents;
+		
+	}
+	
+	/**
+	 * 
+	 */
+	public void clearOpponents() {
+		
+		this.opponents = "";
+		
+	}
 
 	/**
 	 * 
@@ -59,24 +91,6 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 	 * 
 	 */
 	private String category;
-	
-	/**
-	 * @return
-	 */
-	public String getCategory() {
-		
-		return category;
-		
-	}
-	
-	/**
-	 * @param category
-	 */
-	public void setCategory(String category) {
-		
-		this.category = category;
-		
-	}
 
 	/**
 	 * 
@@ -141,6 +155,8 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 		
 		category = "";
 		
+		opponents = "";
+		
 	}
 	
 	/**
@@ -155,6 +171,8 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 		this.attributeToValue = attributeToValue;
 		
 		this.attributes = attributes;
+		
+		opponents = "";
 		
 	}
 	
@@ -172,6 +190,27 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 			}
 			
 		}
+		
+	}
+	
+	/**
+	 * @param record
+	 */
+	public void duplicateRecord(TraverserRecord record) {
+		
+		this.attributeToValue = record.getAttributeToValue();
+		
+		this.traverser = record.getTraverser();
+		
+		this.opponents = record.getOpponents();
+		
+		this.parameters = record.getParameters();
+		
+		this.topology = record.getTopology();
+		
+		this.datafile = record.getDatafile();
+		
+		this.attributes = record.getAttributes();
 		
 	}
 		
@@ -219,9 +258,27 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 	private int currentGameNumber = -1;
 	
 	/**
+	 * @return
+	 */
+	public int getCurrentGameNumber() {
+	
+		return currentGameNumber;
+	
+	}
+
+	/**
 	 * 
 	 */
 	private int currentRoundNumber = -1;
+	
+	/**
+	 * @return
+	 */
+	public int getCurrentRoundNumber() {
+		
+		return currentRoundNumber;
+	
+	}
 	
 	/**
 	 * @param attribute
@@ -496,7 +553,7 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 	 * @param attribute
 	 * @return
 	 */
-	public double getAverageGameAttributeValue(String attribute) {
+	public double getAttributeToGameAverage(String attribute) {
 		
 		return attributeToGameMeasure(TraverserDatasetMeasure.MEAN).get(attribute);
 		
@@ -719,22 +776,29 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 	@Override
 	public boolean equals(Object obj) {
 		
-		return getTraverser().equals(((TraverserRecord) obj).getTraverser());
+		String traverserA = traverser;
+		String traverserB = ((TraverserRecord) obj).traverser;
+		
+		String opponentsA = opponents;
+		String opponentsB = ((TraverserRecord) obj).opponents;
+		
+		//return traverserA.equals(traverserB) && opponentsA.equals(opponentsB);
+		
+		return traverserA.equals(traverserB);
 		
 	}
 	
 	/**
 	 * Actually used in a subclass, but put here for ease.
 	 */
-	protected boolean showSeekers = true;
+	protected boolean showOpponents = true;
 	
 	/**
 	 * 
 	 */
-	public void switchShowSeekers() {
+	public void switchShowOpponents() {
 		
-		showSeekers = showSeekers == true ? false : true;
-		
+		showOpponents = showOpponents == true ? false : true;
 		
 	}
 	
@@ -743,9 +807,19 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 	 */
 	public String toString() {
 		
-		return traverser;
+		if ( showOpponents && opponents != null ) {
+			
+			return traverser + " vs " + opponents;
+			
+		} else {
+			
+			return traverser;
+			
+		}
 		
 	}
+	
+	
 
 	/* (non-Javadoc)
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)

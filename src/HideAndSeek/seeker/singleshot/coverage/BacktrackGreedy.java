@@ -11,7 +11,7 @@ import HideAndSeek.GraphTraverser;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.seeker.SeekerLocalGraph;
+import HideAndSeek.seeker.SeekingAgent;
 import Utility.Utils;
 
 /**
@@ -22,7 +22,7 @@ import Utility.Utils;
  * 
  * @author Martin
  */
-public class NearestNeighbour extends SeekerLocalGraph {
+public class BacktrackGreedy extends SeekingAgent {
 
 	/**
 	 * Viewed by unvisited nodes.
@@ -37,7 +37,7 @@ public class NearestNeighbour extends SeekerLocalGraph {
 	/**
 	 * @param graphController
 	 */
-	public NearestNeighbour(GraphController<StringVertex, StringEdge> graphController) {
+	public BacktrackGreedy(GraphController<StringVertex, StringEdge> graphController) {
 		
 		this(graphController, null);
 		
@@ -46,7 +46,7 @@ public class NearestNeighbour extends SeekerLocalGraph {
 	/**
 	 * @param graphController
 	 */
-	public NearestNeighbour(GraphController<StringVertex, StringEdge> graphController, GraphTraverser responsibleAgent) {
+	public BacktrackGreedy(GraphController<StringVertex, StringEdge> graphController, GraphTraverser responsibleAgent) {
 		
 		super(graphController, responsibleAgent);
 		
@@ -67,7 +67,7 @@ public class NearestNeighbour extends SeekerLocalGraph {
 	}
 	
 	/* (non-Javadoc)
-	 * @see HideAndSeek.seeker.SeekerLocalGraph#getStatus()
+	 * @see HideAndSeek.seeker.SeekingAgent#getStatus()
 	 */
 	public String getStatus() {
 		
@@ -89,8 +89,6 @@ public class NearestNeighbour extends SeekerLocalGraph {
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
 	 */
 	public StringVertex nextNode(StringVertex currentNode) {
-		
-		super.nextNode(currentNode);
 		
 		if ( unvisitedNodes.contains(currentNode) ) unvisitedNodes.remove(currentNode);
 		
@@ -143,7 +141,7 @@ public class NearestNeighbour extends SeekerLocalGraph {
 			
 			currentPath = dsp.getPathEdgeList();
 			
-			if ( dsp.getPathEdgeList().size() > 1 ) Utils.talk(toString(), "Backtracking further than to a neighbour\nCurrent path: " + currentPath);
+			//if ( dsp.getPathEdgeList().size() > 1 ) Utils.talk(toString(), "Backtracking further than to a neighbour\nCurrent path: " + currentPath);
 			
 		} 
 		

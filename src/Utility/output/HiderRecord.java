@@ -18,6 +18,24 @@ public class HiderRecord extends TraverserRecord {
 	private ArrayList<TraverserRecord> seekersAndAttributes;
 	
 	/**
+	 * @return
+	 */
+	public ArrayList<TraverserRecord> getSeekersAndAttributes() {
+		
+		return seekersAndAttributes;
+	
+	}
+	
+	/**
+	 * 
+	 */
+	public void clearSeekersAndAttributes() {
+		
+		seekersAndAttributes.clear();
+		
+	}
+	
+	/**
 	 * 
 	 */
 	private Path fileRelatingTo;
@@ -30,21 +48,18 @@ public class HiderRecord extends TraverserRecord {
 		return fileRelatingTo;
 	
 	}
-
-	/**
-	 * @return
-	 */
-	public ArrayList<TraverserRecord> getSeekersAndAttributes() {
-		
-		if ( seekersAndAttributes.size() > 1 ) {
-			
-			// ~MDC Temp TODO ok if mixed
-			// throw new UnsupportedOperationException("Should be a one hider to one seeker relationship, in this configuration.");
-			
-		}
-		
-		return seekersAndAttributes;
 	
+	/* (non-Javadoc)
+	 * @see Utility.output.TraverserRecord#duplicateRecord(Utility.output.TraverserRecord)
+	 */
+	public void duplicateRecord(TraverserRecord record) {
+		
+		super.duplicateRecord(record);
+		
+		this.seekersAndAttributes = new ArrayList<TraverserRecord>(((HiderRecord)record).getSeekersAndAttributes());
+		
+		this.fileRelatingTo = ((HiderRecord)record).getFileRelatingTo();
+		
 	}
 	
 	/**
@@ -77,11 +92,9 @@ public class HiderRecord extends TraverserRecord {
 	 */
 	public void addSeeker(TraverserRecord seekerRecord) {
 		
-		setCategory(getCategory() + " " + seekerRecord.getTraverser());
-		
-		seekerRecord.setCategory(getTraverser());
-		
 		seekersAndAttributes.add(seekerRecord);
+		
+		opponents = seekersAndAttributes.toString().replace("[", "").replace("]", "").replace(",", "");
 		
 	}
 	
@@ -150,9 +163,9 @@ public class HiderRecord extends TraverserRecord {
 	 */
 	public String toString() {
 		
-		if ( showSeekers ) {
+		if ( showOpponents && opponents != null ) {
 			
-			return traverser + " Seekers: " + seekersAndAttributes.toString().replace("[", "").replace("]", "").replace(",", "");
+			return traverser + " vs " + opponents;
 			
 		} else {
 			

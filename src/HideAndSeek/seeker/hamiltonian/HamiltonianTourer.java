@@ -9,7 +9,7 @@ import org.jgrapht.alg.HamiltonianCycle;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.seeker.SeekerLocalGraph;
+import HideAndSeek.seeker.SeekingAgent;
 
 /**
  * If an Hamiltonian circuit exists in the graph, follow it. 
@@ -17,7 +17,7 @@ import HideAndSeek.seeker.SeekerLocalGraph;
  * @author Martin
  *
  */
-public class HamiltonianTourer extends SeekerLocalGraph {
+public class HamiltonianTourer extends SeekingAgent {
 
 	/**
 	 * 
@@ -40,8 +40,6 @@ public class HamiltonianTourer extends SeekerLocalGraph {
 	 * @return
 	 */
 	public StringVertex nextNode(StringVertex currentNode) {
-		
-		super.nextNode(currentNode);
 		
 		/* 
 		 * If a tour is available of the graph, take the next node on it,

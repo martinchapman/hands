@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import HideAndSeek.GraphTraverser;
-import HideAndSeek.GraphTraversingAgent;
+import HideAndSeek.TraverserLocalGraph;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
@@ -14,7 +14,7 @@ import Utility.Utils;
  * @author Martin
  *
  */
-public abstract class SeekingAgent extends GraphTraversingAgent implements Runnable, Seeker {
+public abstract class SeekingAgent extends TraverserLocalGraph implements Runnable, Seeker {
 	
 	/**
 	 * All hide locations encountered in a game.

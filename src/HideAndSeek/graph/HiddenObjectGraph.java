@@ -1003,8 +1003,6 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 		
     	}
     	
-    	Utils.talk("Graph", traverserEdgeCosts.toString());
-    	
     }
     
     private void resetTraversingAgent(GraphTraverser traverser) {

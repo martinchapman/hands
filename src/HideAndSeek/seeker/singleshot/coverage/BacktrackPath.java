@@ -10,7 +10,7 @@ import org.jgrapht.alg.DijkstraShortestPath;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.seeker.SeekerLocalGraph;
+import HideAndSeek.seeker.SeekingAgent;
 import Utility.Utils;
 
 /**
@@ -25,7 +25,7 @@ import Utility.Utils;
  * @deprecated
  *
  */
-public class BacktrackPath extends SeekerLocalGraph {
+public class BacktrackPath extends SeekingAgent {
 
 	/**
 	 * @param graphController
@@ -76,9 +76,6 @@ public class BacktrackPath extends SeekerLocalGraph {
 	 */
 	@Override
 	public StringVertex nextNode(StringVertex currentNode) {
-		
-		// Call super to add relevant information to local graph
-		super.nextNode(currentNode);
 		
 		// Get all outgoing edges from this node (ordered by weight)
 		List<StringEdge> connectedEdges = getConnectedEdges(currentNode);

@@ -1,11 +1,9 @@
 package HideAndSeek.hider;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import HideAndSeek.GraphTraverser;
-import HideAndSeek.GraphTraversingAgent;
+import HideAndSeek.TraverserLocalGraph;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
@@ -16,11 +14,7 @@ import Utility.Utils;
  * @author Martin
  *
  */
-/**
- * @author Martin
- *
- */
-public abstract class HidingAgent extends GraphTraversingAgent implements Runnable, Hider {
+public abstract class HidingAgent extends TraverserLocalGraph implements Runnable, Hider {
 
 	/**
 	 * 
@@ -146,7 +140,7 @@ public abstract class HidingAgent extends GraphTraversingAgent implements Runnab
 	 */
 	public String getStatus() {
 		
-		return super.getStatus() + "\nprecheckedHideLocations: " +  precheckedHideLocations + "\n";
+		return super.getStatus() + "\nnumberOfHideLocations: " + numberOfHideLocations + "\nprecheckedHideLocations: " +  precheckedHideLocations + "\n";
 		
 	}
 	
@@ -240,7 +234,7 @@ public abstract class HidingAgent extends GraphTraversingAgent implements Runnab
 				
 			} else {
 				
-				currentNode = nextNode;
+				atNextNode(nextNode);
 			
 			}
 			

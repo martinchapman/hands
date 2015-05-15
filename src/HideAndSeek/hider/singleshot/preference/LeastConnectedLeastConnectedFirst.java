@@ -7,7 +7,7 @@ import HideAndSeek.OpenTraverserStrategy;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.seeker.singleshot.coverage.NearestNeighbourMechanism;
+import HideAndSeek.seeker.singleshot.coverage.BacktrackGreedyMechanism;
 import HideAndSeek.seeker.singleshot.preference.LeastConnectedFirstMechanism;
 
 /**

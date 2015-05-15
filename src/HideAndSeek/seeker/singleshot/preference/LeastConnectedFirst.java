@@ -7,7 +7,7 @@ import java.util.List;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.seeker.SeekerLocalGraph;
+import HideAndSeek.seeker.SeekingAgent;
 import Utility.Utils;
 
 /**
@@ -24,7 +24,7 @@ import Utility.Utils;
  * @author Martin
  *
  */
-public class LeastConnectedFirst extends SeekerLocalGraph {
+public class LeastConnectedFirst extends SeekingAgent {
 
 	/**
 	 * @param graph
@@ -104,8 +104,6 @@ public class LeastConnectedFirst extends SeekerLocalGraph {
 
 	@Override
 	public StringVertex nextNode(StringVertex currentNode) {
-		
-		super.nextNode(currentNode);
 		
 		return connectedNode(currentNode);
 		

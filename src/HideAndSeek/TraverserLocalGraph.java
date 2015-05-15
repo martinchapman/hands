@@ -1,4 +1,4 @@
-package HideAndSeek.seeker;
+package HideAndSeek;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,9 +11,10 @@ import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.HiddenObjectGraph;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
+import Utility.Utils;
 
 /**
- * This seeker constructs its own version of the search graph,
+ * This traverser constructs its own version of the search graph,
  * in an attempt to gain a more holistic view of the game environment.
  * 
  * Designed to be extended.
@@ -21,13 +22,31 @@ import HideAndSeek.graph.StringVertex;
  * @author Martin
  *
  */
-public abstract class SeekerLocalGraph extends SeekingAgent {
+public abstract class TraverserLocalGraph extends GraphTraversingAgent {
 
 	/**
 	 * 
 	 */
 	protected HiddenObjectGraph<StringVertex, StringEdge> localGraph;
 	
+	/**
+	 * @return
+	 */
+	public HiddenObjectGraph<StringVertex, StringEdge> getLocalGraph() {
+		
+		return localGraph;
+		
+	}
+
+	/**
+	 * @param localGraph
+	 */
+	public void setLocalGraph(HiddenObjectGraph<StringVertex, StringEdge> localGraph) {
+		
+		this.localGraph = localGraph;
+	
+	}
+
 	/**
 	 * 
 	 */
@@ -36,7 +55,7 @@ public abstract class SeekerLocalGraph extends SeekingAgent {
 	/**
 	 * @param graphController
 	 */
-	public SeekerLocalGraph(GraphController <StringVertex, StringEdge> graphController, GraphTraverser responsibleAgent) {
+	public TraverserLocalGraph(GraphController <StringVertex, StringEdge> graphController, GraphTraverser responsibleAgent) {
 		
 		this(graphController, "", responsibleAgent);
 		
@@ -45,7 +64,7 @@ public abstract class SeekerLocalGraph extends SeekingAgent {
 	/**
 	 * @param graphController
 	 */
-	public SeekerLocalGraph(GraphController <StringVertex, StringEdge> graphController, String name) {
+	public TraverserLocalGraph(GraphController <StringVertex, StringEdge> graphController, String name) {
 		
 		this(graphController, name, null);
 		
@@ -54,7 +73,7 @@ public abstract class SeekerLocalGraph extends SeekingAgent {
 	/**
 	 * @param graphController
 	 */
-	public SeekerLocalGraph(GraphController <StringVertex, StringEdge> graphController) {
+	public TraverserLocalGraph(GraphController <StringVertex, StringEdge> graphController) {
 		
 		this(graphController, "", null);
 		
@@ -63,7 +82,7 @@ public abstract class SeekerLocalGraph extends SeekingAgent {
 	/**
 	 * @param graph
 	 */
-	public SeekerLocalGraph(GraphController <StringVertex, StringEdge> graphController, String name, GraphTraverser responsibleAgent) {
+	public TraverserLocalGraph(GraphController <StringVertex, StringEdge> graphController, String name, GraphTraverser responsibleAgent) {
 		
 		super(graphController, name, responsibleAgent);
 		
@@ -77,15 +96,15 @@ public abstract class SeekerLocalGraph extends SeekingAgent {
 		
 	}
 
-	
-
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraverser#nextNode(HideAndSeek.graph.StringVertex)
 	 * 
 	 * ~MDC: Needs tidying.
 	 */
 	@Override
-	public StringVertex nextNode(StringVertex currentNode) {
+	public void atNode() {
+		
+		super.atNode();
 		
 		addUniquelyVisitedNode(currentNode);
 		
@@ -101,8 +120,6 @@ public abstract class SeekerLocalGraph extends SeekingAgent {
 			localGraph.setEdgeWeight(localGraph.getEdge(edge.getSource(), edge.getTarget()), graphController.getEdgeWeight(edge));
 			
 		}
-		
-		return currentNode;
 		
 	}
 	

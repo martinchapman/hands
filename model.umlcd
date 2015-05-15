@@ -3254,7 +3254,7 @@
       </parameters>
     </operations>
   </nodes>
-  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:ClassifierVisual" xmi:id="_eCOOkG_-EeSZspfDsrt_Bg" comments="_eBGNMG_-EeSZspfDsrt_Bg" targetConnectionVisual="_eBsqIG_-EeSZspfDsrt_Bg" name="HiderLocalGraph" abstractClass="true" associationsOut="_d715wG_-EeSZspfDsrt_Bg" generalizations="_d-V0IG_-EeSZspfDsrt_Bg">
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:ClassifierVisual" xmi:id="_eCOOkG_-EeSZspfDsrt_Bg" comments="_eBGNMG_-EeSZspfDsrt_Bg" targetConnectionVisual="_eBsqIG_-EeSZspfDsrt_Bg" name="HidingAgent" abstractClass="true" associationsOut="_d715wG_-EeSZspfDsrt_Bg" generalizations="_d-V0IG_-EeSZspfDsrt_Bg">
     <modelElement href="model.uml#_MoWYsG_-EeSZspfDsrt_Bg"/>
     <visualProperties xmi:id="_eCOOkW_-EeSZspfDsrt_Bg" position="3035.0,1676.0" size="-1.0,-1.0"/>
     <visibility xmi:id="_eCOOkm_-EeSZspfDsrt_Bg" label="+"/>
@@ -3278,13 +3278,13 @@
         <modelElement href="model.uml#_Mfrk4G_-EeSZspfDsrt_Bg"/>
       </type>
     </attributes>
-    <operations xmi:id="_eCOOmW_-EeSZspfDsrt_Bg" name="HiderLocalGraph">
+    <operations xmi:id="_eCOOmW_-EeSZspfDsrt_Bg" name="HidingAgent">
       <modelElement href="model.uml#_NJeIwG_-EeSZspfDsrt_Bg"/>
       <keywords xmi:id="_eCOOmm_-EeSZspfDsrt_Bg" keyword="create"/>
       <visibility xmi:id="_eCOOm2_-EeSZspfDsrt_Bg" label="+"/>
       <outParameters xmi:id="_eCOOnG_-EeSZspfDsrt_Bg">
         <modelElement href="model.uml#_NJf98G_-EeSZspfDsrt_Bg"/>
-        <type xmi:id="_eCOOnW_-EeSZspfDsrt_Bg" name="HiderLocalGraph">
+        <type xmi:id="_eCOOnW_-EeSZspfDsrt_Bg" name="HidingAgent">
           <modelElement href="model.uml#_MoWYsG_-EeSZspfDsrt_Bg"/>
         </type>
       </outParameters>
@@ -4247,7 +4247,7 @@
       </parameters>
     </operations>
   </nodes>
-  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:ClassifierVisual" xmi:id="_eo2JsG_-EeSZspfDsrt_Bg" comments="_enoBsG_-EeSZspfDsrt_Bg" targetConnectionVisual="_en2EIG_-EeSZspfDsrt_Bg" name="SeekerLocalGraph" abstractClass="true" associationsOut="_eh6bQG_-EeSZspfDsrt_Bg" generalizations="_ekenEG_-EeSZspfDsrt_Bg">
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:ClassifierVisual" xmi:id="_eo2JsG_-EeSZspfDsrt_Bg" comments="_enoBsG_-EeSZspfDsrt_Bg" targetConnectionVisual="_en2EIG_-EeSZspfDsrt_Bg" name="SeekingAgent" abstractClass="true" associationsOut="_eh6bQG_-EeSZspfDsrt_Bg" generalizations="_ekenEG_-EeSZspfDsrt_Bg">
     <modelElement href="model.uml#_OZXDUG_-EeSZspfDsrt_Bg"/>
     <visualProperties xmi:id="_eo2JsW_-EeSZspfDsrt_Bg" position="2290.0,922.0" size="-1.0,-1.0"/>
     <visibility xmi:id="_eo2Jsm_-EeSZspfDsrt_Bg" label="+"/>
@@ -4271,13 +4271,13 @@
         <modelElement href="model.uml#_Mfrk4G_-EeSZspfDsrt_Bg"/>
       </type>
     </attributes>
-    <operations xmi:id="_eo2JuW_-EeSZspfDsrt_Bg" name="SeekerLocalGraph">
+    <operations xmi:id="_eo2JuW_-EeSZspfDsrt_Bg" name="SeekingAgent">
       <modelElement href="model.uml#_OZZfkG_-EeSZspfDsrt_Bg"/>
       <keywords xmi:id="_eo2Jum_-EeSZspfDsrt_Bg" keyword="create"/>
       <visibility xmi:id="_eo2Ju2_-EeSZspfDsrt_Bg" label="+"/>
       <outParameters xmi:id="_eo2JvG_-EeSZspfDsrt_Bg">
         <modelElement href="model.uml#_OZatsm_-EeSZspfDsrt_Bg"/>
-        <type xmi:id="_eo2JvW_-EeSZspfDsrt_Bg" name="SeekerLocalGraph">
+        <type xmi:id="_eo2JvW_-EeSZspfDsrt_Bg" name="SeekingAgent">
           <modelElement href="model.uml#_OZXDUG_-EeSZspfDsrt_Bg"/>
         </type>
       </outParameters>

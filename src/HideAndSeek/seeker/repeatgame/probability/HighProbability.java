@@ -8,7 +8,7 @@ import org.jgrapht.alg.DijkstraShortestPath;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.seeker.SeekerLocalGraph;
+import HideAndSeek.seeker.SeekingAgent;
 import Utility.BehaviourPrediction;
 import Utility.Utils;
 
@@ -16,7 +16,7 @@ import Utility.Utils;
  * @author Martin
  *
  */
-public class HighProbability extends SeekerLocalGraph {
+public class HighProbability extends SeekingAgent {
 
 	/**
 	 * 
@@ -81,8 +81,6 @@ public class HighProbability extends SeekerLocalGraph {
 	 */
 	@Override
 	public StringVertex nextNode(StringVertex currentNode) {
-		
-		super.nextNode(currentNode);
 		
 		// If we happen to pass by, or land upon, our likely node, it is no longer a target
 		if ( likelyNodes.contains(currentNode) ) likelyNodes.remove(likelyNodes.indexOf(currentNode));

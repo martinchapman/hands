@@ -43,6 +43,7 @@ import HideAndSeek.hider.singleshot.preference.LeastConnectedLeastConnectedFirst
 import HideAndSeek.hider.singleshot.preference.LeastConnectedStaticBetween;
 import HideAndSeek.hider.singleshot.preference.MaxDistance;
 import HideAndSeek.hider.singleshot.preference.MaxDistanceStaticBetween;
+import HideAndSeek.hider.singleshot.preference.NotConnecting;
 import HideAndSeek.hider.singleshot.random.GreedyRandomSet;
 import HideAndSeek.hider.singleshot.random.GreedyRandomSetStaticBetween;
 import HideAndSeek.hider.singleshot.random.Random;
@@ -63,21 +64,21 @@ import HideAndSeek.seeker.repeatgame.probability.adaptable.HighProbabilityAdapta
 import HideAndSeek.seeker.repeatgame.probability.adaptable.InverseHighProbabilityAdaptable;
 import HideAndSeek.seeker.singleshot.cost.Greedy;
 import HideAndSeek.seeker.singleshot.coverage.BacktrackPath;
+import HideAndSeek.seeker.singleshot.coverage.BreadthFirstSearch;
+import HideAndSeek.seeker.singleshot.coverage.BreadthFirstSearchGreedy;
+import HideAndSeek.seeker.singleshot.coverage.DepthFirstSearch;
+import HideAndSeek.seeker.singleshot.coverage.DepthFirstSearchGreedy;
 import HideAndSeek.seeker.singleshot.coverage.DepthFirstSearchMechanism;
+import HideAndSeek.seeker.singleshot.coverage.BacktrackGreedy;
 import HideAndSeek.seeker.singleshot.coverage.RandomTarry;
 import HideAndSeek.seeker.singleshot.coverage.VariableBacktrackPath;
-import HideAndSeek.seeker.singleshot.coverage.efficiency.BreadthFirstSearch;
-import HideAndSeek.seeker.singleshot.coverage.efficiency.BreadthFirstSearchGreedy;
-import HideAndSeek.seeker.singleshot.coverage.efficiency.DepthFirstSearch;
-import HideAndSeek.seeker.singleshot.coverage.efficiency.DepthFirstSearchGreedy;
-import HideAndSeek.seeker.singleshot.coverage.efficiency.NearestNeighbour;
-import HideAndSeek.seeker.singleshot.preference.LeastConnectedFirst;
+import HideAndSeek.seeker.singleshot.preference.ApproximateLeastConnectedNodes;
 import HideAndSeek.seeker.singleshot.preference.LinkedPath;
 import HideAndSeek.seeker.singleshot.preference.MostConnectedFirst;
 import HideAndSeek.seeker.singleshot.random.FixedStartRandomWalk;
 import HideAndSeek.seeker.singleshot.random.RandomWalk;
-import HideAndSeek.seeker.singleshot.random.efficiency.SelfAvoidingRandomWalk;
-import HideAndSeek.seeker.singleshot.random.efficiency.SelfAvoidingRandomWalkGreedy;
+import HideAndSeek.seeker.singleshot.random.SelfAvoidingRandomWalk;
+import HideAndSeek.seeker.singleshot.random.SelfAvoidingRandomWalkGreedy;
 import Utility.Pair;
 import Utility.Utils;
 
@@ -162,6 +163,8 @@ public class Main {
 		String topology = args[4];
 		
 		int numberOfVertices = Integer.parseInt(args[5]);
+		
+		numberOfVertices = numberOfVertices == 0 ? 1 : numberOfVertices;
 		
 		String fixedOrUpperBound = args[9];
 		
@@ -261,6 +264,58 @@ public class Main {
 				
 			}
 			
+			if (hiderType.getElement0().equals("FirstKMinus1")) {
+				
+				allHidingAgents.add(new VariableFixedDistance(graphController, "FirstKMinus1", numberOfHideLocations, 0) {
+					
+					public boolean hideHere(StringVertex vertex) {
+						
+						if ( hideLocations().size() < numberOfHideLocations - 1) {
+							
+							return super.hideHere(vertex);
+							
+						} else {
+							
+							if ( currentNode == vertex ) {
+								
+								for ( StringVertex hideLocation : hideLocations() ) {
+									
+									for ( StringEdge edge : graphController.edgesOf(responsibleAgent, vertex) ) {
+										
+										if ( edgeToTarget(edge, vertex).equals(hideLocation) ) {
+											
+											return false;
+											
+										}
+										
+									}
+									
+								}
+							
+								Utils.talk(toString(), "Disconnected node: " + vertex +  " " + graphController.edgesOf(responsibleAgent, vertex));
+								
+								return true;
+								
+							} else {
+								
+								return false;
+								
+							}
+							
+						}
+						
+					}
+					
+				});
+				
+			}
+			
+			if (hiderType.getElement0().equals("NotConnecting")) {
+				
+				allHidingAgents.add(new NotConnecting(graphController, numberOfHideLocations));
+				
+				
+			}
 			if (hiderType.getElement0().equals("FirstKFixedStart")) {
 				
 				allHidingAgents.add(new VariableFixedDistanceFixedStart(graphController, "FirstKFixedStart", numberOfHideLocations, 0));
@@ -820,15 +875,33 @@ public class Main {
 				
 			}
 			
-			if (seekerType.getElement0().equals("LeastConnectedFirst")) {
+			/*if (seekerType.getElement0().equals("LeastConnectedFirst")) {
 				
 				allSeekingAgents.add(new LeastConnectedFirst(graphController));
 				
+			}*/
+			// Instead:
+			if (seekerType.getElement0().equals("LeastConnectedFirst")) {
+				
+				allSeekingAgents.add(new HideAndSeek.seeker.singleshot.preference.LeastConnected(graphController, "LeastConnectedFirst", 1.0));
+			
+			}
+			
+			if (seekerType.getElement0().equals("VariableLeastConnectedFirst")) {
+			
+				allSeekingAgents.add(new HideAndSeek.seeker.singleshot.preference.LeastConnected(graphController, "VariableLeastConnectedFirst", gameNumber / (float)totalGames));
+			
 			}
 			
 			if (seekerType.getElement0().equals("MostConnectedFirst")) {
 				
 				allSeekingAgents.add(new MostConnectedFirst(graphController));
+				
+			}
+			
+			if (seekerType.getElement0().equals("ApproximateLeastConnectedNodes")) {
+				
+				allSeekingAgents.add(new ApproximateLeastConnectedNodes(graphController));
 				
 			}
 			
@@ -857,20 +930,20 @@ public class Main {
 				
 			}
 			
-			if (seekerType.getElement0().equals("NearestNeighbour")) {
+			if (seekerType.getElement0().equals("BacktrackGreedy")) {
 				
-				allSeekingAgents.add(new NearestNeighbour(graphController));
+				allSeekingAgents.add(new BacktrackGreedy(graphController));
 			
 			}
 			
-			if (seekerType.getElement0().equals("NearestNeighbourWithoutBacktracking")) {
+			if (seekerType.getElement0().equals("NearestNeighbour")) {
 		
-				final class NearestNeighbourWithoutBacktracking extends NearestNeighbour {
-					public NearestNeighbourWithoutBacktracking(GraphController<StringVertex, StringEdge> graphController) { super(graphController); }
+				final class BacktrackGreedyWithoutBacktracking extends BacktrackGreedy {
+					public BacktrackGreedyWithoutBacktracking(GraphController<StringVertex, StringEdge> graphController) { super(graphController); }
 					public boolean backtracks() { return false; }
 				}
 				
-				allSeekingAgents.add(new NearestNeighbourWithoutBacktracking(graphController));
+				allSeekingAgents.add(new BacktrackGreedyWithoutBacktracking(graphController));
 			
 			}
 			

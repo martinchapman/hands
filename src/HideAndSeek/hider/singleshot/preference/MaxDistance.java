@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedHashSet;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -19,6 +20,7 @@ import HideAndSeek.graph.HiddenObjectGraph;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.singleshot.random.RandomSetMechanism;
+import Utility.Pair;
 import Utility.Utils;
 
 /**
@@ -102,6 +104,8 @@ public class MaxDistance extends PreferenceHider {
 		this.minDistance = minDistance;
 		
 		maxDistanceNodes = new LinkedHashSet<StringVertex>();
+		
+		diameters = new ArrayList<Double>();
 
 	}
 	
@@ -110,12 +114,17 @@ public class MaxDistance extends PreferenceHider {
 	 */
 	private LinkedHashSet<StringVertex> maxDistanceNodes;
 	
+	private ArrayList<Double> diameters;
+	
 	/**
 	 * The minimum distance to look for between nodes (if -1, default is 
 	 * set to local graph diameter)
 	 */
 	private int minDistance = -1;
 	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.hider.singleshot.preference.PreferenceHider#computeTargetNodes()
+	 */
 	@Override
 	public LinkedHashSet<StringVertex> computeTargetNodes() {
 		
@@ -161,6 +170,10 @@ public class MaxDistance extends PreferenceHider {
 					
 				}
 				
+				Utils.talk(this.toString(), "Nodes at diameter: " + GP.getStartVertex() + " and " + GP.getEndVertex() + ". Distance: " + FWSP.getDiameter() + " Hops: " + GP.getEdgeList().size());
+				
+				diameters.add(FWSP.getDiameter());
+				
 				Utils.add(kthPositionCandidates, 0, GP.getStartVertex(), new ArrayList<StringVertex>(), false);
 				
 				Utils.add(kthPositionCandidates, 1, GP.getEndVertex(), new ArrayList<StringVertex>(), false);
@@ -185,6 +198,8 @@ public class MaxDistance extends PreferenceHider {
 		// Which position in the hide set we are currently concerned with
 		int kth = 2;
 		
+		Hashtable<Pair<StringVertex, StringVertex>, Double> shortestPathLengths = new Hashtable<Pair<StringVertex, StringVertex>, Double>();
+		
 		// Continue until we have complete nodes for the hideset
 		while ( targetVertices.size() < numberOfHideLocations ) {
 			
@@ -192,19 +207,76 @@ public class MaxDistance extends PreferenceHider {
 			outer:
 			for ( StringVertex potentialNode : localGraph.vertexSet() ) {
 			
-				// For all combinations of previous kth nodes
-				for ( ArrayList<StringVertex> candidates : Utils.combinations(new ArrayList<ArrayList<StringVertex>>(kthPositionCandidates.values())) ) {
+				ArrayList<ArrayList<StringVertex>> combinations = new ArrayList<ArrayList<StringVertex>>();
+				
+				ArrayList<StringVertex> singleCombination = new ArrayList<StringVertex>();
+				
+				for ( Entry<Integer, ArrayList<StringVertex>> listOfCandidates : kthPositionCandidates.entrySet() ) {
 					
+					if ( listOfCandidates.getValue().size() == 1 ) {
+						
+						singleCombination.add(listOfCandidates.getValue().get(0));
+						
+					} else {
+						
+						singleCombination.clear();
+						
+						combinations = Utils.combinations(new ArrayList<ArrayList<StringVertex>>(kthPositionCandidates.values()));
+						
+					}
+					
+				}
+				
+				if ( singleCombination.size() > 0 ) {
+					
+					combinations.clear();
+					
+					combinations.add(singleCombination);
+					
+				}
+				
+				// For all combinations of previous kth nodes
+				for ( ArrayList<StringVertex> candidates : combinations ) {
+					
+					Utils.talk(toString(), "Exiting MaxDistance: " + candidates);
 					/* 
 					 * Check if this node is at a given distance from all nodes
 					 * in this potential permutation.
 					 */
 					for ( StringVertex candidate : candidates ) {
 						
-						DSP = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, potentialNode, candidate);
+						if ( candidates.contains(potentialNode) || potentialNode.equals(candidate) ) continue outer;
 						
-						if ( DSP.getPathEdgeList() == null || DSP.getPathEdgeList().size() == 0 || DSP.getPathLength() < diameter ) continue outer;
+						Utils.talk(toString(), "Potential node: " + potentialNode + " vs existing max distance: " + candidate);
+						
+						double length = 0.0;
+						
+						if ( shortestPathLengths.containsKey( new Pair<StringVertex, StringVertex>(potentialNode, candidate)) ) {
+							
+							length = shortestPathLengths.get(new Pair<StringVertex, StringVertex>(potentialNode, candidate));
+							
+						} else {
+							
+							DSP = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, potentialNode, candidate);
+							
+							if ( DSP.getPathEdgeList() == null || DSP.getPathEdgeList().size() == 0 ) { 
+								
+								length = -1;
+								
+							} else {
+							
+								length = DSP.getPathLength();
+								
+							}
+							
+							shortestPathLengths.put(new Pair<StringVertex, StringVertex>(potentialNode, candidate), length);
+									
+						}
+						
+						if ( length < diameter ) continue outer;
 					
+						Utils.talk(toString(), "--> " + potentialNode + " at (at least) diameter " + diameter + " from " + candidate);
+						
 					}
 				
 					/* If we find a node that is greater than all existing candidates,
@@ -235,11 +307,22 @@ public class MaxDistance extends PreferenceHider {
 				
 				int MAX_CANDIDATES = 5;
 				
-				if ( !kthPositionCandidates.containsKey(kth) || ( kthPositionCandidates.containsKey(kth) && kthPositionCandidates.get(kth).size() < MAX_CANDIDATES ) ) {
-				
-					Utils.add(kthPositionCandidates, kth, potentialNode, new ArrayList<StringVertex>(), true);
-				
+				// For complexity
+				if ( numberOfHideLocations > 5 ) {
+					
+					MAX_CANDIDATES = 1;
+					
 				}
+				
+				if ( kthPositionCandidates.containsKey(kth) && kthPositionCandidates.get(kth).size() >= MAX_CANDIDATES ) {
+					
+					break;
+					
+				}
+				
+				Utils.talk(toString(), "------> Adding " + potentialNode);
+					
+				Utils.add(kthPositionCandidates, kth, potentialNode, new ArrayList<StringVertex>(), true);
 				
 			}
 			
@@ -262,9 +345,14 @@ public class MaxDistance extends PreferenceHider {
 					
 				} else {
 					
-					Utils.talk(toString(), "Cannot compute max distance, returning " + ( numberOfHideLocations - targetVertices.size() ) + " random.");
+					if ( numberOfHideLocations - targetVertices.size() > 0 ) {
+						
+						Utils.talk(toString(), "Cannot compute max distance, returning " + ( numberOfHideLocations - targetVertices.size() ) + " random.");
+						
+						targetVertices.addAll(randomSet.createRandomSet(numberOfHideLocations - targetVertices.size(), new TreeSet<StringVertex>(targetVertices)));
+					}
 					
-					targetVertices.addAll(randomSet.createRandomSet(numberOfHideLocations - targetVertices.size(), new TreeSet<StringVertex>(targetVertices)));
+					break;
 					
 				}
 				
@@ -279,11 +367,27 @@ public class MaxDistance extends PreferenceHider {
 	}
 	
 	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraversingAgent#endOfGame()
+	 */
+	@Override
+	public void endOfGame() {
+
+		super.endOfGame();
+		
+		diameters.clear();
+		
+	}
+
+	/* (non-Javadoc)
 	 * @see HideAndSeek.hider.HidingAgent#printGameStats()
 	 */
 	public String printGameStats() {
 		
-		return super.printGameStats() + ",GraphDiameter," +  Utils.graphDiameter(localGraph);
+		double cumulativeDiameter = 0.0;
+		
+		for ( double diameter : diameters ) cumulativeDiameter += diameter;
+			
+		return super.printGameStats() + ",Average Diameter," + (cumulativeDiameter / diameters.size()) + ",Graph Diameter," +  Utils.graphDiameter(localGraph);
 		
 	}
 	

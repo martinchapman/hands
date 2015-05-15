@@ -13,7 +13,7 @@ import HideAndSeek.OpenTraverserStrategy;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.seeker.singleshot.coverage.NearestNeighbourMechanism;
+import HideAndSeek.seeker.singleshot.coverage.BacktrackGreedyMechanism;
 import Utility.Utils;
 
 /**
@@ -45,11 +45,16 @@ public class LeastConnected extends PreferenceHider {
 	}
 
 	/**
-	 * The imagined number of max connections that a node
-	 * can have in order to be considered to have least connectivity.
-	 * (1 = leaf).
+	 * The standard definition of an minimally connected node: 1,
+	 * or leaf.
 	 */
-	protected static final int MAX_CONNECTIONS = 1;
+	protected static final int MIN_CONNECTIONS = 1;
+	
+	/**
+	 * The *estimated* connectivity of the least connected nodes
+	 * in the graph (may be greater than 1).
+	 */
+	protected static int estimatedMinConnections = 1;
 
 	/**
 	 * @param graphController
@@ -165,7 +170,9 @@ public class LeastConnected extends PreferenceHider {
 					leastConnectedNodes.add(minimallyConnectedNode);
 					
 				}
-
+				
+				estimatedMinConnections = nodeToConnections.getKey();
+				
 				Utils.talk(toString(), "Selecting " + leastConnectedNodes + " of size " + nodeToConnections.getKey() + " as minimal.");
 				
 				break;
@@ -177,7 +184,7 @@ public class LeastConnected extends PreferenceHider {
 		// If we have not been able to find K nodes greater than 0 connectivity, return random.
 		if ( leastConnectedNodes.size() == 0 ) {
 			
-			Utils.talk(toString(), "Not suitable connectivity information, selecting randomly.");
+			Utils.talk(toString(), "No suitable connectivity information, selecting randomly.");
 			
 			for ( StringVertex randomNode : randomSet.createRandomSet(numberOfHideLocations, new TreeSet<StringVertex>(hideLocations())) ) {
 				
@@ -195,7 +202,7 @@ public class LeastConnected extends PreferenceHider {
 		
 		leastConnectedNodes.addAll(shuffledLeastConnectedNodes);
 		
-		Utils.talk(toString(), "lestConnectedNodes: " + leastConnectedNodes);
+		Utils.talk(toString(), "leastConnectedNodes: " + leastConnectedNodes);
 		
 		return leastConnectedNodes;
 		
@@ -221,17 +228,19 @@ public class LeastConnected extends PreferenceHider {
 	public boolean hideHere(StringVertex vertex) {
 		
 		// Ensure the check for edge connectivity is only made when *at* a node
-		if ( currentNode == vertex && getConnectedEdges(vertex).size() == MAX_CONNECTIONS ) { 
+		if ( currentNode == vertex && getConnectedEdges(vertex).size() == MIN_CONNECTIONS ) { 
 			
 			if ( !leastConnectedNodes.contains(vertex) ) leastConnectedNodes.add(vertex);
 			
-			return true;
+			addTargetVertex(vertex);
 			
-		} else {
-			
-			return super.hideHere(vertex);
-			
-		}
+		} 
+		
+		/* 
+		 * NOTE: Should LeastConnected do something if its target nodes have connectivity
+		 * significantly higher than what has been estimated?
+		 */
+		return super.hideHere(vertex);
 		
 	}
 	
@@ -284,7 +293,7 @@ public class LeastConnected extends PreferenceHider {
 		
 		if (getConnectedEdges(vertex).size() < minConnections) minConnections = graphController.degreeOf(vertex);
 		
-		if (getConnectedEdges(vertex).size() == MAX_CONNECTIONS) { 
+		if (getConnectedEdges(vertex).size() == MIN_CONNECTIONS) { 
 			
 			triedNodes.clear(); 
 			
