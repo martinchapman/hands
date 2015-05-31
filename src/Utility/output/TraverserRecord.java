@@ -28,8 +28,8 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 	 */
 	public void setTraverser(String traverser) {
 		
-		this.traverser = traverser;
-	
+		this.traverser = Utils.shortenOutputName(traverser);
+		
 	}
 	
 	/**
@@ -143,7 +143,7 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 	 */
 	public TraverserRecord(String traverser) {
 	
-		this.traverser = traverser;
+		setTraverser(traverser);
 		
 		attributeToValue = new LinkedHashMap<AttributeSetIdentifier, Hashtable<String, Double>>();
 		
@@ -511,7 +511,11 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 					  
 					if ( attributeToValue.size() > 1 && minAttributeToValueAllSeries != null && maxAttributeToValueAllSeries != null ) {
 						
-						attributeToDataset.get(attributeToValueEntry.getKey()).addItemToDataset( (attributeToValueEntry.getValue() - minAttributeToValueAllSeries.get(attributeToValueEntry.getKey())) / (maxAttributeToValueAllSeries.get(attributeToValueEntry.getKey()) - minAttributeToValueAllSeries.get(attributeToValueEntry.getKey())) );
+						if ( minAttributeToValueAllSeries.containsKey(attributeToValueEntry.getKey()) && maxAttributeToValueAllSeries.containsKey(attributeToValueEntry.getKey())) {
+							
+							attributeToDataset.get(attributeToValueEntry.getKey()).addItemToDataset( (attributeToValueEntry.getValue() - minAttributeToValueAllSeries.get(attributeToValueEntry.getKey())) / (maxAttributeToValueAllSeries.get(attributeToValueEntry.getKey()) - minAttributeToValueAllSeries.get(attributeToValueEntry.getKey())) );
+						
+						}
 						
 					} else {
 						
@@ -523,9 +527,13 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 					
 					if ( attributeToValue.size() > 1 && minAttributeToValueAllSeries != null && maxAttributeToValueAllSeries != null ) {
 						
-						TraverserDataset gameEntriesForAttribute = new TraverserDataset( (attributeToValueEntry.getValue() - minAttributeToValueAllSeries.get(attributeToValueEntry.getKey()) ) / ( maxAttributeToValueAllSeries.get(attributeToValueEntry.getKey()) - minAttributeToValueAllSeries.get(attributeToValueEntry.getKey()) ) );
+						if ( minAttributeToValueAllSeries.containsKey(attributeToValueEntry.getKey()) && maxAttributeToValueAllSeries.containsKey(attributeToValueEntry.getKey())) {
 						
-						attributeToDataset.put(attributeToValueEntry.getKey(), gameEntriesForAttribute);
+							TraverserDataset gameEntriesForAttribute = new TraverserDataset( (attributeToValueEntry.getValue() - minAttributeToValueAllSeries.get(attributeToValueEntry.getKey()) ) / ( maxAttributeToValueAllSeries.get(attributeToValueEntry.getKey()) - minAttributeToValueAllSeries.get(attributeToValueEntry.getKey()) ) );
+						
+							attributeToDataset.put(attributeToValueEntry.getKey(), gameEntriesForAttribute);
+						
+						}
 						
 					} else {
 						
@@ -680,22 +688,22 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 			
 			// If this is a round entry
 			if ( attributeEntry.getKey().getGameOrRound().equals("Round") ) {
-			
+	
 				// For each attribute entry within that round
 				for ( Entry<String, Double> attributeToValueEntry : attributeEntry.getValue().entrySet() ) {
 					
-					// If an entry for the round doesn't exist within our cumulative map...
-					if ( !cumulativeRoundsAttributeToValue.containsKey( attributeEntry.getKey().getRoundNumber() ) ) {
+					// If an entry for the round doesn't exist within our cumulative map (should only happen for first game processed)...
+					if ( !cumulativeRoundsAttributeToValue.containsKey( new AttributeSetIdentifier(attributeEntry.getKey().getRoundNumber()) ) ) {
 					
 						// Create it
 						cumulativeRoundsAttributeToValue.put(new AttributeSetIdentifier(attributeEntry.getKey().getRoundNumber()), new Hashtable<String, Double>());
 					
 					}
-						
+				
 					// See if an entry for this attribute already exists at this round number, if it does, add it on 
 					if ( cumulativeRoundsAttributeToValue.get(new AttributeSetIdentifier(attributeEntry.getKey().getRoundNumber())).containsKey(attributeToValueEntry.getKey()) ) {
 						
-						cumulativeRoundsAttributeToValue.get(attributeEntry.getKey().getRoundNumber()).put(attributeToValueEntry.getKey(), cumulativeRoundsAttributeToValue.get(attributeEntry.getKey().getRoundNumber()).get(attributeToValueEntry.getKey()) + attributeToValueEntry.getValue() );
+						cumulativeRoundsAttributeToValue.get(new AttributeSetIdentifier(attributeEntry.getKey().getRoundNumber())).put(attributeToValueEntry.getKey(), cumulativeRoundsAttributeToValue.get(new AttributeSetIdentifier(attributeEntry.getKey().getRoundNumber())).get(attributeToValueEntry.getKey()) + attributeToValueEntry.getValue() );
 					
 						attributeAdditions++;
 						
@@ -746,7 +754,7 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 		
 		LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>> series = new LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>>(averageRoundAttributeToValue);
 		
-		series = Utils.manualReverse(series);
+		//series = Utils.manualReverse(series);
 		
 		return series;
 		

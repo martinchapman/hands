@@ -6,9 +6,9 @@ import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.HidingAgent;
 import Utility.Utils;
 
-public class NotConnecting extends HidingAgent {
+public class NotConnected extends HidingAgent {
 
-	public NotConnecting( GraphController<StringVertex, StringEdge> graphController, int numberOfHideLocations) {
+	public NotConnected( GraphController<StringVertex, StringEdge> graphController, int numberOfHideLocations) {
 		
 		super(graphController, numberOfHideLocations);
 

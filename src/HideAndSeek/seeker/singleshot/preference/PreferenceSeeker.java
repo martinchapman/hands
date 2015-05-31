@@ -136,6 +136,8 @@ public abstract class PreferenceSeeker extends SeekingAgent implements VariableT
 		
 		targetVertices.clear();
 		
+		targetsGenerated = false;
+		
 		currentPath.clear();
 		
 		explorationMechanism.endOfRound();
@@ -171,6 +173,8 @@ public abstract class PreferenceSeeker extends SeekingAgent implements VariableT
 		if ( uniquelyVisitedNodes().size() >= ( graphController.vertexSet().size() * graphPortion ) && !targetsGenerated ) {
 			
 			targetVertices = computeTargetNodes();
+			
+			Utils.talk(toString(), "Target nodes: " + targetVertices);
 			
 			targetsGenerated = true;
 			

@@ -215,8 +215,6 @@ public class LeastConnected extends PreferenceHider {
 		
 		super.endOfRound();
 		
-		leastConnectedNodes.clear();
-		
 		maxConnections = 1;
 		
 	}

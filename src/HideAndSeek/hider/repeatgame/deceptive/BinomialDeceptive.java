@@ -31,7 +31,7 @@ public class BinomialDeceptive extends Deceptive {
 			
 			bp.setR(deceptionDuration);
 			
-			double bProbability = bp.calculateBinomialProbability();
+			double bProbability = bp.calculateRorGreaterSuccesses();
 			
 			// Less that 0.01
 			if ( bProbability < 0.01) this.deceptionDuration = deceptionDuration;

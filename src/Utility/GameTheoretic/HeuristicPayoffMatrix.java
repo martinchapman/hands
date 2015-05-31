@@ -2,8 +2,10 @@ package Utility.GameTheoretic;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -218,38 +220,76 @@ public class HeuristicPayoffMatrix {
 		
 	}
 	
+	/**
+	 * @return
+	 */
 	public ArrayList<String> GTAnalysis() {
 		
 		for ( Entry<String, ArrayList<StrategyPayoff>> player : playerToStrategies.entrySet() ) {
 			
-			if ( player.getValue().size() < 2 ) System.err.println("Each player must have at least two strategies in order to analyse matrix.");
-			
-			return new ArrayList<String>();
+			if ( player.getValue().size() < 2 ) { 
+				
+				System.err.println("Each player must have at least two strategies in order to analyse matrix.");
+				
+				return new ArrayList<String>();
+				
+			}
 			
 		}
 		
-		formatForLRS();
+		outputForLRS();
 		
 		return getGTData();
 		
 	}
 
 	/**
-	 * 
+	 * @param values
 	 */
-	private  void formatForLRS() {
+	private void outputForLRS() {
 		
 		Utils.clearFile(Utils.FILEPREFIX + "GTData");
-
+		
 		FileWriter nashOutputWriter = null;
 		
 		try {
+			
 			nashOutputWriter = new FileWriter(Utils.FILEPREFIX + "/GTData", true);
+			
 		} catch (IOException e) {
+			
 			e.printStackTrace();
+			
 		}
 		
-		if ( !playerToStrategies.containsKey("Hider") || !playerToStrategies.containsKey("Seeker") ) return;
+		for ( String bimatrixLine : formatAsBimatrix() ) Utils.writeToFile(nashOutputWriter, bimatrixLine);
+					
+		try {
+			
+			nashOutputWriter.close();
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+			
+		}
+		
+	}
+	
+	/**
+	 * 
+	 */
+	private ArrayList<String> formatAsBimatrix() {
+		
+		ArrayList<String> bimatrixLines = new ArrayList<String>();
+		
+		if ( !playerToStrategies.containsKey("Hider") || !playerToStrategies.containsKey("Seeker") ) {
+			
+			System.out.println("No information for Hider and Seeker");
+			
+			return new ArrayList<String>();
+		
+		}
 		
 		ArrayList<StrategyPayoff> hiderStrategies = playerToStrategies.get("Hider");
 		
@@ -259,46 +299,44 @@ public class HeuristicPayoffMatrix {
 		
 		Collections.sort(seekerStrategies);
 		
-		Utils.writeToFile(nashOutputWriter, hiderStrategies.size() + " " + seekerStrategies.size() + "\n");
+		bimatrixLines.add(hiderStrategies.size() + " " + seekerStrategies.size() + "\n");
 		
-		Utils.writeToFile(nashOutputWriter, "\n");
+		bimatrixLines.add("\n");
 		
 		for ( StrategyPayoff hiderPayoff : hiderStrategies ) {
 		
 			for ( Entry<String, Double> payoff : hiderPayoff.opponentPayoffs().entrySet() ) {
 				
-				Utils.writeToFile(nashOutputWriter, payoff.getValue() + " ");
+				bimatrixLines.add(payoff.getValue() + " ");
 				
 			}
 			
-			Utils.writeToFile(nashOutputWriter, "\n");
+			bimatrixLines.add("\n");
 			
 		}
 		
-		Utils.writeToFile(nashOutputWriter, "\n");
+		bimatrixLines.add("\n");
 		
 		for ( int i = 0; i < hiderStrategies.size(); i++ ) {
 			
 			for ( StrategyPayoff seekerPayoff : seekerStrategies ) {
 				
-				Utils.writeToFile(nashOutputWriter, new ArrayList<Entry<String, Double>>(seekerPayoff.opponentPayoffs().entrySet()).get(i).getValue() + " ");
+				bimatrixLines.add(new ArrayList<Entry<String, Double>>(seekerPayoff.opponentPayoffs().entrySet()).get(i).getValue() + " ");
 				
 			}
 			
-			Utils.writeToFile(nashOutputWriter, "\n");
+			bimatrixLines.add("\n");
 			
 		}
 		
-		try {
-			nashOutputWriter.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		return bimatrixLines;
 
 	}
 	
-	private ArrayList<String> getGTData() {
+	/**
+	 * @return
+	 */
+	public ArrayList<String> getGTData() {
 		
 		Utils.runCommand("/usr/local/bin/setnash " + Utils.FILEPREFIX + "GTData" + " " + Utils.FILEPREFIX + "Player1 " + Utils.FILEPREFIX + "Player2");
 		
@@ -318,8 +356,7 @@ public class HeuristicPayoffMatrix {
 			
 			if ( line.contains("*") || line.length() == 0 ) continue;
 			
-			//Utils.talk(toString(), "Data: " + line);
-			System.out.println("Data: " + line);
+			Utils.talk("", "Data: " + line);
 			
 			String[] lineSplitArray = line.split(" ");
 		
@@ -353,7 +390,7 @@ public class HeuristicPayoffMatrix {
 						
 						double percentage = ( (double)(Integer.parseInt(fractionSplit[0].trim())) / (double)(Integer.parseInt(fractionSplit[1].trim())) ) * 100;
 						
-						hider += pureStrategy + " (" + percentage + ") ";
+						hider += pureStrategy + " (" + twoDecimalPlaces(percentage) + "\\%) ";
 						
 						if (!lineSplit.get(lineSplit.size() - 1).contains("/")) {
 							
@@ -391,7 +428,7 @@ public class HeuristicPayoffMatrix {
 						
 						double percentage = ( (double)Integer.parseInt(fractionSplit[0].trim()) / (double)Integer.parseInt(fractionSplit[1].trim()) ) * 100;
 						
-						seeker += pureStrategy + " (" + percentage + ") ";
+						seeker += pureStrategy + " (" + twoDecimalPlaces(percentage) + "\\%) ";
 						
 						if (!lineSplit.get(lineSplit.size() - 1).contains("/")) {
 							
@@ -413,7 +450,7 @@ public class HeuristicPayoffMatrix {
 			
 			if (!hider.equals("") && !seeker.equals("") ) { 
 				
-				formattedData.add("Hider: " + hider + " (Payoff: " + hiderUtility + ") | Seeker: " + seeker + " (Payoff: " + seekerUtility + ")");
+				formattedData.add("Hider: " + hider + " (Payoff: " + twoDecimalPlaces(hiderUtility) + ") and Seeker: " + seeker + " (Payoff: " + twoDecimalPlaces(seekerUtility) + ")");
 				
 				hider = "";
 				
@@ -427,6 +464,21 @@ public class HeuristicPayoffMatrix {
 		
 	}
 	
+	/**
+	 * @param original
+	 * @return
+	 */
+	public String twoDecimalPlaces(double original) {
+		
+	     DecimalFormat f = new DecimalFormat("##.00");
+	     
+	     return f.format(original);
+	     
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString() {
 		
 		ArrayList<StrategyPayoff> hiderStrategies = playerToStrategies.get("Hider");
@@ -469,11 +521,343 @@ public class HeuristicPayoffMatrix {
 		
 	}
 	
+	/**
+	 * @return
+	 */
+	public ArrayList<String> TikzMatrix() {
+		
+		ArrayList<String> tikzLines = new ArrayList<String>();
+		
+		//
+		
+		//tikzLines.add("\\begin{figure}[h!]");
+		
+		//tikzLines.add("\n");
+		
+		//tikzLines.add("\\centering");
+		
+		//tikzLines.add("\n");
+		
+		//tikzLines.add("\\begin{minipage}{0.5\\textwidth}");
+		
+		//tikzLines.add("\n");
+		
+		tikzLines.add("\\begin{tikzpicture};");
+		
+		tikzLines.add("\n");
+				
+		//
+		
+		tikzLines.add("\\def\\mycolhead{{");
+		
+		for ( StrategyPayoff seekerStrategies : playerToStrategies.get("Seeker") ) {
+			
+			tikzLines.add("\"" + seekerStrategies.toString() + "\",");
+			
+		}
+		
+		String lastLine = tikzLines.remove(tikzLines.size() - 1);
+		lastLine = lastLine.substring(0, lastLine.length() - 1);
+		tikzLines.add(lastLine);
+		
+		tikzLines.add("}}");
+		
+		tikzLines.add("\n");
+				
+		tikzLines.add("\\def\\myrowhead{{");
+		
+		for ( StrategyPayoff hiderStrategies : playerToStrategies.get("Hider") ) {
+			
+			tikzLines.add("\"" + hiderStrategies.toString() + "\",");
+			
+		}
+			
+		lastLine = tikzLines.remove(tikzLines.size() - 1);
+		lastLine = lastLine.substring(0, lastLine.length() - 1);
+		tikzLines.add(lastLine);
+		
+		tikzLines.add("}}");
+		
+		tikzLines.add("\n");
+		
+		//
+		
+		tikzLines.add("\\matrix[matrix of math nodes,draw,every odd row/.style={align=right},everyevenrow/.style={align=left},nodes={text width=2.5cm},row sep=0.2cm,column sep=0.2cm](m){");
+		
+		tikzLines.add("\n");
+		
+		ArrayList<String> bimatrixLines = formatAsBimatrix();
+		
+		// Get rid of reference to strategy numbers
+		bimatrixLines.remove(0);
+		
+		ArrayList<String> hiderPayoffs = new ArrayList<String>(bimatrixLines.subList(0, bimatrixLines.size() / 2));
+		
+		ArrayList<String> seekerPayoffs = new ArrayList<String>(bimatrixLines.subList(bimatrixLines.size() / 2, bimatrixLines.size()));
+		
+		if ( hiderPayoffs.size() != seekerPayoffs.size() ) System.out.println("Should be equal");
+		
+		for ( int i = 0; i < hiderPayoffs.size() - 1; i++ ) {
+		
+			if (seekerPayoffs.get(i).trim().length() == 0 || seekerPayoffs.get(i + 1).trim().length() == 0) continue;
+			
+			tikzLines.add(seekerPayoffs.get(i).trim() + "&" + seekerPayoffs.get(i + 1).trim() + "\\\\");
+			tikzLines.add(hiderPayoffs.get(i).trim() + "&" + hiderPayoffs.get(i + 1).trim() + "\\\\");
+			
+		}
+		
+		tikzLines.add("\n");
+		
+		tikzLines.add("};");
+		
+		tikzLines.add("\n");
+		
+		//
+		
+		tikzLines.add("\\foreach\\x[count=\\xi from 2,evaluate={\\xx=int(2*\\x));\\xxi=int(\\xx+1)}] in {");
+		
+		for (int i = 1; i < playerToStrategies.get("Seeker").size(); i++ ) {
+			
+			tikzLines.add(i + ",");
+			
+		}
+		
+		lastLine = tikzLines.remove(tikzLines.size() - 1);
+		lastLine = lastLine.substring(0, lastLine.length() - 1);
+		tikzLines.add(lastLine);
+		
+		tikzLines.add("}{");
+		
+		tikzLines.add("\n");
+		
+		tikzLines.add("\\draw ({$(m-1-\\x)!0.5!(m-1-\\xi)$}|-m.north) -- ({$(m-1-\\x)!0.5!(m-1-\\xi)$}|-m.south);");
+				
+		tikzLines.add("\n");
+		
+		tikzLines.add("}");
+		
+		tikzLines.add("\n");
+		
+		//
+		
+		tikzLines.add("\\foreach\\x[count=\\xi from 2,evaluate={\\xx=int(2*\\x));\\xxi=int(\\xx+1)}] in {");
+		
+		for (int i = 1; i < playerToStrategies.get("Hider").size(); i++ ) {
+			
+			tikzLines.add(i + ",");
+			
+		}
+		
+		lastLine = tikzLines.remove(tikzLines.size() - 1);
+		lastLine = lastLine.substring(0, lastLine.length() - 1);
+		tikzLines.add(lastLine);
+		
+		tikzLines.add("}{");
+		
+		tikzLines.add("\n");
+		
+		tikzLines.add("\\draw ({$(m-\\xx-1)!0.5!(m-\\xxi-1)$}-|m.west) -- ({$(m-\\xx-1)!0.5!(m-\\xxi-1)$}-|m.east);");
+				
+		tikzLines.add("\n");
+		
+		tikzLines.add("}");
+		
+		tikzLines.add("\n");
+		
+		//
+		
+		tikzLines.add("\\foreach\\x in{");
+		
+		for (int i = 0; i < playerToStrategies.get("Seeker").size(); i++ ) {
+			
+			tikzLines.add(i + ",");
+			
+		}
+		
+		lastLine = tikzLines.remove(tikzLines.size() - 1);
+		lastLine = lastLine.substring(0, lastLine.length() - 1);
+		tikzLines.add(lastLine);
+		
+		tikzLines.add("}{");
+		
+		tikzLines.add("\n");
+		
+		tikzLines.add("\\node[text depth=0.25ex,above=2mm] at ($(m.north west)!{(2*\\x+1)/");
+		
+		tikzLines.add((playerToStrategies.get("Seeker").size() * 2) + "");
+		
+		tikzLines.add("}!(m.north east)$)");
+		
+		tikzLines.add("\n");
+		
+		tikzLines.add("{\\pgfmathparse{\\mycolhead[\\x]}\\pgfmathresult};");
+		
+		tikzLines.add("\n");
+		
+		tikzLines.add("}");
+		
+		tikzLines.add("\n");
+		
+		//
+		
+		tikzLines.add("\\foreach\\x in{");
+		
+		for (int i = 0; i < playerToStrategies.get("Hider").size(); i++ ) {
+			
+			tikzLines.add(i + ",");
+			
+		}
+		
+		lastLine = tikzLines.remove(tikzLines.size() - 1);
+		lastLine = lastLine.substring(0, lastLine.length() - 1);
+		tikzLines.add(lastLine);
+		
+		tikzLines.add("}{");
+		
+		tikzLines.add("\n");
+		
+		tikzLines.add("\\node[left=2mm] at ($(m.north west)!{(2*\\x+1)/");
+		
+		tikzLines.add((playerToStrategies.get("Hider").size() * 2) + "");
+		
+		tikzLines.add("}!(m.south west)$)");
+		
+		tikzLines.add("\n");
+		
+		tikzLines.add("{\\pgfmathparse{\\myrowhead[\\x]}\\pgfmathresult};");
+		
+		tikzLines.add("\n");
+		
+		tikzLines.add("}");
+		
+		//tikzLines.add("\n");
+		
+		//tikzLines.add("\\node[above=18pt of m.north] (firm b) {Seeker};");
+		
+		//tikzLines.add("\n");
+		
+		//tikzLines.add("\\node[left=1.6cm of m.west,align=center,anchor=center] {Hider};");
+		
+		tikzLines.add("\n");
+		
+		tikzLines.add("\\end{tikzpicture}");
+		
+		tikzLines.add("\n");
+		
+		// Uncomment for caption directly in Tikz
+		/*String captionString = "";
+		
+		for ( String line : GTAnalysis() ) { 
+			
+			captionString += line;
+		
+		}
+		
+		tikzLines.add("\\caption{" + captionString + "}");
+		
+		tikzLines.add("\n");
+		
+		tikzLines.add("\\label{" + "" + "}");
+		
+		tikzLines.add("\n");
+		
+		tikzLines.add("\\end{minipage}");
+		
+		tikzLines.add("\n");
+		
+		tikzLines.add("\\end{figure}");
+		
+		tikzLines.add("\n");*/
+		
+		return tikzLines;
+		
+	}
+	
+	/**
+	 * 
+	 */
+	public void printTikzMatrix() {
+		
+		for ( String line : TikzMatrix() ) {
+		
+			if ( line.equals("\n") ) {
+				
+				System.out.println("");
+				
+			} else {
+				
+				System.out.print(line);
+				
+			}
+			
+		}
+		
+	}
+	
+	/**
+	 * 
+	 */
+	public void printTikzMatrixToFile() {
+		
+		String outputPath = "figure" + new SimpleDateFormat("yyyyMMddHHmmss").format(Calendar.getInstance().getTime());
+		
+		FileWriter tikzOutputWriter = null;
+		
+		try {
+			
+			tikzOutputWriter = new FileWriter(Utils.FILEPREFIX + "data/charts/" + outputPath + ".tex", true);
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		
+		}
+		
+		for ( String line : TikzMatrix() ) {
+			
+			Utils.writeToFile(tikzOutputWriter, line);
+			
+		}
+			
+		try {
+			
+			tikzOutputWriter.close();
+		
+		} catch (IOException e) {
+		
+			e.printStackTrace();
+		
+		}
+		
+		try {
+			
+			String captionString = "";
+			
+			for ( String line : GTAnalysis() ) { 
+				
+				captionString += line;
+			
+			}
+			
+			Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "/data/charts/figures.bib", true), "\n @FIG{" + outputPath + ", main = {" + captionString + "}, add = {}, file = {/Users/Martin/Dropbox/workspace/SearchGames/output/data/charts/" + outputPath + "}, source = {}}");
+		
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		
+		}
+		
+	}
+	
+	/**
+	 * For testing.
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		
 		HeuristicPayoffMatrix HPM = new HeuristicPayoffMatrix("");
 		
-		HPM.addPayoff("Hider", "Up", "Left", 2);
+		/*HPM.addPayoff("Hider", "Up", "Left", 2);
 		HPM.addPayoff("Hider", "Up", "Right", 1);
 		HPM.addPayoff("Hider", "Down", "Left", 3);
 		HPM.addPayoff("Hider", "Down", "Right", 1);
@@ -485,11 +869,13 @@ public class HeuristicPayoffMatrix {
 		HPM.addPayoff("Seeker", "Left", "Down", 0);
 		HPM.addPayoff("Seeker", "Right", "Down", 5);
 		HPM.addPayoff("Seeker", "Left", "Bob", 0);
-		HPM.addPayoff("Seeker", "Right", "Bob", 5);
+		HPM.addPayoff("Seeker", "Right", "Bob", 5);*/
 		
-		System.out.println(HPM);
+		//System.out.println(HPM);
 		
-		for ( String line : HPM.GTAnalysis() ) System.out.println(line);
+		//HPM.printTikzMatrix();
+		
+		HPM.getGTData();
 	
 	}
 	

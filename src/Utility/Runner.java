@@ -73,12 +73,13 @@ public class Runner extends JFrame {
 		  "RandomSetStaticBetween",
 		  "UniqueRandomSet",
 		  "UniqueRandomSetRepeat",
+		  "UniqueRandomSetRepeatRandomNodes",
 		  "AutomaticUniqueRandomSetRepeat",
 		  
 		  "FirstK",
 		  //"RandomDirection",
 		  "FirstKMinus1",
-		  "NotConnecting",
+		  "NotConnected",
 		  "FirstKFixedStart",
 		  "FirstKStaticBetween",
 		  
@@ -124,6 +125,8 @@ public class Runner extends JFrame {
 		  
 		  ////
 		  
+		  "DeceptiveNew",
+		  "VariableDeceptiveNew",
 		  "SetDeceptiveNodes",
 		  "VariableDeceptiveNodes",
 		  
@@ -168,6 +171,7 @@ public class Runner extends JFrame {
 		  "RandomWalk",
 		  "SelfAvoidingRandomWalk",
 		  "SelfAvoidingRandomWalkGreedy",
+		  "RepeatGreedy",
 		  "Greedy",
 		  "DepthFirstSearch",
           "DepthFirstSearchGreedy",
@@ -184,6 +188,8 @@ public class Runner extends JFrame {
 	      "VariableLeastConnectedFirst",
 	      "MostConnectedFirst",
 	      "ApproximateLeastConnectedNodes",
+	      "MaxDistanceFirst",
+	      
 	      "LinkedPath",
 	      
           "HighProbability",
@@ -396,9 +402,15 @@ public class Runner extends JFrame {
 				
 				for (ArrayList<HiderRecord> fileHiderRecord : outputManager.getFileHiderRecords()) {
 
+					Utils.printSystemStats();
+					
 					for (HiderRecord hiderRecord : fileHiderRecord) {
 						
+						Utils.printSystemStats();
+						
 						for ( TraverserRecord hidersSeeker : hiderRecord.getSeekersAndAttributes() ) {
+							
+							Utils.printSystemStats();
 							
 							HiderRecord hiderCopy = new HiderRecord("");
 							
@@ -781,19 +793,22 @@ public class Runner extends JFrame {
 					
 				}
 				
+				ArrayList<TraverserRecord> allPlayers = new ArrayList<TraverserRecord>(selectedHiders);
+				allPlayers.addAll(selectedSeekers);
+				
 				if (seekers.isSelected()) {
 					
 					if (graphTypes.getSelectedItem().equals("Line")) {
 						
-						outputManager.showLineGraphForAttribute(selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected());
+						outputManager.showLineGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected());
 				
 					} else if (graphTypes.getSelectedItem().equals("Bar")) {
 						
-						outputManager.showBarGraphForAttribute(selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
+						outputManager.showBarGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
 						
 					} else if (graphTypes.getSelectedItem().equals("3D")) {
 						
-						outputManager.show3DGraphForAttribute(selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
+						outputManager.show3DGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
 						
 					}
 					
@@ -801,11 +816,11 @@ public class Runner extends JFrame {
 					
 					if (graphTypes.getSelectedItem().equals("Line")) {
 						
-						outputManager.showLineGraphForAttribute(selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected());
+						outputManager.showLineGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected());
 						
 					} else if (graphTypes.getSelectedItem().equals("Bar")) {
 						
-						outputManager.showBarGraphForAttribute(selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
+						outputManager.showBarGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
 						
 					}
 					
@@ -816,13 +831,13 @@ public class Runner extends JFrame {
 					
 					HeuristicPayoffMatrix HPM = new HeuristicPayoffMatrix("");
 					
-					for ( Entry<TraverserRecord, Double> seekerPayoff : outputManager.matrixPayoff(selectedSeekers).entrySet() ) {
+					for ( Entry<TraverserRecord, Double> seekerPayoff : outputManager.matrixPayoff(selectedSeekers, allPlayers).entrySet() ) {
 						
 						HPM.addPayoff("Seeker", seekerPayoff.getKey().toString().split(" vs ")[0], seekerPayoff.getKey().toString().split(" vs ")[1], seekerPayoff.getValue());
 						
 					}
 					
-					for ( Entry<TraverserRecord, Double> hiderPayoff : outputManager.matrixPayoff(selectedHiders).entrySet() ) {
+					for ( Entry<TraverserRecord, Double> hiderPayoff : outputManager.matrixPayoff(selectedHiders, allPlayers).entrySet() ) {
 						
 						HPM.addPayoff("Hider", hiderPayoff.getKey().toString().split(" vs ")[0], hiderPayoff.getKey().toString().split(" vs ")[1], hiderPayoff.getValue());
 						
@@ -831,11 +846,21 @@ public class Runner extends JFrame {
 					
 					System.out.println(HPM);
 					
-					for ( String line : HPM.GTAnalysis() ) System.out.println(line);
+					for ( String line : HPM.GTAnalysis() ) { 
+						
+						System.out.println(line);
+					
+					}
+					
+					if ( outputEnabled.isSelected() ) {
+						
+						HPM.printTikzMatrixToFile();
+						
+					}
 				
 				}
 				
-				//collateOutput.doClick();
+				showFiles.doClick();
 				
 			}
 		

@@ -43,6 +43,9 @@ public class LeastConnected extends PreferenceSeeker {
 	@Override
 	public LinkedHashSet<StringVertex> computeTargetNodes() {
 
+		/* ~MDC 27/5 This is just a shorter way of doing what a Hider's least connected strategy does,
+		 * albeit this selects *all* nodes.
+		 */
 		class NodeConnectivity implements Comparable<NodeConnectivity> {
 
 			/**

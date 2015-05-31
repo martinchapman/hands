@@ -1,6 +1,10 @@
 package Utility;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+
+import Utility.output.gnuplot.GNUGraph;
+import Utility.output.gnuplot.GNULineGraph;
 
 /**
  * http://www.mathwords.com/b/binomial_probability_formula.htm
@@ -70,8 +74,6 @@ public class BinomialProbability {
 		
 		this.p = numberOfHideLocations / (double)numberOfNodes;
 		
-		System.out.println(p);
-		
 		this.failure_in_one_trial = 1 - p;
 		
 	}
@@ -95,12 +97,31 @@ public class BinomialProbability {
 		
 	}
 	
+	private double calculateBinomialProbability(int r) {
+		
+		return ( nChoosesK(minus_r, r).doubleValue() * Math.pow(p, r) ) * Math.pow(failure_in_one_trial, minus_r - r);
+		
+	}
 	/**
 	 * @return
 	 */
-	public double calculateBinomialProbability() {
+	public double calculateRSuccesses() {
 		
-		return nChoosesK(minus_r, r).doubleValue() * Math.pow(p, r) * Math.pow(failure_in_one_trial, minus_r - r);
+		return calculateBinomialProbability(r);
+		
+	}
+	
+	public double calculateRorGreaterSuccesses() {
+		
+		double cumulativeLessThanR = 0.0;
+		
+		for ( int i = 0; i < r; i++ ) {
+			
+			cumulativeLessThanR += calculateBinomialProbability(i);
+			
+		}
+		
+		return 1 - cumulativeLessThanR;
 		
 	}
 	
@@ -178,7 +199,11 @@ public class BinomialProbability {
 		// http://www.mathwords.com/b/binomial_probability_formula.htm
 		// BinomialProbability bp = new BinomialProbability(10, 7, 0.25);
 		
+		GNULineGraph graph = new GNULineGraph("");
+		
 		BinomialProbability bp = new BinomialProbability(99, 1, 95, 5);
+		
+		ArrayList<Double> values = new ArrayList<Double>();
 		
 		for (int i = 1; i <= 100; i++) {
 			
@@ -190,9 +215,20 @@ public class BinomialProbability {
 			
 			bp.setR(deceptionDuration);
 			
-			System.out.println("Deception Duration: " + i + " " + bp.calculateBinomialProbability());
+			values.add(bp.calculateRorGreaterSuccesses());
+			
+			System.out.println("Deception Duration: " + i + " " + bp.calculateRorGreaterSuccesses());
 			
 		}
+		
+		//Deprecated
+		//graph.setXStart(1);
+		
+		graph.addDataset("", values);
+		
+		graph.styleGraph();
+		
+		graph.createChart("", "$\\delta$ ($K$)", "$P$");
 		
 	}
 	

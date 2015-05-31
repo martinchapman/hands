@@ -19,6 +19,7 @@ import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,10 +45,6 @@ import HideAndSeek.graph.HiddenObjectGraph;
  * @author Martin
  *
  */
-/**
- * @author Martin
- *
- */
 public class Utils {
 
 	/**
@@ -70,6 +67,32 @@ public class Utils {
 	 */
 	public static String KEY = "trFdcuAh"; 
 	
+	public final static String shortenOutputName(String name) {
+		
+		Hashtable<String, String> shortenedNames = new Hashtable<String, String>();
+		
+		//
+		
+		shortenedNames.put("sDepthFirstSearch", "sDFS");
+		shortenedNames.put("sDepthFirstSearchGreedy", "sDFSGreedy");
+		shortenedNames.put("sBreadthFirstSearch", "sBFS");
+		shortenedNames.put("sBreadthFirstSearchGreedy", "sBFSGreedy");
+		shortenedNames.put("sSelfAvoidingRandomWalk", "sRandomWalk");
+		shortenedNames.put("sNotConnecting", "sNotConnected");
+		
+		//
+		
+		if (shortenedNames.containsKey(name)) { 
+			
+			return shortenedNames.get(name);
+		
+		} else {
+			
+			return name;
+			
+		}
+		
+	}
 	/**
 	 * @return
 	 */
@@ -81,15 +104,12 @@ public class Utils {
 		
 	}
 	
+	/**
+	 * @param command
+	 */
 	public final static void runCommand(String command) {
 		
-		ArrayList<String> returnLines = runCommandWithReturn(command);
-		
-		for ( String line : returnLines ) {
-			
-			System.out.println(line);
-			
-		}
+		runCommandWithReturn(command);
 		
 	}
 	
@@ -123,6 +143,7 @@ public class Utils {
 			while ((line = outputs.readLine()) != null) {  
 			
 				returnLines.add(line);  
+				System.out.println(line);
 			
 			}
 			
@@ -136,7 +157,8 @@ public class Utils {
 		
 			while ((line = errors.readLine()) != null) {  
 				
-				returnLines.add(line);  
+				returnLines.add(line); 
+				System.out.println(line);
 			
 			}
 			
@@ -150,7 +172,7 @@ public class Utils {
 		
 			proc.waitFor();
 		
-		} catch (InterruptedException e) { returnLines.add(e.getMessage()); }
+		} catch (InterruptedException e) { System.out.println(e); returnLines.add(e.getMessage()); }
 	    
 		return returnLines;
 		

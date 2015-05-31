@@ -508,18 +508,6 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	 */
 	public void endOfRound() { 
 		
-		if (uniquelyVisitedNodes != null) {
-			
-			//uniquelyVisitedNodes.clear();
-			
-		}
-		
-		if (uniquelyVisitedEdges != null) {
-			
-			//uniquelyVisitedEdges.clear();
-			
-		}
-		
 		roundsPassed++;
 		
 	}

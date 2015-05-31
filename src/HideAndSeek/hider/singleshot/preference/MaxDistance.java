@@ -128,6 +128,8 @@ public class MaxDistance extends PreferenceHider {
 	@Override
 	public LinkedHashSet<StringVertex> computeTargetNodes() {
 		
+		final boolean DEBUG_MECHANISM = false;
+		
 		DijkstraShortestPath<StringVertex, StringEdge> DSP = null;
 
 		LinkedHashSet<StringVertex> targetVertices = new LinkedHashSet<StringVertex>();
@@ -223,6 +225,8 @@ public class MaxDistance extends PreferenceHider {
 						
 						combinations = Utils.combinations(new ArrayList<ArrayList<StringVertex>>(kthPositionCandidates.values()));
 						
+						break;
+						
 					}
 					
 				}
@@ -238,7 +242,7 @@ public class MaxDistance extends PreferenceHider {
 				// For all combinations of previous kth nodes
 				for ( ArrayList<StringVertex> candidates : combinations ) {
 					
-					Utils.talk(toString(), "Exiting MaxDistance: " + candidates);
+					if ( DEBUG_MECHANISM ) Utils.talk(toString(), "Existing MaxDistance: " + candidates);
 					/* 
 					 * Check if this node is at a given distance from all nodes
 					 * in this potential permutation.
@@ -247,7 +251,7 @@ public class MaxDistance extends PreferenceHider {
 						
 						if ( candidates.contains(potentialNode) || potentialNode.equals(candidate) ) continue outer;
 						
-						Utils.talk(toString(), "Potential node: " + potentialNode + " vs existing max distance: " + candidate);
+						if ( DEBUG_MECHANISM ) Utils.talk(toString(), "Potential node: " + potentialNode + " vs existing max distance: " + candidate);
 						
 						double length = 0.0;
 						
@@ -275,7 +279,7 @@ public class MaxDistance extends PreferenceHider {
 						
 						if ( length < diameter ) continue outer;
 					
-						Utils.talk(toString(), "--> " + potentialNode + " at (at least) diameter " + diameter + " from " + candidate);
+						if ( DEBUG_MECHANISM ) Utils.talk(toString(), "--> " + potentialNode + " at (at least) diameter " + diameter + " from " + candidate);
 						
 					}
 				
@@ -320,7 +324,7 @@ public class MaxDistance extends PreferenceHider {
 					
 				}
 				
-				Utils.talk(toString(), "------> Adding " + potentialNode);
+				if ( DEBUG_MECHANISM ) Utils.talk(toString(), "----> Adding " + potentialNode + " " + kthPositionCandidates);
 					
 				Utils.add(kthPositionCandidates, kth, potentialNode, new ArrayList<StringVertex>(), true);
 				
@@ -341,7 +345,7 @@ public class MaxDistance extends PreferenceHider {
 					
 					diameter--;
 					
-					Utils.talk(toString(), "Reducing diameter to: " + diameter);
+					Utils.talk(toString(), "<-- Reducing diameter to: " + diameter);
 					
 				} else {
 					

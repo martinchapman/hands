@@ -17,5 +17,6 @@
 			<attribute name="javadoc_location" value="file:/Users/Martin/Dropbox/workspace/SearchGames/lib/commons-math-doc/apidocs/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/javaparser.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -10,11 +10,6 @@ import HideAndSeek.hider.singleshot.preference.LeastConnectedMechanism;
 import Utility.Utils;
 
 /**
- * Changes the number of bias hide locations employed in an attempt to deceive
- * the seeker.
- * 
- * Still assumes seeker will choose bias edges going out of a node 100% of the time.
- * 
  * @author Martin
  *
  */

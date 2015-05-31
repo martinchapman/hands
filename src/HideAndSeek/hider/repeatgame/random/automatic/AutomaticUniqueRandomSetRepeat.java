@@ -15,6 +15,8 @@ import Utility.Utils;
  * Alters the size of the unique hide set if it believes this style
  * of play is being anticipated too easily by an opponent.
  * 
+ * ~MDC 29/5 How does this differ from simply taking a probability distribution over HighProb and InverseHighProb?
+ * 
  * @author Martin
  *
  */

@@ -193,9 +193,9 @@ public abstract class PreferenceHider extends HidingAgent implements VariableTra
 		
 		targetVertices.clear();
 		
-		currentPath.clear();
-		
 		targetsGenerated = false;
+		
+		currentPath.clear();
 		
 		explorationMechanism.endOfRound();
 		

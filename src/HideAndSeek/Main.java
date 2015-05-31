@@ -20,11 +20,13 @@ import HideAndSeek.hider.repeatgame.bias.VariableBias;
 import HideAndSeek.hider.repeatgame.bias.VariableBiasLocations;
 import HideAndSeek.hider.repeatgame.bias.VariableBiasStaticBetween;
 import HideAndSeek.hider.repeatgame.deceptive.Deceptive;
+import HideAndSeek.hider.repeatgame.deceptive.DeceptiveNew;
 import HideAndSeek.hider.repeatgame.deceptive.EpsilonDeceptive;
 import HideAndSeek.hider.repeatgame.deceptive.GroupedDeceptive;
 import HideAndSeek.hider.repeatgame.deceptive.LeastConnectedDeceptive;
 import HideAndSeek.hider.repeatgame.random.UniqueRandomSet;
 import HideAndSeek.hider.repeatgame.random.UniqueRandomSetRepeat;
+import HideAndSeek.hider.repeatgame.random.UniqueRandomSetRepeatRandomNodes;
 import HideAndSeek.hider.repeatgame.random.automatic.AutomaticUniqueRandomSetRepeat;
 import HideAndSeek.hider.singleshot.cost.FixedStartVariableGreedy;
 import HideAndSeek.hider.singleshot.cost.VariableGreedy;
@@ -43,7 +45,7 @@ import HideAndSeek.hider.singleshot.preference.LeastConnectedLeastConnectedFirst
 import HideAndSeek.hider.singleshot.preference.LeastConnectedStaticBetween;
 import HideAndSeek.hider.singleshot.preference.MaxDistance;
 import HideAndSeek.hider.singleshot.preference.MaxDistanceStaticBetween;
-import HideAndSeek.hider.singleshot.preference.NotConnecting;
+import HideAndSeek.hider.singleshot.preference.NotConnected;
 import HideAndSeek.hider.singleshot.random.GreedyRandomSet;
 import HideAndSeek.hider.singleshot.random.GreedyRandomSetStaticBetween;
 import HideAndSeek.hider.singleshot.random.Random;
@@ -63,13 +65,13 @@ import HideAndSeek.seeker.repeatgame.probability.VariableHistoryHighProbability;
 import HideAndSeek.seeker.repeatgame.probability.adaptable.HighProbabilityAdaptable;
 import HideAndSeek.seeker.repeatgame.probability.adaptable.InverseHighProbabilityAdaptable;
 import HideAndSeek.seeker.singleshot.cost.Greedy;
+import HideAndSeek.seeker.singleshot.coverage.BacktrackGreedy;
 import HideAndSeek.seeker.singleshot.coverage.BacktrackPath;
 import HideAndSeek.seeker.singleshot.coverage.BreadthFirstSearch;
 import HideAndSeek.seeker.singleshot.coverage.BreadthFirstSearchGreedy;
 import HideAndSeek.seeker.singleshot.coverage.DepthFirstSearch;
 import HideAndSeek.seeker.singleshot.coverage.DepthFirstSearchGreedy;
 import HideAndSeek.seeker.singleshot.coverage.DepthFirstSearchMechanism;
-import HideAndSeek.seeker.singleshot.coverage.BacktrackGreedy;
 import HideAndSeek.seeker.singleshot.coverage.RandomTarry;
 import HideAndSeek.seeker.singleshot.coverage.VariableBacktrackPath;
 import HideAndSeek.seeker.singleshot.preference.ApproximateLeastConnectedNodes;
@@ -310,9 +312,9 @@ public class Main {
 				
 			}
 			
-			if (hiderType.getElement0().equals("NotConnecting")) {
+			if (hiderType.getElement0().equals("NotConnected")) {
 				
-				allHidingAgents.add(new NotConnecting(graphController, numberOfHideLocations));
+				allHidingAgents.add(new NotConnected(graphController, numberOfHideLocations));
 				
 				
 			}
@@ -364,6 +366,12 @@ public class Main {
 			if (hiderType.getElement0().equals("UniqueRandomSetRepeat")) {
 				
 				allHidingAgents.add(new UniqueRandomSetRepeat(graphController, numberOfHideLocations));
+			
+			} 
+			
+			if (hiderType.getElement0().equals("UniqueRandomSetRepeatRandomNodes")) {
+				
+				allHidingAgents.add(new UniqueRandomSetRepeatRandomNodes(graphController, numberOfHideLocations));
 			
 			} 
 			
@@ -599,6 +607,26 @@ public class Main {
 			}
 			
 			////
+			
+			if (hiderType.getElement0().equals("DeceptiveNew")) {
+				
+				allHidingAgents.add(new DeceptiveNew(graphController, "Deceptive", numberOfHideLocations, (int)(totalRounds / 2)));
+			
+			}
+			
+			if (hiderType.getElement0().equals("VariableDeceptiveNew")) {
+				
+				allHidingAgents.add(new DeceptiveNew(graphController, "Deceptive", numberOfHideLocations, gameNumber) {
+					
+					public boolean strategyOverRounds() {
+						
+						return true;
+						
+					}
+					
+				});
+			
+			}
 			
 			if (hiderType.getElement0().equals("SetDeceptiveNodes")) {
 				
@@ -851,6 +879,22 @@ public class Main {
 				
 			}
 			
+			if (seekerType.getElement0().equals("RepeatGreedy")) {
+				
+				allSeekingAgents.add(new Greedy(graphController) {
+					
+					public StringVertex nextNode(StringVertex currentNode) {
+						
+						uniquelyVisitNodes = false;
+						
+						return super.nextNode(currentNode);
+						
+					}
+					
+				});
+				
+			}
+			
 			if (seekerType.getElement0().equals("DepthFirstSearch")) {
 				
 				allSeekingAgents.add(new DepthFirstSearch(graphController));
@@ -903,6 +947,12 @@ public class Main {
 				
 				allSeekingAgents.add(new ApproximateLeastConnectedNodes(graphController));
 				
+			}
+			
+			if (seekerType.getElement0().equals("MaxDistanceFirst")) {
+				
+				allSeekingAgents.add(new HideAndSeek.seeker.singleshot.preference.MaxDistance(graphController, "MaxDistanceFirst", 1.0));
+			
 			}
 			
 			if (seekerType.getElement0().equals("LinkedPath")) {

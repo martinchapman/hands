@@ -8,14 +8,9 @@ import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.singleshot.random.RandomSet;
-import Utility.BinomialProbability;
 import Utility.Utils;
 
 /**
- * Changes the number of bias hide locations employed in an attempt to deceive
- * the seeker.
- * 
- * Still assumes seeker will choose bias edges going out of a node 100% of the time.
  * 
  * @author Martin
  *
@@ -309,15 +304,24 @@ public class Deceptive extends RandomSet {
 		
 		for ( int i = 0; i < deceptiveSets; i++ ) {
 			
-			deceptiveSetList.add(createRandomSet(deceptiveNodes, nodesUsedDeceptively));
+			deceptiveSetList.add(deceptiveSet());
 			
 			populateDeceptiveSet(deceptiveSetList.get(i));
 			
 		}
 		
-		System.out.println(deceptiveSetList);
+		Utils.talk(toString(), deceptiveSetList.toString());
 		
 		setDeceptiveSet(deceptiveSetList.get(0));
+		
+	}
+	
+	/**
+	 * @return
+	 */
+	protected ArrayList<StringVertex> deceptiveSet() {
+		
+		return createRandomSet(deceptiveNodes, nodesUsedDeceptively);
 		
 	}
 	

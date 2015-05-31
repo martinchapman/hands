@@ -11,10 +11,9 @@ import HideAndSeek.hider.singleshot.preference.LeastConnected;
 import Utility.Utils;
 
 /**
- * Changes the number of bias hide locations employed in an attempt to deceive
- * the seeker.
  * 
- * Still assumes seeker will choose bias edges going out of a node 100% of the time.
+ * Attempts to stop a hider 'accidentally' finding new hide locations
+ * while on the way to deceptive ones, by grouping the initial deceptive set.
  * 
  * @author Martin
  *
