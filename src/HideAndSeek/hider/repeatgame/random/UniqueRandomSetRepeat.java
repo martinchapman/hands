@@ -31,18 +31,38 @@ public class UniqueRandomSetRepeat extends UniqueRandomSet {
 		
 	}
 	
+	
 	/**
-	 * 
+	 * @param graphController
+	 * @param name
+	 * @param numberOfHideLocations
+	 */
+	public UniqueRandomSetRepeat(GraphController<StringVertex, StringEdge> graphController, String name, int numberOfHideLocations) {
+
+		super(graphController, name, numberOfHideLocations);
+
+	}
+
+	/* (non-Javadoc)
+	 * @see HideAndSeek.hider.repeatgame.random.UniqueRandomSet#createRandomSet(int, java.util.TreeSet)
 	 */
 	protected ArrayList<StringVertex> createRandomSet(int size, TreeSet<StringVertex> ignoreSet) {
 		
-		if (usedNodes == null) usedNodes = new TreeSet<StringVertex>();
-		
-		if (usedNodes.size() == graphController.vertexSet().size()) usedNodes.clear();
+		if (uniqueHideLocations().size() > ( graphController.vertexSet().size() - numberOfHideLocations() ) ) uniqueHideLocations().clear();
 		
 		ArrayList<StringVertex> hideSet = super.createRandomSet(size, ignoreSet);
-			
+		
 		return hideSet;
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see HideAndSeek.hider.singleshot.random.RandomSet#endOfRound()
+	 */
+	@Override
+	public void endOfRound() {
+
+		super.endOfRound();
 		
 	}
 

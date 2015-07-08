@@ -1,5 +1,7 @@
 package HideAndSeek.seeker.hamiltonain.adaptable;
 
+import java.util.ArrayList;
+
 import org.jgrapht.alg.EulerianCircuit;
 import org.jgrapht.alg.HamiltonianCycle;
 
@@ -8,6 +10,7 @@ import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.seeker.AdaptiveSeeker;
 import HideAndSeek.seeker.hamiltonian.HamiltonianTourer;
+import Utility.adaptive.AdaptiveWeightings;
 
 /**
  * Allows for a strategy to communicate to a parent adaptive agent whether
@@ -15,6 +18,7 @@ import HideAndSeek.seeker.hamiltonian.HamiltonianTourer;
  * can work. 
  * 
  * @author Martin
+ * @deprecated
  *
  */
 public class HamiltonianTourerAdaptable extends HamiltonianTourer implements AdaptiveSeeker {
@@ -27,12 +31,22 @@ public class HamiltonianTourerAdaptable extends HamiltonianTourer implements Ada
 		super(graphController);
 	
 	}
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.AdaptiveGraphTraverser#getAdaptiveWeightings()
+	 */
+	@Override
+	public AdaptiveWeightings getAdaptiveWeightings() {
+
+		return null;
+	
+	}
 
 	/* (non-Javadoc)
 	 * @see HideAndSeek.AdaptiveGraphTraverser#relevanceOfStrategy()
 	 */
 	@Override
-	public double relevanceOfStrategy() {
+	public double environmentalMeasure() {
 		
 		if ( HamiltonianCycle.getApproximateOptimalForCompleteGraph(localGraph).size() == graphController.vertexSet().size() ) {
 			
@@ -50,18 +64,22 @@ public class HamiltonianTourerAdaptable extends HamiltonianTourer implements Ada
 	 * @see HideAndSeek.AdaptiveGraphTraverser#performanceOfOpponent()
 	 */
 	@Override
-	public double performanceOfOpponent() {
+	public double socialMeasure() {
+		
 		return -1;
+	
 	}
-
+	
 	/* (non-Javadoc)
-	 * @see HideAndSeek.AdaptiveGraphTraverser#performanceOfSelf()
+	 * @see HideAndSeek.AdaptiveGraphTraverser#internalMeasure(java.util.ArrayList)
 	 */
 	@Override
-	public double performanceOfSelf() {
-		return -1;
-	}
+	public double internalMeasure(ArrayList<Double> roundStrategyPerformance) {
 
+		return 0;
+
+	}
+	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.AdaptiveGraphTraverser#stopStrategy()
 	 */

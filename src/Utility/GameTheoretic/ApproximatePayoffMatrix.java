@@ -19,7 +19,7 @@ import Utility.Utils;
  * @author Martin
  *
  */
-public class HeuristicPayoffMatrix {
+public class ApproximatePayoffMatrix {
 
 	/**
 	 * @author Martin
@@ -153,8 +153,8 @@ public class HeuristicPayoffMatrix {
 					
 		}
 
-		private HeuristicPayoffMatrix getOuterType() {
-			return HeuristicPayoffMatrix.this;
+		private ApproximatePayoffMatrix getOuterType() {
+			return ApproximatePayoffMatrix.this;
 		}
 		
 	}
@@ -172,7 +172,7 @@ public class HeuristicPayoffMatrix {
 	/**
 	 * @param title
 	 */
-	public HeuristicPayoffMatrix(String title) {
+	public ApproximatePayoffMatrix(String title) {
 		
 		this.title = title;
 		
@@ -855,27 +855,27 @@ public class HeuristicPayoffMatrix {
 	 */
 	public static void main(String[] args) {
 		
-		HeuristicPayoffMatrix HPM = new HeuristicPayoffMatrix("");
+		ApproximatePayoffMatrix HPM = new ApproximatePayoffMatrix("");
 		
-		/*HPM.addPayoff("Hider", "Up", "Left", 2);
-		HPM.addPayoff("Hider", "Up", "Right", 1);
-		HPM.addPayoff("Hider", "Down", "Left", 3);
-		HPM.addPayoff("Hider", "Down", "Right", 1);
-		HPM.addPayoff("Hider", "Bob", "Left", 1);
-		HPM.addPayoff("Hider", "Bob", "Right", 1);
-		
-		HPM.addPayoff("Seeker", "Left", "Up", 5);
-		HPM.addPayoff("Seeker", "Right", "Up", 4);
-		HPM.addPayoff("Seeker", "Left", "Down", 0);
-		HPM.addPayoff("Seeker", "Right", "Down", 5);
-		HPM.addPayoff("Seeker", "Left", "Bob", 0);
-		HPM.addPayoff("Seeker", "Right", "Bob", 5);*/
+		HPM.addPayoff("Hider", "L", "L'", 2.6);
+		HPM.addPayoff("Hider", "L", "R'", 0);
+		HPM.addPayoff("Hider", "M", "L'", 0);
+		HPM.addPayoff("Hider", "M", "R'", 0);
+		HPM.addPayoff("Hider", "R", "L''", 1);
+		HPM.addPayoff("Hider", "R", "R'", 1);
+	
+		HPM.addPayoff("Seeker", "L'", "L", 1);
+		HPM.addPayoff("Seeker", "L'", "M", 2);
+		HPM.addPayoff("Seeker", "L'", "R", 3);
+		HPM.addPayoff("Seeker", "R'", "L", 0);
+		HPM.addPayoff("Seeker", "R'", "M", 1);
+		HPM.addPayoff("Seeker", "R'", "R", 3);
 		
 		//System.out.println(HPM);
 		
 		//HPM.printTikzMatrix();
 		
-		HPM.getGTData();
+		System.out.println(HPM.GTAnalysis());
 	
 	}
 	

@@ -27,6 +27,8 @@ import HideAndSeek.hider.repeatgame.deceptive.LeastConnectedDeceptive;
 import HideAndSeek.hider.repeatgame.random.UniqueRandomSet;
 import HideAndSeek.hider.repeatgame.random.UniqueRandomSetRepeat;
 import HideAndSeek.hider.repeatgame.random.UniqueRandomSetRepeatRandomNodes;
+import HideAndSeek.hider.repeatgame.random.adaptable.RandomSetAdaptable;
+import HideAndSeek.hider.repeatgame.random.adaptable.UniqueRandomSetRepeatAdaptable;
 import HideAndSeek.hider.repeatgame.random.automatic.AutomaticUniqueRandomSetRepeat;
 import HideAndSeek.hider.singleshot.cost.FixedStartVariableGreedy;
 import HideAndSeek.hider.singleshot.cost.VariableGreedy;
@@ -46,6 +48,7 @@ import HideAndSeek.hider.singleshot.preference.LeastConnectedStaticBetween;
 import HideAndSeek.hider.singleshot.preference.MaxDistance;
 import HideAndSeek.hider.singleshot.preference.MaxDistanceStaticBetween;
 import HideAndSeek.hider.singleshot.preference.NotConnected;
+import HideAndSeek.hider.singleshot.preference.adaptable.LeastConnectedAdaptable;
 import HideAndSeek.hider.singleshot.random.GreedyRandomSet;
 import HideAndSeek.hider.singleshot.random.GreedyRandomSetStaticBetween;
 import HideAndSeek.hider.singleshot.random.Random;
@@ -83,6 +86,7 @@ import HideAndSeek.seeker.singleshot.random.SelfAvoidingRandomWalk;
 import HideAndSeek.seeker.singleshot.random.SelfAvoidingRandomWalkGreedy;
 import Utility.Pair;
 import Utility.Utils;
+import Utility.adaptive.AdaptiveWeightings;
 
 /**
  * @author Martin
@@ -778,13 +782,12 @@ public class Main {
 				
 			}
 			
+			
+			
 			// Unknown:
-			
-			ArrayList<AdaptiveHider> strategyPortfolio = new ArrayList<AdaptiveHider>();
-			
 			if (hiderType.getElement0().equals("UnknownRandom")) {
 				
-				strategyPortfolio.clear();
+				ArrayList<AdaptiveHider> strategyPortfolio = new ArrayList<AdaptiveHider>();
 				
 				abstract class RandomSetAnonymous extends RandomSet implements AdaptiveHider {
 					public RandomSetAnonymous(GraphController<StringVertex, StringEdge> graphController, String name, int numberOfHideLocations) {
@@ -794,27 +797,81 @@ public class Main {
 				}
 				
 				strategyPortfolio.add(new RandomSetAnonymous(graphController, "RandomSet", numberOfHideLocations) {
-					public double relevanceOfStrategy() { return -1; }
-					public double performanceOfOpponent() { return -1; }
-					public double performanceOfSelf() { return -1; }
+					public double environmentalMeasure() { return 0; }
+					public double socialMeasure() { return 0; }
+					public double internalMeasure(ArrayList<Double> strategyPerformance) { return 0; }
+					public AdaptiveWeightings getAdaptiveWeightings() { return new AdaptiveWeightings(0.33, 0.33, 0.33); }
+					public void stopStrategy() {}
+				
+				});
+				
+				abstract class UniqueRandomSetRepeatAnonymous extends UniqueRandomSetRepeat implements AdaptiveHider {
+					public UniqueRandomSetRepeatAnonymous(GraphController<StringVertex, StringEdge> graphController, String name, int numberOfHideLocations, int goodPerformanceRounds) {
+						super(graphController, name, numberOfHideLocations);
+					}
+				}
+				
+				strategyPortfolio.add(new UniqueRandomSetRepeatAnonymous(graphController, "UniqueRandomSetRepeat", numberOfHideLocations, 3) {
+					public double environmentalMeasure() { return 0; }
+					public double socialMeasure() { return 0; }
+					public double internalMeasure(ArrayList<Double> strategyPerformance) { return 0; }
+					public AdaptiveWeightings getAdaptiveWeightings() { return new AdaptiveWeightings(0.33, 0.33, 0.33); }
 					public void stopStrategy() {}
 				});
 				
-				abstract class AutomaticUniqueRandomSetRepeatAnonymous extends AutomaticUniqueRandomSetRepeat implements AdaptiveHider {
+				/*abstract class AutomaticUniqueRandomSetRepeatAnonymous extends AutomaticUniqueRandomSetRepeat implements AdaptiveHider {
 					public AutomaticUniqueRandomSetRepeatAnonymous(GraphController<StringVertex, StringEdge> graphController, String name, int numberOfHideLocations, int goodPerformanceRounds) {
 						super(graphController, name, numberOfHideLocations, goodPerformanceRounds);
 					}
 				}
 				
 				strategyPortfolio.add(new AutomaticUniqueRandomSetRepeatAnonymous(graphController, "AutomaticUniqueRandomSetRepeat", numberOfHideLocations, 3) {
-					public double relevanceOfStrategy() { return -1; }
-					public double performanceOfOpponent() { return -1; }
-					public double performanceOfSelf() { return -1; }
+					public double environmentalMeasure() { return 0; }
+					public double socialMeasure() { return 0; }
+					public double internalMeasure(ArrayList<Double> strategyPerformance) { return 0; }
 					public void stopStrategy() {}
-				});
+				});*/
 				
 				allHidingAgents.add(new AdaptiveHidingAgent<AdaptiveHider>(graphController, "UnknownRandom", strategyPortfolio, totalRounds));
 				
+			}
+			
+			if (hiderType.getElement0().equals("AdaptiveRandomSet")) {
+				
+				ArrayList<AdaptiveHider> strategyPortfolio = new ArrayList<AdaptiveHider>();
+				
+				strategyPortfolio.add(new RandomSetAdaptable(graphController, numberOfHideLocations));
+				
+				strategyPortfolio.add(new UniqueRandomSetRepeatAdaptable(graphController, numberOfHideLocations));
+				
+				allHidingAgents.add(new AdaptiveHidingAgent<AdaptiveHider>(graphController, "AdaptiveRandomSet", strategyPortfolio, totalRounds, "RandomSetAdaptable"));
+				
+			}
+			
+			if (hiderType.getElement0().equals("AdaptiveLeastConnected")) {
+				
+				ArrayList<AdaptiveHider> strategyPortfolio = new ArrayList<AdaptiveHider>();
+				
+				abstract class RandomSetAnonymous extends RandomSet implements AdaptiveHider {
+					public RandomSetAnonymous(GraphController<StringVertex, StringEdge> graphController, String name, int numberOfHideLocations) {
+						super(graphController, name, numberOfHideLocations);
+					} 
+					
+				}
+				
+				strategyPortfolio.add(new RandomSetAnonymous(graphController, "RandomSet", numberOfHideLocations) {
+					public double environmentalMeasure() { return 0; }
+					public double socialMeasure() { return 0; }
+					public double internalMeasure(ArrayList<Double> strategyPerformance) { return 0; }
+					public AdaptiveWeightings getAdaptiveWeightings() { return new AdaptiveWeightings(0.33, 0.33, 0.33); }
+					public void stopStrategy() {}
+				
+				});
+				
+				strategyPortfolio.add(new LeastConnectedAdaptable(graphController, numberOfHideLocations));
+				
+				allHidingAgents.add(new AdaptiveHidingAgent<AdaptiveHider>(graphController, "AdaptiveLeastConnected", strategyPortfolio, totalRounds, "LeastConnectedAdaptable"));
+					
 			}
 			
 		}
@@ -1037,11 +1094,11 @@ public class Main {
 				
 				strategyPortfolio.clear();
 				
-				strategyPortfolio.add(new InverseHighProbabilityAdaptable(graphController, "Inverse High Probability", Integer.MAX_VALUE));
+				strategyPortfolio.add(new InverseHighProbabilityAdaptable(graphController, Integer.MAX_VALUE));
 				
-				strategyPortfolio.add(new HighProbabilityAdaptable(graphController, "High Probability"));
+				strategyPortfolio.add(new HighProbabilityAdaptable(graphController));
 				
-				allSeekingAgents.add(new AdaptiveSeekingAgent<AdaptiveSeeker>(graphController, totalRounds, strategyPortfolio.get(1), strategyPortfolio, 0.5, 0.5, 0.5, false));
+				allSeekingAgents.add(new AdaptiveSeekingAgent<AdaptiveSeeker>(graphController, totalRounds, strategyPortfolio, "HighProbabilityAdaptable", 0.5, false));
 				
 			}
 			

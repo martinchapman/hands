@@ -34,13 +34,13 @@ public class UniqueRandomSetRepeatRandomNodes extends UniqueRandomSetRepeat {
 		
 		int setSize = ((int)(Math.random() * numberOfHideLocations)) + 1;
 		
-		ArrayList<StringVertex> uniqueNodes = super.createRandomSet(size, usedNodes);
+		ArrayList<StringVertex> uniqueNodes = super.createRandomSet(size, new TreeSet<StringVertex>(uniqueHideLocations()));
 		
 		ArrayList<StringVertex> randomNodes = super.createRandomSet(numberOfHideLocations - setSize, new TreeSet<StringVertex>());
 		
 		uniqueNodes.addAll(randomNodes);
 			
-		usedNodes.addAll(uniqueNodes);
+		uniqueHideLocations().addAll(uniqueNodes);
 		
 		return uniqueNodes;
 		

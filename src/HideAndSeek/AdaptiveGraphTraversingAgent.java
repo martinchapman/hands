@@ -1,13 +1,18 @@
 package HideAndSeek;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
+import Utility.Metric;
+import Utility.Pair;
 import Utility.Utils;
+import Utility.adaptive.AdaptiveWeightings;
 
 /**
  * An adaptive graph traverser does not rely on its own mechanism to make
@@ -21,7 +26,7 @@ import Utility.Utils;
  * 
  * Also serves to facilitate the random selection of an initial strategy.
  * To do this, a strategy should simply report -1 when asked for its view
- * on the necessity of adapatation. The only 'adaptation' will then be the
+ * on the necessity of adaptation. The only 'adaptation' will then be the
  * initial (random) choice of strategy.
  * 
  * @author Martin
@@ -55,19 +60,24 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 	protected E previousStrategy;
 	
 	/**
-	 * 
+	 * @deprecated
 	 */
 	protected double strategyRelevanceThreshold = 0.5;
 	
 	/**
-	 * 
+	 * @deprecated
+	 */
+	protected double ownPerformanceThreshold = 0.5;
+	
+	/**
+	 * @deprecated
 	 */
 	protected double opponentPerformanceThreshold = 0.5;
-	
+		 
 	/**
 	 * 
 	 */
-	protected double ownPerformanceThreshold = 0.5;
+	protected double cueTriggerThreshold = 0.5;
 	
 	/**
 	 * Whether a strategy can be returned to once it has been selected.
@@ -82,6 +92,11 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 	/**
 	 * 
 	 */
+	LinkedHashMap<Integer, Pair<E, Double>> roundStrategyPerformance;
+	
+	/**
+	 * @deprecated
+	 */
 	protected TreeMap<E, Double> strategyPayoff;
 	
 	/**
@@ -89,19 +104,25 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 	 * @param strategyPortfolio
 	 * @param totalRounds
 	 */
-	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, String name, ArrayList<E> strategyPortfolio, int totalRounds, E currentStrategy) {
+	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, String name, ArrayList<E> strategyPortfolio, int totalRounds, String initialStrategy) {
 		
 		super(graphController, name);
 		
 		remainingStrategies = new ArrayList<E>(strategyPortfolio);
 		
-		this.currentStrategy = currentStrategy;
+		for ( E strategy : strategyPortfolio ) {
+			
+			if ( strategy.getName().equals(initialStrategy) ) {
+				
+				this.currentStrategy = strategy;
+				
+			}
+			
+		}
+		
+		if ( this.currentStrategy == null ) throw new UnsupportedOperationException("No match in portfolio for specified strategy " + initialStrategy);
 		
 		remainingStrategies.remove(currentStrategy);
-		
-		this.initialStrategy = initialStrategy; 
-		
-		this.previousStrategy = initialStrategy;
 		
 		this.strategyPortfolio = strategyPortfolio;
 		
@@ -115,7 +136,7 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 		 */
 		for ( E strategy : strategyPortfolio ) {
 			
-			strategy.setResponsibleAgent(this);
+			strategy.setResponsibleAgent(this.responsibleAgent);
 			
 			graphController.deregisterTraversingAgent(strategy);
 			
@@ -125,12 +146,14 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 		
 		strategyPayoff = new TreeMap<E, Double>();
 		
-		Utils.talk(toString(), "Using strategy: " + currentStrategy);
+		roundStrategyPerformance = new LinkedHashMap<Integer, Pair<E, Double>>();
+		
+		Utils.talk(toString(), "---> Using strategy: " + currentStrategy);
 		
 		this.strategyChanges = 0;
 		
 	}
-	
+
 	/**
 	 * @param graphController
 	 * @param name
@@ -138,7 +161,7 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 	 * @param totalRounds
 	 * @param currentStrategy
 	 */
-	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, ArrayList<E> strategyPortfolio, int totalRounds, E currentStrategy) {
+	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, ArrayList<E> strategyPortfolio, int totalRounds, String currentStrategy) {
 		
 		this(graphController, "", strategyPortfolio, totalRounds, currentStrategy);
 		
@@ -151,13 +174,13 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 	 */
 	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, String name, ArrayList<E> strategyPortfolio, int totalRounds) {
 		
-		this( graphController, name, strategyPortfolio, totalRounds, strategyPortfolio.get((int)(Math.random()*strategyPortfolio.size())));
+		this( graphController, name, strategyPortfolio, totalRounds, strategyPortfolio.get((int)(Math.random()*strategyPortfolio.size())).getName());
 		
 	}
 	
 	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, ArrayList<E> strategyPortfolio, int totalRounds) {
 		
-		this( graphController, "", strategyPortfolio, totalRounds, strategyPortfolio.get((int)(Math.random()*strategyPortfolio.size())));
+		this( graphController, "", strategyPortfolio, totalRounds, strategyPortfolio.get((int)(Math.random()*strategyPortfolio.size())).getName());
 		
 	}
 	
@@ -168,16 +191,12 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 	 * @param opponentPerformanceThreshold
 	 * @param ownPerformanceThreshold
 	 */
-	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, String name, int totalRounds, E initialStrategy, ArrayList<E> strategyPortfolio, 
-			double strategyRelevanceThreshold, double opponentPerformanceThreshold, double ownPerformanceThreshold, boolean canReuse) {
+	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, String name, int totalRounds, ArrayList<E> strategyPortfolio, String initialStrategy, 
+			double cueTriggerThreshold, boolean canReuse) {
 		
 		this(graphController, name, strategyPortfolio, totalRounds, initialStrategy);
 		
-		this.strategyRelevanceThreshold = strategyRelevanceThreshold;
-		
-		this.opponentPerformanceThreshold = opponentPerformanceThreshold;
-		
-		this.ownPerformanceThreshold = ownPerformanceThreshold;
+		this.cueTriggerThreshold = cueTriggerThreshold;
 		
 		this.canReuse = canReuse;
 			
@@ -193,11 +212,187 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 	 * @param ownPerformanceThreshold
 	 * @param canReuse
 	 */
-	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, int totalRounds, E initialStrategy, ArrayList<E> strategyPortfolio, 
-			double strategyRelevanceThreshold, double opponentPerformanceThreshold, double ownPerformanceThreshold, boolean canReuse) {
+	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, int totalRounds, ArrayList<E> strategyPortfolio, String initialStrategy,
+			double cueThreshold, boolean canReuse) {
 		
-		this( graphController, "", totalRounds, initialStrategy, strategyPortfolio, strategyRelevanceThreshold, opponentPerformanceThreshold, ownPerformanceThreshold, canReuse);
+		this( graphController, "", totalRounds, strategyPortfolio, initialStrategy, cueThreshold, canReuse);
 			
+	}
+	
+	/**
+	 * @return
+	 */
+	private Hashtable<E, Double> strategyToAveragePerformance() {
+		
+		Hashtable<E, Integer> numberOfTimesStrategyPlayed = new Hashtable<E, Integer>();
+		
+		Hashtable<E, Double> cumulativeStrategyPayoff = new Hashtable<E, Double>();
+		
+		for ( Entry<Integer, Pair<E, Double>> entry : roundStrategyPerformance.entrySet()) {
+			
+			E thisStrategy = entry.getValue().getElement0();
+			
+			Double thisStrategyRoundPayoff = entry.getValue().getElement1();
+			
+			if ( numberOfTimesStrategyPlayed.containsKey(thisStrategy) ) {
+				
+				numberOfTimesStrategyPlayed.put(thisStrategy, numberOfTimesStrategyPlayed.get(thisStrategy) + 1);
+				
+			} else {
+				
+				numberOfTimesStrategyPlayed.put(thisStrategy, 1);
+				
+			}
+			
+			if ( cumulativeStrategyPayoff.containsKey(entry.getValue().getElement0()) ) {
+				
+				cumulativeStrategyPayoff.put(thisStrategy, cumulativeStrategyPayoff.get(thisStrategy) + thisStrategyRoundPayoff);
+				
+			} else {
+				
+				cumulativeStrategyPayoff.put(thisStrategy, thisStrategyRoundPayoff);
+				
+			}
+			
+		}
+		
+		Hashtable<E, Double> averageStrategyPayoff = new Hashtable<E, Double>();
+		
+		for ( Entry<E, Double> cumulativePayoff : cumulativeStrategyPayoff.entrySet() ) {
+			
+			averageStrategyPayoff.put(cumulativePayoff.getKey(), cumulativePayoff.getValue() / numberOfTimesStrategyPlayed.get(cumulativePayoff.getKey()));
+			
+		}
+		
+		return averageStrategyPayoff;
+		
+	}
+	
+	/**
+	 * @param strategy
+	 * @return
+	 */
+	public ArrayList<Double> strategyToAllPerformances(E strategy) {
+		
+		ArrayList<Double> strategyToAllPerformances = new ArrayList<Double>();
+		
+		for ( Entry<Integer, Pair<E, Double>> entry : roundStrategyPerformance.entrySet()) {
+			
+			if ( entry.getValue().getElement0().equals(strategy)) {
+			
+				strategyToAllPerformances.add(entry.getValue().getElement1());
+			
+			}
+			
+		}
+		
+		return strategyToAllPerformances;
+		
+	}
+	
+	/**
+	 * 
+	 */
+	protected void checkCurrentPerformance() {
+		
+		Utils.talk(toString(), "================================= Adaptive Assessment -- Current Strategy: " + currentStrategy + " =================================");
+		
+		roundStrategyPerformance.put(roundsPassed, new Pair<E, Double>(currentStrategy, graphController.latestTraverserRoundPerformance(responsibleAgent, Metric.SCORE)));
+		
+		double relevanceOfStrategy = currentStrategy.environmentalMeasure();
+		
+		double performanceOfOpponent = currentStrategy.socialMeasure();
+		
+		Utils.talk(toString(), "strategyToAveragePerformance() " + strategyToAveragePerformance());
+		
+		Utils.talk(toString(), "Utils.sortByValue(strategyToAveragePerformance(), true) " + Utils.sortByValue(strategyToAveragePerformance(), true));
+		
+		Hashtable<E, Double> strategyPayoff = strategyToAveragePerformance();
+		 
+	    Utils.talk(toString(), "All strategy payoffs: " + strategyPayoff);
+	    
+		double performanceOfSelf = 0.0;
+		
+	    E highestPerformingStrategy = new ArrayList<E>(strategyPayoff.keySet()).get(new ArrayList<E>(strategyPayoff.keySet()).size() - 1);
+	    
+	    Utils.talk(toString(), "Strategy with highest historic payoff: " + highestPerformingStrategy);
+	    
+		// Other strategy with highest average payoff is this one
+		if ( highestPerformingStrategy.getName().equals(currentStrategy.getName()) ) {
+			
+			Utils.talk(toString(), "Defaulting to relative performance check, as highest performing strategy is this one.");
+			
+			// Default to relative performance check
+			performanceOfSelf = currentStrategy.internalMeasure(strategyToAllPerformances(currentStrategy));
+			
+		} else {
+			
+			double lastValue = new ArrayList<Double>(strategyPayoff.values()).get(new ArrayList<Double>(strategyPayoff.values()).size() - 1);
+			
+			// Compare average payoff to average payoff of highest strategy
+			performanceOfSelf = Utils.percentageChange(strategyPayoff.get(currentStrategy), lastValue) / 100.0;
+			
+			if ( performanceOfSelf < 0 ) performanceOfSelf = 0.0;
+			if ( performanceOfSelf > 1 ) performanceOfSelf = 1.0;
+			
+			Utils.talk(toString(), "Payoff Highest Strategy: Percentage change between " + strategyPayoff.get(currentStrategy) + " and " + lastValue + " = " + Utils.percentageChange(strategyPayoff.get(currentStrategy), lastValue));
+		
+		}
+		
+		AdaptiveWeightings currentStrategyWeightings = currentStrategy.getAdaptiveWeightings();
+		
+		Utils.talk(currentStrategy.toString(), "Relevance of strategy: " + relevanceOfStrategy + " Weighting: " + currentStrategyWeightings.getEnvironmentalWeighting());
+		
+		Utils.talk(currentStrategy.toString(), "Performance of opponent: " + performanceOfOpponent + " Weighting: " + currentStrategyWeightings.getSocialWeighting());
+		
+		Utils.talk(currentStrategy.toString(), "Performance of self: " + performanceOfSelf + " Weighting: " + currentStrategyWeightings.getInternalWeighting());
+		
+		double averageAssessmentValue = ( currentStrategyWeightings.getEnvironmentalWeighting() * relevanceOfStrategy ) + ( currentStrategyWeightings.getSocialWeighting() * performanceOfOpponent ) + ( currentStrategyWeightings.getInternalWeighting() * performanceOfSelf );
+		
+		Utils.talk(toString(), "Average assessment value: " + averageAssessmentValue);
+		
+		double confidenceLevel = currentStrategy.roundsPassed() / ( (double)(totalRounds) / 2 );
+		
+		if ( confidenceLevel >= 1.0 ) confidenceLevel = 1.0;
+		
+		Utils.talk(toString(), "Confidence level: " + confidenceLevel);
+		
+		double adaptationDecision = confidenceLevel * averageAssessmentValue;
+		
+		Utils.talk(toString(), "Adaptation Decision: " + adaptationDecision);
+		
+		if ( adaptationDecision > cueTriggerThreshold ) {
+			
+			Utils.talk(toString(), "Adapting!");
+			
+			if ( !changeToOtherStrategy() ) {
+				
+				if ( highestPerformingStrategy.getName().equals(currentStrategy.getName()) ) {
+					
+					Utils.talk(toString(), "No random strategy selections left. Highest Performing is this strategy. Not changing.");
+					
+				} else {
+					
+					Utils.talk(toString(), "No random strategy selections left. Changing to highest performing strategy: " + highestPerformingStrategy);
+					
+					changeToOtherStrategy(highestPerformingStrategy);
+					
+				}
+				
+				return;
+				
+			}
+			
+			Utils.talk(toString(), "Selecting other strategy from portfolio at random");
+			
+		} else {
+			
+			Utils.talk(toString(), "Not adapting");
+			
+		}
+		
+		Utils.talk(toString(), "==================================================================");
+		
 	}
 	
 	/**
@@ -212,14 +407,16 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 	 * view of the current strategy is more likely to be adhered to. For example,
 	 * a small number of hide locations is more likely to indicate repeat play after
 	 * 50 rounds, than after 1.
+	 * 
+	 * @deprecated
 	 */
-	protected void checkCurrentPerformance() {
+	protected void checkCurrentPerformance_Org() {
 		
-		double relevanceOfStrategy = currentStrategy.relevanceOfStrategy();
+		double relevanceOfStrategy = currentStrategy.environmentalMeasure();
 		
-		double performanceOfOpponent = currentStrategy.performanceOfOpponent();
+		double performanceOfOpponent = currentStrategy.socialMeasure();
 		
-		double performanceOfSelf = currentStrategy.performanceOfSelf();
+		double performanceOfSelf = currentStrategy.internalMeasure(null);
 		
 		Utils.talk(currentStrategy.toString(), "Relevance of strategy: " + relevanceOfStrategy);
 		
@@ -228,16 +425,16 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 		Utils.talk(currentStrategy.toString(), "Performance of self: " + performanceOfSelf);
 		
 		/* 
-		 * Record payoff, later used to compare performance in light of signaled adaptation by all strategies 
+		 * Record payoff, later used to compare performance in light of signalled adaptation by all strategies 
 		 * (i.e. no unused strategies remain).
 		 */
-		strategyPayoff.put(currentStrategy, ( currentStrategy.relevanceOfStrategy() * ( 1.0 - currentStrategy.performanceOfOpponent() ) * currentStrategy.performanceOfSelf() ) / 3 );
+		strategyPayoff.put(currentStrategy, ( currentStrategy.environmentalMeasure() * ( 1.0 - currentStrategy.socialMeasure() ) * currentStrategy.internalMeasure(null) ) / 3 );
 		
-		if ( ( relevanceOfStrategy < strategyRelevanceThreshold && currentStrategy.relevanceOfStrategy() > -1 ) || 
+		if ( ( relevanceOfStrategy < strategyRelevanceThreshold && currentStrategy.environmentalMeasure() > -1 ) || 
 				
-			 ( performanceOfOpponent > opponentPerformanceThreshold && currentStrategy.performanceOfOpponent() > -1 ) ||
+			 ( performanceOfOpponent > opponentPerformanceThreshold && currentStrategy.socialMeasure() > -1 ) ||
 			 
-			 ( performanceOfSelf < ownPerformanceThreshold && currentStrategy.performanceOfSelf() > -1 ) ) { 
+			 ( performanceOfSelf < ownPerformanceThreshold && currentStrategy.internalMeasure(null) > -1 ) ) { 
 			 
 			 Utils.talk(currentStrategy.toString(), "Requires change. Confidence level: " + (currentStrategy.roundsPassed() / (double)(totalRounds)));
 			 
@@ -271,17 +468,19 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 	private int strategyChanges;
 	
 	/**
-	 * 
+	 * Change to a random strategy
 	 */
-	public void changeToOtherStrategy() {
+	public boolean changeToOtherStrategy() {
 		
-		if ( remainingStrategies.size() == 0 ) return;
+		if ( remainingStrategies.size() == 0 ) return false;
 		
 		changeToOtherStrategy(remainingStrategies.get((int)(Math.random()*remainingStrategies.size())));
 		
 		if ( canReuse ) remainingStrategies = new ArrayList<E>(strategyPortfolio);
 			
 		remainingStrategies.remove(currentStrategy);
+		
+		return true;
 		
 	}
 	
@@ -311,6 +510,8 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 		currentStrategy.endOfRound();
 			
 		checkCurrentPerformance();
+		
+		super.endOfRound();
 		
 	}
 
@@ -351,7 +552,7 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 	@Override
 	public String printGameStats() {
 
-		return currentStrategy.printGameStats();
+		return currentStrategy.printGameStats() + ",FinalStrategy-" + currentStrategy + ",1";
 
 	}
 

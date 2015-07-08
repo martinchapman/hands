@@ -13,8 +13,8 @@ import org.jgrapht.generate.RandomGraphGenerator;
 import org.jgrapht.generate.RingGraphGenerator;
 import org.jgrapht.generate.ScaleFreeGraphGenerator;
 import org.jgrapht.graph.ClassBasedVertexFactory;
-import org.jgrapht.graph.DefaultWeightedEdge;
 
+import HideAndSeek.AdaptiveGraphTraversingAgent;
 import HideAndSeek.GraphTraverser;
 import HideAndSeek.Main;
 import HideAndSeek.hider.Hider;
@@ -406,7 +406,8 @@ public class GraphController<V , E> {
 	 */
 	public Set<? extends StringEdge> edgesOf(GraphTraverser agent, StringVertex vertex) {
 	
-		if ( !agent.currentNode().equals(vertex) ) { 
+		// ~MDC 9/6 Second condition is hacky.
+		if ( !agent.currentNode().equals(vertex) && !(agent instanceof AdaptiveGraphTraversingAgent) ) { 
 			
 			throw new UnsupportedOperationException("At " + agent.currentNode() + " asking for edges of " + vertex);
 			 
@@ -481,8 +482,9 @@ public class GraphController<V , E> {
 	 * 
 	 * @param roundsPassed
 	 * @return
+	 * @deprecated
 	 */
-	public double averageSeekersRoundPerformance(int round) {
+	private double averageSeekersRoundPerformance(int round) {
 		
 		return graph.averageSeekersRoundPerformance(round);
 		
@@ -493,8 +495,9 @@ public class GraphController<V , E> {
 	 * 
 	 * @param roundsPassed
 	 * @return
+	 * @deprecated
 	 */
-	public double averageSeekersPerformance(Metric metric) {
+	private double averageSeekersPerformance(Metric metric) {
 		
 		return graph.averageSeekersPerformance(metric);
 		
@@ -541,7 +544,8 @@ public class GraphController<V , E> {
 		
 		} else {
 			
-			if (caller.currentNode() != requestedNode ) throw new UnsupportedOperationException(caller + " trying to check for an object in a node they are not currently at.");
+			//~MDC Second condition is hacky
+			if (caller.currentNode() != requestedNode && !(caller instanceof AdaptiveGraphTraversingAgent) ) throw new UnsupportedOperationException(caller + " trying to check for an object in a node they are not currently at.");
 			
 			return graph.isHideLocation(requestedNode);
 			
@@ -766,6 +770,18 @@ public class GraphController<V , E> {
 		
 		return graph.latestTraverserRoundPerformance(traverser, metric);
 		
+	}
+
+	/**
+	 * @param traverser
+	 * @param score
+	 * @param normalised
+	 * @return
+	 */
+	public Double latestTraverserRoundPerformance(GraphTraverser traverser, Metric score, boolean normalised) {
+
+		return graph.latestTraverserRoundPerformance(traverser, score, normalised);
+
 	}
 
 }

@@ -54,7 +54,12 @@ public class LeastConnected extends PreferenceHider {
 	 * The *estimated* connectivity of the least connected nodes
 	 * in the graph (may be greater than 1).
 	 */
-	protected static int estimatedMinConnections = 1;
+	protected int estimatedMinConnections = 1;
+	
+	/**
+	 * 
+	 */
+	protected int estimatedMaxConnections = Integer.MIN_VALUE;
 
 	/**
 	 * @param graphController
@@ -202,9 +207,7 @@ public class LeastConnected extends PreferenceHider {
 		
 		leastConnectedNodes.addAll(shuffledLeastConnectedNodes);
 		
-		Utils.talk(toString(), "leastConnectedNodes: " + leastConnectedNodes);
-		
-		return leastConnectedNodes;
+		return new LinkedHashSet<StringVertex>(leastConnectedNodes);
 		
 	}
 	
@@ -248,10 +251,12 @@ public class LeastConnected extends PreferenceHider {
 	@Override
 	public StringVertex nextNode(StringVertex currentNode) {
 		
+		if ( graphController.degreeOf(currentNode) > estimatedMaxConnections ) estimatedMaxConnections = graphController.degreeOf(currentNode);
+		
 		return super.nextNode(currentNode);
 	
 	}
-	
+
 	/**
 	 * @deprecated
 	 */

@@ -74,9 +74,9 @@ public class InverseHighProbability extends HighProbability {
 		
 		this.likelyNodes = new ArrayList<StringVertex>(graphController.vertexSet());
 		
-		if (allHideLocations.size() >= graphController.vertexSet().size()) allHideLocations.clear();
+		if (allHideLocations().size() >= ( graphController.vertexSet().size() )) allHideLocations().clear();
 		
-		this.likelyNodes.removeAll(allHideLocations);
+		this.likelyNodes.removeAll(allHideLocations());
 		
 	}
 	

@@ -76,8 +76,10 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	public void notifyEndOfRound() {
 		
     	calculateRealtimeHiderPayoffs();
-		
-		// Calculate average seeker round performance for access by adaptive Hiders
+    	
+    	calculateRealtimeSeekerPayoffs();
+    	
+		// Calculate average seeker round performance for access by adaptive Hiders (~MDC Deprecated)
     	recordAverageSeekersRoundPerformance(Metric.COST);
 		
 		roundNumber++;
@@ -146,6 +148,12 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 		
 	}
 	
+	public double latestSeekerRoundPayoffs(GraphTraverser traverser) {
+		
+		return seekerRoundPayoffs.get(seekerRoundPayoffs.size() - 1).get(traverser);
+		
+	}
+	
 	/**
 	 * Individual round payoffs for each hider
 	 */
@@ -184,7 +192,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 			
 			if ( agent instanceof Hider ) {
 				
-				// We do not play all registered Hiders at once, so not all will be payoffd
+				// We do not play all registered Hiders at once, so not all will be payoff
 				if ( !((Hider)agent).isPlaying() ) { continue; }
 				
 				for ( GraphTraverser seeker : traversers ) {
@@ -193,16 +201,21 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 						
 						opponents++;
 						
+						/* This is equivalent to Seeker Cost - Hider cost due to negation in
+						 * latestTraverserRoundPerformance.
+						 */
 						payoffAgainstEach += latestTraverserRoundPerformance((Hider)agent, Metric.COST) -
 											latestTraverserRoundPerformance((Seeker)seeker, Metric.COST);
+						
+						Utils.talk(toString(), (Hider)agent + " cost = " + latestTraverserRoundPerformance((Hider)agent, Metric.COST));
+						
+						Utils.talk(toString(), (Seeker)seeker + " cost = " + latestTraverserRoundPerformance((Seeker)seeker, Metric.COST));
 										   
 					}
 				
 				}
 				
 				hiderRoundPayoffs.get(hiderRoundPayoffs.size() - 1).put(agent, (payoffAgainstEach / opponents));
-				
-				calculateRealtimeSeekerPayoffs((Hider)agent);
 				
 			}
 			
@@ -215,7 +228,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	 * 
 	 * @param hider
 	 */
-	private void calculateRealtimeSeekerPayoffs(Hider hider) {
+	private void calculateRealtimeSeekerPayoffs() {
 		
 		seekerRoundPayoffs.put(roundNumber, new Hashtable<GraphTraverser, Double>());
 		
@@ -223,7 +236,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 			 
 			if ( traverser instanceof Seeker ) {
 				 
-				seekerRoundPayoffs.get(roundNumber).put(traverser, latestTraverserRoundPerformance((Seeker)traverser, Metric.COST_CHANGE));
+				seekerRoundPayoffs.get(roundNumber).put(traverser, latestTraverserRoundPerformance((Seeker)traverser, Metric.COST));
 				
 			}
 			 
@@ -270,6 +283,26 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 			
 			return performanceMetricRelativeCost(traverser); 
 			
+		} else if ( metric == Metric.SCORE ) {
+			
+	    	calculateRealtimeHiderPayoffs();
+	    	
+	    	calculateRealtimeSeekerPayoffs();
+			
+			if ( traverser instanceof Hider ) {
+				
+				return latestHiderRoundPayoffs(traverser);
+						
+			} else if ( traverser instanceof Seeker ) {
+				
+				return latestSeekerRoundPayoffs(traverser);
+				
+			} else {
+				
+				throw new UnsupportedOperationException("Unable to classify traverser supplied for performance.");
+			}
+			
+		
 		} else {
 			
 			return 0.0;
@@ -473,7 +506,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	}
 
 	/**
-	 * Get the search payoff awarded to a traverser in a particular round
+	 * Get the search payoff awarded to a hider in a particular round
 	 * 
 	 * @param traverser
 	 * @return

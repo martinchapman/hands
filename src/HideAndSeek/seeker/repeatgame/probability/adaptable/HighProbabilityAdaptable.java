@@ -8,9 +8,10 @@ import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.seeker.AdaptiveSeeker;
 import HideAndSeek.seeker.repeatgame.probability.HighProbability;
-import Utility.AdaptiveUtils;
 import Utility.Metric;
 import Utility.Utils;
+import Utility.adaptive.AdaptiveUtils;
+import Utility.adaptive.AdaptiveWeightings;
 
 /**
  * @author Martin
@@ -21,12 +22,12 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 	/**
 	 * 
 	 */
-	HashSet<StringVertex> uniqueHideLocations;
-	
+	ArrayList<Integer> uniqueHideLocationsProgression;
+
 	/**
 	 * 
 	 */
-	ArrayList<Integer> uniqueHideLocationsProgression;
+	private ArrayList<Double> percentageChanges;
 	
 	/**
 	 * Denotes number of rounds for which the same number of 
@@ -62,8 +63,6 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 		
 		super(graphController, name);
 		
-		uniqueHideLocations = new HashSet<StringVertex>();
-		
 		uniqueHideLocationsProgression = new ArrayList<Integer>();
 		
 		percentageChanges = new ArrayList<Double>();
@@ -77,10 +76,29 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 		
 		super.addHideLocation(location);
 		
-		uniqueHideLocations.add(location);
+		uniqueHideLocations().add(location);
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.AdaptiveGraphTraverser#getAdaptiveWeightings()
+	 */
+	@Override
+	public AdaptiveWeightings getAdaptiveWeightings() {
+		
+		return new AdaptiveWeightings(0.0, 1.0, 0.0);
+	
+	}
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.AdaptiveGraphTraverser#environmentalMeasure()
+	 */
+	public double environmentalMeasure() {
+		
+		return 0.0;
+		
+	}
+
 	/* 
 	 * (non-Javadoc)
 	 * @see HideAndSeek.AdaptiveGraphTraverserStrategy#relevanceOfStrategy()
@@ -97,11 +115,31 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 	 * assume that this indicates systematic unique play is being attempted, and thus
 	 * this strategy is void.
 	 */
-	public double relevanceOfStrategy() {
+	@Override
+	public double socialMeasure() {
 		
-		double relevance = 1 - ((uniqueHideLocations.size() / (double)(graphController.vertexSet().size())));
+		if ( uniqueHideLocationsProgression.size() > 2 ) {
+			
+			Utils.talk(toString(), "uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 1) " + uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 1));
+			Utils.talk(toString(), "uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 2) " + uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 2));
+			Utils.talk(toString(), "uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 3) " + uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 3));
+			
+			Utils.talk(toString(), "( uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 1) -  uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 2) ) " + ( uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 1) -  uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 2) ) );
+			Utils.talk(toString(), "estimatedHideLocations " + estimatedNumberOfHideLocations());
+			
+			if ( ( uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 1) -  uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 2) ) 
+			   == (  uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 2) - uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 3) ) &&
+			   ( uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 1) -  uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 2) ) 
+			   == estimatedNumberOfHideLocations())  
+			   return 1.0;
 		
-		if ( uniqueHideLocationsProgression.size() >= ROUND_CONSISTENCY_THRESHOLD ) {
+		}
+		
+		return 0.0;
+		
+		//double trigger = uniqueHideLocations.size() / (double)(graphController.vertexSet().size());
+		
+		/*if ( uniqueHideLocationsProgression.size() >= ROUND_CONSISTENCY_THRESHOLD ) {
 			
 			int lastDifference = uniqueHideLocationsProgression.get( uniqueHideLocationsProgression.size() - ( ROUND_CONSISTENCY_THRESHOLD - 1) ) - 
 								 uniqueHideLocationsProgression.get( uniqueHideLocationsProgression.size() - ( ROUND_CONSISTENCY_THRESHOLD) );
@@ -110,7 +148,7 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 				
 				if ( uniqueHideLocationsProgression.get(i) - uniqueHideLocationsProgression.get(i - 1) != lastDifference ) {
 					
-					return relevance;
+					return trigger;
 					
 				}
 				
@@ -120,36 +158,27 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 			
 			return 0.0;
 			
-		}
+		}*/
 		
-		return relevance;
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see HideAndSeek.seeker.AdaptiveSeekerStrategy#performanceOfOpponent()
-	 */
-	@Override
-	public double performanceOfOpponent() {
-
-		return 0.0;
+		//return trigger;
 		
 	}
-
-	/**
-	 * 
-	 */
-	private ArrayList<Double> percentageChanges;
 	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.seeker.AdaptiveSeekerStrategy#performanceOfSelf()
 	 */
 	@Override
-	public double performanceOfSelf() {
+	public double internalMeasure(ArrayList<Double> roundStrategyPerformance) {
 		
+		return AdaptiveUtils.internalMeasure(roundStrategyPerformance, Metric.TOTAL_EDGE_COST, localGraph);
+
+	}
+
+	public double internalMeasure_Org() {
+
 		percentageChanges.add(graphController.latestTraverserRoundPerformance(responsibleAgent, Metric.COST_CHANGE_SCORE));
 		
-		if (AdaptiveUtils.containsLowPerformance(percentageChanges, INDIVIDUAL_PERFORMANCE_THRESHOLD, INDIVIDUAL_PERFORMANCE_ROUND_THRESHOLD)) {
+		if (AdaptiveUtils.containsLowPerformance(percentageChanges)) {
 			
 			Utils.talk(toString(), "Consecutive low performance detected.");
 			
@@ -160,7 +189,7 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 			return 1.0;
 			
 		}
-
+		
 	}
 	
 	/* (non-Javadoc)
@@ -168,9 +197,19 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 	 */
 	public void endOfRound() {
 		
-		uniqueHideLocationsProgression.add(uniqueHideLocations.size());
+		uniqueHideLocationsProgression.add(uniqueHideLocations().size());
 	
+		if ( uniqueHideLocations().size() > ( graphController.vertexSet().size() - estimatedNumberOfHideLocations() ) ) { 
+			
+			uniqueHideLocations().clear();
+		
+			uniqueHideLocationsProgression.clear();
+		
+		}
+		
 		super.endOfRound();
+		
+		Utils.talk(toString(), "uniqueHideLocations.size() " + uniqueHideLocations().size());
 		
 	}
 	
@@ -180,7 +219,7 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 	@Override
 	public void endOfGame() {
 		
-		uniqueHideLocations.clear();
+		uniqueHideLocations().clear();
 		
 		uniqueHideLocationsProgression.clear();
 		
@@ -196,6 +235,37 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 		
 		percentageChanges.clear();
 		
+		uniqueHideLocationsProgression.clear();
+		
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime
+				* result
+				+ ((getName() == null) ? 0 : getName()
+						.hashCode());
+		return result;
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		InverseHighProbabilityAdaptable other = (InverseHighProbabilityAdaptable) obj;
+		if (getName() == null) {
+			if (other.getName() != null)
+				return false;
+		} else if (!getName().equals(other.getName()))
+			return false;
+		return true;
 	}
 
 }

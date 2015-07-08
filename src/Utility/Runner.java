@@ -38,7 +38,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import Utility.GameTheoretic.HeuristicPayoffMatrix;
+import Utility.GameTheoretic.ApproximatePayoffMatrix;
 import Utility.output.Datafile;
 import Utility.output.HiderRecord;
 import Utility.output.OutputManager;
@@ -50,6 +50,9 @@ import Utility.output.TraverserRecord;
  */
 public class Runner extends JFrame {
 	
+	/**
+	 * 
+	 */
 	public static ArrayList<TraverserRecord> selectedSeekers;
 	
 	/**
@@ -57,6 +60,9 @@ public class Runner extends JFrame {
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	/**
+	 * 
+	 */
 	private static String[] hiderTypes = 
 		{ 
 		
@@ -161,10 +167,15 @@ public class Runner extends JFrame {
 		  
 		  //
 		  
-		  "UnknownRandom"
+		  "UnknownRandom",
+		  "AdaptiveRandomSet",
+		  "AdaptiveLeastConnected"
 		  
 		};
 	
+	/**
+	 * 
+	 */
 	private static String[] seekerTypes = 
 		{ 
 		
@@ -829,7 +840,7 @@ public class Runner extends JFrame {
 				
 				if (graphTypes.getSelectedItem().equals("Payoff Matrix")) {
 					
-					HeuristicPayoffMatrix HPM = new HeuristicPayoffMatrix("");
+					ApproximatePayoffMatrix HPM = new ApproximatePayoffMatrix("");
 					
 					for ( Entry<TraverserRecord, Double> seekerPayoff : outputManager.matrixPayoff(selectedSeekers, allPlayers).entrySet() ) {
 						

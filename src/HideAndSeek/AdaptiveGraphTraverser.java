@@ -1,5 +1,9 @@
 package HideAndSeek;
 
+import java.util.ArrayList;
+
+import Utility.adaptive.AdaptiveWeightings;
+
 public interface AdaptiveGraphTraverser {
 	
 	/**
@@ -16,23 +20,22 @@ public interface AdaptiveGraphTraverser {
 	 */
 	
 	/**
-	 * The relevance of a strategy to the environment or to the
-	 * behaviour of the opponent.
+	 * The relevance of a strategy to the environment.
+	 *  
+	 * A lower value here signals that adaptation should occur. 
+	 * 
+	 * @return
+	 */
+	public double environmentalMeasure();
+	
+	/**
+	 * The relevance of a strategy to the (perception of an) opponent's strategy
 	 * 
 	 * A lower value here signals that adaptation should occur. 
 	 * 
 	 * @return
 	 */
-	public double relevanceOfStrategy();
-	
-	/**
-	 * The performance of an opponent.
-	 * 
-	 * A higher value here signals that adaptation should occur. 
-	 * 
-	 * @return
-	 */
-	public double performanceOfOpponent();
+	public double socialMeasure();
 	
 	/**
 	 * The performance of a strategy itself.
@@ -41,7 +44,12 @@ public interface AdaptiveGraphTraverser {
 	 * 
 	 * @return
 	 */
-	public double performanceOfSelf();
+	public double internalMeasure(ArrayList<Double> roundStrategyPerformance);
+	
+	/**
+	 * @return
+	 */
+	public AdaptiveWeightings getAdaptiveWeightings();
 	
 	/**
 	 * In the event that a strategy is not being played, but it 

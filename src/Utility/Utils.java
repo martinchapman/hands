@@ -38,6 +38,8 @@ import org.jibble.epsgraphics.EpsGraphics2D;
 
 import HideAndSeek.GraphTraverser;
 import HideAndSeek.graph.HiddenObjectGraph;
+import HideAndSeek.graph.StringEdge;
+import HideAndSeek.graph.StringVertex;
 
 /**
  * A set of static utility methods.
@@ -55,7 +57,7 @@ public class Utils {
 	/**
 	 * 
 	 */
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 	
 	/**
 	 * 
@@ -67,6 +69,28 @@ public class Utils {
 	 */
 	public static String KEY = "trFdcuAh"; 
 	
+	/**
+	 * @param hiddenObjectGraph
+	 * @return
+	 */
+	public static double totalEdgeCost(HiddenObjectGraph<StringVertex, StringEdge> hiddenObjectGraph) {
+	
+		double totalCost = 0.0;
+		
+		for ( StringEdge edge : hiddenObjectGraph.edgeSet() ) {
+			
+			totalCost += edge.getWeight();
+			
+		}
+		
+		return totalCost;
+		
+	}
+	
+	/**
+	 * @param name
+	 * @return
+	 */
 	public final static String shortenOutputName(String name) {
 		
 		Hashtable<String, String> shortenedNames = new Hashtable<String, String>();
@@ -93,10 +117,11 @@ public class Utils {
 		}
 		
 	}
+	
 	/**
 	 * @return
 	 */
-	public final static double percentageChane(double A, double B) {
+	public final static double percentageChange(double A, double B) {
 		
 		talk("", "Percentage change from " + A + " to " + B);
 		
@@ -260,9 +285,9 @@ public class Utils {
 	 * @param order
 	 * @return
 	 */
-	public static <K, V extends Number> Map<K, V> sortByValue(Map<K, V> unsortMap, final boolean order) {
+	public static <K, V extends Number> Map<K, V> sortByValue(Map<K, V> unsortedMap, final boolean order) {
 
-        List<Entry<K, V>> list = new LinkedList<Entry<K, V>>(unsortMap.entrySet());
+        List<Entry<K, V>> list = new LinkedList<Entry<K, V>>(unsortedMap.entrySet());
 
         // Sorting the list based on values
         Collections.sort(list, new Comparator<Entry<K, V>>() {

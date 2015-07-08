@@ -17,7 +17,8 @@ public class AdaptiveHidingAgent<E extends Hider & AdaptiveGraphTraverser> exten
 
 	public AdaptiveHidingAgent(
 			GraphController<StringVertex, StringEdge> graphController,
-			ArrayList<E> strategyPortfolio, int totalRounds, E currentStrategy) {
+			ArrayList<E> strategyPortfolio, int totalRounds,
+			String currentStrategy) {
 		super(graphController, strategyPortfolio, totalRounds, currentStrategy);
 		// TODO Auto-generated constructor stub
 	}
@@ -31,21 +32,18 @@ public class AdaptiveHidingAgent<E extends Hider & AdaptiveGraphTraverser> exten
 
 	public AdaptiveHidingAgent(
 			GraphController<StringVertex, StringEdge> graphController,
-			int totalRounds, E initialStrategy, ArrayList<E> strategyPortfolio,
-			double strategyRelevanceThreshold,
-			double opponentPerformanceThreshold,
-			double ownPerformanceThreshold, boolean canReuse) {
-		super(graphController, totalRounds, initialStrategy, strategyPortfolio,
-				strategyRelevanceThreshold, opponentPerformanceThreshold,
-				ownPerformanceThreshold, canReuse);
+			int totalRounds, ArrayList<E> strategyPortfolio,
+			String initialStrategy, double cueThreshold, boolean canReuse) {
+		super(graphController, totalRounds, strategyPortfolio, initialStrategy,
+				cueThreshold, canReuse);
 		// TODO Auto-generated constructor stub
 	}
 
 	public AdaptiveHidingAgent(
 			GraphController<StringVertex, StringEdge> graphController,
 			String name, ArrayList<E> strategyPortfolio, int totalRounds,
-			E currentStrategy) {
-		super(graphController, name, strategyPortfolio, totalRounds, currentStrategy);
+			String initialStrategy) {
+		super(graphController, name, strategyPortfolio, totalRounds, initialStrategy);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -58,13 +56,10 @@ public class AdaptiveHidingAgent<E extends Hider & AdaptiveGraphTraverser> exten
 
 	public AdaptiveHidingAgent(
 			GraphController<StringVertex, StringEdge> graphController,
-			String name, int totalRounds, E initialStrategy,
-			ArrayList<E> strategyPortfolio, double strategyRelevanceThreshold,
-			double opponentPerformanceThreshold,
-			double ownPerformanceThreshold, boolean canReuse) {
-		super(graphController, name, totalRounds, initialStrategy, strategyPortfolio,
-				strategyRelevanceThreshold, opponentPerformanceThreshold,
-				ownPerformanceThreshold, canReuse);
+			String name, int totalRounds, ArrayList<E> strategyPortfolio,
+			String initialStrategy, double cueTriggerThreshold, boolean canReuse) {
+		super(graphController, name, totalRounds, strategyPortfolio, initialStrategy,
+				cueTriggerThreshold, canReuse);
 		// TODO Auto-generated constructor stub
 	}
 

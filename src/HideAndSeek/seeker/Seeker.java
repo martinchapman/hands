@@ -16,21 +16,6 @@ public interface Seeker extends GraphTraverser {
 	 * @return
 	 */
 	public void search();
-	
-	/**
-	 * @return
-	 */
-	public HashSet<StringVertex> uniqueHideLocations();
-	
-	/**
-	 * @return
-	 */
-	public ArrayList<StringVertex> allHideLocations();
-	
-	/**
-	 * @param traverser
-	 */
-	public void mergeOtherTraverser(Seeker traverser);
 
 	/**
 	 * @return

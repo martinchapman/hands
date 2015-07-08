@@ -16,10 +16,11 @@ import Utility.Utils;
  * @author Martin
  */
 public class AdaptiveSeekingAgent<E extends Seeker & AdaptiveGraphTraverser> extends AdaptiveGraphTraversingAgent<E> implements Seeker {
-	
+
 	public AdaptiveSeekingAgent(
 			GraphController<StringVertex, StringEdge> graphController,
-			ArrayList<E> strategyPortfolio, int totalRounds, E currentStrategy) {
+			ArrayList<E> strategyPortfolio, int totalRounds,
+			String currentStrategy) {
 		super(graphController, strategyPortfolio, totalRounds, currentStrategy);
 		// TODO Auto-generated constructor stub
 	}
@@ -33,13 +34,34 @@ public class AdaptiveSeekingAgent<E extends Seeker & AdaptiveGraphTraverser> ext
 
 	public AdaptiveSeekingAgent(
 			GraphController<StringVertex, StringEdge> graphController,
-			int totalRounds, E initialStrategy, ArrayList<E> strategyPortfolio,
-			double strategyRelevanceThreshold,
-			double opponentPerformanceThreshold,
-			double ownPerformanceThreshold, boolean canReuse) {
-		super(graphController, totalRounds, initialStrategy, strategyPortfolio,
-				strategyRelevanceThreshold, opponentPerformanceThreshold,
-				ownPerformanceThreshold, canReuse);
+			int totalRounds, ArrayList<E> strategyPortfolio,
+			String initialStrategy, double cueThreshold, boolean canReuse) {
+		super(graphController, totalRounds, strategyPortfolio, initialStrategy,
+				cueThreshold, canReuse);
+		// TODO Auto-generated constructor stub
+	}
+
+	public AdaptiveSeekingAgent(
+			GraphController<StringVertex, StringEdge> graphController,
+			String name, ArrayList<E> strategyPortfolio, int totalRounds,
+			String initialStrategy) {
+		super(graphController, name, strategyPortfolio, totalRounds, initialStrategy);
+		// TODO Auto-generated constructor stub
+	}
+
+	public AdaptiveSeekingAgent(
+			GraphController<StringVertex, StringEdge> graphController,
+			String name, ArrayList<E> strategyPortfolio, int totalRounds) {
+		super(graphController, name, strategyPortfolio, totalRounds);
+		// TODO Auto-generated constructor stub
+	}
+
+	public AdaptiveSeekingAgent(
+			GraphController<StringVertex, StringEdge> graphController,
+			String name, int totalRounds, ArrayList<E> strategyPortfolio,
+			String initialStrategy, double cueTriggerThreshold, boolean canReuse) {
+		super(graphController, name, totalRounds, strategyPortfolio, initialStrategy,
+				cueTriggerThreshold, canReuse);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -120,16 +142,6 @@ public class AdaptiveSeekingAgent<E extends Seeker & AdaptiveGraphTraverser> ext
 
 		return currentStrategy.uniqueHideLocations();
 	
-	}
-
-	/* (non-Javadoc)
-	 * @see HideAndSeek.seeker.Seeker#mergeOtherTraverser(HideAndSeek.seeker.Seeker)
-	 */
-	@Override
-	public void mergeOtherTraverser(Seeker traverser) {
-		
-		currentStrategy.mergeOtherTraverser(traverser);
-		
 	}
 	
 	/* (non-Javadoc)

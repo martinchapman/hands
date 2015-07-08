@@ -1,21 +1,19 @@
 package HideAndSeek.hider.repeatgame.random.automatic;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.TreeSet;
 
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.repeatgame.random.UniqueRandomSetRepeat;
-import Utility.AdaptiveUtils;
-import Utility.Metric;
 import Utility.Utils;
+import Utility.adaptive.AdaptiveUtils;
 
 /**
  * Alters the size of the unique hide set if it believes this style
  * of play is being anticipated too easily by an opponent.
- * 
- * ~MDC 29/5 How does this differ from simply taking a probability distribution over HighProb and InverseHighProb?
  * 
  * @author Martin
  *
@@ -72,12 +70,75 @@ public class AutomaticUniqueRandomSetRepeat extends UniqueRandomSetRepeat {
 		this(graphController, "", numberOfHideLocations, goodPerformanceRoundsThreshold);
 		
 	}
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.hider.repeatgame.random.UniqueRandomSetRepeat#createRandomSet(int, java.util.TreeSet)
+	 */
+	protected ArrayList<StringVertex> createRandomSet(int size, TreeSet<StringVertex> ignoreSet) {
+		
+		Utils.talk(toString(), "setSize: " + setSize);
+		
+		ArrayList<StringVertex> nonUniqueNodes = nonUniqueNodes(numberOfHideLocations - setSize);
+			
+		ArrayList<StringVertex> uniqueNodes = super.createRandomSet(setSize, new TreeSet<StringVertex>(uniqueHideLocations()));
+			
+		uniqueNodes.addAll(nonUniqueNodes);
+	
+		return uniqueNodes;
+			
+	}
+	
+	/**
+	 * @return
+	 */
+	private ArrayList<StringVertex> nonUniqueNodes(int size) {
+		
+		if ( uniqueHideLocations().size() >= size ) {
+			
+			ArrayList<StringVertex> uniqueHideLocations = new ArrayList<StringVertex>(uniqueHideLocations());
+			
+			Collections.shuffle(uniqueHideLocations);
+			
+			System.out.println("!!" + new ArrayList<StringVertex>(uniqueHideLocations.subList(0, size)));
+			
+			return new ArrayList<StringVertex>(uniqueHideLocations.subList(0, size));
+		
+		} else {
+			
+			return super.createRandomSet(numberOfHideLocations - setSize, new TreeSet<StringVertex>());
+			
+		}
+		
+	}
 
+	/* (non-Javadoc)
+	 * @see HideAndSeek.hider.repeatgame.random.UniqueRandomSetRepeat#endOfRound()
+	 */
 	public void endOfRound() {
 		
 		super.endOfRound();
 		
-		costChangeValues.add(graphController.averageSeekersPerformance(Metric.COST_CHANGE));
+		if ( roundsPassed % 3 == 0 ) {
+			
+			setSize = numberOfHideLocations - 1;
+			
+		} else {
+			
+			setSize = numberOfHideLocations;
+			
+		}
+		
+	}
+	
+	/**
+	 * 
+	 */
+	public void endOfRound_org() {
+		
+		super.endOfRound();
+		
+		// ~MDC 2/7 Needs changing to account for deprecated information source
+		//costChangeValues.add(graphController.averageSeekersPerformance(Metric.COST_CHANGE));
 		
 		if ( AdaptiveUtils.containsHighPerformance(costChangeValues, 0.5, goodPerformanceRounds) ) {
 			
@@ -115,7 +176,7 @@ public class AutomaticUniqueRandomSetRepeat extends UniqueRandomSetRepeat {
 			
 		}
 		
-		ArrayList<StringVertex> uniqueNodes = createRandomSet(setSize, usedNodes);
+		ArrayList<StringVertex> uniqueNodes = createRandomSet(setSize, new TreeSet<StringVertex>(uniqueHideLocations()));
 		
 		ArrayList<StringVertex> randomNodes = createRandomSet(numberOfHideLocations - setSize, new TreeSet<StringVertex>());
 		

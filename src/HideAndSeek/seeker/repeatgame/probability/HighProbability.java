@@ -2,13 +2,18 @@ package HideAndSeek.seeker.repeatgame.probability;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.jgrapht.alg.DijkstraShortestPath;
 
+import HideAndSeek.GraphTraverser;
+import HideAndSeek.OpenTraverserStrategy;
+import HideAndSeek.VariableTraversalStrategy;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.seeker.SeekingAgent;
+import HideAndSeek.seeker.singleshot.coverage.BacktrackGreedyMechanism;
 import Utility.BehaviourPrediction;
 import Utility.Utils;
 
@@ -16,7 +21,21 @@ import Utility.Utils;
  * @author Martin
  *
  */
-public class HighProbability extends SeekingAgent {
+public class HighProbability extends SeekingAgent implements VariableTraversalStrategy {
+
+	/**
+	 * 
+	 */
+	private OpenTraverserStrategy explorationMechanism;
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.VariableTraversalStrategy#getExplorationMechanism(HideAndSeek.GraphTraverser)
+	 */
+	public OpenTraverserStrategy getExplorationMechanism(GraphTraverser responsibleAgent) {
+		
+		return new BacktrackGreedyMechanism(graphController, responsibleAgent);
+		
+	}
 
 	/**
 	 * 
@@ -57,6 +76,8 @@ public class HighProbability extends SeekingAgent {
 		
 		lastHighestProbabilityNodes = new ArrayList<StringVertex>();
 		
+		this.explorationMechanism = getExplorationMechanism(responsibleAgent);
+		
 	}
 	
 	public HighProbability(
@@ -87,7 +108,7 @@ public class HighProbability extends SeekingAgent {
 		
 		// If we're already on the DSP to a node, continue on it
 		if (currentPath.size() > 0) return edgeToTarget(currentPath.remove(0), currentNode);
-		
+
 		// Use likely node information if available, and if graph has sufficient information to use:
 		if ( likelyNodes.size() > 0 && localGraph.containsVertex(likelyNodes.get(0)) ) {
 			
@@ -108,6 +129,15 @@ public class HighProbability extends SeekingAgent {
 			return connectedNode(currentNode);
 			
 		}
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraversingAgent#connectedNode(HideAndSeek.graph.StringVertex)
+	 */
+	public StringVertex connectedNode(StringVertex currentNode) {
+		
+		return explorationMechanism.nextNode(currentNode);
 		
 	}
 
@@ -148,6 +178,8 @@ public class HighProbability extends SeekingAgent {
 		// Recalculate probabilities
 		behaviourPrediction.endRound();
 		
+		currentPath.clear();
+		
 		/* Recreate list of likely vertices (currently assuming unknown value of K on part of seeker (until all objects are found), 
 		   so just get ALL likely locations) */
 		likelyNodes = behaviourPrediction.rankLikelyHideLocations(predictiveNodes);
@@ -175,6 +207,8 @@ public class HighProbability extends SeekingAgent {
 			Utils.talk(toString(), highestProbabilityNodes.size() + " highest probability nodes: " + highestProbabilityNodes);
 		
 		}
+
+		explorationMechanism.endOfRound();
 		
 	}
 
@@ -191,6 +225,41 @@ public class HighProbability extends SeekingAgent {
 		// If game had ended, and an instance of this object may be used in further games, clear all learning.
 		behaviourPrediction = new BehaviourPrediction();
 		
+		explorationMechanism.endOfGame();
+		
+		
+	}
+
+	/**
+	 * @param startNode
+	 */
+	public void atStart(StringVertex startNode) {
+		
+		super.atStart(startNode);
+		
+		explorationMechanism.atStart(currentNode);
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraversingAgent#atNode()
+	 */
+	public void atNode() {
+		
+		super.atNode();
+		
+		explorationMechanism.atNode();
+		
+	}
+	
+	/**
+	 * @param nextNode
+	 */
+	public void atNextNode(StringVertex nextNode) {
+		
+		super.atNextNode(nextNode);
+		
+		explorationMechanism.atNextNode(nextNode);
 		
 	}
 

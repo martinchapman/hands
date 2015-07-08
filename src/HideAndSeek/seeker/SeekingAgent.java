@@ -15,39 +15,11 @@ import Utility.Utils;
  *
  */
 public abstract class SeekingAgent extends TraverserLocalGraph implements Runnable, Seeker {
-	
-	/**
-	 * All hide locations encountered in a game.
-	 */
-	protected ArrayList<StringVertex> allHideLocations;
 
-	/**
-	 * @return
-	 */
-	public ArrayList<StringVertex> allHideLocations() {
-		
-		return allHideLocations;
-	
-	}
-	
 	/**
 	 * 
 	 */
-	protected HashSet<StringVertex> uniqueHideLocations;
-	
-	/**
-	 * @return
-	 */
-	public HashSet<StringVertex> uniqueHideLocations() {
-		
-		return uniqueHideLocations;
-		
-	}
-	
-	/**
-	 * We assume a default number of hide locations as 5.
-	 */
-	private int estimatedNumberOfHideLocations = 5;
+	private int estimatedNumberOfHideLocations;
 	
 	/**
 	 * @return
@@ -57,7 +29,6 @@ public abstract class SeekingAgent extends TraverserLocalGraph implements Runnab
 		return estimatedNumberOfHideLocations;
 		
 	}
-
 	/**
 	 * @param graphController
 	 */
@@ -92,12 +63,6 @@ public abstract class SeekingAgent extends TraverserLocalGraph implements Runnab
 		
 		super(graphController, name, responsibleAgent);
 		
-		// Record of where hidden items have been found (in the whole game)
-		allHideLocations = new ArrayList<StringVertex>();
-		
-		//
-		uniqueHideLocations = new HashSet<StringVertex>();
-		
 	}
 	
 	
@@ -111,7 +76,7 @@ public abstract class SeekingAgent extends TraverserLocalGraph implements Runnab
 	 * by the controller, it must estimate this, on a specified basis, based
 	 * upon the number of hide locations most recently recorded.
 	 */
-	private void updateNumberOfHideLocationsEstimate() {
+	protected void updateNumberOfHideLocationsEstimate() {
 		
 		if ( graphController.numberOfHideLocations(responsibleAgent) == -1 ) {
 			
@@ -119,7 +84,8 @@ public abstract class SeekingAgent extends TraverserLocalGraph implements Runnab
 			
 		} else {
 			
-			estimatedNumberOfHideLocations = graphController.numberOfHideLocations(responsibleAgent);
+			// ~MDC Temp
+			estimatedNumberOfHideLocations = 5; //graphController.numberOfHideLocations(responsibleAgent);
 			
 		}
 		
@@ -159,9 +125,11 @@ public abstract class SeekingAgent extends TraverserLocalGraph implements Runnab
 		
 		hideLocations().add(location); 
 		
-		allHideLocations.add(location);
+		if ( allHideLocations().size() >= graphController.vertexSet().size() ) allHideLocations().clear();
 		
-		uniqueHideLocations.add(location);
+		allHideLocations().add(location);
+		
+		uniqueHideLocations().add(location);
 		
 	}
 	
@@ -266,23 +234,6 @@ public abstract class SeekingAgent extends TraverserLocalGraph implements Runnab
 	public void endOfGame() {
 		
 		super.endOfGame();
-		
-		allHideLocations.clear();
-		
-		uniqueHideLocations.clear();
-		
-	}
-	
-	/**
-	 * @param traverser
-	 */
-	public void mergeOtherTraverser(Seeker traverser) {
-		
-		super.mergeOtherTraverser(traverser);
-		
-		this.allHideLocations.addAll(traverser.allHideLocations());
-		
-		this.uniqueHideLocations.addAll(traverser.uniqueHideLocations());
 		
 	}
 

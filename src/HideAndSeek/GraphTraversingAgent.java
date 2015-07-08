@@ -79,6 +79,34 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	}
 	
 	/**
+	 * All hide locations encountered in a game.
+	 */
+	private ArrayList<StringVertex> allHideLocations;
+
+	/**
+	 * @return
+	 */
+	public ArrayList<StringVertex> allHideLocations() {
+		
+		return allHideLocations;
+	
+	}
+	
+	/**
+	 * 
+	 */
+	private HashSet<StringVertex> uniqueHideLocations;
+	
+	/**
+	 * @return
+	 */
+	public HashSet<StringVertex> uniqueHideLocations() {
+		
+		return uniqueHideLocations;
+		
+	}
+	
+	/**
 	 * @return
 	 */
 	protected boolean automaticMove() {
@@ -184,6 +212,12 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 		exploredNodes = new ArrayList<StringVertex>();
 		
 		queuedNodes = new ArrayList<StringVertex>();
+		
+		// Record of where hidden items have been found (in the whole game)
+		allHideLocations = new ArrayList<StringVertex>();
+		
+		//
+		uniqueHideLocations = new HashSet<StringVertex>();
 		
 	}
 	
@@ -332,7 +366,7 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	 */
 	protected void atNode() {
 	
-		Utils.talk(toString(), "At node " + currentNode);
+		//Utils.talk(toString(), "At node " + currentNode);
 		
 		exploredNodes.add(currentNode);
 		
@@ -393,7 +427,7 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	 * @return
 	 */
 	protected List<StringEdge> getConnectedEdges(StringVertex vertex) {
-		
+	
 		return new ArrayList<StringEdge>(graphController.edgesOf(responsibleAgent, vertex));
 		
 	}
@@ -509,7 +543,7 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	public void endOfRound() { 
 		
 		roundsPassed++;
-		
+
 	}
 	
 	/**
@@ -575,6 +609,10 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 		uniquelyVisitedNodes.clear();
 		
 		uniquelyVisitedEdges.clear();
+		
+		allHideLocations.clear();
+		
+		uniqueHideLocations.clear();
 		
 		hideLocations.clear();
 		
@@ -649,26 +687,26 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	public boolean equals(Object obj) {
 		
 		// If a class equals itself, clearly all fields will be equal
-		if (responsibleAgent == obj) return true;
+		if (responsibleAgent == ((GraphTraverser)((GraphTraverser)obj)).getResponsibleAgent()) return true;
 		
-		if (obj == null) return false;
+		if (((GraphTraverser)obj) == null) return false;
+
+		if (responsibleAgent.getClass() != ((GraphTraverser)obj).getClass()) return false;
 		
-		if (responsibleAgent.getClass() != obj.getClass()) return false;
-		
-		GraphTraversingAgent other = (GraphTraversingAgent) obj;
+		GraphTraversingAgent other = (GraphTraversingAgent) ((GraphTraverser)obj);
 		
 		if (responsibleAgent.getName() == null) {
 			
 			if (other.getResponsibleAgent().getName() != null)
 			
 				return false;
-			
+		
 		} else if (!getName().equals(other.getResponsibleAgent().getName())) {
 			
 			return false;
 			
 		}
-			
+		
 		return true;
 		
 	}
@@ -676,9 +714,22 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	/* (non-Javadoc)
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
-	public int compareTo(GraphTraverser aThat) {
+	public int compareTo(GraphTraverser traverser) {
 		
-	    return ComparatorResult.EQUAL;
+		if ( getName().equals(traverser.getName()) ) {
+			
+			return ComparatorResult.EQUAL;
+			
+		} else if ( getName().compareTo(traverser.getName()) >= ComparatorResult.AFTER ) {
+			
+			return ComparatorResult.AFTER;
+			
+		} else {
+			
+			return ComparatorResult.BEFORE;
+			
+		}
+	    
 	    
 	}
 
@@ -701,6 +752,10 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 		this.exploredNodes.addAll(traverser.exploredNodes());
 		
 		this.hideLocations.addAll(traverser.requestHideLocations(responsibleAgent));
+		
+		this.allHideLocations.addAll(traverser.allHideLocations());
+		
+		this.uniqueHideLocations.addAll(traverser.uniqueHideLocations());	
 		
 	}
 

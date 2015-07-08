@@ -1,10 +1,15 @@
 package HideAndSeek.hider.singleshot.preference.adaptable;
 
+import java.util.ArrayList;
+
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.AdaptiveHider;
 import HideAndSeek.hider.singleshot.preference.LeastConnected;
+import Utility.Metric;
+import Utility.adaptive.AdaptiveUtils;
+import Utility.adaptive.AdaptiveWeightings;
 
 /**
  * 
@@ -16,12 +21,15 @@ import HideAndSeek.hider.singleshot.preference.LeastConnected;
  */
 public class LeastConnectedAdaptable extends LeastConnected implements AdaptiveHider {
 
-	public LeastConnectedAdaptable(
-			GraphController<StringVertex, StringEdge> graphController,
-			int numberOfHideLocations) {
+	/**
+	 * @param graphController
+	 * @param numberOfHideLocations
+	 */
+	public LeastConnectedAdaptable( GraphController<StringVertex, StringEdge> graphController, int numberOfHideLocations) {
+	
 		super(graphController, numberOfHideLocations);
+	
 	}
-
 	
 	/**
 	 * Relevance of strategy based upon smallest connections in graph, as a portion of the
@@ -33,30 +41,55 @@ public class LeastConnectedAdaptable extends LeastConnected implements AdaptiveH
 	 * @return
 	 */
 	@Override
-	public double relevanceOfStrategy() {
+	public double environmentalMeasure() {
 		
-		return (graphController.vertexSet().size() - maxConnections) / graphController.vertexSet().size();
+		double cumulativeConnectivityLeastConnected = 0.0;
+		
+		for ( StringVertex vertex : getMinimumConnectivityNodes() ) {
+			
+			cumulativeConnectivityLeastConnected += graphController.degreeOf(vertex);
+			
+		}
+		
+		return ( cumulativeConnectivityLeastConnected / getMinimumConnectivityNodes().size() ) / ((double)estimatedMaxConnections);
 	
 	}
 
 	/**
-	 * @return
-	 */
-	@Override
-	public double performanceOfOpponent() {
-		return -1;
-	}
-
-	/**
-	 * @return
-	 */
-	@Override
-	public double performanceOfSelf() {
-		return -1;
-	}
-	
-	/**
+	 * Emits a social cue.
 	 * 
+	 * @return
+	 */
+	@Override
+	public double socialMeasure() {
+		
+		return 0.0;
+	
+	}
+
+	/**
+	 * @param roundStrategyPerformance
+	 * @return
+	 */
+	@Override
+	public double internalMeasure(ArrayList<Double> roundStrategyPerformance) {
+		
+		return AdaptiveUtils.internalMeasure(roundStrategyPerformance, Metric.TOTAL_EDGE_COST, localGraph);
+	
+	}
+
+	/**
+	 * @return
+	 */
+	@Override
+	public AdaptiveWeightings getAdaptiveWeightings() {
+		
+		return new AdaptiveWeightings(0.8, 0.0, 0.2);
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see HideAndSeek.AdaptiveGraphTraverser#stopStrategy()
 	 */
 	@Override
 	public void stopStrategy() {}

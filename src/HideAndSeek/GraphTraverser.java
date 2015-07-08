@@ -22,13 +22,27 @@ public interface GraphTraverser extends Comparable<GraphTraverser>, Runnable {
 	/**
 	 * @return
 	 */
+	public GraphTraverser getResponsibleAgent();
+	
+	/**
+	 * @return
+	 */
 	public abstract HashSet<StringVertex> uniquelyVisitedNodes();
 
 	/**
 	 * @return
 	 */
 	public abstract HashSet<StringEdge> uniquelyVisitedEdges();
-
+	
+	/**
+	 * @return
+	 */
+	public ArrayList<StringVertex> allHideLocations();
+	
+	/**
+	 * @return
+	 */
+	public HashSet<StringVertex> uniqueHideLocations();
 	/**
 	 * @return
 	 */

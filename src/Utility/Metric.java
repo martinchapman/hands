@@ -22,6 +22,11 @@ public enum Metric {
 	PATH("Path"), 
 	
 	/**
+	 * Costs accrued compared to total edge costs
+	 */
+	TOTAL_EDGE_COST("Total edge cost"), 
+	
+	/**
 	 * 
 	 */
 	COST_CHANGE("Cost change"), 
@@ -32,7 +37,7 @@ public enum Metric {
 	COST_CHANGE_SCORE("Cost change payoff"), 
 	
 	/**
-	 * 
+	 * Difference between current round and first round
 	 */
 	RELATIVE_COST("Relative cost");
 	

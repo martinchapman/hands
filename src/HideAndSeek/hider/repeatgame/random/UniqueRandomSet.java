@@ -6,6 +6,7 @@ import java.util.TreeSet;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
+import HideAndSeek.hider.Hider;
 import HideAndSeek.hider.singleshot.random.RandomSet;
 import Utility.Utils;
 
@@ -21,7 +22,16 @@ import Utility.Utils;
  */
 public class UniqueRandomSet extends RandomSet {
 
-	protected TreeSet<StringVertex> usedNodes;
+	/**
+	 * @param graphController
+	 * @param name
+	 * @param numberOfHideLocations
+	 */
+	public UniqueRandomSet(GraphController<StringVertex, StringEdge> graphController, String name, int numberOfHideLocations) {
+		
+		super(graphController, name, numberOfHideLocations);
+		
+	}
 	
 	/**
 	 * @param graphController
@@ -32,17 +42,19 @@ public class UniqueRandomSet extends RandomSet {
 		super(graphController, numberOfHideLocations);
 		
 	}
-	
+
 	/**
-	 * 
+	 * @param size
+	 * @param ignoreSet NB: Parameter ignored here. Used simply for override.
+	 * @return
 	 */
 	protected ArrayList<StringVertex> createRandomSet(int size, TreeSet<StringVertex> ignoreSet) {
 		
-		if (usedNodes == null) usedNodes = new TreeSet<StringVertex>();
+		ArrayList<StringVertex> hideSet = super.createRandomSet(size, new TreeSet<StringVertex>(uniqueHideLocations()));
 		
-		ArrayList<StringVertex> hideSet = super.createRandomSet(size, usedNodes);
+		System.out.println("Adding " + hideSet + " to used nodes. Existing: " + uniqueHideLocations());
 		
-		usedNodes.addAll(hideSet);
+		uniqueHideLocations().addAll(hideSet);
 		
 		return hideSet;
 		

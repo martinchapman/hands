@@ -23,6 +23,8 @@ public class BacktrackGreedyMechanism extends BacktrackGreedy implements OpenTra
 		
 		super(graphController, responsibleAgent);
 		
+		if ( responsibleAgent == null ) graphController.deregisterTraversingAgent(this);
+		
 	}
 	
 	/* (non-Javadoc)

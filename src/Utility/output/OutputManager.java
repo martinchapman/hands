@@ -43,7 +43,7 @@ public class OutputManager {
 	/**
 	 * 
 	 */
-	private boolean SHOW_OPPONENT = true;
+	private boolean SHOW_OPPONENT = false;
 	
 	/**
 	 * Multiple hiders per file, and multiple files.
@@ -507,7 +507,7 @@ public class OutputManager {
 		
 		for ( TraverserRecord traverser : traverserRecords ) {
 			
-			matrixPayoffValues.put(traverser, (double)Math.round(traverserPayoff(traverser, minForAttributeInAllSeries(allPlayers, "Game", GraphType.BAR), maxForAttributeInAllSeries(allPlayers, "Game", GraphType.BAR)).getValue() * 10));
+			matrixPayoffValues.put(traverser, traverserPayoff(traverser, minForAttributeInAllSeries(allPlayers, "Game", GraphType.BAR), maxForAttributeInAllSeries(allPlayers, "Game", GraphType.BAR)).getValue() * 10);
 			
 		}
 		
@@ -544,6 +544,10 @@ public class OutputManager {
 
 				Utils.talk(toString(), hidersSeeker + ": " + normalisedSeekerCost);
 				
+				Utils.talk(toString(), "Seeker cost: " + ( ( normalisedSeekerCost / (double)((HiderRecord)traverser).getSeekersAndAttributes().size() )));
+				
+				Utils.talk(toString(), "Hider cost: " +  ( traverser.getAttributeToGameAverage(Metric.COST.getText(), minForAttributeInAllSeries, maxForAttributeInAllSeries) ) );
+				
 				Utils.talk(toString(), traverser + " vs " + hidersSeeker + " payoff: " + ( ( normalisedSeekerCost / (double)((HiderRecord)traverser).getSeekersAndAttributes().size() ) - traverser.getAttributeToGameAverage(Metric.COST.getText(), minForAttributeInAllSeries, maxForAttributeInAllSeries) ) );
 				
 			}
@@ -562,16 +566,21 @@ public class OutputManager {
 	}
 	
 	/**
-	 * @param traverserRecords
+	 * @param playerRecords All players
+	 * @param traverserRecords Only those selected
+	 * @param gameOrRound
 	 * @param title
 	 * @param graphType
-	 * @param attribute
+	 * @param xLabel
+	 * @param yLabel
+	 * @param category
+	 * @param outputEnabled
 	 */
 	public void showGraphForAttribute(ArrayList<TraverserRecord> playerRecords, ArrayList<TraverserRecord> traverserRecords, String gameOrRound, String title, String graphType, String xLabel, String yLabel, String category, boolean outputEnabled) {
 		
 		if ( graphType.equals("Bar") ) SHOW_OPPONENT = false;
 		
-		if ( !SHOW_OPPONENT ) for ( TraverserRecord record : expandTraverserRecords(traverserRecords) ) record.switchShowOpponents();
+		//if ( !SHOW_OPPONENT ) for ( TraverserRecord record : expandTraverserRecords(traverserRecords) ) record.switchShowOpponents();
 			
 		Collections.sort(traverserRecords);
 		
@@ -850,7 +859,7 @@ public class OutputManager {
 								
 								double pValue = traverserA.getKey().pValue(traverserB.getKey(), Metric.COST);
 								
-								Utils.talk(toString(), traverserA.getKey() + " vs " + traverserB.getKey() + " : Percentage Difference - " + ( Utils.percentageChane(traverserB.getValue(), traverserA.getValue()) ) + " PValue - " + pValue);
+								Utils.talk(toString(), traverserA.getKey() + " vs " + traverserB.getKey() + " : Percentage Difference - " + ( Utils.percentageChange(traverserB.getValue(), traverserA.getValue()) ) + " PValue - " + pValue);
 								
 								cumulativeP += pValue;
 								
@@ -860,7 +869,7 @@ public class OutputManager {
 								
 								double pValue = traverserA.getKey().pValue(traverserB.getKey(), minForAttributeInAllSeries, maxForAttributeInAllSeries );
 								
-								Utils.talk(toString(), traverserA.getKey() + " vs " + traverserB.getKey() + " : Percentage Difference - " + ( Utils.percentageChane(traverserB.getValue(), traverserA.getValue()) ) + " PValue - " + pValue);
+								Utils.talk(toString(), traverserA.getKey() + " vs " + traverserB.getKey() + " : Percentage Difference - " + ( Utils.percentageChange(traverserB.getValue(), traverserA.getValue()) ) + " PValue - " + pValue);
 								
 								cumulativeP += pValue;
 								
@@ -922,7 +931,7 @@ public class OutputManager {
 			
 		}
 		
-		if ( !SHOW_OPPONENT ) for ( TraverserRecord record : expandTraverserRecords(traverserRecords) ) record.switchShowOpponents();
+		//if ( !SHOW_OPPONENT ) for ( TraverserRecord record : expandTraverserRecords(traverserRecords) ) record.switchShowOpponents();
 		
 		/*graph.pack();
 		
