@@ -12,6 +12,7 @@ import HideAndSeek.graph.StringVertex;
 import Utility.Metric;
 import Utility.Pair;
 import Utility.Utils;
+import Utility.adaptive.AdaptiveMeasure;
 import Utility.adaptive.AdaptiveWeightings;
 
 /**
@@ -178,9 +179,29 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 		
 	}
 	
+	/**
+	 * @param graphController
+	 * @param strategyPortfolio
+	 * @param totalRounds
+	 */
 	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, ArrayList<E> strategyPortfolio, int totalRounds) {
 		
 		this( graphController, "", strategyPortfolio, totalRounds, strategyPortfolio.get((int)(Math.random()*strategyPortfolio.size())).getName());
+		
+	}
+	
+	/**
+	 * @param graphController
+	 * @param name
+	 * @param strategyPortfolio
+	 * @param totalRounds
+	 * @param cueTriggerThreshold
+	 * @param canReuse
+	 */
+	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, String name, ArrayList<E> strategyPortfolio, int totalRounds, 
+			double cueTriggerThreshold, boolean canReuse) {
+		
+		this( graphController, name, strategyPortfolio,totalRounds, strategyPortfolio.get((int)(Math.random()*strategyPortfolio.size())).getName(), cueTriggerThreshold, canReuse );
 		
 	}
 	
@@ -191,7 +212,7 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 	 * @param opponentPerformanceThreshold
 	 * @param ownPerformanceThreshold
 	 */
-	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, String name, int totalRounds, ArrayList<E> strategyPortfolio, String initialStrategy, 
+	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, String name, ArrayList<E> strategyPortfolio, int totalRounds, String initialStrategy, 
 			double cueTriggerThreshold, boolean canReuse) {
 		
 		this(graphController, name, strategyPortfolio, totalRounds, initialStrategy);
@@ -212,10 +233,23 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 	 * @param ownPerformanceThreshold
 	 * @param canReuse
 	 */
-	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, int totalRounds, ArrayList<E> strategyPortfolio, String initialStrategy,
+	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, ArrayList<E> strategyPortfolio, int totalRounds, String initialStrategy,
 			double cueThreshold, boolean canReuse) {
 		
-		this( graphController, "", totalRounds, strategyPortfolio, initialStrategy, cueThreshold, canReuse);
+		this( graphController, "", strategyPortfolio, totalRounds, initialStrategy, cueThreshold, canReuse);
+			
+	}
+	
+	/**
+	 * @param graphController
+	 * @param strategyPortfolio
+	 * @param totalRounds
+	 * @param cueThreshold
+	 * @param canReuse
+	 */
+	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, ArrayList<E> strategyPortfolio, int totalRounds, double cueThreshold, boolean canReuse) {
+		
+		this( graphController, "", strategyPortfolio, totalRounds, strategyPortfolio.get((int)(Math.random()*strategyPortfolio.size())).getName(), cueThreshold, canReuse);
 			
 	}
 	
@@ -291,17 +325,26 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 	}
 	
 	/**
+	 * @return
+	 */
+	protected double confidenceLevel() {
+		
+		return currentStrategy.roundsPassed() / ( (double)(totalRounds) / 2 );
+		
+	}
+	
+	/**
 	 * 
 	 */
 	protected void checkCurrentPerformance() {
 		
 		Utils.talk(toString(), "================================= Adaptive Assessment -- Current Strategy: " + currentStrategy + " =================================");
 		
-		roundStrategyPerformance.put(roundsPassed, new Pair<E, Double>(currentStrategy, graphController.latestTraverserRoundPerformance(responsibleAgent, Metric.SCORE)));
+		roundStrategyPerformance.put(roundsPassed, new Pair<E, Double>(currentStrategy, graphController.latestTraverserRoundPerformance(responsibleAgent, Metric.PAYOFF)));
 		
-		double relevanceOfStrategy = currentStrategy.environmentalMeasure();
+		double relevanceOfStrategy = currentStrategy.environmentalMeasure().getAdaptiveAssessment();
 		
-		double performanceOfOpponent = currentStrategy.socialMeasure();
+		double performanceOfOpponent = currentStrategy.socialMeasure().getAdaptiveAssessment();
 		
 		Utils.talk(toString(), "strategyToAveragePerformance() " + strategyToAveragePerformance());
 		
@@ -323,7 +366,7 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 			Utils.talk(toString(), "Defaulting to relative performance check, as highest performing strategy is this one.");
 			
 			// Default to relative performance check
-			performanceOfSelf = currentStrategy.internalMeasure(strategyToAllPerformances(currentStrategy));
+			performanceOfSelf = currentStrategy.internalMeasure(strategyToAllPerformances(currentStrategy)).getAdaptiveAssessment();
 			
 		} else {
 			
@@ -351,7 +394,7 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 		
 		Utils.talk(toString(), "Average assessment value: " + averageAssessmentValue);
 		
-		double confidenceLevel = currentStrategy.roundsPassed() / ( (double)(totalRounds) / 2 );
+		double confidenceLevel = confidenceLevel();
 		
 		if ( confidenceLevel >= 1.0 ) confidenceLevel = 1.0;
 		
@@ -364,6 +407,57 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 		if ( adaptationDecision > cueTriggerThreshold ) {
 			
 			Utils.talk(toString(), "Adapting!");
+			
+			Hashtable<Double, AdaptiveMeasure> weightingToMeasure = new Hashtable<Double, AdaptiveMeasure>();
+			
+			weightingToMeasure.put(currentStrategyWeightings.getEnvironmentalWeighting(), currentStrategy.environmentalMeasure());
+			weightingToMeasure.put(currentStrategyWeightings.getSocialWeighting(), currentStrategy.socialMeasure());
+			weightingToMeasure.put(currentStrategyWeightings.getInternalWeighting(), currentStrategy.internalMeasure(strategyToAllPerformances(currentStrategy)));
+			
+			double weightingRandom = Math.random();
+			Utils.talk(toString(), "weightingRandom " + weightingRandom);
+			
+			ArrayList<Double> cumulativeWeights = new ArrayList<Double>();
+			cumulativeWeights.add(0.0);
+			
+			for ( Entry<Double, AdaptiveMeasure> weightingToMeasureEntry : weightingToMeasure.entrySet() ) {
+				
+				Utils.talk(toString(), "weightingToMeasureEntry " + weightingToMeasureEntry);
+				
+				cumulativeWeights.add(cumulativeWeights.get(cumulativeWeights.size() - 1) + weightingToMeasureEntry.getKey());
+				
+				Utils.talk(toString(), "cumulativeWeights.get(cumulativeWeights.size() - 2) " + cumulativeWeights.get(cumulativeWeights.size() - 2));
+				Utils.talk(toString(), "cumulativeWeights.get(cumulativeWeights.size() - 1) " + cumulativeWeights.get(cumulativeWeights.size() - 1));
+				
+				if ( weightingRandom > cumulativeWeights.get(cumulativeWeights.size() - 2) && weightingRandom < cumulativeWeights.get(cumulativeWeights.size() - 1) ) {
+					
+					Utils.talk(toString(), weightingToMeasureEntry + " selected.");
+					
+					if ( weightingToMeasureEntry.getValue().adaptToSpecified() ) { 
+						
+						for ( E strategy : strategyPortfolio ) { 
+							
+							if ( strategy.getName().equals(weightingToMeasureEntry.getValue().getAdaptTo()) ) { 
+								
+								changeToOtherStrategy(strategy);
+								
+								return;
+							
+							}
+							
+						}
+						
+						throw new UnsupportedOperationException("Adapt to strategy not found in portfolio.");
+						
+					} else {
+						
+						Utils.talk(toString(), weightingToMeasureEntry + " no adapt to strategy specified.");
+						
+					}
+					
+				}
+				
+			}
 			
 			if ( !changeToOtherStrategy() ) {
 				
@@ -412,11 +506,11 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 	 */
 	protected void checkCurrentPerformance_Org() {
 		
-		double relevanceOfStrategy = currentStrategy.environmentalMeasure();
+		double relevanceOfStrategy = currentStrategy.environmentalMeasure().getAdaptiveAssessment();
 		
-		double performanceOfOpponent = currentStrategy.socialMeasure();
+		double performanceOfOpponent = currentStrategy.socialMeasure().getAdaptiveAssessment();
 		
-		double performanceOfSelf = currentStrategy.internalMeasure(null);
+		double performanceOfSelf = currentStrategy.internalMeasure(null).getAdaptiveAssessment();
 		
 		Utils.talk(currentStrategy.toString(), "Relevance of strategy: " + relevanceOfStrategy);
 		
@@ -428,13 +522,13 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 		 * Record payoff, later used to compare performance in light of signalled adaptation by all strategies 
 		 * (i.e. no unused strategies remain).
 		 */
-		strategyPayoff.put(currentStrategy, ( currentStrategy.environmentalMeasure() * ( 1.0 - currentStrategy.socialMeasure() ) * currentStrategy.internalMeasure(null) ) / 3 );
+		strategyPayoff.put(currentStrategy, ( currentStrategy.environmentalMeasure().getAdaptiveAssessment() * ( 1.0 - currentStrategy.socialMeasure().getAdaptiveAssessment() ) * currentStrategy.internalMeasure(null).getAdaptiveAssessment() ) / 3 );
 		
-		if ( ( relevanceOfStrategy < strategyRelevanceThreshold && currentStrategy.environmentalMeasure() > -1 ) || 
+		if ( ( relevanceOfStrategy < strategyRelevanceThreshold && currentStrategy.environmentalMeasure().getAdaptiveAssessment() > -1 ) || 
 				
-			 ( performanceOfOpponent > opponentPerformanceThreshold && currentStrategy.socialMeasure() > -1 ) ||
+			 ( performanceOfOpponent > opponentPerformanceThreshold && currentStrategy.socialMeasure().getAdaptiveAssessment() > -1 ) ||
 			 
-			 ( performanceOfSelf < ownPerformanceThreshold && currentStrategy.internalMeasure(null) > -1 ) ) { 
+			 ( performanceOfSelf < ownPerformanceThreshold && currentStrategy.internalMeasure(null).getAdaptiveAssessment() > -1 ) ) { 
 			 
 			 Utils.talk(currentStrategy.toString(), "Requires change. Confidence level: " + (currentStrategy.roundsPassed() / (double)(totalRounds)));
 			 

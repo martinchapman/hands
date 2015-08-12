@@ -84,8 +84,7 @@ public abstract class SeekingAgent extends TraverserLocalGraph implements Runnab
 			
 		} else {
 			
-			// ~MDC Temp
-			estimatedNumberOfHideLocations = 5; //graphController.numberOfHideLocations(responsibleAgent);
+			estimatedNumberOfHideLocations = graphController.numberOfHideLocations();
 			
 		}
 		
@@ -128,6 +127,8 @@ public abstract class SeekingAgent extends TraverserLocalGraph implements Runnab
 		if ( allHideLocations().size() >= graphController.vertexSet().size() ) allHideLocations().clear();
 		
 		allHideLocations().add(location);
+		
+		if ( uniqueHideLocations().size() >= graphController.vertexSet().size() ) uniqueHideLocations().clear();
 		
 		uniqueHideLocations().add(location);
 		
@@ -225,15 +226,7 @@ public abstract class SeekingAgent extends TraverserLocalGraph implements Runnab
 		
 		queuedNodes.clear();
 		
-	}
-	
-	/* (non-Javadoc)
-	 * @see HideAndSeek.GraphTraverser#endOfGame()
-	 */
-	@Override
-	public void endOfGame() {
-		
-		super.endOfGame();
+		Utils.talk(toString(), "uniqueHideLocations() " + uniqueHideLocations() + " UHL Size: " + uniqueHideLocations().size());
 		
 	}
 

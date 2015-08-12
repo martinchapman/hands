@@ -1,4 +1,4 @@
-package Utility.GameTheoretic;
+package Utility.gametheoretic;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -81,7 +81,7 @@ public class ApproximatePayoffMatrix {
 			
 			payoffAgainstOpponent = new TreeMap<String, Double>();
 			
-			addPayoff(opponentStrategy, payoff);
+			addPayoff(opponentStrategy, Utils.round(payoff, 2));
 			
 		}
 		
@@ -121,7 +121,7 @@ public class ApproximatePayoffMatrix {
 		 */
 		public void addPayoff(String opponentStrategy, double payoff) {
 			
-			payoffAgainstOpponent.put(opponentStrategy, payoff);
+			payoffAgainstOpponent.put(opponentStrategy, Utils.round(payoff, 2));
 			
 		}
 		
@@ -582,6 +582,10 @@ public class ApproximatePayoffMatrix {
 		
 		//
 		
+		tikzLines.add("%Alter text width for longer seeker strategy names");
+		
+		tikzLines.add("\n");
+		
 		tikzLines.add("\\matrix[matrix of math nodes,draw,every odd row/.style={align=right},everyevenrow/.style={align=left},nodes={text width=2.5cm},row sep=0.2cm,column sep=0.2cm](m){");
 		
 		tikzLines.add("\n");
@@ -591,18 +595,71 @@ public class ApproximatePayoffMatrix {
 		// Get rid of reference to strategy numbers
 		bimatrixLines.remove(0);
 		
-		ArrayList<String> hiderPayoffs = new ArrayList<String>(bimatrixLines.subList(0, bimatrixLines.size() / 2));
+		ArrayList<String> hiderPayoffs = new ArrayList<String>(bimatrixLines.subList(1, bimatrixLines.size() / 2));
 		
-		ArrayList<String> seekerPayoffs = new ArrayList<String>(bimatrixLines.subList(bimatrixLines.size() / 2, bimatrixLines.size()));
+		ArrayList<String> seekerPayoffs = new ArrayList<String>(bimatrixLines.subList((bimatrixLines.size() / 2) + 1, bimatrixLines.size()));
 		
-		if ( hiderPayoffs.size() != seekerPayoffs.size() ) System.out.println("Should be equal");
+		ArrayList<ArrayList<String>> hiderPayoffRows = new ArrayList<ArrayList<String>>();
 		
-		for ( int i = 0; i < hiderPayoffs.size() - 1; i++ ) {
+		hiderPayoffRows.add(new ArrayList<String>());
 		
-			if (seekerPayoffs.get(i).trim().length() == 0 || seekerPayoffs.get(i + 1).trim().length() == 0) continue;
+		ArrayList<ArrayList<String>> seekerPayoffRows = new ArrayList<ArrayList<String>>();
+		
+		seekerPayoffRows.add(new ArrayList<String>());
+		
+		for ( String hiderPayoff : hiderPayoffs ) {
 			
-			tikzLines.add(seekerPayoffs.get(i).trim() + "&" + seekerPayoffs.get(i + 1).trim() + "\\\\");
-			tikzLines.add(hiderPayoffs.get(i).trim() + "&" + hiderPayoffs.get(i + 1).trim() + "\\\\");
+			if ( hiderPayoff.trim().length() == 0 ) {
+				
+				hiderPayoffRows.add(new ArrayList<String>());
+				
+				continue;
+				
+			}
+			
+			hiderPayoffRows.get(hiderPayoffRows.size() - 1).add(hiderPayoff);
+		
+		}
+		
+		for ( String seekerPayoff : seekerPayoffs ) {
+			
+			if ( seekerPayoff.trim().length() == 0 ) {
+				
+				seekerPayoffRows.add(new ArrayList<String>());
+				
+				continue;
+				
+			}
+			
+			seekerPayoffRows.get(seekerPayoffRows.size() - 1).add(seekerPayoff);
+			
+		}
+		
+		if ( hiderPayoffRows.size() != seekerPayoffRows.size() ) System.out.println("Payoffs should be equal");
+		
+		for ( int i = 0; i < hiderPayoffRows.size(); i++ ) {
+		
+			String seekersLine = "";
+			
+			String hidersLine = "";
+			
+			if ( hiderPayoffRows.get(i).size() == 0 || seekerPayoffRows.get(i).size() == 0 ) continue;
+			
+			for ( String seekerPayoff : seekerPayoffRows.get(i) ) {
+				
+				seekersLine += ( seekerPayoff.trim() + "&" );
+				
+			}
+			
+			tikzLines.add( seekersLine.substring(0, seekersLine.length() - 1) + " \\\\" );
+			
+			for ( String hiderPayoff : hiderPayoffRows.get(i) ) {
+				
+				hidersLine += ( hiderPayoff.trim() + "&" );
+				
+			}
+			
+			tikzLines.add( hidersLine.substring(0, hidersLine.length() - 1)  + " \\\\" );
 			
 		}
 		

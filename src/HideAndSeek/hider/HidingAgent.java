@@ -273,6 +273,8 @@ public abstract class HidingAgent extends TraverserLocalGraph implements Runnabl
 		
 		super.endOfRound();
 		
+		uniqueHideLocations().addAll(hideLocations());
+		
 		super.hideLocations().clear();
 		
 		exploredNodes.clear();
@@ -280,6 +282,8 @@ public abstract class HidingAgent extends TraverserLocalGraph implements Runnabl
 		precheckedHideLocations.clear();
 		
 		queuedNodes.clear();
+		
+		Utils.talk(toString(), "uniqueHideLocations() " + uniqueHideLocations() + " UHL Size: " + uniqueHideLocations().size());
 		
 	}
 	

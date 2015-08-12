@@ -97,13 +97,15 @@ public class GraphController<V , E> {
 	/**
 	 * @param graph
 	 */
-	public GraphController(String topology, int numberOfVertices, String fixedOrUpperBound, double fixedOrUpperValue, int edgeTraversalDecrement) {
+	public GraphController(String topology, int numberOfVertices, int numberOfHideLocations, String fixedOrUpperBound, double fixedOrUpperValue, int edgeTraversalDecrement) {
 		
 		this.fixedOrUpperValue = fixedOrUpperValue;
 		
 		this.fixedOrUpperBound = fixedOrUpperBound;
 		
 		this.edgeTraversalValue = edgeTraversalDecrement;
+		
+		this.numberOfHideLocations = numberOfHideLocations;
 		
 		/**************************
     	 * 
@@ -131,7 +133,7 @@ public class GraphController<V , E> {
 		
 		int edges = numberOfVertices * 3;
 		
-		int vertices = numberOfVertices;
+		int vertices = numberOfVertices >= 2 ? numberOfVertices : 2;
 		
 		boolean incrementingEdges = false;
 		
@@ -384,6 +386,20 @@ public class GraphController<V , E> {
 	 * Whether a seeker is permitted to know the number of hide locations
 	 */
 	private static boolean SEEKER_KNOWS_NUMBER_OF_HIDE_LOCATIONS = true;
+	
+	/**
+	 * 
+	 */
+	private int numberOfHideLocations;
+	
+	/**
+	 * @return
+	 */
+	public int numberOfHideLocations() {
+		
+		return numberOfHideLocations;
+		
+	}
 	
 	/**
 	 * @return

@@ -20,6 +20,8 @@ public class VariableNodesHighProbability extends HighProbability {
 		
 		this.predictiveNodes = predictiveNodes;
 		
+		strategyOverRounds = true;
+		
 	}
 	
 }

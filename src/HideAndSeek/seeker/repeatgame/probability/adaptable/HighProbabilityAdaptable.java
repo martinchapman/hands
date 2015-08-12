@@ -1,7 +1,6 @@
 package HideAndSeek.seeker.repeatgame.probability.adaptable;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
@@ -10,6 +9,7 @@ import HideAndSeek.seeker.AdaptiveSeeker;
 import HideAndSeek.seeker.repeatgame.probability.HighProbability;
 import Utility.Metric;
 import Utility.Utils;
+import Utility.adaptive.AdaptiveMeasure;
 import Utility.adaptive.AdaptiveUtils;
 import Utility.adaptive.AdaptiveWeightings;
 
@@ -93,9 +93,9 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 	/* (non-Javadoc)
 	 * @see HideAndSeek.AdaptiveGraphTraverser#environmentalMeasure()
 	 */
-	public double environmentalMeasure() {
+	public AdaptiveMeasure environmentalMeasure() {
 		
-		return 0.0;
+		return new AdaptiveMeasure(0.0);
 		
 	}
 
@@ -116,7 +116,16 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 	 * this strategy is void.
 	 */
 	@Override
-	public double socialMeasure() {
+	public AdaptiveMeasure socialMeasure() {
+		
+		return new AdaptiveMeasure(regularIncrements(), "InverseHighProbabilityAdaptable");
+		
+	}
+	
+	/**
+	 * @return
+	 */
+	private double regularIncrements() {
 		
 		if ( uniqueHideLocationsProgression.size() > 2 ) {
 			
@@ -130,37 +139,24 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 			if ( ( uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 1) -  uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 2) ) 
 			   == (  uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 2) - uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 3) ) &&
 			   ( uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 1) -  uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 2) ) 
-			   == estimatedNumberOfHideLocations())  
+			   == estimatedNumberOfHideLocations() 
+			   || uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 1) == graphController.vertexSet().size())  
 			   return 1.0;
 		
 		}
 		
 		return 0.0;
 		
-		//double trigger = uniqueHideLocations.size() / (double)(graphController.vertexSet().size());
+	}
+	
+	/**
+	 * @return
+	 */
+	private double uniqueLocationsSize() {
 		
-		/*if ( uniqueHideLocationsProgression.size() >= ROUND_CONSISTENCY_THRESHOLD ) {
-			
-			int lastDifference = uniqueHideLocationsProgression.get( uniqueHideLocationsProgression.size() - ( ROUND_CONSISTENCY_THRESHOLD - 1) ) - 
-								 uniqueHideLocationsProgression.get( uniqueHideLocationsProgression.size() - ( ROUND_CONSISTENCY_THRESHOLD) );
-			
-			for ( int i = uniqueHideLocationsProgression.size() - ( ROUND_CONSISTENCY_THRESHOLD - 2); i < uniqueHideLocationsProgression.size(); i++ ) {
-				
-				if ( uniqueHideLocationsProgression.get(i) - uniqueHideLocationsProgression.get(i - 1) != lastDifference ) {
-					
-					return trigger;
-					
-				}
-				
-			}
-			
-			Utils.talk(toString(), "Increments are consistent, strategy change needed for this.");
-			
-			return 0.0;
-			
-		}*/
+		Utils.talk(toString(), "uniqueHideLocations().size() / (double)(graphController.vertexSet().size()) " + (uniqueHideLocations().size() / (double)(graphController.vertexSet().size())));
 		
-		//return trigger;
+		return uniqueHideLocations().size() / (double)(graphController.vertexSet().size()); 
 		
 	}
 	
@@ -168,15 +164,15 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 	 * @see HideAndSeek.seeker.AdaptiveSeekerStrategy#performanceOfSelf()
 	 */
 	@Override
-	public double internalMeasure(ArrayList<Double> roundStrategyPerformance) {
+	public AdaptiveMeasure internalMeasure(ArrayList<Double> roundStrategyPerformance) {
 		
-		return AdaptiveUtils.internalMeasure(roundStrategyPerformance, Metric.TOTAL_EDGE_COST, localGraph);
+		return new AdaptiveMeasure(AdaptiveUtils.internalMeasure(roundStrategyPerformance, Metric.TOTAL_EDGE_COST, localGraph));
 
 	}
 
 	public double internalMeasure_Org() {
 
-		percentageChanges.add(graphController.latestTraverserRoundPerformance(responsibleAgent, Metric.COST_CHANGE_SCORE));
+		percentageChanges.add(graphController.latestTraverserRoundPerformance(responsibleAgent, Metric.COST_CHANGE_PAYOFF));
 		
 		if (AdaptiveUtils.containsLowPerformance(percentageChanges)) {
 			
@@ -202,14 +198,12 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 		if ( uniqueHideLocations().size() > ( graphController.vertexSet().size() - estimatedNumberOfHideLocations() ) ) { 
 			
 			uniqueHideLocations().clear();
-		
+			
 			uniqueHideLocationsProgression.clear();
 		
 		}
 		
 		super.endOfRound();
-		
-		Utils.talk(toString(), "uniqueHideLocations.size() " + uniqueHideLocations().size());
 		
 	}
 	
@@ -218,8 +212,6 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 	 */
 	@Override
 	public void endOfGame() {
-		
-		uniqueHideLocations().clear();
 		
 		uniqueHideLocationsProgression.clear();
 		

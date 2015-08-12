@@ -15,6 +15,34 @@ import HideAndSeek.seeker.Seeker;
  */
 public class AdaptiveHidingAgent<E extends Hider & AdaptiveGraphTraverser> extends AdaptiveGraphTraversingAgent<E> implements Hider {
 
+	
+
+	public AdaptiveHidingAgent(
+			GraphController<StringVertex, StringEdge> graphController,
+			String name, ArrayList<E> strategyPortfolio, int totalRounds,
+			double cueTriggerThreshold, boolean canReuse) {
+		super(graphController, name, strategyPortfolio, totalRounds,
+				cueTriggerThreshold, canReuse);
+		// TODO Auto-generated constructor stub
+	}
+
+	public AdaptiveHidingAgent(
+			GraphController<StringVertex, StringEdge> graphController,
+			ArrayList<E> strategyPortfolio, int totalRounds,
+			double cueThreshold, boolean canReuse) {
+		super(graphController, strategyPortfolio, totalRounds, cueThreshold, canReuse);
+		// TODO Auto-generated constructor stub
+	}
+
+	public AdaptiveHidingAgent(
+			GraphController<StringVertex, StringEdge> graphController,
+			ArrayList<E> strategyPortfolio, int totalRounds,
+			String initialStrategy, double cueThreshold, boolean canReuse) {
+		super(graphController, strategyPortfolio, totalRounds, initialStrategy,
+				cueThreshold, canReuse);
+		// TODO Auto-generated constructor stub
+	}
+
 	public AdaptiveHidingAgent(
 			GraphController<StringVertex, StringEdge> graphController,
 			ArrayList<E> strategyPortfolio, int totalRounds,
@@ -32,10 +60,10 @@ public class AdaptiveHidingAgent<E extends Hider & AdaptiveGraphTraverser> exten
 
 	public AdaptiveHidingAgent(
 			GraphController<StringVertex, StringEdge> graphController,
-			int totalRounds, ArrayList<E> strategyPortfolio,
-			String initialStrategy, double cueThreshold, boolean canReuse) {
-		super(graphController, totalRounds, strategyPortfolio, initialStrategy,
-				cueThreshold, canReuse);
+			String name, ArrayList<E> strategyPortfolio, int totalRounds,
+			String initialStrategy, double cueTriggerThreshold, boolean canReuse) {
+		super(graphController, name, strategyPortfolio, totalRounds, initialStrategy,
+				cueTriggerThreshold, canReuse);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -51,15 +79,6 @@ public class AdaptiveHidingAgent<E extends Hider & AdaptiveGraphTraverser> exten
 			GraphController<StringVertex, StringEdge> graphController,
 			String name, ArrayList<E> strategyPortfolio, int totalRounds) {
 		super(graphController, name, strategyPortfolio, totalRounds);
-		// TODO Auto-generated constructor stub
-	}
-
-	public AdaptiveHidingAgent(
-			GraphController<StringVertex, StringEdge> graphController,
-			String name, int totalRounds, ArrayList<E> strategyPortfolio,
-			String initialStrategy, double cueTriggerThreshold, boolean canReuse) {
-		super(graphController, name, totalRounds, strategyPortfolio, initialStrategy,
-				cueTriggerThreshold, canReuse);
 		// TODO Auto-generated constructor stub
 	}
 

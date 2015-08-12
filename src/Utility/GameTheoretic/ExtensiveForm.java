@@ -1,4 +1,4 @@
-package Utility.GameTheoretic;
+package Utility.gametheoretic;
 
 import java.util.ArrayList;
 import java.util.Arrays;

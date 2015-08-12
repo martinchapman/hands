@@ -1,4 +1,4 @@
-package HideAndSeek.seeker.singleshot.preference;
+package HideAndSeek.seeker.repeatgame.preference;
 
 import java.util.ArrayList;
 import java.util.HashSet;

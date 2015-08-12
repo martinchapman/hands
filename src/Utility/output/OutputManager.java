@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
@@ -43,7 +44,7 @@ public class OutputManager {
 	/**
 	 * 
 	 */
-	private boolean SHOW_OPPONENT = false;
+	private boolean SHOW_OPPONENT = true;
 	
 	/**
 	 * Multiple hiders per file, and multiple files.
@@ -578,9 +579,13 @@ public class OutputManager {
 	 */
 	public void showGraphForAttribute(ArrayList<TraverserRecord> playerRecords, ArrayList<TraverserRecord> traverserRecords, String gameOrRound, String title, String graphType, String xLabel, String yLabel, String category, boolean outputEnabled) {
 		
+		SignificanceTable significanceTable = new SignificanceTable(); 
+		
 		if ( graphType.equals("Bar") ) SHOW_OPPONENT = false;
 		
-		//if ( !SHOW_OPPONENT ) for ( TraverserRecord record : expandTraverserRecords(traverserRecords) ) record.switchShowOpponents();
+		if ( !SHOW_OPPONENT ) for ( TraverserRecord record : traverserRecords ) record.doNotShowOpponents();
+		
+		if ( SHOW_OPPONENT ) for ( TraverserRecord record : traverserRecords ) record.showOpponents();
 			
 		Collections.sort(traverserRecords);
 		
@@ -706,7 +711,7 @@ public class OutputManager {
 				
 				((GNU3DGraph) graph).setZAxisLabel(yLabel);
 				
-				traverser = traverser.substring(traverser.indexOf("Variable"), traverser.length());
+				//traverser = traverser.substring(traverser.indexOf("Variable"), traverser.length());
 				
 				String[] labels = traverser.split("Variable");
 				
@@ -840,7 +845,7 @@ public class OutputManager {
 				
 				Hashtable<TraverserRecord, String> traverserToSignificanceClass = new Hashtable<TraverserRecord, String>();
 				
-				if ( yLabel.equals(Metric.COST.getText()) || yLabel.equals(Metric.SCORE.getText()) ) {
+				if ( yLabel.equals(Metric.COST.getText()) || yLabel.equals(Metric.PAYOFF.getText()) ) {
 					
 					outer:
 					for ( Entry<TraverserRecord, Double> traverserA : storedTraverserAndData.getValue() ) {
@@ -853,27 +858,31 @@ public class OutputManager {
 							
 							if ( traverserA.getKey() == traverserB.getKey() ) continue;
 							
+							double pValue = 0.0;
+							
 							if ( yLabel.equals(Metric.COST.getText()) ) {
 							
 								if ( traverserA.getKey().pGroup(traverserB.getKey(), Metric.COST).equals("") ) continue outer;
 								
-								double pValue = traverserA.getKey().pValue(traverserB.getKey(), Metric.COST);
+								pValue = traverserA.getKey().pValue(traverserB.getKey(), Metric.COST);
 								
 								Utils.talk(toString(), traverserA.getKey() + " vs " + traverserB.getKey() + " : Percentage Difference - " + ( Utils.percentageChange(traverserB.getValue(), traverserA.getValue()) ) + " PValue - " + pValue);
 								
 								cumulativeP += pValue;
 								
-							} else if ( yLabel.equals(Metric.SCORE.getText()) ) {
+							} else if ( yLabel.equals(Metric.PAYOFF.getText()) ) {
 								
 								if ( traverserA.getKey().pGroup(traverserB.getKey(), minForAttributeInAllSeries, maxForAttributeInAllSeries ).equals("") ) continue outer;
 								
-								double pValue = traverserA.getKey().pValue(traverserB.getKey(), minForAttributeInAllSeries, maxForAttributeInAllSeries );
+								pValue = traverserA.getKey().pValue(traverserB.getKey(), minForAttributeInAllSeries, maxForAttributeInAllSeries );
 								
 								Utils.talk(toString(), traverserA.getKey() + " vs " + traverserB.getKey() + " : Percentage Difference - " + ( Utils.percentageChange(traverserB.getValue(), traverserA.getValue()) ) + " PValue - " + pValue);
 								
 								cumulativeP += pValue;
 								
 							}
+							
+							significanceTable.addPValue(traverserA.getKey().getTraverser(), traverserB.getKey().getTraverser(), traverserA.getValue(), traverserB.getValue(), pValue);
 							
 						}
 						
@@ -897,15 +906,15 @@ public class OutputManager {
 		
 		graph.styleGraph();
 
-		String outputPath = "figure" + new SimpleDateFormat("yyyyMMddHHmmss").format(Calendar.getInstance().getTime());
+		String figureID = "figure" + new SimpleDateFormat("yyyyMMddHHmmss").format(Calendar.getInstance().getTime());
 		
 		graph.createChart("", xLabel, yLabel);
 		
 		if ( outputEnabled ) {
 		
-			graph.exportChartAsEPS(Utils.FILEPREFIX + "data/charts/" + outputPath + ".eps");
+			graph.exportChartAsEPS(Utils.FILEPREFIX + "data/charts/" + figureID + ".eps");
 			
-			graph.exportChartAsTikz(Utils.FILEPREFIX + "data/charts/" + outputPath + ".tex");
+			graph.exportChartAsTikz(Utils.FILEPREFIX + "data/charts/" + figureID + ".tex");
 			
 			for ( TraverserRecord traverser : traverserRecords ) {
 				
@@ -913,15 +922,16 @@ public class OutputManager {
 				
 				if ( !traverser.getDatafile().toString().contains("GRAPHED") ) graphedSuffix += "_GRAPHED";
 				
-				graphedSuffix += ( "_" + outputPath );
+				graphedSuffix += ( "_" + figureID );
 				
 				traverser.getDatafile().toFile().renameTo(new File(traverser.getDatafile().toString().substring(0, traverser.getDatafile().toString().length() - 4) + graphedSuffix + ".csv"));
 				
 			}
+	
 			
 			try {
 				
-				Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "/data/charts/figures.bib", true), "\n @FIG{" + outputPath + ", main = {}, add = { " + title + " }, file = {/Users/Martin/Dropbox/workspace/SearchGames/output/data/charts/" + outputPath + "}, source = {}}");
+				Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "/data/charts/figures.bib", true), "\n @FIG{" + figureID + ", main = { " + setupCaptionString(playerRecords, traverserRecords) + " }, add = { " + title + " }, file = {/Users/Martin/Dropbox/workspace/SearchGames/output/data/charts/" + figureID + "}, source = {}}");
 			
 			} catch (IOException e) {
 				
@@ -929,9 +939,12 @@ public class OutputManager {
 			
 			}
 			
+			if ( graphType.equals("Bar") ) significanceTable.outputPValueTable(figureID, "pValues for the graph shown in \\fbref{" + figureID + "}.");
+			
 		}
 		
-		//if ( !SHOW_OPPONENT ) for ( TraverserRecord record : expandTraverserRecords(traverserRecords) ) record.switchShowOpponents();
+		// Reshow opponents on UI
+		if ( !SHOW_OPPONENT ) for ( TraverserRecord record : expandTraverserRecords(traverserRecords) ) record.showOpponents();
 		
 		/*graph.pack();
 		
@@ -940,6 +953,127 @@ public class OutputManager {
 		graph.setVisible(true);*/
 		
 	} 
+	
+	/**
+	 * @param traverserRecords
+	 * @return
+	 */
+	private String setupCaptionString(ArrayList<TraverserRecord> playerRecords, ArrayList<TraverserRecord> traverserRecords) {
+		
+		HashSet<String> hiders = new HashSet<String>();
+		
+		HashSet<String> seekers = new HashSet<String>();
+		
+		boolean hiderTarget;
+		
+		if (traverserRecords.get(0) instanceof HiderRecord) {
+			
+			hiderTarget = true;
+			
+		} else {
+			
+			hiderTarget = false;
+			
+		}
+		
+		//
+		
+		for (TraverserRecord traverser : Utils.expandTraverserRecords(traverserRecords)) {
+			
+			if ( traverser instanceof HiderRecord ) {
+				
+				hiders.add(traverser.getTraverser());
+				
+			} else {
+				
+				seekers.add(traverser.getTraverser());
+				
+			}
+			
+			/* If no hiders, are found, traverserRecords must be all seekers, 
+			 * in which case we have to look through all player records, and find those
+			 * hiders that are associated to the seekers in traverser records (~MDC 10/8 design needs
+			 * updating to account for this)
+			 */
+			if ( hiders.size() == 0 ) {
+			
+				for ( TraverserRecord hider : playerRecords ) {
+					
+					if (hider instanceof HiderRecord) {
+						
+						if ( ((HiderRecord)hider).containsSeeker(traverser) ) {
+							
+							hiders.add(hider.getTraverser());
+							
+						}
+						
+					}
+					
+				}
+			
+			}
+			
+		}
+		
+		//
+		
+		String hiderList = traverserList(hiders, "hider");
+		
+		String seekerList = traverserList(seekers, "seeker");
+		
+		//
+		
+		if ( hiderTarget ) {
+			
+			return "The performance of " + hiderList + " against " + seekerList + " on a " + traverserRecords.get(0).getTopology() + " network.";
+			
+		} else {
+			
+			return "The performance of " + seekerList + " against " + hiderList + " on a " + traverserRecords.get(0).getTopology() + " network.";
+			
+		}
+		
+	}
+	
+	/**
+	 * @param traversers
+	 * @param hiderOrSeeker
+	 * @return
+	 */
+	private String traverserList(HashSet<String> traversers, String hiderOrSeeker) {
+	
+		String traverserList;
+		
+		if ( traversers.size() > 3 ) {
+			
+			traverserList = "several " + hiderOrSeeker + " strategies";
+		
+		} else if ( traversers.size() == 1 ) {
+			
+			traverserList = "the " + hiderOrSeeker + " strategy " + (new ArrayList<String>(traversers).get(0));
+			
+		} else {
+			
+			traverserList = "the " + traverserNumberToWord(traversers.size()) + hiderOrSeeker + " strategies " + Utils.listToProse(new ArrayList<String>(traversers));
+			
+		}
+		
+		return traverserList;
+	
+	}
+	
+	/**
+	 * @param number
+	 * @return
+	 */
+	private String traverserNumberToWord(int number) {
+		
+		if (number == 2) return "two ";
+		if (number == 3) return "three ";
+		
+		return "";
+			
+	}
 	
 	/**
 	 * @return

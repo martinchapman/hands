@@ -2,7 +2,6 @@ package HideAndSeek.seeker.hamiltonain.adaptable;
 
 import java.util.ArrayList;
 
-import org.jgrapht.alg.EulerianCircuit;
 import org.jgrapht.alg.HamiltonianCycle;
 
 import HideAndSeek.graph.GraphController;
@@ -10,6 +9,7 @@ import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.seeker.AdaptiveSeeker;
 import HideAndSeek.seeker.hamiltonian.HamiltonianTourer;
+import Utility.adaptive.AdaptiveMeasure;
 import Utility.adaptive.AdaptiveWeightings;
 
 /**
@@ -46,15 +46,15 @@ public class HamiltonianTourerAdaptable extends HamiltonianTourer implements Ada
 	 * @see HideAndSeek.AdaptiveGraphTraverser#relevanceOfStrategy()
 	 */
 	@Override
-	public double environmentalMeasure() {
+	public AdaptiveMeasure environmentalMeasure() {
 		
 		if ( HamiltonianCycle.getApproximateOptimalForCompleteGraph(localGraph).size() == graphController.vertexSet().size() ) {
 			
-			return 1.0;
+			return new AdaptiveMeasure(1.0);
 			
 		} else {
 			
-			return 0.0;
+			return new AdaptiveMeasure(0.0);
 			
 		}
 		
@@ -64,9 +64,9 @@ public class HamiltonianTourerAdaptable extends HamiltonianTourer implements Ada
 	 * @see HideAndSeek.AdaptiveGraphTraverser#performanceOfOpponent()
 	 */
 	@Override
-	public double socialMeasure() {
+	public AdaptiveMeasure socialMeasure() {
 		
-		return -1;
+		return new AdaptiveMeasure(0.0);
 	
 	}
 	
@@ -74,9 +74,9 @@ public class HamiltonianTourerAdaptable extends HamiltonianTourer implements Ada
 	 * @see HideAndSeek.AdaptiveGraphTraverser#internalMeasure(java.util.ArrayList)
 	 */
 	@Override
-	public double internalMeasure(ArrayList<Double> roundStrategyPerformance) {
+	public AdaptiveMeasure internalMeasure(ArrayList<Double> roundStrategyPerformance) {
 
-		return 0;
+		return new AdaptiveMeasure(0.0);
 
 	}
 	

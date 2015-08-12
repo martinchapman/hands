@@ -9,11 +9,20 @@ import HideAndSeek.hider.AdaptiveHider;
 import HideAndSeek.hider.singleshot.random.RandomSet;
 import Utility.Metric;
 import Utility.Utils;
+import Utility.adaptive.AdaptiveMeasure;
 import Utility.adaptive.AdaptiveUtils;
 import Utility.adaptive.AdaptiveWeightings;
 
+/**
+ * @author Martin
+ *
+ */
 public class RandomSetAdaptable extends RandomSet implements AdaptiveHider {
 
+	/**
+	 * @param graphController
+	 * @param numberOfHideLocations
+	 */
 	public RandomSetAdaptable(
 			GraphController<StringVertex, StringEdge> graphController,
 			int numberOfHideLocations) {
@@ -21,6 +30,11 @@ public class RandomSetAdaptable extends RandomSet implements AdaptiveHider {
 		// Auto-generated constructor
 	}
 
+	/**
+	 * @param graphController
+	 * @param name
+	 * @param numberOfHideLocations
+	 */
 	public RandomSetAdaptable(
 			GraphController<StringVertex, StringEdge> graphController,
 			String name, int numberOfHideLocations) {
@@ -28,28 +42,53 @@ public class RandomSetAdaptable extends RandomSet implements AdaptiveHider {
 		// Auto-generated constructor
 	}
 
+	/* (non-Javadoc)
+	 * @see HideAndSeek.AdaptiveGraphTraverser#environmentalMeasure()
+	 */
 	@Override
-	public double environmentalMeasure() {
-		return 0;
-	}
-
-	@Override
-	public double socialMeasure() {
-		return 0;
-	}
-
-	@Override
-	public double internalMeasure(ArrayList<Double> roundStrategyPerformance) {
+	public AdaptiveMeasure environmentalMeasure() {
 		
-		return AdaptiveUtils.internalMeasure(roundStrategyPerformance, Metric.TOTAL_EDGE_COST, localGraph);
+		return new AdaptiveMeasure(0.0);
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see HideAndSeek.AdaptiveGraphTraverser#socialMeasure()
+	 */
+	@Override
+	public AdaptiveMeasure socialMeasure() {
+		
+		return new AdaptiveMeasure(0.0);
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see HideAndSeek.AdaptiveGraphTraverser#internalMeasure(java.util.ArrayList)
+	 */
+	@Override
+	public AdaptiveMeasure internalMeasure(ArrayList<Double> roundStrategyPerformance) {
+		
+		Utils.talk(toString(), "0.33 * AdaptiveUtils.internalMeasure(roundStrategyPerformance, Metric.RELATIVE_COST, localGraph) ) " + ( 0.33 * AdaptiveUtils.internalMeasure(roundStrategyPerformance, Metric.RELATIVE_COST, localGraph ) ) );
+		Utils.talk(toString(), "0.33 * AdaptiveUtils.internalMeasure(roundStrategyPerformance, Metric.COST_CHANGE_PAYOFF, localGraph) ) " + ( 0.33 * AdaptiveUtils.internalMeasure(roundStrategyPerformance, Metric.COST_CHANGE_PAYOFF, localGraph ) ) );
+		Utils.talk(toString(), "0.33 * AdaptiveUtils.internalMeasure(roundStrategyPerformance, Metric.TOTAL_EDGE_COST, localGraph) ) " + ( 0.33 * AdaptiveUtils.internalMeasure(roundStrategyPerformance, Metric.TOTAL_EDGE_COST, localGraph ) ) );
+		
+		return new AdaptiveMeasure( ( 0.33 * AdaptiveUtils.internalMeasure(roundStrategyPerformance, Metric.RELATIVE_COST, localGraph) ) + ( 0.33 * AdaptiveUtils.internalMeasure(roundStrategyPerformance, Metric.COST_CHANGE_PAYOFF, localGraph) ) + ( 0.33 * AdaptiveUtils.internalMeasure(roundStrategyPerformance, Metric.TOTAL_EDGE_COST, localGraph) ), "UniqueRandomSetRepeatAdaptable");	
+	
+	}
+
+	/* (non-Javadoc)
+	 * @see HideAndSeek.AdaptiveGraphTraverser#getAdaptiveWeightings()
+	 */
 	@Override
 	public AdaptiveWeightings getAdaptiveWeightings() {
+		
 		return new AdaptiveWeightings(0.0, 0.0, 1.0);
+	
 	}
 
+	/* (non-Javadoc)
+	 * @see HideAndSeek.hider.singleshot.random.RandomSet#endOfRound()
+	 */
 	public void endOfRound() {
 		
 		uniqueHideLocations().addAll(hideLocations());
@@ -60,6 +99,9 @@ public class RandomSetAdaptable extends RandomSet implements AdaptiveHider {
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.AdaptiveGraphTraverser#stopStrategy()
+	 */
 	@Override
 	public void stopStrategy() { }
 

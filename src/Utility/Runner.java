@@ -38,11 +38,13 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import Utility.GameTheoretic.ApproximatePayoffMatrix;
+import Utility.gametheoretic.ApproximatePayoffMatrix;
 import Utility.output.Datafile;
 import Utility.output.HiderRecord;
 import Utility.output.OutputManager;
 import Utility.output.TraverserRecord;
+import bsh.EvalError;
+import bsh.Interpreter;
 
 /**
  * @author Martin
@@ -204,6 +206,8 @@ public class Runner extends JFrame {
 	      "LinkedPath",
 	      
           "HighProbability",
+          "VariableNodesHighProbability",
+          "VariableNodesHighProbabilityTemp",
           "VariableHistoryHighProbability",
           "HighProbabilityRepetitionCheck",
           
@@ -833,8 +837,11 @@ public class Runner extends JFrame {
 						
 						outputManager.showBarGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
 						
+					} else if (graphTypes.getSelectedItem().equals("3D")) {
+						
+						outputManager.show3DGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
+						
 					}
-					
 					
 				}
 				
@@ -1642,8 +1649,44 @@ public class Runner extends JFrame {
 		}
 		
 	}
-		
+	
+	/**
+	 * ~MDC 8/8 Messy and inefficient
+	 * 
+	 * @param GAMES
+	 * @param simulationParameters
+	 */
 	private void runSimulation(int GAMES, String[] simulationParameters) {
+		
+		for ( int paramID = 0; paramID < simulationParameters.length; paramID++ ) {
+			
+			if ( simulationParameters[paramID].contains("j") ) {
+				
+				String jExpression = simulationParameters[paramID];
+				
+				for ( int j = 0; j < GAMES; j++ ) {
+					
+					String parsed = Utils.parseExpression(jExpression.replace("j", j + "").substring(jExpression.replace("j", j + "").indexOf(",") + 1, jExpression.replace("j", j + "").length() - 1));
+					
+					if ( parsed.equals("-1") ) throw new UnsupportedOperationException("Failed to parse J expression");
+					
+					simulationParameters[paramID] = jExpression.substring(0, jExpression.indexOf(",") + 1) + parsed + "}";
+	    	    	 
+					runSimulationX(GAMES, simulationParameters);
+					
+				}
+				
+				return;
+				
+			}
+			
+		}
+		
+		runSimulationX(GAMES, simulationParameters);
+		
+	}
+	
+	private void runSimulationX(int GAMES, String[] simulationParameters) {
 		
 		/***********/
 		
@@ -1713,11 +1756,17 @@ public class Runner extends JFrame {
 			
 			for (int j = 0; j < simulationParameters.length; j++) {
 	    		  
-	    	    if (simulationParametersUnchanged[j].contains("i*")) { 
+	    	    if (simulationParametersUnchanged[j].contains("*") || simulationParametersUnchanged[j].contains("+")) { 
 	    	    	
-	    	    	simulationParameters[j] = 
+	    	    	String parsed = Utils.parseExpression(simulationParametersUnchanged[j].replace("i", i + "").substring(simulationParametersUnchanged[j].replace("i", i + "").indexOf(",") + 1, simulationParametersUnchanged[j].replace("i", i + "").length() - 1));
 	    	    	
-	    	        simulationParametersUnchanged[j].replaceAll("(i\\*([0-9]+))", 
+	    	    	if ( parsed.equals("-1") ) throw new UnsupportedOperationException("Failed to parse I expression");
+	    	    	
+					simulationParameters[j] = "" + simulationParametersUnchanged[j].substring(0, simulationParametersUnchanged[j].indexOf(",") + 1) + parsed + "}";
+					
+	    	    		
+	    	     /*
+	    	         simulationParametersUnchanged[j].replaceAll("(i\\*([0-9]+))", 
 	    											   "" + (i * Integer.parseInt(
 	    													     simulationParametersUnchanged[j].substring( 
 														            		   Utils.startIndexOf(simulationParametersUnchanged[j], "(i\\*([0-9]+))") + 2, 
@@ -1740,7 +1789,9 @@ public class Runner extends JFrame {
 	    	        										   			)
 	    	        										   	  )
 	    	        										)
-	    	        								   ); 
+	    	        								   );
+	    	    
+	    	    */
 	    	    
 	    	    } else if (simulationParametersUnchanged[j].contains(",i")) { 
 	    	  		

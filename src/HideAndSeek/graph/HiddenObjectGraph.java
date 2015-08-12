@@ -275,7 +275,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 			
 			return performanceMetricCostChange(traverser);
 			
-		} else if ( metric == Metric.COST_CHANGE_SCORE ) {
+		} else if ( metric == Metric.COST_CHANGE_PAYOFF ) {
 			
 			return performanceMetricCostChangePayoff(traverser); 
 		
@@ -283,7 +283,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 			
 			return performanceMetricRelativeCost(traverser); 
 			
-		} else if ( metric == Metric.SCORE ) {
+		} else if ( metric == Metric.PAYOFF ) {
 			
 	    	calculateRealtimeHiderPayoffs();
 	    	

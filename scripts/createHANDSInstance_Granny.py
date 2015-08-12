@@ -2,8 +2,8 @@ import shutil, errno, os, subprocess, datetime, time
 
 ts = time.time()
 
-dropbox_directory = "/Volumes/Storage/Dropbox/workspace/SearchGames"
-mounted_drive_directory = "/Volumes/Martin/Dropbox/workspace/SearchGames"
+dropbox_directory = "/Users/Martin/Dropbox/workspace/SearchGames"
+mounted_drive_directory = "/Users/Martin/Dropbox/workspace/SearchGames"
 
 print "Create new HANDS instance"
 var = raw_input("Use (1) Local dropbox (2) Mounted drive for copy ");
@@ -57,4 +57,4 @@ copyanything(schedule_file, target_directory + "/output")
 os.chdir(target_directory)
 
 print "Running HANDS..."
-subprocess.call(['/Library/Java/JavaVirtualMachines/jdk1.8.0_25.jdk/Contents/Home/bin/java', '-XX:-UseGCOverheadLimit', '-Xmx5g', '-Dfile.encoding=US-ASCII', '-classpath', target_directory + '/bin:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/epsgraphics.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/jcommon-1.0.21.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/jfreechart-1.0.17.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/jgrapht-core-0.9.0.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/jgraph-sna.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/java-plot.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/commons-math3-3.4.1.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/bsh-2.0b4.jar', 'Utility.Runner'])
+subprocess.call(['/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/bin/java', '-XX:-UseGCOverheadLimit', '-Xmx5g', '-Dfile.encoding=US-ASCII', '-classpath', target_directory + '/bin:/Users/Martin/Dropbox/workspace/SearchGames/lib/epsgraphics.jar:/Users/Martin/Dropbox/workspace/SearchGames/lib/jcommon-1.0.21.jar:/Users/Martin/Dropbox/workspace/SearchGames/lib/jfreechart-1.0.17.jar:/Users/Martin/Dropbox/workspace/SearchGames/lib/jgrapht-core-0.9.0.jar:/Users/Martin/Dropbox/workspace/SearchGames/lib/jgraph-sna.jar:/Users/Martin/Dropbox/workspace/SearchGames/lib/java-plot.jar:/Users/Martin/Dropbox/workspace/SearchGames/lib/commons-math3-3.4.1.jar:/Users/Martin/Dropbox/workspace/SearchGames/lib/bsh-2.0b4.jar', 'Utility.Runner'])

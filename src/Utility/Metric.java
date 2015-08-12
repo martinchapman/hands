@@ -14,7 +14,7 @@ public enum Metric {
 	/**
 	 * 
 	 */
-	SCORE("Payoff"),
+	PAYOFF("Payoff"),
 	
 	/**
 	 * 
@@ -34,7 +34,7 @@ public enum Metric {
 	/**
 	 * 
 	 */
-	COST_CHANGE_SCORE("Cost change payoff"), 
+	COST_CHANGE_PAYOFF("Cost change payoff"), 
 	
 	/**
 	 * Difference between current round and first round

@@ -1,6 +1,7 @@
 package HideAndSeek.hider.repeatgame.random;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.TreeSet;
 
 import HideAndSeek.graph.GraphController;
@@ -27,7 +28,7 @@ public class UniqueRandomSetRepeat extends UniqueRandomSet {
 	 */
 	public UniqueRandomSetRepeat(GraphController<StringVertex, StringEdge> graphController, int numberOfHideLocations) {
 		
-		super(graphController, numberOfHideLocations);
+		this(graphController, "", numberOfHideLocations);
 		
 	}
 	
@@ -48,7 +49,7 @@ public class UniqueRandomSetRepeat extends UniqueRandomSet {
 	 */
 	protected ArrayList<StringVertex> createRandomSet(int size, TreeSet<StringVertex> ignoreSet) {
 		
-		if (uniqueHideLocations().size() > ( graphController.vertexSet().size() - numberOfHideLocations() ) ) uniqueHideLocations().clear();
+		if ( uniqueHideLocations().size() > ( graphController.vertexSet().size() - numberOfHideLocations() ) ) uniqueHideLocations().clear();
 		
 		ArrayList<StringVertex> hideSet = super.createRandomSet(size, ignoreSet);
 		

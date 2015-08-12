@@ -61,10 +61,12 @@ import HideAndSeek.hider.singleshot.staticlocations.StaticLocations;
 import HideAndSeek.seeker.AdaptiveSeeker;
 import HideAndSeek.seeker.AdaptiveSeekingAgent;
 import HideAndSeek.seeker.Seeker;
+import HideAndSeek.seeker.repeatgame.preference.ApproximateLeastConnectedNodes;
 import HideAndSeek.seeker.repeatgame.probability.HighProbability;
 import HideAndSeek.seeker.repeatgame.probability.HighProbabilityRepetitionCheck;
 import HideAndSeek.seeker.repeatgame.probability.InverseHighProbability;
 import HideAndSeek.seeker.repeatgame.probability.VariableHistoryHighProbability;
+import HideAndSeek.seeker.repeatgame.probability.VariableNodesHighProbability;
 import HideAndSeek.seeker.repeatgame.probability.adaptable.HighProbabilityAdaptable;
 import HideAndSeek.seeker.repeatgame.probability.adaptable.InverseHighProbabilityAdaptable;
 import HideAndSeek.seeker.singleshot.cost.Greedy;
@@ -77,7 +79,6 @@ import HideAndSeek.seeker.singleshot.coverage.DepthFirstSearchGreedy;
 import HideAndSeek.seeker.singleshot.coverage.DepthFirstSearchMechanism;
 import HideAndSeek.seeker.singleshot.coverage.RandomTarry;
 import HideAndSeek.seeker.singleshot.coverage.VariableBacktrackPath;
-import HideAndSeek.seeker.singleshot.preference.ApproximateLeastConnectedNodes;
 import HideAndSeek.seeker.singleshot.preference.LinkedPath;
 import HideAndSeek.seeker.singleshot.preference.MostConnectedFirst;
 import HideAndSeek.seeker.singleshot.random.FixedStartRandomWalk;
@@ -86,7 +87,10 @@ import HideAndSeek.seeker.singleshot.random.SelfAvoidingRandomWalk;
 import HideAndSeek.seeker.singleshot.random.SelfAvoidingRandomWalkGreedy;
 import Utility.Pair;
 import Utility.Utils;
+import Utility.adaptive.AdaptiveMeasure;
 import Utility.adaptive.AdaptiveWeightings;
+import bsh.EvalError;
+import bsh.Interpreter;
 
 /**
  * @author Martin
@@ -178,7 +182,15 @@ public class Main {
 		
 		int edgeTraversalDecrement = Integer.parseInt(args[10]);
 		
-		initGraph(topology, numberOfVertices, fixedOrUpperBound, fixedOrUpperValue, edgeTraversalDecrement);
+		numberOfHideLocations = Integer.parseInt(args[6]);
+		
+		if ( numberOfVertices < numberOfHideLocations ) {
+			
+			throw new UnsupportedOperationException("More objects to hide than there are vertices.");
+			
+		}
+		
+		initGraph(topology, numberOfVertices, numberOfHideLocations, fixedOrUpperBound, fixedOrUpperValue, edgeTraversalDecrement);
 		
 		mixHiders = Boolean.parseBoolean(args[11]);
 		
@@ -198,18 +210,16 @@ public class Main {
 		
 		seekerList = args[3];
 		
-		numberOfHideLocations = Integer.parseInt(args[6]);
-		
-		startRounds(initHiders(hiderList, numberOfHideLocations, mixHiders), initSeekers(seekerList, numberOfHideLocations, mixSeekers), rounds, true, resetPerRound);
+		startRounds(initHiders(hiderList, numberOfHideLocations, mixHiders), initSeekers(seekerList, mixSeekers), rounds, true, resetPerRound);
 		
 	}
 	
 	/**
 	 * @param args
 	 */
-	private void initGraph(String topology, int numberOfVertices, String fixedOrUpperBound, double fixedOrUpperValue, int edgeTraversalDecrement) {
+	private void initGraph(String topology, int numberOfVertices, int numberOfHideLocations, String fixedOrUpperBound, double fixedOrUpperValue, int edgeTraversalDecrement) {
 		
-		graphController = new GraphController<StringVertex, StringEdge>(topology, numberOfVertices, fixedOrUpperBound, fixedOrUpperValue, edgeTraversalDecrement);
+		graphController = new GraphController<StringVertex, StringEdge>(topology, numberOfVertices, numberOfHideLocations, fixedOrUpperBound, fixedOrUpperValue, edgeTraversalDecrement);
 		
 	}
 	
@@ -797,9 +807,9 @@ public class Main {
 				}
 				
 				strategyPortfolio.add(new RandomSetAnonymous(graphController, "RandomSet", numberOfHideLocations) {
-					public double environmentalMeasure() { return 0; }
-					public double socialMeasure() { return 0; }
-					public double internalMeasure(ArrayList<Double> strategyPerformance) { return 0; }
+					public AdaptiveMeasure environmentalMeasure() { return new AdaptiveMeasure(0.0); }
+					public AdaptiveMeasure socialMeasure() { return new AdaptiveMeasure(0.0); }
+					public AdaptiveMeasure internalMeasure(ArrayList<Double> strategyPerformance) { return new AdaptiveMeasure(0.0); }
 					public AdaptiveWeightings getAdaptiveWeightings() { return new AdaptiveWeightings(0.33, 0.33, 0.33); }
 					public void stopStrategy() {}
 				
@@ -812,9 +822,9 @@ public class Main {
 				}
 				
 				strategyPortfolio.add(new UniqueRandomSetRepeatAnonymous(graphController, "UniqueRandomSetRepeat", numberOfHideLocations, 3) {
-					public double environmentalMeasure() { return 0; }
-					public double socialMeasure() { return 0; }
-					public double internalMeasure(ArrayList<Double> strategyPerformance) { return 0; }
+					public AdaptiveMeasure environmentalMeasure() { return new AdaptiveMeasure(0.0); }
+					public AdaptiveMeasure socialMeasure() { return new AdaptiveMeasure(0.0); }
+					public AdaptiveMeasure internalMeasure(ArrayList<Double> strategyPerformance) { return new AdaptiveMeasure(0.0); }
 					public AdaptiveWeightings getAdaptiveWeightings() { return new AdaptiveWeightings(0.33, 0.33, 0.33); }
 					public void stopStrategy() {}
 				});
@@ -860,9 +870,9 @@ public class Main {
 				}
 				
 				strategyPortfolio.add(new RandomSetAnonymous(graphController, "RandomSet", numberOfHideLocations) {
-					public double environmentalMeasure() { return 0; }
-					public double socialMeasure() { return 0; }
-					public double internalMeasure(ArrayList<Double> strategyPerformance) { return 0; }
+					public AdaptiveMeasure environmentalMeasure() { return new AdaptiveMeasure(0.0); }
+					public AdaptiveMeasure socialMeasure() { return new AdaptiveMeasure(0.0); }
+					public AdaptiveMeasure internalMeasure(ArrayList<Double> strategyPerformance) { return new AdaptiveMeasure(0.0); }
 					public AdaptiveWeightings getAdaptiveWeightings() { return new AdaptiveWeightings(0.33, 0.33, 0.33); }
 					public void stopStrategy() {}
 				
@@ -892,7 +902,7 @@ public class Main {
 	 * @param agentList
 	 * @return
 	 */
-	private List<Seeker> initSeekers(String agentList, int numberOfHideLocations, boolean mixSeekers) {
+	private List<Seeker> initSeekers(String agentList, boolean mixSeekers) {
 		
 		/**************************
     	 * 
@@ -1068,6 +1078,26 @@ public class Main {
 				
 			}
 			
+			if (seekerType.getElement0().equals("VariableNodesHighProbability")) {
+				
+				allSeekingAgents.add(new VariableNodesHighProbability(graphController, gameNumber));
+				
+			}
+			
+			if (seekerType.getElement0().equals("VariableNodesHighProbabilityTemp")) {
+				
+				allSeekingAgents.add(new VariableNodesHighProbability(graphController, gameNumber) {
+					
+					public boolean strategyOverRounds() {
+						
+						return false;
+						
+					}
+					
+				});
+				
+			}
+			
 			if (seekerType.getElement0().equals("VariableHistoryHighProbability")) {
 				
 				allSeekingAgents.add(new VariableHistoryHighProbability(graphController, gameNumber));
@@ -1098,7 +1128,18 @@ public class Main {
 				
 				strategyPortfolio.add(new HighProbabilityAdaptable(graphController));
 				
-				allSeekingAgents.add(new AdaptiveSeekingAgent<AdaptiveSeeker>(graphController, totalRounds, strategyPortfolio, "HighProbabilityAdaptable", 0.5, false));
+				allSeekingAgents.add(new AdaptiveSeekingAgent<AdaptiveSeeker>(graphController, "AdaptiveHighProbability", strategyPortfolio, totalRounds, 0.5, false) {
+					
+					/* (non-Javadoc)
+					 * @see HideAndSeek.AdaptiveGraphTraversingAgent#confidenceLevel()
+					 */
+					protected double confidenceLevel() {
+						
+						return uniqueHideLocations().size() / (double)graphController.vertexSet().size();
+					
+					}
+					
+				});
 				
 			}
 			
@@ -1229,7 +1270,7 @@ public class Main {
 							
 							Utils.talk("Main", "Resetting " + seeker);
 							
-							for ( Seeker newSeekerObject : initSeekers(seekerList, numberOfHideLocations, mixSeekers) ) {
+							for ( Seeker newSeekerObject : initSeekers(seekerList, mixSeekers) ) {
 			        			
 			        			if ( newSeekerObject.toString().equals(seeker.toString()) ) {
 			        				

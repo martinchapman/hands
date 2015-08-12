@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.AbstractCollection;
@@ -36,10 +38,14 @@ import org.jgrapht.alg.FloydWarshallShortestPaths;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jibble.epsgraphics.EpsGraphics2D;
 
+import bsh.EvalError;
+import bsh.Interpreter;
 import HideAndSeek.GraphTraverser;
 import HideAndSeek.graph.HiddenObjectGraph;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
+import Utility.output.HiderRecord;
+import Utility.output.TraverserRecord;
 
 /**
  * A set of static utility methods.
@@ -57,6 +63,11 @@ public class Utils {
 	/**
 	 * 
 	 */
+	public final static String MARTINPREFIX = "/Users/Martin/Dropbox/workspace/SearchGames/";
+	
+	/**
+	 * 
+	 */
 	public static boolean DEBUG = true;
 	
 	/**
@@ -68,6 +79,30 @@ public class Utils {
 	 * 
 	 */
 	public static String KEY = "trFdcuAh"; 
+	
+	/**
+	 * @param expression
+	 * @return
+	 */
+	public static String parseExpression(String expression) {
+		
+		Interpreter interpreter = new Interpreter();
+    	
+    	try {
+    		
+    		interpreter.eval("result = " +  expression);
+    		
+    		return "" + interpreter.get("result");
+    		
+		} catch (EvalError e) {
+			
+			e.printStackTrace();
+			
+			return "-1";
+			
+		}
+	
+	}
 	
 	/**
 	 * @param hiddenObjectGraph
@@ -87,6 +122,57 @@ public class Utils {
 		
 	}
 	
+	/**
+	 * @param traverserRecords
+	 * @return
+	 */
+	public static ArrayList<TraverserRecord> expandTraverserRecords( ArrayList<TraverserRecord> traverserRecords ) {
+		
+		ArrayList<TraverserRecord> localTraverserRecords = new ArrayList<TraverserRecord>();
+		
+		for ( TraverserRecord traverserRecord : traverserRecords ) {
+			
+			localTraverserRecords.add(traverserRecord);
+			
+			if ( traverserRecord instanceof HiderRecord ) {
+				
+				localTraverserRecords.addAll(((HiderRecord)traverserRecord).getSeekersAndAttributes());
+				
+			} 
+			
+		}
+		
+		return localTraverserRecords;
+			
+	}
+	
+	/**
+	 * @param list
+	 * @return
+	 */
+	public static <E> String listToProse(ArrayList<E> list) {
+		
+		String textList = "";
+		
+		for ( int i = 0; i < list.size(); i++ ) {
+			
+			if ( i == list.size() - 1 ) {
+				
+				textList = textList.substring(0, textList.length() - 2) + " ";
+				
+				textList += "and " + list.get(i);
+				
+			} else {
+				
+				textList += list.get(i) + ", ";
+			}
+			
+		}
+		
+		return textList;
+		
+	}
+
 	/**
 	 * @param name
 	 * @return
@@ -201,6 +287,14 @@ public class Utils {
 	    
 		return returnLines;
 		
+	}
+	
+	public static double round(double value, int places) {
+	    if (places < 0) throw new IllegalArgumentException();
+
+	    BigDecimal bd = new BigDecimal(value);
+	    bd = bd.setScale(places, RoundingMode.HALF_UP);
+	    return bd.doubleValue();
 	}
 	
 	/**

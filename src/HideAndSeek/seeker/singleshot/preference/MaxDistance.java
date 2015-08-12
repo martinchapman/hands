@@ -34,7 +34,7 @@ public class MaxDistance extends PreferenceSeeker {
 		
 		super(graphController, name, graphPortion);
 		
-		maxDistanceMechanism = new MaxDistanceMechansim(graphController, name, estimatedNumberOfHideLocations(), graphPortion, -1);
+		maxDistanceMechanism = new MaxDistanceMechansim(graphController, name, graphController.numberOfHideLocations(), graphPortion, -1);
 		
 	}
 
@@ -44,6 +44,8 @@ public class MaxDistance extends PreferenceSeeker {
 	@Override
 	public LinkedHashSet<StringVertex> computeTargetNodes() {
 
+		LinkedHashSet<StringVertex> targetNodes = maxDistanceMechanism.computeTargetNodes(localGraph);
+		
 		return maxDistanceMechanism.computeTargetNodes(localGraph);
 
 	}

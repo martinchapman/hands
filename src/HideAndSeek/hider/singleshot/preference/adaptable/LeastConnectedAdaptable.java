@@ -8,6 +8,7 @@ import HideAndSeek.graph.StringVertex;
 import HideAndSeek.hider.AdaptiveHider;
 import HideAndSeek.hider.singleshot.preference.LeastConnected;
 import Utility.Metric;
+import Utility.adaptive.AdaptiveMeasure;
 import Utility.adaptive.AdaptiveUtils;
 import Utility.adaptive.AdaptiveWeightings;
 
@@ -41,7 +42,7 @@ public class LeastConnectedAdaptable extends LeastConnected implements AdaptiveH
 	 * @return
 	 */
 	@Override
-	public double environmentalMeasure() {
+	public AdaptiveMeasure environmentalMeasure() {
 		
 		double cumulativeConnectivityLeastConnected = 0.0;
 		
@@ -51,7 +52,7 @@ public class LeastConnectedAdaptable extends LeastConnected implements AdaptiveH
 			
 		}
 		
-		return ( cumulativeConnectivityLeastConnected / getMinimumConnectivityNodes().size() ) / ((double)estimatedMaxConnections);
+		return new AdaptiveMeasure(( cumulativeConnectivityLeastConnected / getMinimumConnectivityNodes().size() ) / ((double)estimatedMaxConnections));
 	
 	}
 
@@ -61,9 +62,9 @@ public class LeastConnectedAdaptable extends LeastConnected implements AdaptiveH
 	 * @return
 	 */
 	@Override
-	public double socialMeasure() {
+	public AdaptiveMeasure socialMeasure() {
 		
-		return 0.0;
+		return new AdaptiveMeasure(0.0);
 	
 	}
 
@@ -72,9 +73,9 @@ public class LeastConnectedAdaptable extends LeastConnected implements AdaptiveH
 	 * @return
 	 */
 	@Override
-	public double internalMeasure(ArrayList<Double> roundStrategyPerformance) {
+	public AdaptiveMeasure internalMeasure(ArrayList<Double> roundStrategyPerformance) {
 		
-		return AdaptiveUtils.internalMeasure(roundStrategyPerformance, Metric.TOTAL_EDGE_COST, localGraph);
+		return new AdaptiveMeasure(AdaptiveUtils.internalMeasure(roundStrategyPerformance, Metric.TOTAL_EDGE_COST, localGraph));
 	
 	}
 

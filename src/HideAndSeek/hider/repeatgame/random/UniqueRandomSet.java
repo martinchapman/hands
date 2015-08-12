@@ -1,12 +1,12 @@
 package HideAndSeek.hider.repeatgame.random;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.TreeSet;
 
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.hider.Hider;
 import HideAndSeek.hider.singleshot.random.RandomSet;
 import Utility.Utils;
 
@@ -39,10 +39,10 @@ public class UniqueRandomSet extends RandomSet {
 	 */
 	public UniqueRandomSet(GraphController<StringVertex, StringEdge> graphController, int numberOfHideLocations) {
 		
-		super(graphController, numberOfHideLocations);
+		this(graphController, "", numberOfHideLocations);
 		
 	}
-
+	
 	/**
 	 * @param size
 	 * @param ignoreSet NB: Parameter ignored here. Used simply for override.
@@ -52,11 +52,17 @@ public class UniqueRandomSet extends RandomSet {
 		
 		ArrayList<StringVertex> hideSet = super.createRandomSet(size, new TreeSet<StringVertex>(uniqueHideLocations()));
 		
-		System.out.println("Adding " + hideSet + " to used nodes. Existing: " + uniqueHideLocations());
-		
-		uniqueHideLocations().addAll(hideSet);
-		
 		return hideSet;
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see HideAndSeek.hider.singleshot.random.RandomSet#endOfRound()
+	 */
+	@Override
+	public void endOfRound() {
+
+		super.endOfRound();
 		
 	}
 

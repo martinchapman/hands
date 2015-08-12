@@ -804,9 +804,18 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 	/**
 	 * 
 	 */
-	public void switchShowOpponents() {
+	public void doNotShowOpponents() {
 		
-		showOpponents = showOpponents == true ? false : true;
+		showOpponents = false;
+		
+	}
+	
+	/**
+	 * 
+	 */
+	public void showOpponents() {
+		
+		showOpponents = true;
 		
 	}
 	

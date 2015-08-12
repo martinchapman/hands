@@ -111,6 +111,10 @@ public class BinomialProbability {
 		
 	}
 	
+	/**
+	 * Or greater = cumulative binomial
+	 * @return
+	 */
 	public double calculateRorGreaterSuccesses() {
 		
 		double cumulativeLessThanR = 0.0;

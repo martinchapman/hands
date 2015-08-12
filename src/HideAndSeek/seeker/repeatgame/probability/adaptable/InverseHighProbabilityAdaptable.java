@@ -9,6 +9,7 @@ import HideAndSeek.seeker.AdaptiveSeeker;
 import HideAndSeek.seeker.repeatgame.probability.VariableNodesInverseHighProbability;
 import Utility.Metric;
 import Utility.Utils;
+import Utility.adaptive.AdaptiveMeasure;
 import Utility.adaptive.AdaptiveUtils;
 import Utility.adaptive.AdaptiveWeightings;
 
@@ -76,9 +77,9 @@ public class InverseHighProbabilityAdaptable extends VariableNodesInverseHighPro
 	 * @see HideAndSeek.AdaptiveGraphTraverser#environmentalMeasure()
 	 */
 	@Override
-	public double environmentalMeasure() {
+	public AdaptiveMeasure environmentalMeasure() {
 	
-		return 0.0;
+		return new AdaptiveMeasure(0.0);
 		
 	}
 
@@ -93,8 +94,17 @@ public class InverseHighProbabilityAdaptable extends VariableNodesInverseHighPro
 	 * @return
 	 */
 	@Override
-	public double socialMeasure() {
+	public AdaptiveMeasure socialMeasure() {
 
+		return new AdaptiveMeasure(regularIncrements(), "HighProbabilityAdaptable");
+		
+	}
+	
+	/**
+	 * @return
+	 */
+	private double regularIncrements() {
+		
 		if ( uniqueHideLocationsProgression.size() > 2 ) {
 
 			Utils.talk(toString(), "uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 1) " + uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 1));
@@ -109,7 +119,37 @@ public class InverseHighProbabilityAdaptable extends VariableNodesInverseHighPro
 		
 		return 0.0;
 		
-		//return 1 - (uniqueHideLocations.size() / (double)(graphController.vertexSet().size())); 
+	}
+	
+	/**
+	 * NB: Not a reliable metric, as when confidence level is high enough, 
+	 * number of remaining unique nodes is too low.
+	 * @return
+	 */
+	private double uniqueLocationsSize() {
+		
+		Utils.talk(toString(), "1 - (uniqueHideLocations().size() / (double)(graphController.vertexSet().size())) " + (1 - (uniqueHideLocations().size() / (double)(graphController.vertexSet().size()))));
+		
+		return 1 - (uniqueHideLocations().size() / (double)(graphController.vertexSet().size())); 
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.seeker.repeatgame.probability.InverseHighProbability#endOfRound()
+	 */
+	public void endOfRound() {
+		
+		uniqueHideLocationsProgression.add(uniqueHideLocations().size());
+	
+		if ( uniqueHideLocations().size() > ( graphController.vertexSet().size() - estimatedNumberOfHideLocations() ) ) { 
+			
+			uniqueHideLocations().clear();
+			
+			uniqueHideLocationsProgression.clear();
+		
+		}
+		
+		super.endOfRound();
 		
 	}
 
@@ -117,9 +157,9 @@ public class InverseHighProbabilityAdaptable extends VariableNodesInverseHighPro
 	 * @param roundStrategyPerformance
 	 * @return
 	 */
-	public double internalMeasure(ArrayList<Double> roundStrategyPerformance) {
+	public AdaptiveMeasure internalMeasure(ArrayList<Double> roundStrategyPerformance) {
 		
-		return AdaptiveUtils.internalMeasure(roundStrategyPerformance, Metric.TOTAL_EDGE_COST, localGraph);
+		return new AdaptiveMeasure(AdaptiveUtils.internalMeasure(roundStrategyPerformance, Metric.TOTAL_EDGE_COST, localGraph));
 		
 	}
 
@@ -129,7 +169,7 @@ public class InverseHighProbabilityAdaptable extends VariableNodesInverseHighPro
 	 */
 	public double internalMeasure_Org() {
 
-		percentageChanges.add(graphController.latestTraverserRoundPerformance(responsibleAgent, Metric.COST_CHANGE_SCORE));
+		percentageChanges.add(graphController.latestTraverserRoundPerformance(responsibleAgent, Metric.COST_CHANGE_PAYOFF));
 		
 		if (AdaptiveUtils.containsLowPerformance(percentageChanges)) {
 			
@@ -142,37 +182,6 @@ public class InverseHighProbabilityAdaptable extends VariableNodesInverseHighPro
 			return 1.0;
 			
 		}
-		
-	}
-	
-	/* (non-Javadoc)
-	 * @see HideAndSeek.seeker.repeatgame.probability.HighProbability#endOfRound()
-	 */
-	public void endOfRound() {
-		
-		uniqueHideLocationsProgression.add(uniqueHideLocations().size());
-	
-		if ( uniqueHideLocations().size() > ( graphController.vertexSet().size() - estimatedNumberOfHideLocations() ) ) { 
-			
-			uniqueHideLocations().clear();
-			
-			uniqueHideLocationsProgression.clear();
-			
-		}
-		
-		super.endOfRound();
-		
-		Utils.talk(toString(), "uniqueHideLocations.size() " + uniqueHideLocations().size());
-		
-	}
-	
-	/* (non-Javadoc)
-	 * @see HideAndSeek.seeker.repeatgame.probability.InverseHighProbability#endOfGame()
-	 */
-	@Override
-	public void endOfGame() {
-		
-		super.endOfGame();
 		
 	}
 	

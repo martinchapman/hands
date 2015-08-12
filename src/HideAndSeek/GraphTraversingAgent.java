@@ -737,6 +737,8 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	 * Allows for the data from another strategy to be merged 
 	 * into this one.
 	 * 
+	 * MDC 15/7 Should be addAll or just straight assignment?
+	 * 
 	 * @param traverser
 	 */
 	public void mergeOtherTraverser(GraphTraverser traverser) {
@@ -754,6 +756,8 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 		this.hideLocations.addAll(traverser.requestHideLocations(responsibleAgent));
 		
 		this.allHideLocations.addAll(traverser.allHideLocations());
+		
+		uniqueHideLocations.clear();
 		
 		this.uniqueHideLocations.addAll(traverser.uniqueHideLocations());	
 		
