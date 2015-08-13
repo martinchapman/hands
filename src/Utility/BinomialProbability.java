@@ -130,6 +130,19 @@ public class BinomialProbability {
 	}
 	
 	/**
+	 * Probability of r - 1 successes in n - 1 trials, times by p (the probability in the current nth trial).
+	 * 
+	 * @param nth trial 
+	 * @param rth sucesses
+	 * @return
+	 */
+	public double calculateRthInNth(int nth, int rth) {
+		
+		return ( ( nChoosesK(nth - 1, rth - 1).doubleValue() * Math.pow(p, r - 1) ) * Math.pow(failure_in_one_trial, ( ( nth - 1 ) - ( rth - 1) )) ) * p;
+		
+	}
+	
+	/**
 	 * Set number of remaining rounds (trials)
 	 * @param minus_r (n)
 	 */
@@ -194,11 +207,8 @@ public class BinomialProbability {
 	    return ret;
 	
 	}
-	 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
+	
+	private void generateForDeceptive() {
 		
 		// http://www.mathwords.com/b/binomial_probability_formula.htm
 		// BinomialProbability bp = new BinomialProbability(10, 7, 0.25);
@@ -233,6 +243,21 @@ public class BinomialProbability {
 		graph.styleGraph();
 		
 		graph.createChart("", "$\\delta$ ($K$)", "$P$");
+		
+	}
+	
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		
+		// generateForDeceptive()
+		
+		BinomialProbability bp = new BinomialProbability(2, 2, 100, 5);
+		
+		System.out.println(bp.calculateRthInNth(2, 2));
+		
+		System.out.println(nChoosesK(10, 1).doubleValue());
 		
 	}
 	

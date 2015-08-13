@@ -38,8 +38,6 @@ import org.jgrapht.alg.FloydWarshallShortestPaths;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jibble.epsgraphics.EpsGraphics2D;
 
-import bsh.EvalError;
-import bsh.Interpreter;
 import HideAndSeek.GraphTraverser;
 import HideAndSeek.graph.HiddenObjectGraph;
 import HideAndSeek.graph.StringEdge;
@@ -79,30 +77,6 @@ public class Utils {
 	 * 
 	 */
 	public static String KEY = "trFdcuAh"; 
-	
-	/**
-	 * @param expression
-	 * @return
-	 */
-	public static String parseExpression(String expression) {
-		
-		Interpreter interpreter = new Interpreter();
-    	
-    	try {
-    		
-    		interpreter.eval("result = " +  expression);
-    		
-    		return "" + interpreter.get("result");
-    		
-		} catch (EvalError e) {
-			
-			e.printStackTrace();
-			
-			return "-1";
-			
-		}
-	
-	}
 	
 	/**
 	 * @param hiddenObjectGraph

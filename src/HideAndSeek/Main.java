@@ -1,5 +1,7 @@
 package HideAndSeek;
 
+import bsh.*;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -89,8 +91,6 @@ import Utility.Pair;
 import Utility.Utils;
 import Utility.adaptive.AdaptiveMeasure;
 import Utility.adaptive.AdaptiveWeightings;
-import bsh.EvalError;
-import bsh.Interpreter;
 
 /**
  * @author Martin

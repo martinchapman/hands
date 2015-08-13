@@ -46,6 +46,7 @@ import Utility.output.TraverserRecord;
 import bsh.EvalError;
 import bsh.Interpreter;
 
+
 /**
  * @author Martin
  *
@@ -207,7 +208,6 @@ public class Runner extends JFrame {
 	      
           "HighProbability",
           "VariableNodesHighProbability",
-          "VariableNodesHighProbabilityTemp",
           "VariableHistoryHighProbability",
           "HighProbabilityRepetitionCheck",
           
@@ -1666,7 +1666,7 @@ public class Runner extends JFrame {
 				
 				for ( int j = 0; j < GAMES; j++ ) {
 					
-					String parsed = Utils.parseExpression(jExpression.replace("j", j + "").substring(jExpression.replace("j", j + "").indexOf(",") + 1, jExpression.replace("j", j + "").length() - 1));
+					String parsed = parseExpression(jExpression.replace("j", j + "").substring(jExpression.replace("j", j + "").indexOf(",") + 1, jExpression.replace("j", j + "").length() - 1));
 					
 					if ( parsed.equals("-1") ) throw new UnsupportedOperationException("Failed to parse J expression");
 					
@@ -1684,6 +1684,30 @@ public class Runner extends JFrame {
 		
 		runSimulationX(GAMES, simulationParameters);
 		
+	}
+	
+	/**
+	 * @param expression
+	 * @return
+	 */
+	private String parseExpression(String expression) {
+		
+		Interpreter interpreter = new Interpreter();
+    	
+    	try {
+    		
+    		interpreter.eval("result = " +  expression);
+    		
+    		return "" + interpreter.get("result");
+    		
+		} catch (EvalError e) {
+			
+			e.printStackTrace();
+			
+			return "-1";
+			
+		}
+	
 	}
 	
 	private void runSimulationX(int GAMES, String[] simulationParameters) {
@@ -1758,7 +1782,7 @@ public class Runner extends JFrame {
 	    		  
 	    	    if (simulationParametersUnchanged[j].contains("*") || simulationParametersUnchanged[j].contains("+")) { 
 	    	    	
-	    	    	String parsed = Utils.parseExpression(simulationParametersUnchanged[j].replace("i", i + "").substring(simulationParametersUnchanged[j].replace("i", i + "").indexOf(",") + 1, simulationParametersUnchanged[j].replace("i", i + "").length() - 1));
+	    	    	String parsed = parseExpression(simulationParametersUnchanged[j].replace("i", i + "").substring(simulationParametersUnchanged[j].replace("i", i + "").indexOf(",") + 1, simulationParametersUnchanged[j].replace("i", i + "").length() - 1));
 	    	    	
 	    	    	if ( parsed.equals("-1") ) throw new UnsupportedOperationException("Failed to parse I expression");
 	    	    	

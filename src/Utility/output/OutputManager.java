@@ -583,6 +583,8 @@ public class OutputManager {
 		
 		if ( graphType.equals("Bar") ) SHOW_OPPONENT = false;
 		
+		if ( graphType.equals("Line") ) SHOW_OPPONENT = true;
+		
 		if ( !SHOW_OPPONENT ) for ( TraverserRecord record : traverserRecords ) record.doNotShowOpponents();
 		
 		if ( SHOW_OPPONENT ) for ( TraverserRecord record : traverserRecords ) record.showOpponents();
