@@ -1078,6 +1078,12 @@ public class Main {
 				
 			}
 			
+			if (seekerType.getElement0().equals("HighProbabilityK")) {
+				
+				allSeekingAgents.add(new VariableNodesHighProbability(graphController, numberOfHideLocations));
+				
+			}
+			
 			if (seekerType.getElement0().equals("VariableNodesHighProbability")) {
 				
 				allSeekingAgents.add(new VariableNodesHighProbability(graphController, gameNumber));

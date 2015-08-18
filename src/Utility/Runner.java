@@ -15,7 +15,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Enumeration;
 import java.util.Map.Entry;
+import java.util.Scanner;
 
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListCellRenderer;
@@ -33,6 +35,8 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
 import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
@@ -207,6 +211,7 @@ public class Runner extends JFrame {
 	      "LinkedPath",
 	      
           "HighProbability",
+          "HighProbabilityK",
           "VariableNodesHighProbability",
           "VariableHistoryHighProbability",
           "HighProbabilityRepetitionCheck",
@@ -237,8 +242,16 @@ public class Runner extends JFrame {
 	 */
 	public static void main(String args[]) {
 		
-		new Runner();
-
+		if ( args.length == 1 ) { 
+			
+			new Runner(args[0]);
+			
+		} else {
+			
+			new Runner();
+			
+		}
+		
 	}
 	
 	private JComboBox<String> topologies;
@@ -360,6 +373,11 @@ public class Runner extends JFrame {
 	}
 	
 	/**
+	 * 
+	 */
+
+	
+	/**
 	 * @param tabbedPane
 	 */
 	private void outputTab(JTabbedPane tabbedPane) {
@@ -384,7 +402,7 @@ public class Runner extends JFrame {
 		
 		//
 		
-		final JButton collateOutput = new JButton("Process Output");
+		collateOutput = new JButton("Process Output");
 		
 		northPane.add(collateOutput);
 		
@@ -394,7 +412,7 @@ public class Runner extends JFrame {
 		
 		showTextStats.setEnabled(false);
 		
-		final JComboBox<Datafile> files = new JComboBox<Datafile>();
+		files = new JComboBox<Datafile>();
 		
 		files.setEnabled(false);
 		
@@ -499,7 +517,7 @@ public class Runner extends JFrame {
 		
 		// 
 		
-		final JButton showFiles = new JButton("Show files");
+		showFiles = new JButton("Show files");
 		
 		showFiles.addActionListener(new ActionListener() {
 
@@ -564,15 +582,15 @@ public class Runner extends JFrame {
 		
 		//
 		
-		final JList<HiderRecord> outputFeedbackList = new JList<HiderRecord>(outputFeedback);
+		outputFeedbackList = new JList<HiderRecord>(outputFeedback);
 		
 		JScrollPane outputFeedbackListScroll = new JScrollPane(outputFeedbackList);
 		
-		final JComboBox<String> measure = new JComboBox<String>();
+		measure = new JComboBox<String>();
 		
 		final JLabel simulationParameters = new JLabel();
 		
-		final JRadioButton seekers = new JRadioButton("Seekers");
+		seekers = new JRadioButton("Seekers");
 		
 		outputFeedbackList.addListSelectionListener(new ListSelectionListener() {
 
@@ -654,7 +672,7 @@ public class Runner extends JFrame {
 		
 		seekers.setSelected(true);
 		
-		final JRadioButton hiders = new JRadioButton("Hiders");
+		hiders = new JRadioButton("Hiders");
 		
 		centerPaneRightCenter.add(hiders);
 		
@@ -716,23 +734,23 @@ public class Runner extends JFrame {
 		
 		//
 		
-		final JComboBox<String> graphTypes = new JComboBox<String>();
+		graphTypesCombo = new JComboBox<String>();
 
-		graphTypes.addItem("Bar");
+		graphTypesCombo.addItem("Bar");
 		
-		graphTypes.addItem("Line");
+		graphTypesCombo.addItem("Line");
 		
-		graphTypes.addItem("3D");
+		graphTypesCombo.addItem("3D");
 		
-		graphTypes.addItem("Payoff Matrix");
+		graphTypesCombo.addItem("Payoff Matrix");
 		
 		centerPaneRightCenter.add(new JLabel("Graph types:"));
 		
-		centerPaneRightCenter.add(graphTypes);
+		centerPaneRightCenter.add(graphTypesCombo);
 		
 		//
 		
-		final JComboBox<String> categories = new JComboBox<String>();
+		categories = new JComboBox<String>();
 		
 		categories.addItem("Opponent");
 		
@@ -744,7 +762,7 @@ public class Runner extends JFrame {
 		
 		//
 		
-		final JComboBox<String> gameOrRound = new JComboBox<String>();
+		gameOrRound = new JComboBox<String>();
 		
 		gameOrRound.addItem("Game");
 		
@@ -756,13 +774,13 @@ public class Runner extends JFrame {
 		
 		//
 		
-		final JCheckBox outputEnabled = new JCheckBox("Output enabled");
+		outputEnabled = new JCheckBox("Output enabled");
 		
 		centerPaneRightCenter.add(outputEnabled);
 		
 		//
 		
-		JButton generateGraph = new JButton("Generate graph");
+		generateGraph = new JButton("Generate graph");
 		
 		generateGraph.addActionListener(new ActionListener() {
 
@@ -813,15 +831,15 @@ public class Runner extends JFrame {
 				
 				if (seekers.isSelected()) {
 					
-					if (graphTypes.getSelectedItem().equals("Line")) {
+					if (graphTypesCombo.getSelectedItem().equals("Line")) {
 						
 						outputManager.showLineGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected());
 				
-					} else if (graphTypes.getSelectedItem().equals("Bar")) {
+					} else if (graphTypesCombo.getSelectedItem().equals("Bar")) {
 						
 						outputManager.showBarGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
 						
-					} else if (graphTypes.getSelectedItem().equals("3D")) {
+					} else if (graphTypesCombo.getSelectedItem().equals("3D")) {
 						
 						outputManager.show3DGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
 						
@@ -829,15 +847,15 @@ public class Runner extends JFrame {
 					
 				} else if (hiders.isSelected()) {
 					
-					if (graphTypes.getSelectedItem().equals("Line")) {
+					if (graphTypesCombo.getSelectedItem().equals("Line")) {
 						
 						outputManager.showLineGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected());
 						
-					} else if (graphTypes.getSelectedItem().equals("Bar")) {
+					} else if (graphTypesCombo.getSelectedItem().equals("Bar")) {
 						
 						outputManager.showBarGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
 						
-					} else if (graphTypes.getSelectedItem().equals("3D")) {
+					} else if (graphTypesCombo.getSelectedItem().equals("3D")) {
 						
 						outputManager.show3DGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
 						
@@ -845,7 +863,7 @@ public class Runner extends JFrame {
 					
 				}
 				
-				if (graphTypes.getSelectedItem().equals("Payoff Matrix")) {
+				if (graphTypesCombo.getSelectedItem().equals("Payoff Matrix")) {
 					
 					ApproximatePayoffMatrix HPM = new ApproximatePayoffMatrix("");
 					
@@ -1364,7 +1382,359 @@ public class Runner extends JFrame {
 
 	}
 	
+	/**
+	 * 
+	 */
 	private ArrayList<String> simulations;
+	
+	/**
+	 * @param input
+	 * @return
+	 */
+	private boolean checkForBack(String input) {
+		
+		if ( input.contains("back") ) return true;
+		
+		return false;
+		
+	}
+	
+	/**
+	 * @param input
+	 * @return
+	 */
+	private boolean checkForBlank(String input) {
+		
+		if ( input.trim().length() == 0 ) return true;
+		
+		return false;
+		
+	}
+	
+	/**
+	 * @param question
+	 * @return
+	 */
+	private String askQuestion(String question, Scanner in) {
+		
+		System.out.println(question);
+		
+		String response = "";
+		
+		response = in.nextLine();
+		
+		return response;
+		
+	}
+	
+	/**
+	 * @param listModel
+	 * @return
+	 */
+	private <E> ArrayList<Object> itemsInList(ListModel<E> listModel) {
+		
+		ArrayList<Object> itemsInList = new ArrayList<Object>();
+		
+		for ( int i = 0; i < listModel.getSize(); i++ ) {
+			
+			itemsInList.add(listModel.getElementAt(i));
+			
+		}
+		
+		return itemsInList;
+		
+	}
+	
+	private JButton showFiles;
+	
+	private JComboBox<Datafile> files;
+	
+	private JButton collateOutput;
+	
+	private JList<HiderRecord> outputFeedbackList;
+	
+	private JRadioButton seekers;
+	
+	private JRadioButton hiders;
+	
+	private JComboBox<String> measure;
+	
+	private JComboBox<String> graphTypesCombo;
+	
+	private JComboBox<String> categories;
+	
+	private JComboBox<String> gameOrRound;
+	
+	private JCheckBox outputEnabled;
+	
+	private JButton generateGraph;
+	
+	private final static boolean SHORT_TEXT_UI = true;
+	
+	public Runner(String arg) {
+		
+		this();
+		
+		Scanner in = new Scanner(System.in);
+	
+		if ( arg.equals("-t") ) {
+			
+			while ( true ) {
+				
+				String response = askQuestion("Main menu \n(1) List simulation schedule \n(2) List complete simulations", in);
+				
+				if ( response.equals("1") ) {
+					
+					while (true) {
+						
+						for ( Object item : itemsInList(queueListModel) ) {
+							
+							if ( SHORT_TEXT_UI ) item = item.toString().substring(0,  item.toString().indexOf("EdgeWeight") - 2);
+							
+							System.out.println("("+ itemsInList(queueListModel).indexOf(item) + ") " + item);
+							
+							System.out.println("------------------------------------------------------------------------------------");
+							
+						}
+						
+						response = askQuestion("Enter number to start simulation or (back)", in);
+						
+						if ( !checkForBack(response) ) {
+							
+							queueList.setSelectedIndex(Integer.parseInt(response));
+							
+							startSelected.doClick();
+							
+						} else {
+							
+							break;
+							
+						}
+					
+					}
+					
+				} else if ( response.equals("2") ) {
+					
+					while (true) {
+						
+						if ( files.getModel().getSize() == 0 ) showFiles.doClick();
+						
+						for ( Object item : itemsInList(files.getModel()) ) {
+						
+							System.out.println("("+ itemsInList(files.getModel()).indexOf(item) + ") " + item);
+							
+							System.out.println("------------------------------------------------------------------------------------");
+							
+						}
+						
+						response = askQuestion("Enter number to process or (back)", in);
+						
+						if ( !checkForBack(response) ) {
+						
+							files.getModel().setSelectedItem(files.getModel().getElementAt(Integer.parseInt(response)));
+							
+							collateOutput.doClick();
+							
+							System.out.println("");
+							
+							System.out.println("------------------------------------------");
+							
+							outputFeedbackList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+							
+							for ( Object item : itemsInList(outputFeedbackList.getModel()) ) {
+								
+								System.out.println("("+ itemsInList(outputFeedbackList.getModel()).indexOf(item) + ") " + item);
+								
+							}
+							
+							response = "";
+							
+							while ( response.equals("") || ( response.trim().split(" ").length > ( outputFeedbackList.getModel().getSize() - 1 ) ) ) {
+							
+								response = askQuestion("Enter pair of player numbers (spaced list) or (back)", in);
+								
+								for ( String pair : response.trim().split(" ") ) {
+									
+									if (Integer.parseInt(pair) > ( response.trim().split(" ").length  - 1) ) {
+										
+										response = "";
+										
+									}
+									
+								}
+							
+							}
+							
+							if ( !checkForBack(response) ) {
+								
+								if ( response.length() == 1 ) {
+									
+									outputFeedbackList.setSelectedIndex(Integer.parseInt(response));
+									
+								} else {
+									
+									for ( String pair : response.split(" ") ) {
+										
+										outputFeedbackList.setSelectionInterval(Integer.parseInt((pair.trim())) - 1, Integer.parseInt((pair.trim())));
+										
+									}
+									
+								}
+								
+								
+								response = askQuestion("Enter hiders or seekers. (Enter) for default: " + ( hiders.isSelected() ? "hider" : "seeker" ) + " or (back).", in);
+								
+								if ( !checkForBack(response) ) {
+									
+									if ( !checkForBlank(response) ) {
+										
+										if ( response.contains("hider") ) {
+											
+											hiders.setSelected(true);
+											
+										} else {
+											
+											seekers.setSelected(true);
+											
+										}
+										
+									}
+									
+									while ( !itemsInList(measure.getModel()).contains(response) ) {
+									
+										response = askQuestion("Enter measure (" + itemsInList(measure.getModel()) + "). (Enter) for default: " + measure.getModel().getElementAt(measure.getSelectedIndex()) + " or (back).", in);
+									
+									}
+									
+									if ( !checkForBack(response) ) {
+										
+										if ( !checkForBlank(response) ) {
+											
+											response = response.trim();
+											
+											measure.getModel().setSelectedItem(measure.getModel().getElementAt(itemsInList(measure.getModel()).indexOf(response)));
+											
+										}
+										
+										while ( !itemsInList(graphTypesCombo.getModel()).contains(response) ) {
+										
+											response = askQuestion("Enter graph type (" + itemsInList(graphTypesCombo.getModel()) + "). (Enter) for default: " + graphTypesCombo.getModel().getElementAt(graphTypesCombo.getSelectedIndex()) + " or (back).", in);
+										
+										}
+										
+										if ( !checkForBack(response) ) {
+											
+											if ( !checkForBlank(response) ) {
+												
+												response = response.trim();
+												
+												graphTypesCombo.getModel().setSelectedItem(graphTypesCombo.getModel().getElementAt(itemsInList(graphTypesCombo.getModel()).indexOf(response)));
+												
+											}
+											
+											while ( !itemsInList(categories.getModel()).contains(response) ) {
+											
+												response = askQuestion("Enter bar category (" + itemsInList(categories.getModel()) + "). (Enter) for default: " + categories.getModel().getElementAt(categories.getSelectedIndex()) + " or (back).", in);
+											
+											}
+											
+											if ( !checkForBack(response) ) {
+												
+												if ( !checkForBlank(response) ) {
+													
+													response = response.trim();
+													
+													categories.getModel().setSelectedItem(categories.getModel().getElementAt(itemsInList(categories.getModel()).indexOf(response)));
+													
+												}
+												
+												while ( !itemsInList(gameOrRound.getModel()).contains(response) ) {
+												
+													response = askQuestion("Enter game or round (" + itemsInList(gameOrRound.getModel()) + "). (Enter) for default: " + gameOrRound.getModel().getElementAt(gameOrRound.getSelectedIndex()) + " or (back).", in);
+												
+												}
+											
+												if ( !checkForBack(response) ) {
+													
+													if ( !checkForBlank(response) ) {
+														
+														response = response.trim();
+														
+														gameOrRound.getModel().setSelectedItem(gameOrRound.getModel().getElementAt(itemsInList(gameOrRound.getModel()).indexOf(response)));
+														
+													}
+													
+												} else {
+													
+													break;
+													
+												}
+												
+												response = askQuestion("Confirm graph output (y/n)", in);
+												
+												if ( response.contains("y")) {
+													
+													outputEnabled.setSelected(true);
+													
+													generateGraph.doClick();
+												
+												}
+												
+												response = askQuestion("(exit) or (back)", in);
+												
+												if ( !checkForBack(response) ) {
+													
+													System.exit(0);
+													
+												}
+												
+											} else {
+												
+												break;
+												
+											}
+											
+										} else {
+											
+											break;
+											
+										}
+										
+									} else {
+										
+										break;
+										
+									}
+									
+								} else {
+									
+									break;
+									
+								}
+								
+							} else {
+								
+								break;
+								
+							}
+						
+						} else {
+							
+							break;
+							
+						}
+						
+					}
+					
+				}
+				
+			}
+			
+		}
+		
+		in.close();
+		
+	}
 	
 	/**
 	 * 
