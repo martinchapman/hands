@@ -213,7 +213,7 @@ public class BinomialProbability {
 		// http://www.mathwords.com/b/binomial_probability_formula.htm
 		// BinomialProbability bp = new BinomialProbability(10, 7, 0.25);
 		
-		GNULineGraph graph = new GNULineGraph("");
+		GNULineGraph graph = new GNULineGraph("", false);
 		
 		BinomialProbability bp = new BinomialProbability(99, 1, 95, 5);
 		

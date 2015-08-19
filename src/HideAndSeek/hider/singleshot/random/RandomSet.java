@@ -149,8 +149,6 @@ public class RandomSet extends HidingAgent implements VariableTraversalStrategy 
 			
 		}
 		
-		System.out.println("HIDE SET: " + hideSet);
-		
 		return hideSet;
 		
 	}

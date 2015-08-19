@@ -18,6 +18,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
@@ -45,6 +46,20 @@ public class OutputManager {
 	 * 
 	 */
 	private boolean SHOW_OPPONENT = true;
+	
+	/**
+	 * 
+	 */
+	private boolean textBased = false;
+	
+	/**
+	 * @param textBased
+	 */
+	public void setTextBased(boolean textBased) {
+		
+		this.textBased = textBased;
+		
+	}
 	
 	/**
 	 * Multiple hiders per file, and multiple files.
@@ -90,7 +105,29 @@ public class OutputManager {
 			// If it is a .csv file (what we want):
 			if (path.toString().substring(path.toString().length() - 3, path.toString().length()).equals("csv")) {
 			
-				availableFiles.add(new Datafile(Utils.readFirstLineFromFile(path.toString()), path));
+				// If it starts with a number + '-', it is part of a collection
+				if ( path.toFile().getName().contains("-")) {
+					
+					// Find existing GroupedDatafile for this in list, and add on (could do this inside GroupedDatafile)
+					if ( availableFiles.contains(new GroupedDatafiles(path.toFile().getName().substring(0, path.toFile().getName().indexOf("-")))) ) {
+						
+						((GroupedDatafiles) availableFiles.get(availableFiles.indexOf(new GroupedDatafiles(path.toFile().getName().substring(0, path.toFile().getName().indexOf("-")))))).addDatafile(new Datafile(Utils.readFirstLineFromFile(path.toString()), path));
+						
+					} else {
+						
+						GroupedDatafiles groupedDatafiles = new GroupedDatafiles(Utils.readFirstLineFromFile(path.toString()), path);
+						
+						groupedDatafiles.setIdentifier(path.toFile().getName().substring(0, path.toFile().getName().indexOf("-")));
+						
+						availableFiles.add(groupedDatafiles);
+						
+					}
+					
+				} else {
+					
+					availableFiles.add(new Datafile(Utils.readFirstLineFromFile(path.toString()), path));
+					
+				}
 				
 			}
 			
@@ -107,9 +144,9 @@ public class OutputManager {
 		
 		fileHiderRecords.clear();
 		
-		for ( Datafile path : availableFiles() ) {
+		for ( Datafile datafile : availableFiles() ) {
 			
-			processOutput(path.getPath());
+			processOutput(datafile);
 			
 		}
 	
@@ -118,18 +155,58 @@ public class OutputManager {
 	/**
 	 * @param path
 	 */
-	public void processIndividualOutput(Path path) {
+	public void processIndividualOutput(Datafile datafile) {
 		
 		fileHiderRecords.clear();
 		
-		processOutput(path);
+		processOutput(datafile);
+		
+	}
+	
+	public void processOutput(Datafile datafile) {
+		
+		if ( datafile instanceof GroupedDatafiles ) {
+			
+			ArrayList<HiderRecord> groupedHiderRecords = new ArrayList<HiderRecord>();
+			
+			ArrayList<ArrayList<HiderRecord>> toBeSplit = new ArrayList<ArrayList<HiderRecord>>();
+			
+			for ( Datafile file : ((GroupedDatafiles)datafile).getAllDatafiles() ) {
+				
+				toBeSplit.add(createHiderRecords(file.getPath()));
+				
+			}
+			
+			for ( int i = 0; i < toBeSplit.get(0).size(); i++ ) {
+				
+				groupedHiderRecords.add(new GroupedHiderRecords());
+				
+			}
+			
+			for ( ArrayList<HiderRecord> individualRecordList : toBeSplit ) {
+				
+				for ( HiderRecord individualRecord : individualRecordList ) {
+				
+					((GroupedHiderRecords)groupedHiderRecords.get(individualRecordList.indexOf(individualRecord))).addHider(individualRecord);
+					
+				}
+				
+			}
+			
+			fileHiderRecords.add(groupedHiderRecords);
+			
+		} else {
+			
+			fileHiderRecords.add(createHiderRecords(datafile.getPath()));
+			
+		}
 		
 	}
 	
 	/**
 	 * 
 	 */
-	public void processOutput(Path path) {
+	public ArrayList<HiderRecord> createHiderRecords(Path path) {
 		
 		ArrayList<HiderRecord> hiderRecords = new ArrayList<HiderRecord>();
 		
@@ -287,7 +364,7 @@ public class OutputManager {
 			
 		}
 		
-		fileHiderRecords.add(hiderRecords);
+		return hiderRecords;
 	
 	}
 	
@@ -588,7 +665,7 @@ public class OutputManager {
 		if ( !SHOW_OPPONENT ) for ( TraverserRecord record : traverserRecords ) record.doNotShowOpponents();
 		
 		if ( SHOW_OPPONENT ) for ( TraverserRecord record : traverserRecords ) record.showOpponents();
-			
+		
 		Collections.sort(traverserRecords);
 		
 		//TraverserGraph graph = null;
@@ -609,15 +686,15 @@ public class OutputManager {
 			if (graphType.equals("Line")) {
 			
 				//graph = new LineGraph(title);
-				graph = new GNULineGraph(title);
+				graph = new GNULineGraph(title, textBased);
 			
 			} else if (graphType.equals("3D")) {
 				
-				graph = new GNU3DGraph(title);
+				graph = new GNU3DGraph(title, textBased);
 				
 			}
 			
-			Hashtable<String, ArrayList<ArrayList<Double>>> multipleAttributeToValues = new Hashtable<String, ArrayList<ArrayList<Double>>>();
+			LinkedHashMap<String, ArrayList<ArrayList<Double>>> multipleAttributeToValues = new LinkedHashMap<String, ArrayList<ArrayList<Double>>>();
 			
 			for ( TraverserRecord traverser : traverserRecords ) {
 				
@@ -739,7 +816,7 @@ public class OutputManager {
 			
 		} else if (graphType.equals("Bar")) {
 			
-			graph = new GNUBarGraph(title);
+			graph = new GNUBarGraph(title, textBased);
 			
 			TreeMap<String, ArrayList<Entry<TraverserRecord, Double>>> categoryToTraverserAndData = new TreeMap<String, ArrayList<Entry<TraverserRecord, Double>>>();
 

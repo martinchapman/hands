@@ -15,7 +15,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Enumeration;
 import java.util.Map.Entry;
 import java.util.Scanner;
 
@@ -44,6 +43,7 @@ import javax.swing.event.ListSelectionListener;
 
 import Utility.gametheoretic.ApproximatePayoffMatrix;
 import Utility.output.Datafile;
+import Utility.output.GroupedHiderRecords;
 import Utility.output.HiderRecord;
 import Utility.output.OutputManager;
 import Utility.output.TraverserRecord;
@@ -242,9 +242,9 @@ public class Runner extends JFrame {
 	 */
 	public static void main(String args[]) {
 		
-		if ( args.length == 1 ) { 
+		if ( args.length > 0 ) { 
 			
-			new Runner(args[0]);
+			new Runner(args);
 			
 		} else {
 			
@@ -375,14 +375,14 @@ public class Runner extends JFrame {
 	/**
 	 * 
 	 */
-
+	private OutputManager outputManager;
 	
 	/**
 	 * @param tabbedPane
 	 */
 	private void outputTab(JTabbedPane tabbedPane) {
 		
-		final OutputManager outputManager = new OutputManager();
+		outputManager = new OutputManager();
 		
 		//////
 		
@@ -423,7 +423,7 @@ public class Runner extends JFrame {
 				
 				if ( files.isEnabled() ) {
 					
-					outputManager.processIndividualOutput(((Datafile)files.getSelectedItem()).getPath());
+					outputManager.processIndividualOutput(((Datafile)files.getSelectedItem()));
 					
 				} else {
 					
@@ -445,7 +445,17 @@ public class Runner extends JFrame {
 							
 							Utils.printSystemStats();
 							
-							HiderRecord hiderCopy = new HiderRecord("");
+							HiderRecord hiderCopy;
+							
+							if ( hiderRecord instanceof GroupedHiderRecords ) {
+								
+								hiderCopy = new GroupedHiderRecords("");
+								
+							} else {
+								
+								hiderCopy = new HiderRecord("");
+								
+							}
 							
 							hiderCopy.duplicateRecord(hiderRecord);
 							
@@ -796,7 +806,21 @@ public class Runner extends JFrame {
 				
 				String title = "";
 				
-				for ( HiderRecord hider : outputFeedbackList.getSelectedValuesList()) {
+				ArrayList<HiderRecord> recordsFromList = new ArrayList<HiderRecord>(outputFeedbackList.getSelectedValuesList());
+				
+				ArrayList<HiderRecord> recordsForGraph = new ArrayList<HiderRecord>();
+				
+				for ( HiderRecord record : recordsFromList ) {
+					
+					if ( record instanceof GroupedHiderRecords ) { 
+						
+						recordsForGraph.addAll(((GroupedHiderRecords)record).allHiders());
+						
+					}
+					
+				}
+				
+				for ( HiderRecord hider : recordsForGraph ) {
 					
 					if (hider.toString().equals("-----")) continue;
 					
@@ -817,8 +841,8 @@ public class Runner extends JFrame {
 							//selectedSeekers.get(selectedSeekers.indexOf(hidersSeekers)).integrateRecord(hidersSeekers);
 							
 						//} else {
-							
-						selectedSeekers.add(hidersSeeker);
+						
+						selectedSeekers.add(selectedSeekers.size(), hidersSeeker);
 							
 						//}
 						
@@ -1421,7 +1445,21 @@ public class Runner extends JFrame {
 		
 		String response = "";
 		
-		response = in.nextLine();
+		while(true) {
+			
+			try {
+				
+				response = in.nextLine();
+				
+				break;
+				
+			} catch ( java.util.NoSuchElementException e ) {
+				
+				continue;
+				
+			}
+		
+		}
 		
 		return response;
 		
@@ -1471,17 +1509,29 @@ public class Runner extends JFrame {
 	
 	private final static boolean SHORT_TEXT_UI = true;
 	
-	public Runner(String arg) {
+	private boolean KILL_AFTER_SIM = false;
+	
+	public Runner(String[] args) {
 		
 		this();
 		
+		ArrayList<String> argsList = new ArrayList<String>(Arrays.asList(args));
+		
 		Scanner in = new Scanner(System.in);
 	
-		if ( arg.equals("-t") ) {
+		if ( argsList.contains("-k") ) {
+			
+			KILL_AFTER_SIM = true;
+			
+		}
+		
+		if ( argsList.contains("-t") ) {
+			
+			outputManager.setTextBased(true);
 			
 			while ( true ) {
 				
-				String response = askQuestion("Main menu \n(1) List simulation schedule \n(2) List complete simulations", in);
+				String response = askQuestion("\nMain menu :) \n(1) List simulation schedule \n(2) List complete simulations", in);
 				
 				if ( response.equals("1") ) {
 					
@@ -1489,9 +1539,11 @@ public class Runner extends JFrame {
 						
 						for ( Object item : itemsInList(queueListModel) ) {
 							
-							if ( SHORT_TEXT_UI ) item = item.toString().substring(0,  item.toString().indexOf("EdgeWeight") - 2);
+							String itemText;
 							
-							System.out.println("("+ itemsInList(queueListModel).indexOf(item) + ") " + item);
+							if ( SHORT_TEXT_UI ) itemText = item.toString().substring(0,  item.toString().indexOf("EdgeWeight") - 2);
+							
+							System.out.println("("+ itemsInList(queueListModel).indexOf(item) + ") " + itemText);
 							
 							System.out.println("------------------------------------------------------------------------------------");
 							
@@ -1521,17 +1573,29 @@ public class Runner extends JFrame {
 						
 						for ( Object item : itemsInList(files.getModel()) ) {
 						
-							System.out.println("("+ itemsInList(files.getModel()).indexOf(item) + ") " + item);
+							String itemText = "";
+							
+							if ( SHORT_TEXT_UI && item.toString().contains("EdgeWeight") ) itemText = item.toString().substring(0,  item.toString().indexOf("EdgeWeight") - 2);
+							
+							System.out.println("("+ itemsInList(files.getModel()).indexOf(item) + ") " + itemText);
 							
 							System.out.println("------------------------------------------------------------------------------------");
 							
 						}
 						
-						response = askQuestion("Enter number to process or (back)", in);
+						response = askQuestion("Enter number to process, (all) to process all or (back)", in);
 						
 						if ( !checkForBack(response) ) {
 						
-							files.getModel().setSelectedItem(files.getModel().getElementAt(Integer.parseInt(response)));
+							if ( response.contains("all") ) {
+							
+								showFiles.doClick();
+								
+							} else {
+								
+								files.getModel().setSelectedItem(files.getModel().getElementAt(Integer.parseInt(response)));
+							
+							}
 							
 							collateOutput.doClick();
 							
@@ -1541,9 +1605,11 @@ public class Runner extends JFrame {
 							
 							outputFeedbackList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 							
+							int outputIndex = 0;
+							
 							for ( Object item : itemsInList(outputFeedbackList.getModel()) ) {
 								
-								System.out.println("("+ itemsInList(outputFeedbackList.getModel()).indexOf(item) + ") " + item);
+								System.out.println("("+ (outputIndex++) + ") " + item);
 								
 							}
 							
@@ -1600,10 +1666,13 @@ public class Runner extends JFrame {
 										
 									}
 									
+									
 									while ( !itemsInList(measure.getModel()).contains(response) ) {
 									
 										response = askQuestion("Enter measure (" + itemsInList(measure.getModel()) + "). (Enter) for default: " + measure.getModel().getElementAt(measure.getSelectedIndex()) + " or (back).", in);
 									
+										if ( response.equals("") ) break;
+										
 									}
 									
 									if ( !checkForBack(response) ) {
@@ -1620,6 +1689,8 @@ public class Runner extends JFrame {
 										
 											response = askQuestion("Enter graph type (" + itemsInList(graphTypesCombo.getModel()) + "). (Enter) for default: " + graphTypesCombo.getModel().getElementAt(graphTypesCombo.getSelectedIndex()) + " or (back).", in);
 										
+											if ( response.equals("") ) break;
+											
 										}
 										
 										if ( !checkForBack(response) ) {
@@ -1636,6 +1707,8 @@ public class Runner extends JFrame {
 											
 												response = askQuestion("Enter bar category (" + itemsInList(categories.getModel()) + "). (Enter) for default: " + categories.getModel().getElementAt(categories.getSelectedIndex()) + " or (back).", in);
 											
+												if ( response.equals("") ) break;
+												
 											}
 											
 											if ( !checkForBack(response) ) {
@@ -1652,6 +1725,8 @@ public class Runner extends JFrame {
 												
 													response = askQuestion("Enter game or round (" + itemsInList(gameOrRound.getModel()) + "). (Enter) for default: " + gameOrRound.getModel().getElementAt(gameOrRound.getSelectedIndex()) + " or (back).", in);
 												
+													if ( response.equals("") ) break;
+													
 												}
 											
 												if ( !checkForBack(response) ) {
@@ -1670,7 +1745,13 @@ public class Runner extends JFrame {
 													
 												}
 												
-												response = askQuestion("Confirm graph output (y/n)", in);
+												response = "";
+												
+												while ( response.equals("") ) {
+													
+													response = askQuestion("Confirm graph output (y/n)", in);
+													
+												}
 												
 												if ( response.contains("y")) {
 													
@@ -1767,6 +1848,8 @@ public class Runner extends JFrame {
 				
 				runSimulation(Integer.parseInt(numberOfGames.getText()), getUISettings());
 				
+				if (KILL_AFTER_SIM) System.exit(0);
+				
 			}
         	
         });
@@ -1785,6 +1868,8 @@ public class Runner extends JFrame {
 		        	runSimulation(Integer.parseInt(simulation[0]), simulation);
 	        	
 				}
+				
+				if (KILL_AFTER_SIM) System.exit(0);
 				
 			}
         	
@@ -1830,6 +1915,8 @@ public class Runner extends JFrame {
 				
 				runSimulationList(simulations);
 				
+				if (KILL_AFTER_SIM) System.exit(0);
+				
 			}
         	
         });
@@ -1852,7 +1939,7 @@ public class Runner extends JFrame {
       	  
 			if (param.indexOf('{') != -1) {
 				
-				Pair<String, String> paramPair = Utils.stringToArray(param, "(\\{([0-9a-zA-Z]+),([0-9a-zA-Z.+\\*]+)\\})").get(0);
+				Pair<String, String> paramPair = Utils.stringToArray(param, "(\\{([0-9a-zA-Z]+),([0-9a-zA-Z.+\\*\\(\\)]+)\\})").get(0);
   
 				if (paramPair.getElement0().equals("Topology")) {
 		  
@@ -2028,7 +2115,7 @@ public class Runner extends JFrame {
 	 */
 	private void runSimulation(int GAMES, String[] simulationParameters) {
 		
-		for ( int paramID = 0; paramID < simulationParameters.length; paramID++ ) {
+		/*for ( int paramID = 0; paramID < simulationParameters.length; paramID++ ) {
 			
 			if ( simulationParameters[paramID].contains("j") ) {
 				
@@ -2050,9 +2137,55 @@ public class Runner extends JFrame {
 				
 			}
 			
+		}*/
+		
+		// Group ID to use if j and there are multiple files output from one simulation
+		String groupID = Utils.timestamp();
+		
+		String[] simulationParametersUnchanged = Arrays.copyOf(simulationParameters, simulationParameters.length);
+		
+		boolean containsJ = false;
+		
+		for ( int j = 0; j < GAMES; j++ ) {
+		
+			containsJ = false;
+			
+			for (int k = 0; k < simulationParameters.length; k++) {
+	  		  
+	    	    if (simulationParametersUnchanged[k].contains("j*") || simulationParametersUnchanged[k].contains("j+")) { 
+	    	    	
+	    	    	containsJ = true;
+	    	    	
+	    	    	String parsed = parseExpression(simulationParametersUnchanged[k].replace("j", j + "").substring(simulationParametersUnchanged[k].replace("j", j + "").indexOf(",") + 1, simulationParametersUnchanged[k].replace("j", j + "").length() - 1));
+	    	    	
+	    	    	if ( parsed.equals("-1") ) throw new UnsupportedOperationException("Failed to parse I expression");
+	    	    	
+					simulationParameters[k] = "" + simulationParametersUnchanged[k].substring(0, simulationParametersUnchanged[k].indexOf(",") + 1) + parsed + "}";
+	
+	    	    
+	    	    } else if (simulationParametersUnchanged[k].contains(",j")) { 
+	    	  		
+	    	    	containsJ = true;
+	    	    	
+	    	  		simulationParameters[k] = simulationParametersUnchanged[k].replaceAll("(\\,j)", "," + j); 
+	    	  		
+	    	  	}
+		   
+		    }
+			
+			if ( containsJ ) { 
+				
+				runSimulationX(GAMES, simulationParameters, "" + groupID);
+			
+			} else {
+				
+				break;
+				
+			}
+			
 		}
 		
-		runSimulationX(GAMES, simulationParameters);
+		if (!containsJ) runSimulationX(GAMES, simulationParameters);
 		
 	}
 	
@@ -2080,13 +2213,23 @@ public class Runner extends JFrame {
 	
 	}
 	
+	/**
+	 * @param GAMES
+	 * @param simulationParameters
+	 */
 	private void runSimulationX(int GAMES, String[] simulationParameters) {
+		
+		runSimulationX(GAMES, simulationParameters, "");
+		
+	}
+	
+	private void runSimulationX(int GAMES, String[] simulationParameters, String namePrefix) {
 		
 		/***********/
 		
 		// Generate ID For this simulation
 		
-		String currentSimulationIdentifier = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
+		String currentSimulationIdentifier = namePrefix + "-" + ( Utils.timestamp() );
 		
 		Utils.writeToFile(Utils.FILEPREFIX + "simRecordID.txt", currentSimulationIdentifier);
 		

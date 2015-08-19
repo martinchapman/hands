@@ -17,8 +17,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.SimpleDateFormat;
 import java.util.AbstractCollection;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Hashtable;
@@ -77,6 +79,15 @@ public class Utils {
 	 * 
 	 */
 	public static String KEY = "trFdcuAh"; 
+	
+	/**
+	 * @return
+	 */
+	public static String timestamp() {
+		
+		return new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
+		
+	}
 	
 	/**
 	 * @param hiddenObjectGraph
