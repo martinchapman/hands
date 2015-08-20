@@ -118,6 +118,29 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 	/**
 	 * 
 	 */
+	private int rounds;
+	
+	/**
+	 * @return
+	 */
+	public int getRounds() {
+		
+		return rounds;
+	
+	}
+
+	/**
+	 * @param rounds
+	 */
+	public void setRounds(int rounds) {
+	
+		this.rounds = rounds;
+	
+	}
+
+	/**
+	 * 
+	 */
 	private Path datafile;
 	
 	/**
@@ -207,6 +230,8 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 		this.parameters = record.getParameters();
 		
 		this.topology = record.getTopology();
+		
+		this.rounds = record.getRounds();
 		
 		this.datafile = record.getDatafile();
 		
@@ -676,12 +701,13 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 	 * 
 	 * @return
 	 */
-	public LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>> getRoundSeries() {
+	public LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>> getRoundSeries(int totalRounds) {
 	
 		// Create map to hold round numbers to average values for all attributes within that round
 		LinkedHashMap<AttributeSetIdentifier, Hashtable<String, Double>> cumulativeRoundsAttributeToValue = new LinkedHashMap<AttributeSetIdentifier, Hashtable<String, Double>>();
 		
 		int attributeAdditions = 0; 
+		
 		
 		// For each record 
 		for ( Entry<AttributeSetIdentifier, Hashtable<String, Double>> attributeEntry : attributeToValue.entrySet() ) {
@@ -693,24 +719,24 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 				for ( Entry<String, Double> attributeToValueEntry : attributeEntry.getValue().entrySet() ) {
 					
 					// If an entry for the round doesn't exist within our cumulative map (should only happen for first game processed)...
-					if ( !cumulativeRoundsAttributeToValue.containsKey( new AttributeSetIdentifier(attributeEntry.getKey().getRoundNumber()) ) ) {
+					if ( !cumulativeRoundsAttributeToValue.containsKey( new AttributeSetIdentifier(attributeEntry.getKey().getRoundNumber() % totalRounds ) ) ) {
 					
 						// Create it
-						cumulativeRoundsAttributeToValue.put(new AttributeSetIdentifier(attributeEntry.getKey().getRoundNumber()), new Hashtable<String, Double>());
+						cumulativeRoundsAttributeToValue.put(new AttributeSetIdentifier(attributeEntry.getKey().getRoundNumber() % totalRounds), new Hashtable<String, Double>());
 					
 					}
 				
 					// See if an entry for this attribute already exists at this round number, if it does, add it on 
-					if ( cumulativeRoundsAttributeToValue.get(new AttributeSetIdentifier(attributeEntry.getKey().getRoundNumber())).containsKey(attributeToValueEntry.getKey()) ) {
+					if ( cumulativeRoundsAttributeToValue.get(new AttributeSetIdentifier(attributeEntry.getKey().getRoundNumber() % totalRounds)).containsKey(attributeToValueEntry.getKey()) ) {
 						
-						cumulativeRoundsAttributeToValue.get(new AttributeSetIdentifier(attributeEntry.getKey().getRoundNumber())).put(attributeToValueEntry.getKey(), cumulativeRoundsAttributeToValue.get(new AttributeSetIdentifier(attributeEntry.getKey().getRoundNumber())).get(attributeToValueEntry.getKey()) + attributeToValueEntry.getValue() );
+						cumulativeRoundsAttributeToValue.get(new AttributeSetIdentifier(attributeEntry.getKey().getRoundNumber() % totalRounds)).put(attributeToValueEntry.getKey(), cumulativeRoundsAttributeToValue.get(new AttributeSetIdentifier(attributeEntry.getKey().getRoundNumber() % totalRounds)).get(attributeToValueEntry.getKey()) + attributeToValueEntry.getValue() );
 					
 						attributeAdditions++;
 						
 					// Otherwise create this entry, at that round number
 					} else {
 						
-						cumulativeRoundsAttributeToValue.get(new AttributeSetIdentifier(attributeEntry.getKey().getRoundNumber())).put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
+						cumulativeRoundsAttributeToValue.get(new AttributeSetIdentifier(attributeEntry.getKey().getRoundNumber() % totalRounds)).put(attributeToValueEntry.getKey(), attributeToValueEntry.getValue());
 						
 						attributeAdditions++;
 						

@@ -3,9 +3,7 @@ package Utility.output;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -18,7 +16,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
@@ -26,7 +23,7 @@ import Utility.ComparatorResult;
 import Utility.Metric;
 import Utility.TraverserDataset;
 import Utility.Utils;
-import Utility.output.gnuplot.GNU3DGraph;
+import Utility.output.gnuplot.GNU3DCollection;
 import Utility.output.gnuplot.GNUBarGraph;
 import Utility.output.gnuplot.GNUGraph;
 import Utility.output.gnuplot.GNULineGraph;
@@ -89,7 +86,7 @@ public class OutputManager {
 	 */
 	public ArrayList<Datafile> availableFiles() {
 		
-		ArrayList<Path> files = listFilesForFolder(new File(FILEPREFIX + "data"));
+		ArrayList<Path> files = Utils.listFilesForFolder(new File(FILEPREFIX + "data"));
 		
 		ArrayList<Datafile> availableFiles = new ArrayList<Datafile>();
 		
@@ -216,6 +213,8 @@ public class OutputManager {
 		
 		String topology = "";
 		
+		int rounds = -1;
+		
 		for ( String parameter : parameters.split(" ") ) {
 			
 			String[] keyAndValue = parameter.split(",");
@@ -223,6 +222,10 @@ public class OutputManager {
 			if ( keyAndValue[0].replace("{", "").equals("Topology") ) {
 				
 				topology = keyAndValue[1].replace("}", "");
+				
+			} else if ( keyAndValue[0].replace("{", "").equals("Rounds") ) {
+				
+				rounds = Integer.parseInt(keyAndValue[1].replace("}", ""));
 				
 			}
 			
@@ -277,6 +280,8 @@ public class OutputManager {
 								
 								hiderRecords.get(hiderRecords.size() - 1 ).setTopology(topology);
 								
+								hiderRecords.get(hiderRecords.size() - 1 ).setRounds(rounds);
+								
 								hiderRecords.get(hiderRecords.size() - 1 ).setParameters(parameters);
 								
 								hiderRecords.get(hiderRecords.size() - 1 ).setDatafile(path);
@@ -294,6 +299,8 @@ public class OutputManager {
 								hiderRecords.add(new HiderRecord(path, word));
 								
 								hiderRecords.get(hiderRecords.size() - 1 ).setTopology(topology);
+								
+								hiderRecords.get(hiderRecords.size() - 1 ).setRounds(rounds);
 								
 								hiderRecords.get(hiderRecords.size() - 1 ).setParameters(parameters);
 								
@@ -318,6 +325,8 @@ public class OutputManager {
 								
 								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker("MixedSeekerStrats").setTopology(topology);
 								
+								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker("MixedSeekerStrats").setRounds(rounds);
+								
 								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker("MixedSeekerStrats").setDatafile(path);
 							
 							}
@@ -332,6 +341,8 @@ public class OutputManager {
 								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).addSeeker(new TraverserRecord(word));
 								
 								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker(word).setTopology(topology);
+								
+								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker(word).setRounds(rounds);
 								
 								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker(word).setDatafile(path);
 							
@@ -450,7 +461,7 @@ public class OutputManager {
 			
 		} else if ( gameOrRound.equals("Round") ) {
 
-			return new LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>>(traverser.getRoundSeries());
+			return new LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>>(traverser.getRoundSeries(traverser.getRounds()));
 			
 		} else {
 			
@@ -656,6 +667,14 @@ public class OutputManager {
 	 */
 	public void showGraphForAttribute(ArrayList<TraverserRecord> playerRecords, ArrayList<TraverserRecord> traverserRecords, String gameOrRound, String title, String graphType, String xLabel, String yLabel, String category, boolean outputEnabled) {
 		
+		if (traverserRecords.size() == 0 || playerRecords.size() == 0) {
+			
+			System.err.println("Warning, no traverser supplied");
+			
+			return;
+			
+		}
+			
 		SignificanceTable significanceTable = new SignificanceTable(); 
 		
 		if ( graphType.equals("Bar") ) SHOW_OPPONENT = false;
@@ -690,7 +709,7 @@ public class OutputManager {
 			
 			} else if (graphType.equals("3D")) {
 				
-				graph = new GNU3DGraph(title, textBased);
+				graph = new GNU3DCollection(title, textBased);
 				
 			}
 			
@@ -756,63 +775,71 @@ public class OutputManager {
 			
 			if (graphType.equals("3D")) {
 				
-				String traverser = traverserRecords.get(0).getTraverser();
-				
-				// Extrapolate those values that will not 'fill' the entire 3D area to do so.
-				
-				int maxRows = Integer.MIN_VALUE;
-				
-				ArrayList<ArrayList<ArrayList<Double>>> datasets = new ArrayList<ArrayList<ArrayList<Double>>>();
-				
-				for ( Entry<String, ArrayList<ArrayList<Double>>> individualAttributeToValues : multipleAttributeToValues.entrySet()) {
+				//for ( TraverserRecord traverserRecord : traverserRecords ) {
 					
-					if ( individualAttributeToValues.getValue().size() > maxRows ) maxRows = individualAttributeToValues.getValue().size();
+					//System.out.println("TraverserRecord: " + traverserRecord);
 					
-					datasets.add(individualAttributeToValues.getValue());
+					//Extrapolate those values that will not 'fill' the entire 3D area to do so. ~MDC Deprecated?
+		
+					int maxRows = Integer.MIN_VALUE;
 					
-				}
-				
-				for ( ArrayList<ArrayList<Double>> dataset : datasets ) {
+					//ArrayList<ArrayList<ArrayList<Double>>> datasets = new ArrayList<ArrayList<ArrayList<Double>>>();
 					
-					if (dataset.size() < maxRows) {
+					for ( Entry<String, ArrayList<ArrayList<Double>>> individualAttributeToValues : multipleAttributeToValues.entrySet()) {
 						
-						for ( int i = 1; i < maxRows; i ++) {
+						if ( individualAttributeToValues.getValue().size() > maxRows ) maxRows = individualAttributeToValues.getValue().size();
+					
+						//for ( ArrayList<ArrayList<Double>> dataset : datasets ) {
+						
+						if (individualAttributeToValues.getValue().size() < maxRows) {
 							
-							dataset.add(dataset.get(0));
+							for ( int i = 1; i < maxRows; i ++) {
+								
+								individualAttributeToValues.getValue().add(individualAttributeToValues.getValue().get(0));
+								
+							}
 							
 						}
 						
-					}
-					
-					((GNU3DGraph) graph).addDataset(traverserRecords.get(0).getTraverser(), dataset);
-					
-				}
-				
-				((GNU3DGraph) graph).setZAxisLabel(yLabel);
-				
-				//traverser = traverser.substring(traverser.indexOf("Variable"), traverser.length());
-				
-				String[] labels = traverser.split("Variable");
-				
-				for ( int i = 0; i < labels.length; i++ ) {
-					
-					if ( labels[i].contains("-") ) {
+						((GNU3DCollection) graph).addDataset(individualAttributeToValues.getKey(), individualAttributeToValues.getValue());
 						
-						labels[i] = labels[i].substring(0, labels[i].indexOf("-"));
+					//}
+					
+						((GNU3DCollection) graph).setZAxisLabel(yLabel);
+					
+					/*if ( traverserRecord.getTraverser().toString().contains("Variable") ) {
+					
+						String traverser = traverserRecord.getTraverser().toString();
 						
+						traverser = traverser.substring(traverser.indexOf("Variable"), traverser.length());
+						
+						String[] labels = traverser.split("Variable");
+						
+						for ( int i = 0; i < labels.length; i++ ) {
+							
+							if ( labels[i].contains("-") ) {
+								
+								labels[i] = labels[i].substring(0, labels[i].indexOf("-"));
+								
+							}
+							
+						}
+						
+						if (labels.length > 2 ) {
+							
+							yLabel = labels[1]; 
+						
+							xLabel = labels[2];
+						
+						}
+					
+					}*/
+					
 					}
-					
-				}
-				
-				if (labels.length > 2 ) {
-					
-					yLabel = labels[1]; 
-				
-					xLabel = labels[2];
 				
 				}
 				
-			}
+			//}
 			
 		} else if (graphType.equals("Bar")) {
 			
@@ -1183,7 +1210,7 @@ public class OutputManager {
 	public void removeAllOutputFiles() {
 		
 		// Archive instead
-		for ( Path path : listFilesForFolder(new File(FILEPREFIX + "/data")) ) { 
+		for ( Path path : Utils.listFilesForFolder(new File(FILEPREFIX + "/data")) ) { 
 			
 			File archivedFile = new File(FILEPREFIX + "/dataArchive/" + path.getFileName());
 			
@@ -1193,7 +1220,7 @@ public class OutputManager {
 			
 		}
 			
-		for ( Path path : listFilesForFolder(new File(FILEPREFIX + "/data/js/data")) ) deleteFile(path);
+		for ( Path path : Utils.listFilesForFolder(new File(FILEPREFIX + "/data/js/data")) ) deleteFile(path);
 		
 	}
 	
@@ -1204,7 +1231,7 @@ public class OutputManager {
 		
 		ArrayList<String> CSVIDs = new ArrayList<String>();
 		
-		for ( Path path : listFilesForFolder(new File(FILEPREFIX + "/data")) ) { 
+		for ( Path path : Utils.listFilesForFolder(new File(FILEPREFIX + "/data")) ) { 
 			
 			// If this is a .csv file, track its ID
 			if ( path.toString().substring(path.toString().lastIndexOf('.'), path.toString().length()).equals(".csv")) {
@@ -1216,7 +1243,7 @@ public class OutputManager {
 		}
 		
 		// For all .html files, if no corresponding .csv ID recorded, remove.
-		for ( Path path : listFilesForFolder(new File(FILEPREFIX + "/data")) ) { 
+		for ( Path path : Utils.listFilesForFolder(new File(FILEPREFIX + "/data")) ) { 
 			
 			if ( path.toString().contains("-") && !CSVIDs.contains( path.toString().substring(path.toString().lastIndexOf('/') + 1, path.toString().lastIndexOf('-')) )) {
 				
@@ -1227,7 +1254,7 @@ public class OutputManager {
 		}
 		
 		// Similar for .js files
-		for ( Path path : listFilesForFolder(new File(FILEPREFIX + "/data/js/data")) ) {
+		for ( Path path : Utils.listFilesForFolder(new File(FILEPREFIX + "/data/js/data")) ) {
 			
 			if ( path.toString().contains("-") && !CSVIDs.contains( path.toString().substring(path.toString().lastIndexOf('/') + 1, path.toString().lastIndexOf('-')) )) {
 				
@@ -1267,46 +1294,9 @@ public class OutputManager {
 	 * @param path
 	 */
 	public void deleteFile(Path path) {
-		
-		try {
-		    
-			Files.delete(path);
-		    
-		} catch (NoSuchFileException x) {
-		    
-			System.err.format("%s: no such" + " file or directory%n", path);
-		
-		} catch (DirectoryNotEmptyException x) {
-		
-			System.err.format("%s not empty%n", path);
-		
-		} catch (IOException x) {
-		
-			// File permission problems are caught here.
-		    System.err.println(x);
-		}
 	
-	}
+		Utils.deleteFile(path);
 	
-	/**
-	 * @param folder
-	 */
-	private ArrayList<Path> listFilesForFolder(final File folder) {
-		
-		ArrayList<Path> files = new ArrayList<Path>();
-		
-	    for (final File fileEntry : folder.listFiles()) {
-	    	
-	        if (!fileEntry.isDirectory()) {
-	        
-	        	files.add(Paths.get(fileEntry.getAbsolutePath()));
-	        
-	        }
-	        
-	    }
-	    
-	    return files;
-	    
 	}
 	
 	/* (non-Javadoc)

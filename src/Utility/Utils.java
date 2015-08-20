@@ -17,6 +17,11 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.AbstractCollection;
 import java.util.ArrayList;
@@ -24,6 +29,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -79,6 +85,68 @@ public class Utils {
 	 * 
 	 */
 	public static String KEY = "trFdcuAh"; 
+	
+	
+	/**
+	 * @param path
+	 */
+	public static void deleteFile(Path path) {
+		
+		try {
+		    
+			Files.delete(path);
+		    
+		} catch (NoSuchFileException x) {
+		    
+			System.err.format("%s: no such" + " file or directory%n", path);
+		
+		} catch (DirectoryNotEmptyException x) {
+		
+			System.err.format("%s not empty%n", path);
+		
+		} catch (IOException x) {
+		
+			// File permission problems are caught here.
+		    System.err.println(x);
+		}
+	
+	}
+	
+	/**
+	 * @param folder
+	 */
+	public static ArrayList<Path> listFilesForFolder(final File folder) {
+		
+		ArrayList<Path> files = new ArrayList<Path>();
+		
+	    for (final File fileEntry : folder.listFiles()) {
+	    	
+	        if (!fileEntry.isDirectory()) {
+	        
+	        	files.add(Paths.get(fileEntry.getAbsolutePath()));
+	        
+	        }
+	        
+	    }
+	    
+	    return files;
+	    
+	}
+	
+	/**
+	 * @param integers
+	 * @return
+	 */
+	public static int[] convertIntegers(List<Integer> integers)
+	{
+	    int[] ret = new int[integers.size()];
+	    Iterator<Integer> iterator = integers.iterator();
+	    for (int i = 0; i < ret.length; i++)
+	    {
+	        ret[i] = iterator.next().intValue();
+	    }
+	    return ret;
+	}
 	
 	/**
 	 * @return

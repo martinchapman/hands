@@ -238,11 +238,17 @@ public class BinomialProbability {
 		//Deprecated
 		//graph.setXStart(1);
 		
+		graph.startsAtOne();
+		
 		graph.addDataset("", values);
 		
 		graph.styleGraph();
 		
 		graph.createChart("", "$\\delta$ ($K$)", "$P$");
+		
+		graph.exportChartAsEPS(Utils.FILEPREFIX + "data/charts/binomial.eps");
+		
+		graph.exportChartAsTikz(Utils.FILEPREFIX + "data/charts/binomial.tex");
 		
 	}
 	
@@ -251,9 +257,9 @@ public class BinomialProbability {
 	 */
 	public static void main(String[] args) {
 		
-		// generateForDeceptive()
-		
 		BinomialProbability bp = new BinomialProbability(2, 2, 100, 5);
+		
+		bp.generateForDeceptive();
 		
 		System.out.println(bp.calculateRthInNth(2, 2));
 		

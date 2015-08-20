@@ -313,7 +313,7 @@ public class Runner extends JFrame {
 	 * @param deleted
 	 */
 	private void deleteOnClick(final JList<?> list, final DefaultListModel<?> model, final PostDelete deleted) {
-		
+	
 		list.addMouseListener(new MouseAdapter() {
 		    
 			public void mouseClicked(MouseEvent evt) {
@@ -815,6 +815,10 @@ public class Runner extends JFrame {
 					if ( record instanceof GroupedHiderRecords ) { 
 						
 						recordsForGraph.addAll(((GroupedHiderRecords)record).allHiders());
+						
+					} else {
+						
+						recordsForGraph.add(record);
 						
 					}
 					
@@ -1511,6 +1515,9 @@ public class Runner extends JFrame {
 	
 	private boolean KILL_AFTER_SIM = false;
 	
+	/**
+	 * @param args
+	 */
 	public Runner(String[] args) {
 		
 		this();
@@ -1529,291 +1536,375 @@ public class Runner extends JFrame {
 			
 			outputManager.setTextBased(true);
 			
-			while ( true ) {
+			textMenu(in);
+			
+		}
+		
+		in.close();
+		
+	}
+	
+	public void simulationSchedule(Scanner in) {
+		
+		String response;
+		
+		while (true) {
+			
+			for ( Object item : itemsInList(queueListModel) ) {
 				
-				String response = askQuestion("\nMain menu :) \n(1) List simulation schedule \n(2) List complete simulations", in);
+				String itemText;
 				
-				if ( response.equals("1") ) {
+				if ( SHORT_TEXT_UI ) itemText = item.toString().substring(0,  item.toString().indexOf("EdgeWeight") - 2);
+				
+				System.out.println("("+ itemsInList(queueListModel).indexOf(item) + ") " + itemText);
+				
+				System.out.println("------------------------------------------------------------------------------------");
+				
+			}
+			
+			response = askQuestion("Enter single number to start simulation, or list of sims to queue, or (back)", in);
+			
+			if ( !checkForBack(response) ) {
+				
+				queueList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+				
+				if ( !response.trim().contains(" ") ) {
 					
-					while (true) {
-						
-						for ( Object item : itemsInList(queueListModel) ) {
-							
-							String itemText;
-							
-							if ( SHORT_TEXT_UI ) itemText = item.toString().substring(0,  item.toString().indexOf("EdgeWeight") - 2);
-							
-							System.out.println("("+ itemsInList(queueListModel).indexOf(item) + ") " + itemText);
-							
-							System.out.println("------------------------------------------------------------------------------------");
-							
-						}
-						
-						response = askQuestion("Enter number to start simulation or (back)", in);
-						
-						if ( !checkForBack(response) ) {
-							
-							queueList.setSelectedIndex(Integer.parseInt(response));
-							
-							startSelected.doClick();
-							
-						} else {
-							
-							break;
-							
-						}
+					queueList.setSelectedIndex(Integer.parseInt(response));
 					
-					}
+				} else {
 					
-				} else if ( response.equals("2") ) {
-					
-					while (true) {
+					for ( String pair : response.split(" ") ) {
 						
-						if ( files.getModel().getSize() == 0 ) showFiles.doClick();
-						
-						for ( Object item : itemsInList(files.getModel()) ) {
-						
-							String itemText = "";
-							
-							if ( SHORT_TEXT_UI && item.toString().contains("EdgeWeight") ) itemText = item.toString().substring(0,  item.toString().indexOf("EdgeWeight") - 2);
-							
-							System.out.println("("+ itemsInList(files.getModel()).indexOf(item) + ") " + itemText);
-							
-							System.out.println("------------------------------------------------------------------------------------");
-							
-						}
-						
-						response = askQuestion("Enter number to process, (all) to process all or (back)", in);
-						
-						if ( !checkForBack(response) ) {
-						
-							if ( response.contains("all") ) {
-							
-								showFiles.doClick();
-								
-							} else {
-								
-								files.getModel().setSelectedItem(files.getModel().getElementAt(Integer.parseInt(response)));
-							
-							}
-							
-							collateOutput.doClick();
-							
-							System.out.println("");
-							
-							System.out.println("------------------------------------------");
-							
-							outputFeedbackList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-							
-							int outputIndex = 0;
-							
-							for ( Object item : itemsInList(outputFeedbackList.getModel()) ) {
-								
-								System.out.println("("+ (outputIndex++) + ") " + item);
-								
-							}
-							
-							response = "";
-							
-							while ( response.equals("") || ( response.trim().split(" ").length > ( outputFeedbackList.getModel().getSize() - 1 ) ) ) {
-							
-								response = askQuestion("Enter pair of player numbers (spaced list) or (back)", in);
-								
-								for ( String pair : response.trim().split(" ") ) {
-									
-									if (Integer.parseInt(pair) > ( response.trim().split(" ").length  - 1) ) {
-										
-										response = "";
-										
-									}
-									
-								}
-							
-							}
-							
-							if ( !checkForBack(response) ) {
-								
-								if ( response.length() == 1 ) {
-									
-									outputFeedbackList.setSelectedIndex(Integer.parseInt(response));
-									
-								} else {
-									
-									for ( String pair : response.split(" ") ) {
-										
-										outputFeedbackList.setSelectionInterval(Integer.parseInt((pair.trim())) - 1, Integer.parseInt((pair.trim())));
-										
-									}
-									
-								}
-								
-								
-								response = askQuestion("Enter hiders or seekers. (Enter) for default: " + ( hiders.isSelected() ? "hider" : "seeker" ) + " or (back).", in);
-								
-								if ( !checkForBack(response) ) {
-									
-									if ( !checkForBlank(response) ) {
-										
-										if ( response.contains("hider") ) {
-											
-											hiders.setSelected(true);
-											
-										} else {
-											
-											seekers.setSelected(true);
-											
-										}
-										
-									}
-									
-									
-									while ( !itemsInList(measure.getModel()).contains(response) ) {
-									
-										response = askQuestion("Enter measure (" + itemsInList(measure.getModel()) + "). (Enter) for default: " + measure.getModel().getElementAt(measure.getSelectedIndex()) + " or (back).", in);
-									
-										if ( response.equals("") ) break;
-										
-									}
-									
-									if ( !checkForBack(response) ) {
-										
-										if ( !checkForBlank(response) ) {
-											
-											response = response.trim();
-											
-											measure.getModel().setSelectedItem(measure.getModel().getElementAt(itemsInList(measure.getModel()).indexOf(response)));
-											
-										}
-										
-										while ( !itemsInList(graphTypesCombo.getModel()).contains(response) ) {
-										
-											response = askQuestion("Enter graph type (" + itemsInList(graphTypesCombo.getModel()) + "). (Enter) for default: " + graphTypesCombo.getModel().getElementAt(graphTypesCombo.getSelectedIndex()) + " or (back).", in);
-										
-											if ( response.equals("") ) break;
-											
-										}
-										
-										if ( !checkForBack(response) ) {
-											
-											if ( !checkForBlank(response) ) {
-												
-												response = response.trim();
-												
-												graphTypesCombo.getModel().setSelectedItem(graphTypesCombo.getModel().getElementAt(itemsInList(graphTypesCombo.getModel()).indexOf(response)));
-												
-											}
-											
-											while ( !itemsInList(categories.getModel()).contains(response) ) {
-											
-												response = askQuestion("Enter bar category (" + itemsInList(categories.getModel()) + "). (Enter) for default: " + categories.getModel().getElementAt(categories.getSelectedIndex()) + " or (back).", in);
-											
-												if ( response.equals("") ) break;
-												
-											}
-											
-											if ( !checkForBack(response) ) {
-												
-												if ( !checkForBlank(response) ) {
-													
-													response = response.trim();
-													
-													categories.getModel().setSelectedItem(categories.getModel().getElementAt(itemsInList(categories.getModel()).indexOf(response)));
-													
-												}
-												
-												while ( !itemsInList(gameOrRound.getModel()).contains(response) ) {
-												
-													response = askQuestion("Enter game or round (" + itemsInList(gameOrRound.getModel()) + "). (Enter) for default: " + gameOrRound.getModel().getElementAt(gameOrRound.getSelectedIndex()) + " or (back).", in);
-												
-													if ( response.equals("") ) break;
-													
-												}
-											
-												if ( !checkForBack(response) ) {
-													
-													if ( !checkForBlank(response) ) {
-														
-														response = response.trim();
-														
-														gameOrRound.getModel().setSelectedItem(gameOrRound.getModel().getElementAt(itemsInList(gameOrRound.getModel()).indexOf(response)));
-														
-													}
-													
-												} else {
-													
-													break;
-													
-												}
-												
-												response = "";
-												
-												while ( response.equals("") ) {
-													
-													response = askQuestion("Confirm graph output (y/n)", in);
-													
-												}
-												
-												if ( response.contains("y")) {
-													
-													outputEnabled.setSelected(true);
-													
-													generateGraph.doClick();
-												
-												}
-												
-												response = askQuestion("(exit) or (back)", in);
-												
-												if ( !checkForBack(response) ) {
-													
-													System.exit(0);
-													
-												}
-												
-											} else {
-												
-												break;
-												
-											}
-											
-										} else {
-											
-											break;
-											
-										}
-										
-									} else {
-										
-										break;
-										
-									}
-									
-								} else {
-									
-									break;
-									
-								}
-								
-							} else {
-								
-								break;
-								
-							}
-						
-						} else {
-							
-							break;
-							
-						}
+						queueList.setSelectionInterval(Integer.parseInt((pair.trim())) - 1, Integer.parseInt((pair.trim())));
 						
 					}
 					
 				}
 				
+				startSelected.doClick();
+				
+			} else {
+				
+				break;
+				
+			}
+		
+		}
+		
+	}
+	
+	public void plotGraph(Scanner in, boolean deleting) {
+		
+		String response = "";
+		
+		if ( !deleting ) System.out.println("");
+		
+		if ( !deleting ) System.out.println("------------------------------------------");
+		
+		outputFeedbackList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		
+		int outputIndex = 0;
+		
+		for ( Object item : itemsInList(outputFeedbackList.getModel()) ) {
+			
+			if ( !deleting ) System.out.println("("+ (outputIndex++) + ") " + item);
+			
+		}
+		
+		if ( deleting ) {
+			
+			outputFeedbackList.setSelectedIndex(0);
+			
+			if (!outputFeedbackList.getSelectedValue().toString().equals("-----")) {
+				
+				outputManager.deleteFile(outputFeedbackList.getSelectedValue().getFileRelatingTo());
+				
+				outputManager.removeOrphaned();
+			
+				showFiles.doClick();
+			
+				return;
+			
 			}
 			
 		}
 		
-		in.close();
+		while ( response.equals("") || ( response.trim().split(" ").length > ( outputFeedbackList.getModel().getSize() - 1 ) ) ) {
+		
+			response = askQuestion("Enter pairs of player numbers (spaced list) or (back)", in);
+			
+			if ( checkForBack(response) ) break;
+			
+			for ( String pair : response.trim().split(" ") ) {
+				
+				if (Integer.parseInt(pair) < 0 || Integer.parseInt(pair) > outputIndex ) {
+					
+					response = "";
+					
+				}
+				
+			}
+		
+		}
+		
+		if ( !checkForBack(response) ) {
+			
+			if ( !response.trim().contains(" ") ) {
+				
+				outputFeedbackList.setSelectedIndex(Integer.parseInt(response));
+				
+			} else {
+				
+				ArrayList<Integer> indices = new ArrayList<Integer>();
+				
+				for ( String index : response.trim().split(" ") ) {
+					
+					indices.add(Integer.parseInt(index));
+					
+				}
+				
+				outputFeedbackList.setSelectedIndices(Utils.convertIntegers(indices));
+				
+			}
+			
+			
+			response = askQuestion("Enter hiders or seekers. (Enter) for default: " + ( hiders.isSelected() ? "hider" : "seeker" ) + " or (back).", in);
+			
+			if ( !checkForBack(response) ) {
+				
+				if ( !checkForBlank(response) ) {
+					
+					if ( response.contains("hider") ) {
+						
+						hiders.setSelected(true);
+						
+					} else {
+						
+						seekers.setSelected(true);
+						
+					}
+					
+				}
+				
+				
+				while ( !itemsInList(measure.getModel()).contains(response) ) {
+				
+					response = askQuestion("Enter measure (" + itemsInList(measure.getModel()) + "). (Enter) for default: " + measure.getModel().getElementAt(measure.getSelectedIndex()) + " or (back).", in);
+				
+					if ( response.equals("") ) break;
+					
+				}
+				
+				if ( !checkForBack(response) ) {
+					
+					if ( !checkForBlank(response) ) {
+						
+						response = response.trim();
+						
+						measure.getModel().setSelectedItem(measure.getModel().getElementAt(itemsInList(measure.getModel()).indexOf(response)));
+						
+					}
+					
+					while ( !itemsInList(graphTypesCombo.getModel()).contains(response) ) {
+					
+						response = askQuestion("Enter graph type (" + itemsInList(graphTypesCombo.getModel()) + "). (Enter) for default: " + graphTypesCombo.getModel().getElementAt(graphTypesCombo.getSelectedIndex()) + " or (back).", in);
+					
+						if ( response.equals("") ) break;
+						
+					}
+					
+					if ( !checkForBack(response) ) {
+						
+						if ( !checkForBlank(response) ) {
+							
+							response = response.trim();
+							
+							graphTypesCombo.getModel().setSelectedItem(graphTypesCombo.getModel().getElementAt(itemsInList(graphTypesCombo.getModel()).indexOf(response)));
+							
+						}
+						
+						while ( !itemsInList(categories.getModel()).contains(response) ) {
+						
+							response = askQuestion("Enter bar category (" + itemsInList(categories.getModel()) + "). (Enter) for default: " + categories.getModel().getElementAt(categories.getSelectedIndex()) + " or (back).", in);
+						
+							if ( response.equals("") ) break;
+							
+						}
+						
+						if ( !checkForBack(response) ) {
+							
+							if ( !checkForBlank(response) ) {
+								
+								response = response.trim();
+								
+								categories.getModel().setSelectedItem(categories.getModel().getElementAt(itemsInList(categories.getModel()).indexOf(response)));
+								
+							}
+							
+							while ( !itemsInList(gameOrRound.getModel()).contains(response) ) {
+							
+								response = askQuestion("Enter game or round (" + itemsInList(gameOrRound.getModel()) + "). (Enter) for default: " + gameOrRound.getModel().getElementAt(gameOrRound.getSelectedIndex()) + " or (back).", in);
+							
+								if ( response.equals("") ) break;
+								
+							}
+						
+							if ( !checkForBack(response) ) {
+								
+								if ( !checkForBlank(response) ) {
+									
+									response = response.trim();
+									
+									gameOrRound.getModel().setSelectedItem(gameOrRound.getModel().getElementAt(itemsInList(gameOrRound.getModel()).indexOf(response)));
+									
+								}
+								
+							} else {
+								
+								return;
+								
+							}
+							
+							response = "";
+							
+							while ( response.equals("") ) {
+								
+								response = askQuestion("Confirm graph output (y/n)", in);
+								
+							}
+							
+							if ( response.contains("y")) {
+								
+								outputEnabled.setSelected(true);
+								
+								generateGraph.doClick();
+							
+							}
+							
+							response = askQuestion("(replot), (exit) or (back)", in);
+							
+							if ( !checkForBack(response) ) {
+								
+								if ( response.contains("replot") ) {
+									
+									plotGraph(in, deleting);
+									
+								} else {
+									
+									System.exit(0);
+									
+								}
+								
+							}
+							
+						} else {
+							
+							return;
+							
+						}
+						
+					} else {
+						
+						return;
+						
+					}
+					
+				} else {
+					
+					return;
+					
+				}
+				
+			} else {
+				
+				return;
+				
+			}
+			
+		} else {
+			
+			return;
+			
+		}
+		
+	}
+	
+	public void completeSimulations(Scanner in) {
+		
+		String response = "";
+		
+		while (true) {
+			
+			if ( files.getModel().getSize() == 0 ) showFiles.doClick();
+			
+			for ( Object item : itemsInList(files.getModel()) ) {
+			
+				String itemText = "";
+				
+				if ( SHORT_TEXT_UI && item.toString().contains("EdgeWeight") ) itemText = item.toString().substring(0,  item.toString().indexOf("EdgeWeight") - 2);
+				
+				System.out.println("("+ itemsInList(files.getModel()).indexOf(item) + ") " + itemText);
+				
+				System.out.println("------------------------------------------------------------------------------------");
+				
+			}
+			
+			response = askQuestion("Enter number to process, (all) to process all or (back). D<N> deletes.", in);
+			
+			boolean deleting = false;
+			
+			if ( !checkForBack(response) ) {
+			
+				if ( response.contains("all") ) {
+				
+					showFiles.doClick();
+					
+				} else {
+					
+					if ( response.contains("D") ) {
+						
+						deleting = true;
+						
+						response = response.replace("D", "");
+						
+					}
+					
+					files.getModel().setSelectedItem(files.getModel().getElementAt(Integer.parseInt(response)));
+				
+				}
+				
+				collateOutput.doClick();
+				
+				plotGraph(in, deleting);
+			
+			} else {
+				
+				break;
+				
+			}
+			
+		}
+		
+	}
+	
+	public void textMenu(Scanner in) {
+		
+		while ( true ) {
+			
+			String response = askQuestion("\nMain menu :) \n(1) List simulation schedule \n(2) List complete simulations", in);
+			
+			if ( response.equals("1") ) {
+				
+				simulationSchedule(in);
+				
+			} else if ( response.equals("2") ) {
+				
+				completeSimulations(in);
+				
+			}
+			
+		}
 		
 	}
 	
@@ -2227,9 +2318,10 @@ public class Runner extends JFrame {
 		
 		/***********/
 		
-		// Generate ID For this simulation
+		if ( !namePrefix.equals("") ) namePrefix = namePrefix + "-";
 		
-		String currentSimulationIdentifier = namePrefix + "-" + ( Utils.timestamp() );
+		// Generate ID For this simulation
+		String currentSimulationIdentifier = namePrefix + ( Utils.timestamp() );
 		
 		Utils.writeToFile(Utils.FILEPREFIX + "simRecordID.txt", currentSimulationIdentifier);
 		
