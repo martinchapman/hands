@@ -807,6 +807,7 @@ public class OutputManager {
 					
 						((GNU3DCollection) graph).setZAxisLabel(yLabel);
 					
+					// ~MDC 20/8 May need putting back in if 'variable' in traverser name 
 					/*if ( traverserRecord.getTraverser().toString().contains("Variable") ) {
 					
 						String traverser = traverserRecord.getTraverser().toString();
@@ -1233,8 +1234,10 @@ public class OutputManager {
 		
 		for ( Path path : Utils.listFilesForFolder(new File(FILEPREFIX + "/data")) ) { 
 			
+			if ( !path.toString().contains(".") ) continue;
+			
 			// If this is a .csv file, track its ID
-			if ( path.toString().substring(path.toString().lastIndexOf('.'), path.toString().length()).equals(".csv")) {
+			if ( path.toString().substring(path.toString().lastIndexOf("."), path.toString().length()).equals(".csv")) {
 				
 				CSVIDs.add(path.toString().substring(path.toString().lastIndexOf('/') + 1, path.toString().lastIndexOf('.')));
 			

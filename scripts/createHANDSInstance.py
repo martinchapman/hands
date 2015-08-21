@@ -2,11 +2,13 @@ import shutil, errno, os, subprocess, datetime, time, sys
 
 nocopy = False
 nokill = False
+nodelete = False
 
 if ( len(sys.argv) > 0 ):
     for arg in sys.argv:
         if ( arg == "-ncp"):
             nocopy = True
+	    nodelete = True
         if ( arg == "-nk"):
             nokill = True
         
@@ -75,16 +77,21 @@ my_env["AWT_FORCE_HEADFUL"] = "true";
 
 print "Running HANDS..."
 
-if (nokill == True):
-    subprocess.call(['/Library/Java/JavaVirtualMachines/jdk1.8.0_25.jdk/Contents/Home/bin/java', '-XX:-UseGCOverheadLimit', '-Xmx5g', '-Dfile.encoding=US-ASCII', '-classpath', target_directory + '/bin:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/epsgraphics.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/jcommon-1.0.21.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/jfreechart-1.0.17.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/jgrapht-core-0.9.0.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/jgraph-sna.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/java-plot.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/commons-math3-3.4.1.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/bsh-2.0b4.jar', 'Utility.Runner', '-t'], env=my_env)
-else:
-    subprocess.call(['/Library/Java/JavaVirtualMachines/jdk1.8.0_25.jdk/Contents/Home/bin/java', '-XX:-UseGCOverheadLimit', '-Xmx5g', '-Dfile.encoding=US-ASCII', '-classpath', target_directory + '/bin:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/epsgraphics.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/jcommon-1.0.21.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/jfreechart-1.0.17.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/jgrapht-core-0.9.0.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/jgraph-sna.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/java-plot.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/commons-math3-3.4.1.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/bsh-2.0b4.jar', 'Utility.Runner', '-t', '-k'], env=my_env)
-    
+try:
+    if (nokill == True):
+        subprocess.call(['/Library/Java/JavaVirtualMachines/jdk1.8.0_25.jdk/Contents/Home/bin/java', '-XX:-UseGCOverheadLimit', '-Xmx5g', '-Dfile.encoding=US-ASCII', '-classpath', target_directory + '/bin:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/epsgraphics.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/jcommon-1.0.21.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/jfreechart-1.0.17.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/jgrapht-core-0.9.0.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/jgraph-sna.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/java-plot.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/commons-math3-3.4.1.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/bsh-2.0b4.jar', 'Utility.Runner', '-t'], env=my_env)
+    else:
+        subprocess.call(['/Library/Java/JavaVirtualMachines/jdk1.8.0_25.jdk/Contents/Home/bin/java', '-XX:-UseGCOverheadLimit', '-Xmx5g', '-Dfile.encoding=US-ASCII', '-classpath', target_directory + '/bin:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/epsgraphics.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/jcommon-1.0.21.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/jfreechart-1.0.17.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/jgrapht-core-0.9.0.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/jgraph-sna.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/java-plot.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/commons-math3-3.4.1.jar:/Volumes/Storage/Dropbox/workspace/SearchGames/lib/bsh-2.0b4.jar', 'Utility.Runner', '-t', '-k'], env=my_env)
+except KeyboardInterrupt:
+    print "Quitting HANDS."
+    nocopy = True
+   
 if (nocopy == False):
     print "Simulation(s) complete. Moving files to main directory."
 
     copymultiple(target_directory + "/output/data/", root_copy_directory + "/output/data/")
 
+if (nodelete == False):
     print "Deleting temporary directory"
 
     shutil.rmtree(target_directory)

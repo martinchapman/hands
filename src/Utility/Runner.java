@@ -242,15 +242,7 @@ public class Runner extends JFrame {
 	 */
 	public static void main(String args[]) {
 		
-		if ( args.length > 0 ) { 
-			
-			new Runner(args);
-			
-		} else {
-			
-			new Runner();
-			
-		}
+		new Runner(args);
 		
 	}
 	
@@ -368,7 +360,7 @@ public class Runner extends JFrame {
 		
 		pack();
 		
-		setVisible(true);
+		if (!textBased) setVisible(true);
 		
 	}
 	
@@ -1513,38 +1505,11 @@ public class Runner extends JFrame {
 	
 	private final static boolean SHORT_TEXT_UI = true;
 	
-	private boolean KILL_AFTER_SIM = false;
+	private boolean textBased = false;
 	
-	/**
-	 * @param args
-	 */
-	public Runner(String[] args) {
-		
-		this();
-		
-		ArrayList<String> argsList = new ArrayList<String>(Arrays.asList(args));
-		
-		Scanner in = new Scanner(System.in);
+	private boolean killAfterSim = false;
 	
-		if ( argsList.contains("-k") ) {
-			
-			KILL_AFTER_SIM = true;
-			
-		}
-		
-		if ( argsList.contains("-t") ) {
-			
-			outputManager.setTextBased(true);
-			
-			textMenu(in);
-			
-		}
-		
-		in.close();
-		
-	}
-	
-	public void simulationSchedule(Scanner in) {
+	public void simulationSchedule(Scanner in) throws NumberFormatException {
 		
 		String response;
 		
@@ -1574,11 +1539,15 @@ public class Runner extends JFrame {
 					
 				} else {
 					
-					for ( String pair : response.split(" ") ) {
+					ArrayList<Integer> indices = new ArrayList<Integer>();
+					
+					for ( String index : response.trim().split(" ") ) {
 						
-						queueList.setSelectionInterval(Integer.parseInt((pair.trim())) - 1, Integer.parseInt((pair.trim())));
+						indices.add(Integer.parseInt(index));
 						
 					}
+					
+					queueList.setSelectedIndices(Utils.convertIntegers(indices));
 					
 				}
 				
@@ -1594,7 +1563,7 @@ public class Runner extends JFrame {
 		
 	}
 	
-	public void plotGraph(Scanner in, boolean deleting) {
+	public void plotGraph(Scanner in, boolean deleting) throws NumberFormatException {
 		
 		String response = "";
 		
@@ -1788,7 +1757,21 @@ public class Runner extends JFrame {
 								
 								if ( response.contains("replot") ) {
 									
-									plotGraph(in, deleting);
+									while ( true ) {
+									
+										try {
+										
+											plotGraph(in, deleting);
+											
+											break;
+										
+										} catch (NumberFormatException e ) {
+											
+											System.out.println("Input error, restarting...");
+											
+										}
+									
+									}
 									
 								} else {
 									
@@ -1830,7 +1813,7 @@ public class Runner extends JFrame {
 		
 	}
 	
-	public void completeSimulations(Scanner in) {
+	public void completeSimulations(Scanner in) throws NumberFormatException {
 		
 		String response = "";
 		
@@ -1850,7 +1833,17 @@ public class Runner extends JFrame {
 				
 			}
 			
-			response = askQuestion("Enter number to process, (all) to process all or (back). D<N> deletes.", in);
+			response = "";
+			
+			while ( response == "") {
+			
+				response = askQuestion("Enter number to process, (all) to process all or (back). D<N> deletes.", in);
+				
+				if ( response.contains("D") ) response = response.replace("D", "");
+				
+				if ( Integer.parseInt(response) < 0 || Integer.parseInt(response) > ( itemsInList(files.getModel()).size() - 1 ) ) response = "";
+				
+			}
 			
 			boolean deleting = false;
 			
@@ -1876,7 +1869,21 @@ public class Runner extends JFrame {
 				
 				collateOutput.doClick();
 				
-				plotGraph(in, deleting);
+				while ( true ) {
+					
+					try {
+						
+						plotGraph(in, deleting);
+						
+						break;
+					
+					} catch (NumberFormatException e ) { 
+						
+						System.out.println("Input error, restarting...");
+						
+					}
+				
+				}
 			
 			} else {
 				
@@ -1888,7 +1895,7 @@ public class Runner extends JFrame {
 		
 	}
 	
-	public void textMenu(Scanner in) {
+	public void textMenu(Scanner in) throws NumberFormatException {
 		
 		while ( true ) {
 			
@@ -1909,12 +1916,62 @@ public class Runner extends JFrame {
 	}
 	
 	/**
-	 * 
+	 * @param args
 	 */
-	public Runner() {
+	public Runner(String[] args) {
 		
 		super("HANDS");
 		
+		if ( args.length > 0 ) {
+			
+			ArrayList<String> argsList = new ArrayList<String>(Arrays.asList(args));
+			
+			if ( argsList.contains("-k") ) {
+				
+				killAfterSim = true;
+				
+			}
+			
+			if ( argsList.contains("-t") ) {
+				
+				textBased = true;
+				
+			}
+			
+		}
+		
+		init();
+		
+		if ( textBased ) {
+			
+			Scanner in = new Scanner(System.in);
+			
+			outputManager.setTextBased(true);
+			
+			while ( true ) {
+				
+				try {
+				
+					textMenu(in);
+				
+					break;
+					
+				} catch (NumberFormatException e) {
+					
+					System.out.println("Input error, restarting...");
+				
+				}
+				
+			}
+			
+			in.close();
+			
+		}
+		
+	}
+	
+	private void init() {
+	
 		generateGUI();
 		
 		// Collect list of simulations
@@ -1939,7 +1996,7 @@ public class Runner extends JFrame {
 				
 				runSimulation(Integer.parseInt(numberOfGames.getText()), getUISettings());
 				
-				if (KILL_AFTER_SIM) System.exit(0);
+				if (killAfterSim) System.exit(0);
 				
 			}
         	
@@ -1960,7 +2017,7 @@ public class Runner extends JFrame {
 	        	
 				}
 				
-				if (KILL_AFTER_SIM) System.exit(0);
+				if (killAfterSim) System.exit(0);
 				
 			}
         	
@@ -2006,7 +2063,7 @@ public class Runner extends JFrame {
 				
 				runSimulationList(simulations);
 				
-				if (KILL_AFTER_SIM) System.exit(0);
+				if (killAfterSim) System.exit(0);
 				
 			}
         	

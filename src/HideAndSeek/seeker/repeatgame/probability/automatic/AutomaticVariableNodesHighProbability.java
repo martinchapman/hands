@@ -14,7 +14,7 @@ public class AutomaticVariableNodesHighProbability extends VariableNodesHighProb
 	public AutomaticVariableNodesHighProbability(
 			GraphController <StringVertex, StringEdge> graphController) {
 		
-		super(graphController, Integer.MAX_VALUE);
+		super(graphController, Integer.MAX_VALUE, true);
 		
 	}
 	

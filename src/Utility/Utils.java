@@ -242,6 +242,7 @@ public class Utils {
 		shortenedNames.put("sBreadthFirstSearchGreedy", "sBFSGreedy");
 		shortenedNames.put("sSelfAvoidingRandomWalk", "sRandomWalk");
 		shortenedNames.put("sNotConnecting", "sNotConnected");
+		shortenedNames.put("hUniqueRandomSetRepeat", "hUniqueRandomSet");
 		
 		//
 		

@@ -15,13 +15,22 @@ import HideAndSeek.graph.StringVertex;
 public class VariableNodesHighProbability extends HighProbability {
 	
 	public VariableNodesHighProbability(
-			GraphController <StringVertex, StringEdge> graphController, int predictiveNodes) {
-		super(graphController);
+			GraphController <StringVertex, StringEdge> graphController, int predictiveNodes, boolean variablePredictiveNodes) {
+		
+		this(graphController, "", predictiveNodes, variablePredictiveNodes);
+		
+	}
+
+	public VariableNodesHighProbability(
+			GraphController<StringVertex, StringEdge> graphController,
+			String name, int predictiveNodes, boolean variablePredictiveNodes) {
+		
+		super(graphController, name);
 		
 		this.predictiveNodes = predictiveNodes;
 		
-		strategyOverRounds = true;
-		
+		if (variablePredictiveNodes) strategyOverRounds = true;
+			
 	}
 	
 }

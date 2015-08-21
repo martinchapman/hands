@@ -1080,27 +1080,13 @@ public class Main {
 			
 			if (seekerType.getElement0().equals("HighProbabilityK")) {
 				
-				allSeekingAgents.add(new VariableNodesHighProbability(graphController, numberOfHideLocations));
+				allSeekingAgents.add(new VariableNodesHighProbability(graphController, "HighProbabilityK", numberOfHideLocations, false));
 				
 			}
 			
 			if (seekerType.getElement0().equals("VariableNodesHighProbability")) {
 				
-				allSeekingAgents.add(new VariableNodesHighProbability(graphController, gameNumber));
-				
-			}
-			
-			if (seekerType.getElement0().equals("VariableNodesHighProbabilityTemp")) {
-				
-				allSeekingAgents.add(new VariableNodesHighProbability(graphController, gameNumber) {
-					
-					public boolean strategyOverRounds() {
-						
-						return false;
-						
-					}
-					
-				});
+				allSeekingAgents.add(new VariableNodesHighProbability(graphController, gameNumber, true));
 				
 			}
 			
