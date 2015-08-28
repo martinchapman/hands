@@ -8,6 +8,7 @@ import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.seeker.Seeker;
+import Utility.Pair;
 
 /**
  * @author Martin
@@ -15,20 +16,9 @@ import HideAndSeek.seeker.Seeker;
  */
 public class AdaptiveHidingAgent<E extends Hider & AdaptiveGraphTraverser> extends AdaptiveGraphTraversingAgent<E> implements Hider {
 
-	
-
 	public AdaptiveHidingAgent(
 			GraphController<StringVertex, StringEdge> graphController,
-			String name, ArrayList<E> strategyPortfolio, int totalRounds,
-			double cueTriggerThreshold, boolean canReuse) {
-		super(graphController, name, strategyPortfolio, totalRounds,
-				cueTriggerThreshold, canReuse);
-		// TODO Auto-generated constructor stub
-	}
-
-	public AdaptiveHidingAgent(
-			GraphController<StringVertex, StringEdge> graphController,
-			ArrayList<E> strategyPortfolio, int totalRounds,
+			ArrayList<Pair<E, Double>> strategyPortfolio, int totalRounds,
 			double cueThreshold, boolean canReuse) {
 		super(graphController, strategyPortfolio, totalRounds, cueThreshold, canReuse);
 		// TODO Auto-generated constructor stub
@@ -36,7 +26,7 @@ public class AdaptiveHidingAgent<E extends Hider & AdaptiveGraphTraverser> exten
 
 	public AdaptiveHidingAgent(
 			GraphController<StringVertex, StringEdge> graphController,
-			ArrayList<E> strategyPortfolio, int totalRounds,
+			ArrayList<Pair<E, Double>> strategyPortfolio, int totalRounds,
 			String initialStrategy, double cueThreshold, boolean canReuse) {
 		super(graphController, strategyPortfolio, totalRounds, initialStrategy,
 				cueThreshold, canReuse);
@@ -45,7 +35,7 @@ public class AdaptiveHidingAgent<E extends Hider & AdaptiveGraphTraverser> exten
 
 	public AdaptiveHidingAgent(
 			GraphController<StringVertex, StringEdge> graphController,
-			ArrayList<E> strategyPortfolio, int totalRounds,
+			ArrayList<Pair<E, Double>> strategyPortfolio, int totalRounds,
 			String currentStrategy) {
 		super(graphController, strategyPortfolio, totalRounds, currentStrategy);
 		// TODO Auto-generated constructor stub
@@ -53,15 +43,25 @@ public class AdaptiveHidingAgent<E extends Hider & AdaptiveGraphTraverser> exten
 
 	public AdaptiveHidingAgent(
 			GraphController<StringVertex, StringEdge> graphController,
-			ArrayList<E> strategyPortfolio, int totalRounds) {
+			ArrayList<Pair<E, Double>> strategyPortfolio, int totalRounds) {
 		super(graphController, strategyPortfolio, totalRounds);
 		// TODO Auto-generated constructor stub
 	}
 
 	public AdaptiveHidingAgent(
 			GraphController<StringVertex, StringEdge> graphController,
-			String name, ArrayList<E> strategyPortfolio, int totalRounds,
-			String initialStrategy, double cueTriggerThreshold, boolean canReuse) {
+			String name, ArrayList<Pair<E, Double>> strategyPortfolio,
+			int totalRounds, double cueTriggerThreshold, boolean canReuse) {
+		super(graphController, name, strategyPortfolio, totalRounds,
+				cueTriggerThreshold, canReuse);
+		// TODO Auto-generated constructor stub
+	}
+
+	public AdaptiveHidingAgent(
+			GraphController<StringVertex, StringEdge> graphController,
+			String name, ArrayList<Pair<E, Double>> strategyPortfolio,
+			int totalRounds, String initialStrategy,
+			double cueTriggerThreshold, boolean canReuse) {
 		super(graphController, name, strategyPortfolio, totalRounds, initialStrategy,
 				cueTriggerThreshold, canReuse);
 		// TODO Auto-generated constructor stub
@@ -69,15 +69,16 @@ public class AdaptiveHidingAgent<E extends Hider & AdaptiveGraphTraverser> exten
 
 	public AdaptiveHidingAgent(
 			GraphController<StringVertex, StringEdge> graphController,
-			String name, ArrayList<E> strategyPortfolio, int totalRounds,
-			String initialStrategy) {
+			String name, ArrayList<Pair<E, Double>> strategyPortfolio,
+			int totalRounds, String initialStrategy) {
 		super(graphController, name, strategyPortfolio, totalRounds, initialStrategy);
 		// TODO Auto-generated constructor stub
 	}
 
 	public AdaptiveHidingAgent(
 			GraphController<StringVertex, StringEdge> graphController,
-			String name, ArrayList<E> strategyPortfolio, int totalRounds) {
+			String name, ArrayList<Pair<E, Double>> strategyPortfolio,
+			int totalRounds) {
 		super(graphController, name, strategyPortfolio, totalRounds);
 		// TODO Auto-generated constructor stub
 	}

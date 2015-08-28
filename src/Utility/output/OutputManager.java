@@ -19,8 +19,13 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import org.mapdblocal.BTreeMap;
+import org.mapdblocal.HTreeMap;
+import org.mapdblocal.DB;
+
 import Utility.ComparatorResult;
 import Utility.Metric;
+import Utility.Pair;
 import Utility.TraverserDataset;
 import Utility.Utils;
 import Utility.output.gnuplot.GNU3DCollection;
@@ -42,12 +47,17 @@ public class OutputManager {
 	/**
 	 * 
 	 */
-	private boolean SHOW_OPPONENT = true;
+	protected boolean SHOW_OPPONENT = true;
 	
 	/**
 	 * 
 	 */
-	private boolean textBased = false;
+	protected boolean textBased = false;
+	
+	/**
+	 * Whether to regularly encourage garbage collection
+	 */
+	protected static boolean GARBAGE = false;
 	
 	/**
 	 * @param textBased
@@ -60,16 +70,17 @@ public class OutputManager {
 	
 	/**
 	 * Multiple hiders per file, and multiple files.
+	 * (was ArrayList<ArrayList<HiderRecord>>)
 	 */
-	private ArrayList<ArrayList<HiderRecord>> fileHiderRecords;
+	private ArrayList<ArrayList<HiderRecord>> cache;
 	
 	/**
 	 * @return
 	 */
-	public ArrayList<ArrayList<HiderRecord>> getFileHiderRecords() {
+	public ArrayList<ArrayList<HiderRecord>> getCache() {
 		
-		return fileHiderRecords;
-		
+        return cache;
+        
 	}
 	
 	/**
@@ -77,7 +88,7 @@ public class OutputManager {
 	 */
 	public OutputManager() {
 		
-		fileHiderRecords = new ArrayList<ArrayList<HiderRecord>>();
+		cache = new ArrayList<ArrayList<HiderRecord>>();
 		
 	}
 	
@@ -139,8 +150,6 @@ public class OutputManager {
 	 */
 	public void processAllOutput() {
 		
-		fileHiderRecords.clear();
-		
 		for ( Datafile datafile : availableFiles() ) {
 			
 			processOutput(datafile);
@@ -154,14 +163,12 @@ public class OutputManager {
 	 */
 	public void processIndividualOutput(Datafile datafile) {
 		
-		fileHiderRecords.clear();
-		
 		processOutput(datafile);
 		
 	}
 	
 	public void processOutput(Datafile datafile) {
-		
+        
 		if ( datafile instanceof GroupedDatafiles ) {
 			
 			ArrayList<HiderRecord> groupedHiderRecords = new ArrayList<HiderRecord>();
@@ -169,6 +176,8 @@ public class OutputManager {
 			ArrayList<ArrayList<HiderRecord>> toBeSplit = new ArrayList<ArrayList<HiderRecord>>();
 			
 			for ( Datafile file : ((GroupedDatafiles)datafile).getAllDatafiles() ) {
+				
+				System.out.println("\nProcessing datafile");
 				
 				toBeSplit.add(createHiderRecords(file.getPath()));
 				
@@ -185,16 +194,16 @@ public class OutputManager {
 				for ( HiderRecord individualRecord : individualRecordList ) {
 				
 					((GroupedHiderRecords)groupedHiderRecords.get(individualRecordList.indexOf(individualRecord))).addHider(individualRecord);
-					
+				
 				}
 				
 			}
 			
-			fileHiderRecords.add(groupedHiderRecords);
+			cache.add(groupedHiderRecords);
 			
 		} else {
 			
-			fileHiderRecords.add(createHiderRecords(datafile.getPath()));
+			cache.add(createHiderRecords(datafile.getPath()));
 			
 		}
 		
@@ -203,7 +212,7 @@ public class OutputManager {
 	/**
 	 * 
 	 */
-	public ArrayList<HiderRecord> createHiderRecords(Path path) {
+	private ArrayList<HiderRecord> createHiderRecords(Path path) {
 		
 		ArrayList<HiderRecord> hiderRecords = new ArrayList<HiderRecord>();
 		
@@ -233,7 +242,7 @@ public class OutputManager {
 		
 		for ( String line : lines ) {
 		
-			Utils.printSystemStats();
+			Utils.printSystemStats("Hider records: " + hiderRecords.size() + " Lines: " + lines.size());
 			
 			String lastHider = "";
 			
@@ -247,7 +256,7 @@ public class OutputManager {
 			
 			for ( String word : line.split(",")) {
 				
-				Utils.printSystemStats();
+				Utils.printSystemStats("Hider records: " + hiderRecords.size() + " Lines: " + lines.size());
 				
 				word = word.trim();
 				
@@ -259,9 +268,13 @@ public class OutputManager {
 					
 						hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).attribute(gameOrRound, lastAttribute, value);
 						
+						if ( GARBAGE ) System.gc();
+						
 					} else if ( lastTraverser.equals("seeker") ) {
 					
 						hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker(lastSeeker).attribute(gameOrRound, lastAttribute, value);
+						
+						if ( GARBAGE ) System.gc();
 						
 					}
 
@@ -277,6 +290,8 @@ public class OutputManager {
 							if ( (hiderRecords.size() == 0) ) {
 							
 								hiderRecords.add(new HiderRecord(path, "MixedHiderStrats"));
+								
+								if ( GARBAGE ) System.gc();
 								
 								hiderRecords.get(hiderRecords.size() - 1 ).setTopology(topology);
 								
@@ -295,8 +310,12 @@ public class OutputManager {
 							// If we do not yet have a record for this hider
 							if (!hiderRecords.contains(new TraverserRecord(word))) {
 								
+								if ( GARBAGE ) System.gc();
+								
 								// Create it
 								hiderRecords.add(new HiderRecord(path, word));
+								
+								if ( GARBAGE ) System.gc();
 								
 								hiderRecords.get(hiderRecords.size() - 1 ).setTopology(topology);
 								
@@ -321,30 +340,44 @@ public class OutputManager {
 							
 							if ( hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeekersAndAttributes().size() == 0 ) {
 								
-								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).addSeeker(new TraverserRecord("MixedSeekerStrats"));
+								if ( GARBAGE ) System.gc();
 								
-								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker("MixedSeekerStrats").setTopology(topology);
+								HiderRecord record = hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider)));
 								
-								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker("MixedSeekerStrats").setRounds(rounds);
+								if ( GARBAGE ) System.gc();
 								
-								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker("MixedSeekerStrats").setDatafile(path);
+								record.addSeeker(new TraverserRecord("MixedSeekerStrats"));
+								
+								record.getSeeker("MixedSeekerStrats").setTopology(topology);
+								
+								record.getSeeker("MixedSeekerStrats").setRounds(rounds);
+								
+								record.getSeeker("MixedSeekerStrats").setDatafile(path);
 							
 							}
 							
 							lastSeeker = hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker("MixedSeekerStrats").getTraverser();
 							
+							if ( GARBAGE ) System.gc();
+							
 						} else {
 							
 							// If the last hider doesn't have a record of this seeker, add it
 							if (!hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).containsSeeker(new TraverserRecord(word))) {
-									
-								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).addSeeker(new TraverserRecord(word));
 								
-								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker(word).setTopology(topology);
+								if ( GARBAGE ) System.gc();
 								
-								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker(word).setRounds(rounds);
+								HiderRecord record = hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider)));
 								
-								hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker(word).setDatafile(path);
+								if ( GARBAGE ) System.gc();
+								
+								record.addSeeker(new TraverserRecord(word));
+								
+								record.getSeeker(word).setTopology(topology);
+								
+								record.getSeeker(word).setRounds(rounds);
+								
+								record.getSeeker(word).setDatafile(path);
 							
 							}
 							
@@ -428,7 +461,7 @@ public class OutputManager {
 	 * @param traverserRecords
 	 * @return
 	 */
-	private ArrayList<TraverserRecord> expandTraverserRecords( ArrayList<TraverserRecord> traverserRecords ) {
+	protected ArrayList<TraverserRecord> expandTraverserRecords( ArrayList<TraverserRecord> traverserRecords ) {
 		
 		ArrayList<TraverserRecord> localTraverserRecords = new ArrayList<TraverserRecord>();
 		
@@ -453,7 +486,7 @@ public class OutputManager {
 	 * @param gameOrRound
 	 * @return
 	 */
-	private LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>> getTraverserSeries(TraverserRecord traverser, String gameOrRound) {
+	protected LinkedHashMap<AttributeSetIdentifier, Hashtable<String,Double>> getTraverserSeries(TraverserRecord traverser, String gameOrRound) {
 		
 		if ( gameOrRound.equals("Game") ) {
 			
@@ -475,7 +508,7 @@ public class OutputManager {
 	 * @param traverserRecords
 	 * @return
 	 */
-	private Hashtable<String, Double> maxForAttributeInAllSeries( ArrayList<TraverserRecord> traverserRecords, String gameOrRound, GraphType graphType ) {
+	protected Hashtable<String, Double> maxForAttributeInAllSeries( ArrayList<TraverserRecord> traverserRecords, String gameOrRound, GraphType graphType ) {
 		
 		Hashtable<String, Double> maxAttributeToValueAllSeries = new Hashtable<String, Double>();
 		
@@ -525,7 +558,7 @@ public class OutputManager {
 	 * @param traverserRecords
 	 * @return
 	 */
-	private Hashtable<String, Double> minForAttributeInAllSeries( ArrayList<TraverserRecord> traverserRecords, String gameOrRound, GraphType graphType ) {
+	protected Hashtable<String, Double> minForAttributeInAllSeries( ArrayList<TraverserRecord> traverserRecords, String gameOrRound, GraphType graphType ) {
 		
 		Hashtable<String, Double> minAttributeToValueAllSeries = new Hashtable<String, Double>();
 		
@@ -577,7 +610,7 @@ public class OutputManager {
 	 * @param maxInSeries
 	 * @return
 	 */
-	private double normaliseEntry(Hashtable<String, Double> entries, Hashtable<String, Double> minInSeries,  Hashtable<String, Double> maxInSeries) {
+	protected double normaliseEntry(Hashtable<String, Double> entries, Hashtable<String, Double> minInSeries,  Hashtable<String, Double> maxInSeries) {
 		
 		return ( entries.get(Metric.COST.getText()) - minInSeries.get(Metric.COST.getText()) ) / ( maxInSeries.get(Metric.COST.getText()) - minInSeries.get(Metric.COST.getText()) );
 		
@@ -1019,9 +1052,9 @@ public class OutputManager {
 		
 		if ( outputEnabled ) {
 		
-			graph.exportChartAsEPS(Utils.FILEPREFIX + "data/charts/" + figureID + ".eps");
+			graph.exportChartAsEPS(Utils.FILEPREFIX + "charts/" + figureID + ".eps");
 			
-			graph.exportChartAsTikz(Utils.FILEPREFIX + "data/charts/" + figureID + ".tex");
+			graph.exportChartAsTikz(Utils.FILEPREFIX + "charts/" + figureID + ".tex");
 			
 			for ( TraverserRecord traverser : traverserRecords ) {
 				
@@ -1038,7 +1071,7 @@ public class OutputManager {
 			
 			try {
 				
-				Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "/data/charts/figures.bib", true), "\n @FIG{" + figureID + ", main = { " + setupCaptionString(playerRecords, traverserRecords) + " }, add = { " + title + " }, file = {/Users/Martin/Dropbox/workspace/SearchGames/output/data/charts/" + figureID + "}, source = {}}");
+				Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "charts/figures.bib", true), "\n @FIG{" + figureID + ", main = { " + setupCaptionString(playerRecords, traverserRecords) + " }, add = { " + title + " }, file = {/Users/Martin/Dropbox/workspace/SearchGames/output/charts/" + figureID + "}, source = {}}");
 			
 			} catch (IOException e) {
 				
@@ -1065,7 +1098,7 @@ public class OutputManager {
 	 * @param traverserRecords
 	 * @return
 	 */
-	private String setupCaptionString(ArrayList<TraverserRecord> playerRecords, ArrayList<TraverserRecord> traverserRecords) {
+	protected String setupCaptionString(ArrayList<TraverserRecord> playerRecords, ArrayList<TraverserRecord> traverserRecords) {
 		
 		HashSet<String> hiders = new HashSet<String>();
 		
@@ -1147,7 +1180,7 @@ public class OutputManager {
 	 * @param hiderOrSeeker
 	 * @return
 	 */
-	private String traverserList(HashSet<String> traversers, String hiderOrSeeker) {
+	protected String traverserList(HashSet<String> traversers, String hiderOrSeeker) {
 	
 		String traverserList;
 		
@@ -1173,7 +1206,7 @@ public class OutputManager {
 	 * @param number
 	 * @return
 	 */
-	private String traverserNumberToWord(int number) {
+	protected String traverserNumberToWord(int number) {
 		
 		if (number == 2) return "two ";
 		if (number == 3) return "three ";
@@ -1189,7 +1222,7 @@ public class OutputManager {
 		
 		String returner = "";
 		
-		for ( ArrayList<HiderRecord> hiderRecords : fileHiderRecords ) {
+		for ( ArrayList<HiderRecord> hiderRecords : cache ) {
 			
 			for ( HiderRecord hiderRecord : hiderRecords ) {
 				
@@ -1273,7 +1306,7 @@ public class OutputManager {
 	/**
 	 * 
 	 */
-	private final static String FILEPREFIX = "Output/";
+	protected final static String FILEPREFIX = "Output/";
 	
 	/**
 	 * @param source

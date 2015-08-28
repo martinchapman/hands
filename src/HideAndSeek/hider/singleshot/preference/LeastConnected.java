@@ -9,11 +9,9 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import HideAndSeek.GraphTraverser;
-import HideAndSeek.OpenTraverserStrategy;
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.seeker.singleshot.coverage.BacktrackGreedyMechanism;
 import Utility.Utils;
 
 /**
@@ -130,13 +128,15 @@ public class LeastConnected extends PreferenceHider {
 		
 	}
 	
+	private int lastEdgeCount = -1;
+	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.hider.singleshot.preference.PreferenceHider#computeTargetNodes()
 	 */
 	@Override
 	public LinkedHashSet<StringVertex> computeTargetNodes() {
 		
-		leastConnectedNodes.clear();
+		if ( localGraph.edgeSet().size() == lastEdgeCount ) return new LinkedHashSet<StringVertex>(leastConnectedNodes);
 		
 		TreeMap<Integer, ArrayList<StringVertex>> nodesToConnections = new TreeMap<Integer, ArrayList<StringVertex>>();
 		
@@ -146,7 +146,7 @@ public class LeastConnected extends PreferenceHider {
 		
 		}
 		
-		LinkedHashSet<StringVertex> cumulativeConnectedNodes = new LinkedHashSet<StringVertex>();
+		HashSet<StringVertex> cumulativeConnectedNodes = new HashSet<StringVertex>();
 		
 		for ( Map.Entry<Integer, ArrayList<StringVertex>> nodeToConnections : nodesToConnections.entrySet() ) {
 			
@@ -206,6 +206,8 @@ public class LeastConnected extends PreferenceHider {
 		leastConnectedNodes.clear();
 		
 		leastConnectedNodes.addAll(shuffledLeastConnectedNodes);
+		
+		lastEdgeCount = localGraph.edgeSet().size();
 		
 		return new LinkedHashSet<StringVertex>(leastConnectedNodes);
 		

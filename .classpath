@@ -19,5 +19,7 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/javaparser.jar"/>
 	<classpathentry kind="lib" path="lib/bsh-2.0b4.jar"/>
+	<classpathentry kind="lib" path="lib/fst-2.38-onejar.jar"/>
+	<classpathentry kind="lib" path="lib/mapdb.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -10,6 +10,7 @@ import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
 import HideAndSeek.seeker.repeatgame.probability.adaptable.HighProbabilityAdaptable;
+import Utility.Pair;
 import Utility.Utils;
 
 /**
@@ -19,7 +20,7 @@ public class AdaptiveSeekingAgent<E extends Seeker & AdaptiveGraphTraverser> ext
 
 	public AdaptiveSeekingAgent(
 			GraphController<StringVertex, StringEdge> graphController,
-			ArrayList<E> strategyPortfolio, int totalRounds,
+			ArrayList<Pair<E, Double>> strategyPortfolio, int totalRounds,
 			double cueThreshold, boolean canReuse) {
 		super(graphController, strategyPortfolio, totalRounds, cueThreshold, canReuse);
 		// TODO Auto-generated constructor stub
@@ -27,7 +28,7 @@ public class AdaptiveSeekingAgent<E extends Seeker & AdaptiveGraphTraverser> ext
 
 	public AdaptiveSeekingAgent(
 			GraphController<StringVertex, StringEdge> graphController,
-			ArrayList<E> strategyPortfolio, int totalRounds,
+			ArrayList<Pair<E, Double>> strategyPortfolio, int totalRounds,
 			String initialStrategy, double cueThreshold, boolean canReuse) {
 		super(graphController, strategyPortfolio, totalRounds, initialStrategy,
 				cueThreshold, canReuse);
@@ -36,7 +37,7 @@ public class AdaptiveSeekingAgent<E extends Seeker & AdaptiveGraphTraverser> ext
 
 	public AdaptiveSeekingAgent(
 			GraphController<StringVertex, StringEdge> graphController,
-			ArrayList<E> strategyPortfolio, int totalRounds,
+			ArrayList<Pair<E, Double>> strategyPortfolio, int totalRounds,
 			String currentStrategy) {
 		super(graphController, strategyPortfolio, totalRounds, currentStrategy);
 		// TODO Auto-generated constructor stub
@@ -44,15 +45,15 @@ public class AdaptiveSeekingAgent<E extends Seeker & AdaptiveGraphTraverser> ext
 
 	public AdaptiveSeekingAgent(
 			GraphController<StringVertex, StringEdge> graphController,
-			ArrayList<E> strategyPortfolio, int totalRounds) {
+			ArrayList<Pair<E, Double>> strategyPortfolio, int totalRounds) {
 		super(graphController, strategyPortfolio, totalRounds);
 		// TODO Auto-generated constructor stub
 	}
 
 	public AdaptiveSeekingAgent(
 			GraphController<StringVertex, StringEdge> graphController,
-			String name, ArrayList<E> strategyPortfolio, int totalRounds,
-			double cueTriggerThreshold, boolean canReuse) {
+			String name, ArrayList<Pair<E, Double>> strategyPortfolio,
+			int totalRounds, double cueTriggerThreshold, boolean canReuse) {
 		super(graphController, name, strategyPortfolio, totalRounds,
 				cueTriggerThreshold, canReuse);
 		// TODO Auto-generated constructor stub
@@ -60,8 +61,9 @@ public class AdaptiveSeekingAgent<E extends Seeker & AdaptiveGraphTraverser> ext
 
 	public AdaptiveSeekingAgent(
 			GraphController<StringVertex, StringEdge> graphController,
-			String name, ArrayList<E> strategyPortfolio, int totalRounds,
-			String initialStrategy, double cueTriggerThreshold, boolean canReuse) {
+			String name, ArrayList<Pair<E, Double>> strategyPortfolio,
+			int totalRounds, String initialStrategy,
+			double cueTriggerThreshold, boolean canReuse) {
 		super(graphController, name, strategyPortfolio, totalRounds, initialStrategy,
 				cueTriggerThreshold, canReuse);
 		// TODO Auto-generated constructor stub
@@ -69,15 +71,16 @@ public class AdaptiveSeekingAgent<E extends Seeker & AdaptiveGraphTraverser> ext
 
 	public AdaptiveSeekingAgent(
 			GraphController<StringVertex, StringEdge> graphController,
-			String name, ArrayList<E> strategyPortfolio, int totalRounds,
-			String initialStrategy) {
+			String name, ArrayList<Pair<E, Double>> strategyPortfolio,
+			int totalRounds, String initialStrategy) {
 		super(graphController, name, strategyPortfolio, totalRounds, initialStrategy);
 		// TODO Auto-generated constructor stub
 	}
 
 	public AdaptiveSeekingAgent(
 			GraphController<StringVertex, StringEdge> graphController,
-			String name, ArrayList<E> strategyPortfolio, int totalRounds) {
+			String name, ArrayList<Pair<E, Double>> strategyPortfolio,
+			int totalRounds) {
 		super(graphController, name, strategyPortfolio, totalRounds);
 		// TODO Auto-generated constructor stub
 	}

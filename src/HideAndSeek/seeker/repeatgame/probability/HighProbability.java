@@ -167,12 +167,29 @@ public class HighProbability extends SeekingAgent implements VariableTraversalSt
 	 */
 	private ArrayList<StringVertex> lastHighestProbabilityNodes;
 	
+	/**
+	 * 
+	 */
+	private int numberInTopK = 0;
+
+	private boolean LOG_TOP_K = false;
+	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.seeker.Seeker#endOfRound()
 	 */
 	@Override
 	public void endOfRound() {
 		
+		numberInTopK = 0;
+		
+		if ( lastHighestProbabilityNodes.size() > 0 ) lastHighestProbabilityNodes = new ArrayList<StringVertex>(lastHighestProbabilityNodes.subList(0, hideLocations().size() - 1));
+		
+		for ( StringVertex vertex : hideLocations() ) {
+			
+			if ( lastHighestProbabilityNodes.contains(vertex) ) numberInTopK++;
+			
+		}
+
 		super.endOfRound();
 		
 		// Recalculate probabilities
@@ -183,6 +200,10 @@ public class HighProbability extends SeekingAgent implements VariableTraversalSt
 		/* Recreate list of likely vertices (currently assuming unknown value of K on part of seeker (until all objects are found), 
 		   so just get ALL likely locations) */
 		likelyNodes = behaviourPrediction.rankLikelyHideLocations(predictiveNodes);
+		
+		Utils.talk(toString(), "Likely: " + likelyNodes.size() + " " + likelyNodes);
+		
+		lastHighestProbabilityNodes = new ArrayList<StringVertex>(likelyNodes);
 		
 		if ( printHighestProbabilityNodes ) {
 		
@@ -209,6 +230,24 @@ public class HighProbability extends SeekingAgent implements VariableTraversalSt
 		}
 
 		explorationMechanism.endOfRound();
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see HideAndSeek.seeker.SeekingAgent#printRoundStats()
+	 */
+	@Override
+	public String printRoundStats() {
+
+		if ( LOG_TOP_K ) {
+			
+			return super.printRoundStats() + ",numberInTopK," + numberInTopK;
+			
+		} else {
+			
+			return super.printRoundStats();
+			
+		}
 		
 	}
 

@@ -1,15 +1,10 @@
 package HideAndSeek.seeker.repeatgame.probability;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import org.jgrapht.alg.DijkstraShortestPath;
 
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.seeker.SeekingAgent;
-import Utility.BehaviourPrediction;
 import Utility.Utils;
 
 /**
@@ -23,15 +18,27 @@ import Utility.Utils;
  * @author Martin
  *
  */
-public class InverseHighProbability extends HighProbability {
+public class InverseHighProbability extends VariableNodesHighProbability {
 
+	/**
+	 * 
+	 */
+	private int likelyNodesSize = 0;
+	
+	/**
+	 * 
+	 */
+	private static boolean LIKELY_NODES_SIZE = false;
+	
 	/**
 	 * @param graphController
 	 * @param name
 	 */
 	public InverseHighProbability(GraphController<StringVertex, StringEdge> graphController, String name) {
 		
-		super(graphController, name);
+		//graphController.numberOfHideLocations()
+		 
+		super(graphController, name, Integer.MAX_VALUE, false);
 		
 		likelyNodes = new ArrayList<StringVertex>(graphController.vertexSet());
 		
@@ -60,10 +67,33 @@ public class InverseHighProbability extends HighProbability {
 		 */
 		this.likelyNodes = orderNodesByProximity(newNode, Integer.MAX_VALUE, likelyNodes);
 		
+		//likelyNodes.addAll(uniqueHideLocations());
+		
+		likelyNodesSize = likelyNodes.size();
+		
+		if ( likelyNodes.size() >= predictiveNodes ) likelyNodes = new ArrayList<StringVertex>(likelyNodes.subList(0, predictiveNodes));
+		
+		Utils.talk(toString(), "Likely nodes (" + likelyNodes.size() + "): " + likelyNodes);
+		
 		return newNode;
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.seeker.repeatgame.probability.HighProbability#printRoundStats()
+	 */
+	@Override
+	public String printRoundStats() {
+	
+		String roundStats = "";
+		
+		if ( LIKELY_NODES_SIZE ) roundStats += ",likelyNodesSize," + likelyNodesSize + ",";
+		
+		return super.printRoundStats() + roundStats;
+	
+	}
+	
+
 	/* (non-Javadoc)
 	 * @see HideAndSeek.seeker.Seeker#endOfRound()
 	 */
@@ -72,11 +102,25 @@ public class InverseHighProbability extends HighProbability {
 		
 		super.endOfRound();
 		
-		this.likelyNodes = new ArrayList<StringVertex>(graphController.vertexSet());
+		likelyNodes.clear();
 		
-		if (allHideLocations().size() >= ( graphController.vertexSet().size() )) allHideLocations().clear();
+		//this.likelyNodes = new ArrayList<StringVertex>(graphController.vertexSet());
 		
-		this.likelyNodes.removeAll(allHideLocations());
+		if (allHideLocations().size() >= ( graphController.vertexSet().size() )) uniqueHideLocations().clear();
+		
+		for ( StringVertex vertex : graphController.vertexSet() ) {
+			
+			// If this vertex has not been visited before
+			if ( !uniqueHideLocations().contains(vertex) ) {
+				
+				this.likelyNodes.add(vertex);
+				
+			}
+		
+		}
+		
+		// ~MDC Operation is slow.
+		//this.likelyNodes.removeAll(uniqueHideLocations());
 		
 	}
 	

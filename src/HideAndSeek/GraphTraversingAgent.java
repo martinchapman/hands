@@ -689,8 +689,6 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 		// If a class equals itself, clearly all fields will be equal
 		if (responsibleAgent == ((GraphTraverser)((GraphTraverser)obj)).getResponsibleAgent()) return true;
 		
-		if (((GraphTraverser)obj) == null) return false;
-
 		if (responsibleAgent.getClass() != ((GraphTraverser)obj).getClass()) return false;
 		
 		GraphTraversingAgent other = (GraphTraversingAgent) ((GraphTraverser)obj);
@@ -743,7 +741,17 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	 */
 	public void mergeOtherTraverser(GraphTraverser traverser) {
 		
-		this.currentNode = traverser.currentNode();
+		try {
+			
+			this.currentNode = traverser.currentNode();
+		
+		} catch ( Exception e ) {
+			
+			System.out.println(this.name);
+			
+			System.out.println(this.currentNode + " " + traverser.currentNode());
+			
+		}
 		
 		this.roundsPassed = traverser.roundsPassed();
 		

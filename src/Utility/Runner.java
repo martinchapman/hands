@@ -41,11 +41,14 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.mapdblocal.BTreeMap;
+
 import Utility.gametheoretic.ApproximatePayoffMatrix;
 import Utility.output.Datafile;
 import Utility.output.GroupedHiderRecords;
 import Utility.output.HiderRecord;
 import Utility.output.OutputManager;
+import Utility.output.OutputManagerOffHeap;
 import Utility.output.TraverserRecord;
 import bsh.EvalError;
 import bsh.Interpreter;
@@ -56,6 +59,11 @@ import bsh.Interpreter;
  *
  */
 public class Runner extends JFrame {
+	
+	/**
+	 * 
+	 */
+	private static boolean OFF_HEAP = true;
 	
 	/**
 	 * 
@@ -175,8 +183,8 @@ public class Runner extends JFrame {
 		  //
 		  
 		  "UnknownRandom",
-		  "AdaptiveRandomSet",
-		  "AdaptiveLeastConnected"
+		  "MetaRandom",
+		  "MetaConnected"
 		  
 		};
 	
@@ -220,7 +228,7 @@ public class Runner extends JFrame {
           
           // 
           
-          "AdaptiveHighProbability"
+          "MetaProbability"
           
 		};
 	
@@ -370,11 +378,71 @@ public class Runner extends JFrame {
 	private OutputManager outputManager;
 	
 	/**
+	 * @param outputFeedback
+	 * @param hiderRecord
+	 * @param hidersSeeker
+	 */
+	private void outputFeedback(DefaultListModel<HiderRecord> outputFeedback, HiderRecord hiderRecord, TraverserRecord hidersSeeker) {
+		
+		HiderRecord hiderCopy;
+		
+		if ( hiderRecord instanceof GroupedHiderRecords ) {
+			
+			hiderCopy = new GroupedHiderRecords("");
+			
+		} else {
+			
+			hiderCopy = new HiderRecord("");
+			
+		}
+		
+		hiderCopy.duplicateRecord(hiderRecord);
+		
+		hiderCopy.clearSeekersAndAttributes();
+		
+		hiderCopy.addSeeker(hidersSeeker);
+		
+		hiderCopy.setOpponents(hidersSeeker.getTraverser());
+		
+		outputFeedback.addElement(hiderCopy);
+		
+	}
+	
+	private void outputFeedbackEnd(DefaultListModel<HiderRecord> outputFeedback) {
+		
+		// Mark end of Hiders in that game
+		
+		outputFeedback.addElement(new HiderRecord("") {
+			
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			public String toString() {
+				
+				return "-----";
+				
+			}
+			
+		});
+		
+	}
+	
+	/**
 	 * @param tabbedPane
 	 */
 	private void outputTab(JTabbedPane tabbedPane) {
 		
-		outputManager = new OutputManager();
+		if ( OFF_HEAP ) {
+			
+			outputManager = new OutputManagerOffHeap();
+			
+		} else {
+			
+			outputManager = new OutputManager();
+		
+		}
 		
 		//////
 		
@@ -425,60 +493,58 @@ public class Runner extends JFrame {
 				
 				outputFeedback.clear();
 				
-				for (ArrayList<HiderRecord> fileHiderRecord : outputManager.getFileHiderRecords()) {
-
-					Utils.printSystemStats();
-					
-					for (HiderRecord hiderRecord : fileHiderRecord) {
-						
+				if ( OFF_HEAP ) {
+				
+					for (Entry<Integer, BTreeMap<Integer, HiderRecord>> fileHiderRecord : ((OutputManagerOffHeap)outputManager).getOffHeapCache().entrySet()) {
+	
 						Utils.printSystemStats();
 						
-						for ( TraverserRecord hidersSeeker : hiderRecord.getSeekersAndAttributes() ) {
+						for (Entry<Integer, HiderRecord> hiderRecord : fileHiderRecord.getValue().entrySet()) {
 							
 							Utils.printSystemStats();
 							
-							HiderRecord hiderCopy;
-							
-							if ( hiderRecord instanceof GroupedHiderRecords ) {
+							for ( TraverserRecord hidersSeeker : hiderRecord.getValue().getSeekersAndAttributes() ) {
 								
-								hiderCopy = new GroupedHiderRecords("");
+								Utils.printSystemStats();
 								
-							} else {
-								
-								hiderCopy = new HiderRecord("");
+								outputFeedback(outputFeedback, hiderRecord.getValue(), hidersSeeker);
 								
 							}
 							
-							hiderCopy.duplicateRecord(hiderRecord);
-							
-							hiderCopy.clearSeekersAndAttributes();
-							
-							hiderCopy.addSeeker(hidersSeeker);
-							
-							hiderCopy.setOpponents(hidersSeeker.getTraverser());
-							
-							outputFeedback.addElement(hiderCopy);
-							
 						}
+						
+						outputFeedbackEnd(outputFeedback);
 						
 					}
+				
+				} else {
 					
-					// Mark end of Hiders in that game
-					
-					outputFeedback.addElement(new HiderRecord("") {
+					for (ArrayList<HiderRecord> fileHiderRecord : outputManager.getCache() ) {
 						
-						public String toString() {
+						Utils.printSystemStats();
+						
+						for (HiderRecord hiderRecord : fileHiderRecord) {
 							
-							return "-----";
+							Utils.printSystemStats();
+							
+							for ( TraverserRecord hidersSeeker : hiderRecord.getSeekersAndAttributes() ) {
+								
+								Utils.printSystemStats();
+								
+								outputFeedback(outputFeedback, hiderRecord, hidersSeeker);
+								
+							}
 							
 						}
 						
-					});
+						outputFeedbackEnd(outputFeedback);
+						
+					}
 					
 				}
 				
 				showTextStats.setEnabled(true);
-				
+		
 			}
 			
 		});
@@ -1565,103 +1631,153 @@ public class Runner extends JFrame {
 	
 	public void plotGraph(Scanner in, boolean deleting) throws NumberFormatException {
 		
-		String response = "";
-		
-		if ( !deleting ) System.out.println("");
-		
-		if ( !deleting ) System.out.println("------------------------------------------");
-		
-		outputFeedbackList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		
-		int outputIndex = 0;
-		
-		for ( Object item : itemsInList(outputFeedbackList.getModel()) ) {
+		while ( true ) {
 			
-			if ( !deleting ) System.out.println("("+ (outputIndex++) + ") " + item);
+			String response = "";
 			
-		}
-		
-		if ( deleting ) {
+			if ( !deleting ) System.out.println("");
 			
-			outputFeedbackList.setSelectedIndex(0);
+			if ( !deleting ) System.out.println("------------------------------------------");
 			
-			if (!outputFeedbackList.getSelectedValue().toString().equals("-----")) {
+			outputFeedbackList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+			
+			int outputIndex = 0;
+			
+			for ( Object item : itemsInList(outputFeedbackList.getModel()) ) {
 				
-				outputManager.deleteFile(outputFeedbackList.getSelectedValue().getFileRelatingTo());
+				if ( !deleting ) System.out.println("("+ (outputIndex++) + ") " + item);
 				
-				outputManager.removeOrphaned();
-			
-				showFiles.doClick();
-			
-				return;
-			
 			}
 			
-		}
-		
-		while ( response.equals("") || ( response.trim().split(" ").length > ( outputFeedbackList.getModel().getSize() - 1 ) ) ) {
-		
-			response = askQuestion("Enter pairs of player numbers (spaced list) or (back)", in);
-			
-			if ( checkForBack(response) ) break;
-			
-			for ( String pair : response.trim().split(" ") ) {
+			if ( deleting ) {
 				
-				if (Integer.parseInt(pair) < 0 || Integer.parseInt(pair) > outputIndex ) {
+				outputFeedbackList.setSelectedIndex(0);
+				
+				if (!outputFeedbackList.getSelectedValue().toString().equals("-----")) {
 					
-					response = "";
+					outputManager.deleteFile(outputFeedbackList.getSelectedValue().getFileRelatingTo());
 					
+					outputManager.removeOrphaned();
+				
+					showFiles.doClick();
+				
+					return;
+				
 				}
 				
 			}
-		
-		}
-		
-		if ( !checkForBack(response) ) {
 			
-			if ( !response.trim().contains(" ") ) {
+			while ( response.equals("") || ( response.trim().split(" ").length > ( outputFeedbackList.getModel().getSize() - 1 ) ) ) {
+			
+				response = askQuestion("Enter pairs of player numbers (spaced list) or (back)", in);
 				
-				outputFeedbackList.setSelectedIndex(Integer.parseInt(response));
+				if ( checkForBack(response) ) break;
 				
-			} else {
-				
-				ArrayList<Integer> indices = new ArrayList<Integer>();
-				
-				for ( String index : response.trim().split(" ") ) {
+				for ( String pair : response.trim().split(" ") ) {
 					
-					indices.add(Integer.parseInt(index));
+					if (Integer.parseInt(pair) < 0 || Integer.parseInt(pair) > outputIndex ) {
+						
+						response = "";
+						
+					}
 					
 				}
-				
-				outputFeedbackList.setSelectedIndices(Utils.convertIntegers(indices));
-				
+			
 			}
-			
-			
-			response = askQuestion("Enter hiders or seekers. (Enter) for default: " + ( hiders.isSelected() ? "hider" : "seeker" ) + " or (back).", in);
 			
 			if ( !checkForBack(response) ) {
 				
-				if ( !checkForBlank(response) ) {
+				if ( !response.trim().contains(" ") ) {
 					
-					if ( response.contains("hider") ) {
+					outputFeedbackList.setSelectedIndex(Integer.parseInt(response));
+					
+				} else {
+					
+					ArrayList<Integer> indices = new ArrayList<Integer>();
+					
+					for ( String index : response.trim().split(" ") ) {
 						
-						hiders.setSelected(true);
+						indices.add(Integer.parseInt(index));
 						
-					} else {
+					}
+					
+					outputFeedbackList.setSelectedIndices(Utils.convertIntegers(indices));
+					
+				}
+				
+				while (true) {
+					
+					try {
 						
-						seekers.setSelected(true);
+						configureGraph(in);
+						
+						break;
+						
+					} catch ( NumberFormatException e ) {
+						
+						System.out.println("Input error, restarting...");
 						
 					}
 					
 				}
 				
+			} else {
 				
-				while ( !itemsInList(measure.getModel()).contains(response) ) {
+				return;
 				
-					response = askQuestion("Enter measure (" + itemsInList(measure.getModel()) + "). (Enter) for default: " + measure.getModel().getElementAt(measure.getSelectedIndex()) + " or (back).", in);
+			}
+		
+		}
+		
+	}
+	
+	/**
+	 * @param in
+	 * @throws NumberFormatException
+	 */
+	private void configureGraph(Scanner in) throws NumberFormatException {
+		
+		String response = askQuestion("Enter hiders or seekers. (Enter) for default: " + ( hiders.isSelected() ? "hiders" : "seekers" ) + " or (back).", in);
+		
+		if ( !checkForBack(response) ) {
+			
+			if ( !checkForBlank(response) ) {
 				
-					if ( response.equals("") ) break;
+				if ( response.toLowerCase().contains("hider") ) {
+					
+					hiders.setSelected(true);
+					
+				} else {
+					
+					seekers.setSelected(true);
+					
+				}
+				
+			}
+			
+			while ( !itemsInList(measure.getModel()).contains(response) ) {
+			
+				response = askQuestion("Enter measure (" + itemsInList(measure.getModel()) + "). (Enter) for default: " + measure.getModel().getElementAt(measure.getSelectedIndex()) + " or (back).", in);
+			
+				if ( response.equals("") || checkForBack(response) ) break;
+				
+			}
+			
+			if ( !checkForBack(response) ) {
+				
+				if ( !checkForBlank(response) ) {
+					
+					response = response.trim();
+					
+					measure.getModel().setSelectedItem(measure.getModel().getElementAt(itemsInList(measure.getModel()).indexOf(response)));
+					
+				}
+				
+				while ( !itemsInList(graphTypesCombo.getModel()).contains(response) ) {
+				
+					response = askQuestion("Enter graph type (" + itemsInList(graphTypesCombo.getModel()) + "). (Enter) for default: " + graphTypesCombo.getModel().getElementAt(graphTypesCombo.getSelectedIndex()) + " or (back).", in);
+				
+					if ( response.equals("") || checkForBack(response) ) break;
 					
 				}
 				
@@ -1671,15 +1787,15 @@ public class Runner extends JFrame {
 						
 						response = response.trim();
 						
-						measure.getModel().setSelectedItem(measure.getModel().getElementAt(itemsInList(measure.getModel()).indexOf(response)));
+						graphTypesCombo.getModel().setSelectedItem(graphTypesCombo.getModel().getElementAt(itemsInList(graphTypesCombo.getModel()).indexOf(response)));
 						
 					}
 					
-					while ( !itemsInList(graphTypesCombo.getModel()).contains(response) ) {
+					while ( !itemsInList(categories.getModel()).contains(response) ) {
 					
-						response = askQuestion("Enter graph type (" + itemsInList(graphTypesCombo.getModel()) + "). (Enter) for default: " + graphTypesCombo.getModel().getElementAt(graphTypesCombo.getSelectedIndex()) + " or (back).", in);
+						response = askQuestion("Enter bar category (" + itemsInList(categories.getModel()) + "). (Enter) for default: " + categories.getModel().getElementAt(categories.getSelectedIndex()) + " or (back).", in);
 					
-						if ( response.equals("") ) break;
+						if ( response.equals("") || checkForBack(response) ) break;
 						
 					}
 					
@@ -1689,101 +1805,63 @@ public class Runner extends JFrame {
 							
 							response = response.trim();
 							
-							graphTypesCombo.getModel().setSelectedItem(graphTypesCombo.getModel().getElementAt(itemsInList(graphTypesCombo.getModel()).indexOf(response)));
+							categories.getModel().setSelectedItem(categories.getModel().getElementAt(itemsInList(categories.getModel()).indexOf(response)));
 							
 						}
 						
-						while ( !itemsInList(categories.getModel()).contains(response) ) {
+						while ( !itemsInList(gameOrRound.getModel()).contains(response) ) {
 						
-							response = askQuestion("Enter bar category (" + itemsInList(categories.getModel()) + "). (Enter) for default: " + categories.getModel().getElementAt(categories.getSelectedIndex()) + " or (back).", in);
+							response = askQuestion("Enter game or round (" + itemsInList(gameOrRound.getModel()) + "). (Enter) for default: " + gameOrRound.getModel().getElementAt(gameOrRound.getSelectedIndex()) + " or (back).", in);
 						
-							if ( response.equals("") ) break;
+							if ( response.equals("") || checkForBack(response) ) break;
 							
 						}
-						
+					
 						if ( !checkForBack(response) ) {
 							
 							if ( !checkForBlank(response) ) {
 								
 								response = response.trim();
 								
-								categories.getModel().setSelectedItem(categories.getModel().getElementAt(itemsInList(categories.getModel()).indexOf(response)));
-								
-							}
-							
-							while ( !itemsInList(gameOrRound.getModel()).contains(response) ) {
-							
-								response = askQuestion("Enter game or round (" + itemsInList(gameOrRound.getModel()) + "). (Enter) for default: " + gameOrRound.getModel().getElementAt(gameOrRound.getSelectedIndex()) + " or (back).", in);
-							
-								if ( response.equals("") ) break;
-								
-							}
-						
-							if ( !checkForBack(response) ) {
-								
-								if ( !checkForBlank(response) ) {
-									
-									response = response.trim();
-									
-									gameOrRound.getModel().setSelectedItem(gameOrRound.getModel().getElementAt(itemsInList(gameOrRound.getModel()).indexOf(response)));
-									
-								}
-								
-							} else {
-								
-								return;
-								
-							}
-							
-							response = "";
-							
-							while ( response.equals("") ) {
-								
-								response = askQuestion("Confirm graph output (y/n)", in);
-								
-							}
-							
-							if ( response.contains("y")) {
-								
-								outputEnabled.setSelected(true);
-								
-								generateGraph.doClick();
-							
-							}
-							
-							response = askQuestion("(replot), (exit) or (back)", in);
-							
-							if ( !checkForBack(response) ) {
-								
-								if ( response.contains("replot") ) {
-									
-									while ( true ) {
-									
-										try {
-										
-											plotGraph(in, deleting);
-											
-											break;
-										
-										} catch (NumberFormatException e ) {
-											
-											System.out.println("Input error, restarting...");
-											
-										}
-									
-									}
-									
-								} else {
-									
-									System.exit(0);
-									
-								}
+								gameOrRound.getModel().setSelectedItem(gameOrRound.getModel().getElementAt(itemsInList(gameOrRound.getModel()).indexOf(response)));
 								
 							}
 							
 						} else {
 							
 							return;
+							
+						}
+						
+						response = "";
+						
+						while ( response.equals("") ) {
+							
+							response = askQuestion("Confirm graph output (y/n)", in);
+							
+						}
+						
+						if ( response.contains("y")) {
+							
+							outputEnabled.setSelected(true);
+							
+							generateGraph.doClick();
+						
+						}
+						
+						response = askQuestion("(replot), (exit) or (back)", in);
+						
+						if ( !checkForBack(response) ) {
+							
+							if ( response.contains("replot") ) {
+								
+								return;
+								
+							} else {
+								
+								System.exit(0);
+								
+							}
 							
 						}
 						
@@ -1813,7 +1891,11 @@ public class Runner extends JFrame {
 		
 	}
 	
-	public void completeSimulations(Scanner in) throws NumberFormatException {
+	/**
+	 * @param in
+	 * @throws NumberFormatException
+	 */
+	private void completeSimulations(Scanner in) throws NumberFormatException {
 		
 		String response = "";
 		
@@ -1835,17 +1917,23 @@ public class Runner extends JFrame {
 			
 			response = "";
 			
+			boolean deleting = false;
+			
 			while ( response == "") {
 			
 				response = askQuestion("Enter number to process, (all) to process all or (back). D<N> deletes.", in);
 				
-				if ( response.contains("D") ) response = response.replace("D", "");
+				if ( response.contains("D") ) { 
+					
+					response = response.replace("D", "");
+				
+					deleting = true;
+					
+				}
 				
 				if ( Integer.parseInt(response) < 0 || Integer.parseInt(response) > ( itemsInList(files.getModel()).size() - 1 ) ) response = "";
 				
 			}
-			
-			boolean deleting = false;
 			
 			if ( !checkForBack(response) ) {
 			
@@ -1854,14 +1942,6 @@ public class Runner extends JFrame {
 					showFiles.doClick();
 					
 				} else {
-					
-					if ( response.contains("D") ) {
-						
-						deleting = true;
-						
-						response = response.replace("D", "");
-						
-					}
 					
 					files.getModel().setSelectedItem(files.getModel().getElementAt(Integer.parseInt(response)));
 				
@@ -1899,6 +1979,18 @@ public class Runner extends JFrame {
 		
 		while ( true ) {
 			
+			if ( Utils.DEBUG == true ) {
+			
+				String response = askQuestion("\nWARNING: DEBUG ENABLED \nQuit (q) or Continue (c)", in);
+				
+				if ( response.equals("q") ) {
+					
+					System.exit(0);
+
+				} 
+			
+			}
+			
 			String response = askQuestion("\nMain menu :) \n(1) List simulation schedule \n(2) List complete simulations", in);
 			
 			if ( response.equals("1") ) {
@@ -1914,6 +2006,11 @@ public class Runner extends JFrame {
 		}
 		
 	}
+	
+	/**
+	 * 
+	 */
+	private boolean generateOutput = true;
 	
 	/**
 	 * @param args
@@ -1935,6 +2032,12 @@ public class Runner extends JFrame {
 			if ( argsList.contains("-t") ) {
 				
 				textBased = true;
+				
+			}
+			
+			if ( argsList.contains("-nop")) {
+				
+				generateOutput = false;
 				
 			}
 			
@@ -2380,11 +2483,15 @@ public class Runner extends JFrame {
 		// Generate ID For this simulation
 		String currentSimulationIdentifier = namePrefix + ( Utils.timestamp() );
 		
-		Utils.writeToFile(Utils.FILEPREFIX + "simRecordID.txt", currentSimulationIdentifier);
+		if ( generateOutput ) {
+			
+			Utils.writeToFile(Utils.FILEPREFIX + "simRecordID.txt", currentSimulationIdentifier);
 		
-		Utils.writeToFile(Utils.FILEPREFIX + "/data/" + currentSimulationIdentifier + ".csv", "");
+			Utils.writeToFile(Utils.FILEPREFIX + "/data/" + currentSimulationIdentifier + ".csv", "");
 		
-		Utils.writeToFile(Utils.FILEPREFIX + "/data/" + currentSimulationIdentifier + ".csv", Arrays.toString(simulationParameters) + "\n");
+			Utils.writeToFile(Utils.FILEPREFIX + "/data/" + currentSimulationIdentifier + ".csv", Arrays.toString(simulationParameters) + "\n");
+		
+		}
 		
 		/***********/
 		
@@ -2399,7 +2506,8 @@ public class Runner extends JFrame {
   				  "EdgeTraversalDecrement", // % discount gained by an agent for having traversed an edge before (100 = no discount; < 100 = discount)
   				  "MixHiders", // Mix equally between the hide strategies
   				  "MixSeekers", // Mix equally between the search strategies
-  				  "ResetPerRound" // Whether players knowledge should persist through rounds
+  				  "ResetPerRound", // Whether players knowledge should persist through rounds
+  				  "GenerateOutputFiles" // Whether to log results to file
 				  };
   				  
 		String[] defaultParameters = { simulationParameters[1],
@@ -2413,7 +2521,8 @@ public class Runner extends JFrame {
 				 "0",// % discount gained by an agent for having traversed an edge before (1.0 = no discount; < 1.0 = discount),
 				 "false", // Mix equally between the hide strategies
 				 "false", // Mix equally between the search strategies
-				 "true" // Whether players knowledge should persist through rounds
+				 "true", // Whether players knowledge should persist through rounds
+				  (generateOutput + "")
 		  		  };
 			
 		/***********/

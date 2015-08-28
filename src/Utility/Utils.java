@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -45,6 +46,10 @@ import org.jgrapht.GraphPath;
 import org.jgrapht.alg.FloydWarshallShortestPaths;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jibble.epsgraphics.EpsGraphics2D;
+import org.mapdblocal.BTreeMap;
+import org.mapdblocal.DB;
+import org.mapdblocal.DBMaker;
+import org.mapdblocal.Serializer;
 
 import HideAndSeek.GraphTraverser;
 import HideAndSeek.graph.HiddenObjectGraph;
@@ -86,6 +91,63 @@ public class Utils {
 	 */
 	public static String KEY = "trFdcuAh"; 
 	
+	/**
+	 * @param cacheSizeInGB
+	 * @return
+	 */
+	public static <K, V> Pair<DB, BTreeMap<K,V>> getDBAndCache(double cacheSizeInGB) {
+		
+		//first create store
+	    DB db = DBMaker
+	            .memoryDirectDB()
+	             // make it faster
+	            .transactionDisable()
+	            .asyncWriteFlushDelay(100)
+	            //some additional options for DB
+	            .asyncWriteEnable()
+	            //.cacheSize(100000)
+	            .closeOnJvmShutdown()
+	            //.compressionEnable()
+	            .make();
+	    
+	    BTreeMap<K, V> cache = db
+	            .treeMapCreate("cache")
+	            //.expireStoreSize(cacheSizeInGB)
+	            .counterEnable() //disable this if cache.size() is not used
+	            //use proper serializers to and improve performance
+	            .keySerializer(Serializer.INTEGER)
+	            .valueSerializer(Serializer.FASTJAVA)
+	            .make();
+	    
+		return new Pair<DB, BTreeMap<K, V>>(db, cache);
+		
+	}
+	
+	/**
+	 * @param byteStrings
+	 * @return
+	 */
+	public static String[] convertToStrings(byte[][] byteStrings) {
+	    String[] data = new String[byteStrings.length];
+	    for (int i = 0; i < byteStrings.length; i++) {
+	        data[i] = new String(byteStrings[i], Charset.defaultCharset());
+
+	    }
+	    return data;
+	}
+
+	/**
+	 * @param strings
+	 * @return
+	 */
+	public static byte[][] convertToBytes(String[] strings) {
+	    byte[][] data = new byte[strings.length][];
+	    for (int i = 0; i < strings.length; i++) {
+	        String string = strings[i];
+	        data[i] = string.getBytes(Charset.defaultCharset()); // you can chose charset
+	    }
+	    return data;
+	}
 	
 	/**
 	 * @param path
@@ -394,6 +456,15 @@ public class Utils {
 	 */
 	public static void printSystemStats() {
 		
+		printSystemStats("");
+		
+	}
+	
+	/**
+	 * 
+	 */
+	public static void printSystemStats(String monitoredSize) {
+		
 		if ( !MEMORY_CHECK ) return;
 		
 		System.out.print("\r[");
@@ -402,7 +473,7 @@ public class Utils {
 	    // System.out.println("Available processors (cores): " +  Runtime.getRuntime().availableProcessors());
 
 	    /* Total amount of free memory available to the JVM */
-	    System.out.print("Free memory (bytes): " + Runtime.getRuntime().freeMemory());
+	    System.out.print("Free memory (bytes): " + Runtime.getRuntime().freeMemory() + " [ Monitored size: " + monitoredSize + " ]");
 
 	    /* This will return Long.MAX_VALUE if there is no preset limit */
 	    // long maxMemory = Runtime.getRuntime().maxMemory();

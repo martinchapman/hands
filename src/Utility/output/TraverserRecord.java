@@ -1,5 +1,7 @@
 package Utility.output;
 
+import java.io.File;
+import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -16,8 +18,13 @@ import Utility.Utils;
  * @author Martin
  *
  */
-public class TraverserRecord implements Comparable<TraverserRecord> {
+public class TraverserRecord implements Comparable<TraverserRecord>, Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * 
 	 */
@@ -141,14 +148,14 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 	/**
 	 * 
 	 */
-	private Path datafile;
+	private String datafile;
 	
 	/**
 	 * @param datafile
 	 */
 	public void setDatafile(Path datafile) {
 		
-		this.datafile = datafile;
+		this.datafile = datafile.toString();
 		
 	}
 	
@@ -157,7 +164,7 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 	 */
 	public Path getDatafile() {
 		
-		return datafile;
+		return new File(datafile).toPath();
 		
 	}
 	
@@ -233,7 +240,7 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 		
 		this.rounds = record.getRounds();
 		
-		this.datafile = record.getDatafile();
+		this.datafile = record.getDatafile().toString();
 		
 		this.attributes = record.getAttributes();
 		
@@ -708,7 +715,6 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 		
 		int attributeAdditions = 0; 
 		
-		
 		// For each record 
 		for ( Entry<AttributeSetIdentifier, Hashtable<String, Double>> attributeEntry : attributeToValue.entrySet() ) {
 			
@@ -805,21 +811,35 @@ public class TraverserRecord implements Comparable<TraverserRecord> {
 	}
 	
 	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((traverser == null) ? 0 : traverser.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		
-		String traverserA = traverser;
-		String traverserB = ((TraverserRecord) obj).traverser;
-		
-		String opponentsA = opponents;
-		String opponentsB = ((TraverserRecord) obj).opponents;
-		
-		//return traverserA.equals(traverserB) && opponentsA.equals(opponentsB);
-		
-		return traverserA.equals(traverserB);
-		
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TraverserRecord other = (TraverserRecord) obj;
+		if (traverser == null) {
+			if (other.traverser != null)
+				return false;
+		} else if (!traverser.equals(other.traverser))
+			return false;
+		return true;
 	}
 	
 	/**

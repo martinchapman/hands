@@ -101,21 +101,71 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 	protected TreeMap<E, Double> strategyPayoff;
 	
 	/**
+	 * @param strategyProbabilityDistribution
+	 * @return
+	 */
+	private static <E> E selectStrategyProbabilityDistribution(ArrayList<Pair<E, Double>> strategyProbabilityDistribution) {
+		
+		double cumulativeCheck = 0.0;
+		
+		for ( Pair<E, Double> sPD : strategyProbabilityDistribution ) {
+			
+			cumulativeCheck += sPD.getElement1();
+			
+		}
+		
+		if ( cumulativeCheck > 1.0 ) throw new UnsupportedOperationException("Initial adaptive distribution greater than one.");
+		
+		if ( cumulativeCheck < 1.0 && cumulativeCheck > 0.0 ) throw new UnsupportedOperationException("Initial adaptive distribution does not add up to one.");
+	
+		if ( cumulativeCheck == 0.0 ) return strategyProbabilityDistribution.get((int)(Math.random() * strategyProbabilityDistribution.size())).getElement0();
+		
+		double lowerBound = 0.0;
+		
+		double upperBound = 0.0;
+		
+		double randomValue = Math.random();
+		
+		for ( Pair<E, Double> sPD : strategyProbabilityDistribution ) {
+			
+			upperBound += sPD.getElement1();
+			
+			if ( randomValue > lowerBound && randomValue < upperBound ) return sPD.getElement0();
+			
+			lowerBound = upperBound;
+			
+		}
+		
+		return null;
+		
+	}
+	
+	/**
 	 * @param graphController
 	 * @param strategyPortfolio
 	 * @param totalRounds
 	 */
-	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, String name, ArrayList<E> strategyPortfolio, int totalRounds, String initialStrategy) {
+	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, String name, ArrayList<Pair<E, Double>> strategyPortfolio, int totalRounds, String initialStrategy) {
 		
 		super(graphController, name);
 		
-		remainingStrategies = new ArrayList<E>(strategyPortfolio);
+		ArrayList<E> strategyPortfolioList = new ArrayList<E>();
 		
-		for ( E strategy : strategyPortfolio ) {
+		for ( Pair<E, Double> sPEntry : strategyPortfolio ) {
+			
+			strategyPortfolioList.add(sPEntry.getElement0());
+			
+		}
+		
+		remainingStrategies = new ArrayList<E>(strategyPortfolioList);
+		
+		for ( E strategy : strategyPortfolioList ) {
 			
 			if ( strategy.getName().equals(initialStrategy) ) {
 				
 				this.currentStrategy = strategy;
+				
+				this.previousStrategy = strategy;
 				
 			}
 			
@@ -125,7 +175,7 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 		
 		remainingStrategies.remove(currentStrategy);
 		
-		this.strategyPortfolio = strategyPortfolio;
+		this.strategyPortfolio = strategyPortfolioList;
 		
 		this.totalRounds = totalRounds;
 		
@@ -135,7 +185,7 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 		 * They should also be deregistered as stand-alone strategies.
 		 * 
 		 */
-		for ( E strategy : strategyPortfolio ) {
+		for ( E strategy : strategyPortfolioList ) {
 			
 			strategy.setResponsibleAgent(this.responsibleAgent);
 			
@@ -162,7 +212,7 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 	 * @param totalRounds
 	 * @param currentStrategy
 	 */
-	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, ArrayList<E> strategyPortfolio, int totalRounds, String currentStrategy) {
+	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, ArrayList<Pair<E, Double>> strategyPortfolio, int totalRounds, String currentStrategy) {
 		
 		this(graphController, "", strategyPortfolio, totalRounds, currentStrategy);
 		
@@ -173,9 +223,9 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 	 * @param numberOfHideLocations
 	 * @param strategyList
 	 */
-	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, String name, ArrayList<E> strategyPortfolio, int totalRounds) {
+	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, String name, ArrayList<Pair<E, Double>> strategyPortfolio, int totalRounds) {
 		
-		this( graphController, name, strategyPortfolio, totalRounds, strategyPortfolio.get((int)(Math.random()*strategyPortfolio.size())).getName());
+		this( graphController, name, strategyPortfolio, totalRounds, selectStrategyProbabilityDistribution(strategyPortfolio).getName());
 		
 	}
 	
@@ -184,9 +234,9 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 	 * @param strategyPortfolio
 	 * @param totalRounds
 	 */
-	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, ArrayList<E> strategyPortfolio, int totalRounds) {
+	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, ArrayList<Pair<E, Double>> strategyPortfolio, int totalRounds) {
 		
-		this( graphController, "", strategyPortfolio, totalRounds, strategyPortfolio.get((int)(Math.random()*strategyPortfolio.size())).getName());
+		this( graphController, "", strategyPortfolio, totalRounds, selectStrategyProbabilityDistribution(strategyPortfolio).getName());
 		
 	}
 	
@@ -198,10 +248,10 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 	 * @param cueTriggerThreshold
 	 * @param canReuse
 	 */
-	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, String name, ArrayList<E> strategyPortfolio, int totalRounds, 
+	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, String name, ArrayList<Pair<E, Double>> strategyPortfolio, int totalRounds, 
 			double cueTriggerThreshold, boolean canReuse) {
 		
-		this( graphController, name, strategyPortfolio,totalRounds, strategyPortfolio.get((int)(Math.random()*strategyPortfolio.size())).getName(), cueTriggerThreshold, canReuse );
+		this( graphController, name, strategyPortfolio,totalRounds, selectStrategyProbabilityDistribution(strategyPortfolio).getName(), cueTriggerThreshold, canReuse );
 		
 	}
 	
@@ -212,7 +262,7 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 	 * @param opponentPerformanceThreshold
 	 * @param ownPerformanceThreshold
 	 */
-	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, String name, ArrayList<E> strategyPortfolio, int totalRounds, String initialStrategy, 
+	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, String name, ArrayList<Pair<E, Double>> strategyPortfolio, int totalRounds, String initialStrategy, 
 			double cueTriggerThreshold, boolean canReuse) {
 		
 		this(graphController, name, strategyPortfolio, totalRounds, initialStrategy);
@@ -233,7 +283,7 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 	 * @param ownPerformanceThreshold
 	 * @param canReuse
 	 */
-	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, ArrayList<E> strategyPortfolio, int totalRounds, String initialStrategy,
+	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, ArrayList<Pair<E, Double>> strategyPortfolio, int totalRounds, String initialStrategy,
 			double cueThreshold, boolean canReuse) {
 		
 		this( graphController, "", strategyPortfolio, totalRounds, initialStrategy, cueThreshold, canReuse);
@@ -247,9 +297,9 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 	 * @param cueThreshold
 	 * @param canReuse
 	 */
-	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, ArrayList<E> strategyPortfolio, int totalRounds, double cueThreshold, boolean canReuse) {
+	public AdaptiveGraphTraversingAgent( GraphController<StringVertex, StringEdge> graphController, ArrayList<Pair<E, Double>> strategyPortfolio, int totalRounds, double cueThreshold, boolean canReuse) {
 		
-		this( graphController, "", strategyPortfolio, totalRounds, strategyPortfolio.get((int)(Math.random()*strategyPortfolio.size())).getName(), cueThreshold, canReuse);
+		this( graphController, "", strategyPortfolio, totalRounds, selectStrategyProbabilityDistribution(strategyPortfolio).getName(), cueThreshold, canReuse);
 			
 	}
 	
@@ -588,9 +638,11 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 		currentStrategy.stopStrategy();
 		
 		// Attempt to transfer the knowledge we gained from the last strategy to the new one.
-		currentStrategy.mergeOtherTraverser(previousStrategy);
+		// currentStrategy.mergeOtherTraverser(previousStrategy);
 		
 		currentStrategy = strategy;
+		
+		strategy.mergeOtherTraverser(previousStrategy);
 		
 		Utils.talk(toString(), "Changing from " + previousStrategy + " to: " + currentStrategy);
 				

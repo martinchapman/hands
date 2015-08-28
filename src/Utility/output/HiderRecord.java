@@ -1,5 +1,7 @@
 package Utility.output;
 
+import java.io.File;
+import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,6 +14,10 @@ import Utility.Utils;
 
 public class HiderRecord extends TraverserRecord {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	/**
 	 * 
 	 */
@@ -38,14 +44,14 @@ public class HiderRecord extends TraverserRecord {
 	/**
 	 * 
 	 */
-	private Path fileRelatingTo;
+	private String fileRelatingTo;
 	
 	/**
 	 * @return
 	 */
 	public Path getFileRelatingTo() {
 		
-		return fileRelatingTo;
+		return new File(fileRelatingTo).toPath();
 	
 	}
 	
@@ -58,7 +64,7 @@ public class HiderRecord extends TraverserRecord {
 		
 		this.seekersAndAttributes = new ArrayList<TraverserRecord>(((HiderRecord)record).getSeekersAndAttributes());
 		
-		this.fileRelatingTo = ((HiderRecord)record).getFileRelatingTo();
+		this.fileRelatingTo = ((HiderRecord)record).getFileRelatingTo().toString();
 		
 	}
 	
@@ -81,7 +87,7 @@ public class HiderRecord extends TraverserRecord {
 		
 		super(hider);
 		
-		this.fileRelatingTo = fileRelatingTo;
+		this.fileRelatingTo = fileRelatingTo.toString();
 		
 		seekersAndAttributes = new ArrayList<TraverserRecord>();
 	
