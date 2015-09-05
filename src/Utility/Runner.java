@@ -393,7 +393,7 @@ public class Runner extends JFrame {
 		} else {
 			
 			hiderCopy = new HiderRecord("");
-			
+
 		}
 		
 		hiderCopy.duplicateRecord(hiderRecord);
@@ -405,6 +405,36 @@ public class Runner extends JFrame {
 		hiderCopy.setOpponents(hidersSeeker.getTraverser());
 		
 		outputFeedback.addElement(hiderCopy);
+		
+		if ( hiderRecord instanceof GroupedHiderRecords ) {
+			
+			((GroupedHiderRecords)hiderCopy).clearAllHiders();
+			
+			for ( HiderRecord innerHider : ((GroupedHiderRecords)hiderRecord).allHidersNoOuter() ) {
+				
+				HiderRecord innerHiderCopy = new HiderRecord("");
+				
+				innerHiderCopy.duplicateRecord(innerHider);
+				
+				for ( TraverserRecord innerHiderSeeker : innerHider.getSeekersAndAttributes() ) {
+					
+					if ( !innerHiderSeeker.getTraverser().equals(hidersSeeker.getTraverser()) ) {
+						
+						innerHiderCopy.getSeekersAndAttributes().remove(innerHiderSeeker);
+						
+					} else {
+					
+						innerHiderCopy.setOpponents(innerHiderSeeker.getTraverser());
+						
+					}
+					
+				}
+				
+				((GroupedHiderRecords)hiderCopy).addHider(innerHiderCopy);
+				
+			}
+			
+		}
 		
 	}
 	
@@ -494,7 +524,9 @@ public class Runner extends JFrame {
 				outputFeedback.clear();
 				
 				if ( OFF_HEAP ) {
-				
+				    
+					if ( Runner.this.textBased ) System.out.println("\nWriting processed results:");
+					
 					for (Entry<Integer, BTreeMap<Integer, HiderRecord>> fileHiderRecord : ((OutputManagerOffHeap)outputManager).getOffHeapCache().entrySet()) {
 	
 						Utils.printSystemStats();
@@ -953,15 +985,15 @@ public class Runner extends JFrame {
 					
 					ApproximatePayoffMatrix HPM = new ApproximatePayoffMatrix("");
 					
-					for ( Entry<TraverserRecord, Double> seekerPayoff : outputManager.matrixPayoff(selectedSeekers, allPlayers).entrySet() ) {
+					for ( Pair<TraverserRecord, Double> seekerPayoff : outputManager.matrixPayoff(selectedSeekers, allPlayers) ) {
 						
-						HPM.addPayoff("Seeker", seekerPayoff.getKey().toString().split(" vs ")[0], seekerPayoff.getKey().toString().split(" vs ")[1], seekerPayoff.getValue());
+						HPM.addPayoff("Seeker", seekerPayoff.getElement0().toString().split(" vs ")[0], seekerPayoff.getElement0().toString().split(" vs ")[1], seekerPayoff.getElement1());
 						
 					}
 					
-					for ( Entry<TraverserRecord, Double> hiderPayoff : outputManager.matrixPayoff(selectedHiders, allPlayers).entrySet() ) {
+					for ( Pair<TraverserRecord, Double> hiderPayoff : outputManager.matrixPayoff(selectedHiders, allPlayers) ) {
 						
-						HPM.addPayoff("Hider", hiderPayoff.getKey().toString().split(" vs ")[0], hiderPayoff.getKey().toString().split(" vs ")[1], hiderPayoff.getValue());
+						HPM.addPayoff("Hider", hiderPayoff.getElement0().toString().split(" vs ")[0], hiderPayoff.getElement0().toString().split(" vs ")[1], hiderPayoff.getElement1());
 						
 						
 					}
@@ -1732,6 +1764,11 @@ public class Runner extends JFrame {
 	}
 	
 	/**
+	 * 
+	 */
+	private boolean ASK_FOR_CATEGORY = false;
+	
+	/**
 	 * @param in
 	 * @throws NumberFormatException
 	 */
@@ -1791,11 +1828,19 @@ public class Runner extends JFrame {
 						
 					}
 					
-					while ( !itemsInList(categories.getModel()).contains(response) ) {
+					if ( ASK_FOR_CATEGORY ) {
+						
+						while ( !itemsInList(categories.getModel()).contains(response) ) {
 					
-						response = askQuestion("Enter bar category (" + itemsInList(categories.getModel()) + "). (Enter) for default: " + categories.getModel().getElementAt(categories.getSelectedIndex()) + " or (back).", in);
+							response = askQuestion("Enter bar category (" + itemsInList(categories.getModel()) + "). (Enter) for default: " + categories.getModel().getElementAt(categories.getSelectedIndex()) + " or (back).", in);
 					
-						if ( response.equals("") || checkForBack(response) ) break;
+							if ( response.equals("") || checkForBack(response) ) break;
+						
+						}
+					
+					} else {
+						
+						response = "";
 						
 					}
 					
@@ -1960,6 +2005,10 @@ public class Runner extends JFrame {
 					} catch (NumberFormatException e ) { 
 						
 						System.out.println("Input error, restarting...");
+						
+					} catch (Exception e) {
+						
+						System.out.println("Restarting...");
 						
 					}
 				

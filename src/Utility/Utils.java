@@ -84,7 +84,7 @@ public class Utils {
 	/**
 	 * 
 	 */
-	public static boolean MEMORY_CHECK = true;
+	public static boolean MEMORY_CHECK = false;
 	
 	/**
 	 * 
@@ -105,7 +105,7 @@ public class Utils {
 	            .asyncWriteFlushDelay(100)
 	            //some additional options for DB
 	            .asyncWriteEnable()
-	            //.cacheSize(100000)
+	            .cacheSize(1000000000)
 	            .closeOnJvmShutdown()
 	            //.compressionEnable()
 	            .make();
@@ -180,6 +180,8 @@ public class Utils {
 	public static ArrayList<Path> listFilesForFolder(final File folder) {
 		
 		ArrayList<Path> files = new ArrayList<Path>();
+		
+		if ( !folder.exists() ) return files;
 		
 	    for (final File fileEntry : folder.listFiles()) {
 	    	

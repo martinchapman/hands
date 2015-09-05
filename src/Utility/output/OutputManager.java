@@ -99,6 +99,8 @@ public class OutputManager {
 		
 		ArrayList<Path> files = Utils.listFilesForFolder(new File(FILEPREFIX + "data"));
 		
+		if ( files.size() == 0 ) files.addAll(Utils.listFilesForFolder(new File(FILEPREFIX + "data-sample")));
+		
 		ArrayList<Datafile> availableFiles = new ArrayList<Datafile>();
 		
 		if (files.size() == 0) {
@@ -176,8 +178,6 @@ public class OutputManager {
 			ArrayList<ArrayList<HiderRecord>> toBeSplit = new ArrayList<ArrayList<HiderRecord>>();
 			
 			for ( Datafile file : ((GroupedDatafiles)datafile).getAllDatafiles() ) {
-				
-				System.out.println("\nProcessing datafile");
 				
 				toBeSplit.add(createHiderRecords(file.getPath()));
 				
@@ -623,13 +623,13 @@ public class OutputManager {
 	 * @param traverserRecords
 	 * @return
 	 */
-	public Hashtable<TraverserRecord, Double> matrixPayoff(ArrayList<TraverserRecord> traverserRecords, ArrayList<TraverserRecord> allPlayers) {
+	public ArrayList<Pair<TraverserRecord, Double>> matrixPayoff(ArrayList<TraverserRecord> traverserRecords, ArrayList<TraverserRecord> allPlayers) {
 		
-		Hashtable<TraverserRecord, Double> matrixPayoffValues = new Hashtable<TraverserRecord, Double>();
+		ArrayList<Pair<TraverserRecord, Double>> matrixPayoffValues = new ArrayList<Pair<TraverserRecord, Double>>();
 		
 		for ( TraverserRecord traverser : traverserRecords ) {
 			
-			matrixPayoffValues.put(traverser, traverserPayoff(traverser, minForAttributeInAllSeries(allPlayers, "Game", GraphType.BAR), maxForAttributeInAllSeries(allPlayers, "Game", GraphType.BAR)).getValue() * 10);
+			matrixPayoffValues.add(new Pair<TraverserRecord, Double>(traverser, traverserPayoff(traverser, minForAttributeInAllSeries(allPlayers, "Game", GraphType.BAR), maxForAttributeInAllSeries(allPlayers, "Game", GraphType.BAR)).getValue() * 10));
 			
 		}
 		
@@ -707,7 +707,7 @@ public class OutputManager {
 			return;
 			
 		}
-			
+		
 		SignificanceTable significanceTable = new SignificanceTable(); 
 		
 		if ( graphType.equals("Bar") ) SHOW_OPPONENT = false;
@@ -750,11 +750,7 @@ public class OutputManager {
 			
 			for ( TraverserRecord traverser : traverserRecords ) {
 				
-				String traverserName = traverser.toString();
-				
-				if (traverserName.contains("-")) traverserName = traverserName.substring(0, traverserName.indexOf("-"));
-				
-				if ( !multipleAttributeToValues.containsKey(traverserName)) multipleAttributeToValues.put(traverserName, new ArrayList<ArrayList<Double>>());
+				if ( !multipleAttributeToValues.containsKey(traverser.getTraverser())) multipleAttributeToValues.put(traverser.getTraverser(), new ArrayList<ArrayList<Double>>());
 				
 				ArrayList<Double> attributeToValues = new ArrayList<Double>();
 				
@@ -768,7 +764,7 @@ public class OutputManager {
 							
 							double cumulativeNormalisedSeekerCosts = 0.0;
 
-							if ( ((HiderRecord)traverser).getSeekersAndAttributes().size() > 1 ) System.err.println("WARNING: A Hider is matched to more than one seeking agent. Taking an average of the performance of these seekers in order to calculate payoff.");
+							//if ( ((HiderRecord)traverser).getSeekersAndAttributes().size() > 1 ) System.err.println("WARNING: A Hider is matched to more than one seeking agent. Taking an average of the performance of these seekers in order to calculate payoff.");
 							
 							for ( TraverserRecord hidersSeeker : ((HiderRecord)traverser).getSeekersAndAttributes()) {
 								
@@ -789,18 +785,17 @@ public class OutputManager {
 					
 						attributeToValues.add( seriesEntry.getValue().get(yLabel)  );
 					
-						
 					}
 					
 					seriesNumber++;
 					
 				}
 				
-				multipleAttributeToValues.get(traverserName).add(attributeToValues);
+				multipleAttributeToValues.get(traverser.getTraverser()).add(attributeToValues);
 				
 				if (graphType.equals("Line")) {
 					
-					((GNULineGraph) graph).addDataset(traverserName, attributeToValues);
+					((GNULineGraph) graph).addDataset(traverser.toString(), attributeToValues);
 					
 				}
 				
@@ -1306,7 +1301,7 @@ public class OutputManager {
 	/**
 	 * 
 	 */
-	protected final static String FILEPREFIX = "Output/";
+	protected final static String FILEPREFIX = "output/";
 	
 	/**
 	 * @param source

@@ -862,7 +862,7 @@ public class ApproximatePayoffMatrix {
 		
 		try {
 			
-			tikzOutputWriter = new FileWriter(Utils.FILEPREFIX + "data/charts/" + outputPath + ".tex", true);
+			tikzOutputWriter = new FileWriter(Utils.FILEPREFIX + "charts/" + outputPath + ".tex", true);
 			
 		} catch (IOException e) {
 			
@@ -896,7 +896,7 @@ public class ApproximatePayoffMatrix {
 			
 			}
 			
-			Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "/data/charts/figures.bib", true), "\n @FIG{" + outputPath + ", main = {" + captionString + "}, add = {}, file = {/Users/Martin/Dropbox/workspace/SearchGames/output/data/charts/" + outputPath + "}, source = {}}");
+			Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "/charts/figures.bib", true), "\n @FIG{" + outputPath + ", main = {" + captionString + "}, add = {}, file = {/Users/Martin/Dropbox/workspace/SearchGames/output/charts/" + outputPath + "}, source = {}}");
 		
 		} catch (IOException e) {
 			

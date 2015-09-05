@@ -1233,7 +1233,7 @@ public class Main {
 				
 				for (int i = 0; i < rounds; i++) {
 		        	
-		        	System.out.println("Game " + gameNumber + " Round " + i + ": " + ( ( i / ( ( (float) rounds * hiders.size() ) ) ) * totalGames ) + "%");
+		        	Utils.talk("", "Game " + gameNumber + " Round " + i + ": " + ( ( i / ( ( (float) rounds * hiders.size() ) ) ) * totalGames ) + "%");
 		        	
 		        	/* 
 		        	 * Allows rounds to act as individual games. Useful for varying parameters per a set
