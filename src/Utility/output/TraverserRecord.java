@@ -524,6 +524,8 @@ public class TraverserRecord implements Comparable<TraverserRecord>, Serializabl
 		
 	}
 
+	boolean ONLY_DISPLAY_SHARED_ATTRIBUTED = false;
+	
 	/**
 	 * 
 	 * Match each attribute to a dataset containing values for all games (effectively switches attributeToValue).
@@ -543,7 +545,7 @@ public class TraverserRecord implements Comparable<TraverserRecord>, Serializabl
 					  
 					if ( attributeToValue.size() > 1 && minAttributeToValueAllSeries != null && maxAttributeToValueAllSeries != null ) {
 						
-						if ( minAttributeToValueAllSeries.containsKey(attributeToValueEntry.getKey()) && maxAttributeToValueAllSeries.containsKey(attributeToValueEntry.getKey())) {
+						if ( !ONLY_DISPLAY_SHARED_ATTRIBUTED || ( minAttributeToValueAllSeries.containsKey(attributeToValueEntry.getKey()) && maxAttributeToValueAllSeries.containsKey(attributeToValueEntry.getKey()) ) ) {
 							
 							attributeToDataset.get(attributeToValueEntry.getKey()).addItemToDataset( (attributeToValueEntry.getValue() - minAttributeToValueAllSeries.get(attributeToValueEntry.getKey())) / (maxAttributeToValueAllSeries.get(attributeToValueEntry.getKey()) - minAttributeToValueAllSeries.get(attributeToValueEntry.getKey())) );
 						
@@ -559,7 +561,7 @@ public class TraverserRecord implements Comparable<TraverserRecord>, Serializabl
 					
 					if ( attributeToValue.size() > 1 && minAttributeToValueAllSeries != null && maxAttributeToValueAllSeries != null ) {
 						
-						if ( minAttributeToValueAllSeries.containsKey(attributeToValueEntry.getKey()) && maxAttributeToValueAllSeries.containsKey(attributeToValueEntry.getKey())) {
+						if ( !ONLY_DISPLAY_SHARED_ATTRIBUTED || ( minAttributeToValueAllSeries.containsKey(attributeToValueEntry.getKey()) && maxAttributeToValueAllSeries.containsKey(attributeToValueEntry.getKey()) ) ) {
 						
 							TraverserDataset gameEntriesForAttribute = new TraverserDataset( (attributeToValueEntry.getValue() - minAttributeToValueAllSeries.get(attributeToValueEntry.getKey()) ) / ( maxAttributeToValueAllSeries.get(attributeToValueEntry.getKey()) - minAttributeToValueAllSeries.get(attributeToValueEntry.getKey()) ) );
 						

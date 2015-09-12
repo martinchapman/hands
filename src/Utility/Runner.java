@@ -94,6 +94,7 @@ public class Runner extends JFrame {
 		  "RandomSetStaticBetween",
 		  "UniqueRandomSet",
 		  "UniqueRandomSetRepeat",
+		  "UniqueRandomSetRepeatStrategyOver",
 		  "UniqueRandomSetRepeatRandomNodes",
 		  "AutomaticUniqueRandomSetRepeat",
 		  
@@ -184,7 +185,9 @@ public class Runner extends JFrame {
 		  
 		  "UnknownRandom",
 		  "MetaRandom",
-		  "MetaConnected"
+		  "MetaRandomStrategyOver",
+		  "MetaConnected",
+		  "MetaConnectedStrategyOver"
 		  
 		};
 	
@@ -228,7 +231,8 @@ public class Runner extends JFrame {
           
           // 
           
-          "MetaProbability"
+          "MetaProbability",
+          "MetaProbabilityStrategyOver"
           
 		};
 	
@@ -457,6 +461,34 @@ public class Runner extends JFrame {
 			
 		});
 		
+	}
+	
+	/**
+	 * 
+	 */
+	private void refreshMeasureList() {
+		
+		measure.removeAllItems();
+		
+		measure.addItem("Payoff");
+		
+		if ( seekers.isSelected() ) {
+			
+			for ( String attribute : outputFeedbackList.getSelectedValue().getSeekerAttributes() ) {
+				
+				measure.addItem(attribute);
+				
+			}
+		
+		} else {
+			
+			for ( String attribute : outputFeedbackList.getSelectedValue().getAttributes() ) {
+				
+				measure.addItem(attribute);
+				
+			}
+			
+		}
 	}
 	
 	/**
@@ -701,27 +733,7 @@ public class Runner extends JFrame {
 				
 				if (outputFeedbackList.getSelectedIndex() == -1 || outputFeedbackList.getSelectedValue().toString().equals("-----")) return;
 				
-				measure.removeAllItems();
-				
-				measure.addItem("Payoff");
-				
-				if ( seekers.isSelected() ) {
-				
-					for ( String attribute : outputFeedbackList.getSelectedValue().getSeekerAttributes() ) {
-						
-						measure.addItem(attribute);
-						
-					}
-				
-				} else {
-					
-					for ( String attribute : outputFeedbackList.getSelectedValue().getAttributes() ) {
-						
-						measure.addItem(attribute);
-						
-					}
-					
-				}
+				refreshMeasureList();
 				
 				simulationParameters.setText("<html><body style='width: 100px;'>Simulation parameters: " + outputFeedbackList.getSelectedValue().getParameters() + "</body></html>");
 				
@@ -839,6 +851,8 @@ public class Runner extends JFrame {
 		graphTypesCombo.addItem("Bar");
 		
 		graphTypesCombo.addItem("Line");
+		
+		graphTypesCombo.addItem("LineOne");
 		
 		graphTypesCombo.addItem("3D");
 		
@@ -1404,7 +1418,7 @@ public class Runner extends JFrame {
 				
 				try {
 					
-					writer = new FileWriter(Utils.FILEPREFIX + "simulationSchedule.txt");
+					writer = new FileWriter(Utils.FILEPREFIX + SIMULATION_SCHEDULE);
 					
 					writer.write("");
 					
@@ -1792,6 +1806,8 @@ public class Runner extends JFrame {
 				
 			}
 			
+			refreshMeasureList();
+			
 			while ( !itemsInList(measure.getModel()).contains(response) ) {
 			
 				response = askQuestion("Enter measure (" + itemsInList(measure.getModel()) + "). (Enter) for default: " + measure.getModel().getElementAt(measure.getSelectedIndex()) + " or (back).", in);
@@ -2062,6 +2078,11 @@ public class Runner extends JFrame {
 	private boolean generateOutput = true;
 	
 	/**
+	 * 
+	 */
+	private String SIMULATION_SCHEDULE = "simulationSchedule.txt";
+	
+	/**
 	 * @param args
 	 */
 	public Runner(String[] args) {
@@ -2088,6 +2109,12 @@ public class Runner extends JFrame {
 				
 				generateOutput = false;
 				
+			}
+			
+			if ( argsList.contains("-ss")) {
+				
+				SIMULATION_SCHEDULE = argsList.get(argsList.indexOf("-ss") + 1);
+			
 			}
 			
 		}
@@ -2127,7 +2154,7 @@ public class Runner extends JFrame {
 		generateGUI();
 		
 		// Collect list of simulations
-        simulations = Utils.readFromFile(Utils.FILEPREFIX + "simulationSchedule.txt");
+        simulations = Utils.readFromFile(Utils.FILEPREFIX + SIMULATION_SCHEDULE);
         
         for (String simulation : simulations) { 
         	
@@ -2188,9 +2215,9 @@ public class Runner extends JFrame {
 				
 					try {
 						
-						Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "simulationSchedule.txt", true), Arrays.toString(getUISettings()).substring(1, Arrays.toString(getUISettings()).length() - 1) + "\n");
+						Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + SIMULATION_SCHEDULE, true), Arrays.toString(getUISettings()).substring(1, Arrays.toString(getUISettings()).length() - 1) + "\n");
 						
-						simulations = Utils.readFromFile(Utils.FILEPREFIX + "simulationSchedule.txt");
+						simulations = Utils.readFromFile(Utils.FILEPREFIX + SIMULATION_SCHEDULE);
 						
 					} catch (IOException e1) {
 					

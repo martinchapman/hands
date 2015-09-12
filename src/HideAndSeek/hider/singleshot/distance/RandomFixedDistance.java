@@ -55,11 +55,11 @@ public class RandomFixedDistance extends HidingAgent {
 	 */
 	public boolean hideHere(StringVertex vertex) {
 		
-		Utils.talk(toString(), "exploredNodes.size() " + exploredNodes.size() + " minHideDistance: " + minHideDistance );
+		Utils.talk(toString(), "exploredNodes.size() " + exploredNodesSize() + " minHideDistance: " + minHideDistance );
 		
 		if (minHideDistance == 0) { return true; }
 		
-		if ( exploredNodes.size() > 0 && ( exploredNodes.size() % minHideDistance == 0 ) ) { 
+		if ( exploredNodesSize() > 0 && ( exploredNodesSize() % minHideDistance == 0 ) ) { 
 			
 			return true;
 			

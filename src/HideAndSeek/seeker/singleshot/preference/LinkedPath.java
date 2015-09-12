@@ -177,7 +177,7 @@ public class LinkedPath extends SeekingAgent implements VariableTraversalStrateg
 			// Record first node found to contain an object
 			if ( firstNode == null ) firstNode = hideLocations().get(0);
 			
-			if ( hideLocations().contains(currentNode) && Collections.frequency(exploredNodes(), currentNode) == 1) {
+			if ( hideLocations().contains(currentNode) && exploredNodesTable().containsKey(currentNode) && exploredNodesTable().get(currentNode) == 1) {
 				
 				potentialNodes.clear();
 				

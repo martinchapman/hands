@@ -3,6 +3,9 @@ import shutil, errno, os, subprocess, datetime, time, sys
 nocopy = False
 nokill = False
 nodelete = False
+schedule_file_name = "simulationSchedule.txt"
+
+print sys.argv
 
 if ( len(sys.argv) > 0 ):
     for arg in sys.argv:
@@ -11,7 +14,9 @@ if ( len(sys.argv) > 0 ):
             nodelete = True
         if ( arg == "-nk"):
             nokill = True
-        
+        if ( arg == "-ss"):
+            schedule_file_name = sys.argv[sys.argv.index("-ss") + 1]
+
 ts = time.time()
 
 dropbox_directory = "/Volumes/Storage/Dropbox/workspace/SearchGames"
@@ -29,7 +34,7 @@ else:
     
 jar_directory = root_copy_directory + "/bin"
 lib_directory = root_copy_directory + "/lib"
-schedule_file = root_copy_directory + "/output/simulationSchedule.txt"
+schedule_file = root_copy_directory + "/output/" + schedule_file_name
 
 target_directory = "/Users/Martin/Desktop/" + datetime.datetime.fromtimestamp(ts).strftime('%Y%m%d_%H%M%S')
 
@@ -42,7 +47,10 @@ if not os.path.exists(target_directory):
     os.makedirs(target_directory + "/output/dataArchive")
     os.makedirs(target_directory + "/output/data/charts")
     file = open(target_directory + "/output/simRecordID.txt",'w')
-    
+
+def rename(src, dst):
+    os.rename(src, dst)
+             
 def copyanything(src, dst):
     try:
         shutil.copytree(src, dst)
@@ -69,6 +77,8 @@ copyanything(lib_directory, target_directory + "/lib")
 print "Copying schedule from " + schedule_file + "..."
 
 copyanything(schedule_file, target_directory + "/output")
+
+rename(target_directory + "/output/" + schedule_file_name, target_directory + "/output/simulationSchedule.txt")
 
 os.chdir(target_directory)
 

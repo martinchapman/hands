@@ -4,13 +4,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.TreeSet;
 
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
 import HideAndSeek.graph.StringVertex;
-import HideAndSeek.seeker.Seeker;
 import Utility.ComparatorResult;
 import Utility.Utils;
 
@@ -209,7 +210,7 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 		hideLocations = new ArrayList<StringVertex>();
 		
 		// List of nodes that have been explored
-		exploredNodes = new ArrayList<StringVertex>();
+		exploredNodes = new Hashtable<StringVertex, Integer>();
 		
 		queuedNodes = new ArrayList<StringVertex>();
 		
@@ -339,14 +340,30 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 	/**
 	 * 
 	 */
-	protected ArrayList<StringVertex> exploredNodes;
+	private Hashtable<StringVertex, Integer> exploredNodes;
 
 	/**
 	 * @return
 	 */
-	public ArrayList<StringVertex> exploredNodes() {
+	public Hashtable<StringVertex, Integer> exploredNodesTable() {
 	
 		return exploredNodes;
+	
+	}
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraverser#exploredNodesSize()
+	 */
+	public int exploredNodesSize() {
+		
+		int exploredNodesSize = 0;
+		
+		for ( Entry<StringVertex, Integer> entry : exploredNodes.entrySet() ) {
+			
+			exploredNodesSize += entry.getValue();
+		}
+		
+		return exploredNodesSize;
 	
 	}
 	
@@ -361,14 +378,54 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 		
 	}
 	
+	protected void addExploredNode(StringVertex node) {
+		
+		if ( exploredNodes.containsKey(node) ) {
+			
+			int frequency = exploredNodes.get(node);
+			
+			exploredNodes.put(node, ++frequency);
+			
+		} else {
+			
+			exploredNodes.put(node, 1);
+			
+		}
+		
+	}
+	
+	/**
+	 * @param node
+	 */
+	protected void addAllExploredNodes(Hashtable<StringVertex, Integer> nodeToFrequency) {
+		
+		for ( Entry<StringVertex,Integer> nodeToFrequencyEntry : nodeToFrequency.entrySet() ) {
+			
+			if ( exploredNodes.containsKey(nodeToFrequencyEntry.getKey()) ) {
+				
+				int frequency = exploredNodes.get(nodeToFrequencyEntry.getKey());
+				
+				exploredNodes.put(nodeToFrequencyEntry.getKey(), frequency + nodeToFrequencyEntry.getValue());
+				
+			} else {
+				
+				exploredNodes.put(nodeToFrequencyEntry.getKey(), 1);
+				
+			}
+			
+		}
+		
+		
+	}
+	
 	/**
 	 * 
 	 */
 	protected void atNode() {
 	
-		//Utils.talk(toString(), "At node " + currentNode);
+		Utils.talk(toString(), "At node " + currentNode);
 		
-		exploredNodes.add(currentNode);
+		addExploredNode(currentNode);
 		
 		addUniquelyVisitedNode(currentNode);
 		
@@ -759,7 +816,7 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 		
 		this.uniquelyVisitedNodes.addAll(traverser.uniquelyVisitedNodes());
 		
-		this.exploredNodes.addAll(traverser.exploredNodes());
+		addAllExploredNodes(traverser.exploredNodesTable());
 		
 		this.hideLocations.addAll(traverser.requestHideLocations(responsibleAgent));
 		

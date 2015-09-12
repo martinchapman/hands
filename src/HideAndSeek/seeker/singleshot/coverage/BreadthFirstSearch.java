@@ -150,7 +150,7 @@ public class BreadthFirstSearch extends SeekingAgent {
 	 */
 	public String printRoundStats() {
 		
-		Utils.talk(toString(), "Explored nodes: " + exploredNodes);
+		Utils.talk(toString(), "Explored nodes: " + exploredNodesTable());
 		
 		return super.printRoundStats();
 		

@@ -233,8 +233,7 @@ public class LeastConnected extends PreferenceHider {
 		// Ensure the check for edge connectivity is only made when *at* a node
 		if ( currentNode == vertex && getConnectedEdges(vertex).size() == MIN_CONNECTIONS ) { 
 			
-			if ( !leastConnectedNodes.contains(vertex) ) leastConnectedNodes.add(vertex);
-			
+			// Will trigger super method to hide immediately
 			addTargetVertex(vertex);
 			
 		} 

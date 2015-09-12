@@ -2,6 +2,7 @@ package HideAndSeek;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Hashtable;
 
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
@@ -107,7 +108,12 @@ public interface GraphTraverser extends Comparable<GraphTraverser>, Runnable {
 	/**
 	 * @return
 	 */
-	public ArrayList<StringVertex> exploredNodes();
+	public Hashtable<StringVertex, Integer> exploredNodesTable();
+	
+	/**
+	 * @return
+	 */
+	public int exploredNodesSize();
 	
 	/**
 	 * @return

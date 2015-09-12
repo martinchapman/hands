@@ -271,7 +271,7 @@ public abstract class PreferenceHider extends HidingAgent implements VariableTra
 		
 		// Number of hide locations ensures that we do not re-explore after targets have been removed
 		if ( ( targetVertices.size() + graphController.numberOfHideLocations(responsibleAgent) ) < TARGET_VERTICES_SIZE ) {
-
+			
 			return explorationMechanism.nextNode(currentNode);
 			
 		} else {

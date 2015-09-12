@@ -98,7 +98,7 @@ public class BacktrackGreedy extends SeekingAgent {
 			for (StringEdge edge : getConnectedEdges(currentNode) ) {
 				
 				// Do not relist nodes as unvisited if they have already been visited
-				if ( !exploredNodes.contains(edgeToTarget(edge, currentNode)) ) unvisitedNodes.add(edgeToTarget(edge, currentNode));
+				if ( !exploredNodesTable().containsKey(edgeToTarget(edge, currentNode)) ) unvisitedNodes.add(edgeToTarget(edge, currentNode));
 				
 			}
 			
@@ -188,7 +188,7 @@ public class BacktrackGreedy extends SeekingAgent {
 		super.endOfRound();
 		
 		// Need to clear in this instance for this mechanism.
-		exploredNodes.clear();
+		exploredNodesTable().clear();
 		
 		currentPath.clear();
 		

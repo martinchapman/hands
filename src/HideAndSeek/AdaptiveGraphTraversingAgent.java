@@ -140,6 +140,15 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.GraphTraversingAgent#strategyOverRounds()
+	 */
+	public boolean strategyOverRounds() {
+		
+		return true;
+		
+	}
+	
 	/**
 	 * @param graphController
 	 * @param strategyPortfolio
@@ -201,7 +210,7 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 		
 		Utils.talk(toString(), "---> Using strategy: " + currentStrategy);
 		
-		this.strategyChanges = 0;
+		this.BehaviouralChanges = 0;
 		
 	}
 
@@ -609,7 +618,7 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 	/**
 	 * 
 	 */
-	private int strategyChanges;
+	private int BehaviouralChanges;
 	
 	/**
 	 * Change to a random strategy
@@ -633,7 +642,7 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 	 */
 	public void changeToOtherStrategy(E strategy) {
 		
-		strategyChanges++;
+		BehaviouralChanges++;
 		
 		currentStrategy.stopStrategy();
 		
@@ -642,7 +651,7 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 		
 		currentStrategy = strategy;
 		
-		strategy.mergeOtherTraverser(previousStrategy);
+		currentStrategy.mergeOtherTraverser(previousStrategy);
 		
 		Utils.talk(toString(), "Changing from " + previousStrategy + " to: " + currentStrategy);
 				
@@ -670,6 +679,11 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 	
 	}
 	
+	/**
+	 * Whether this is the first strategy change
+	 */
+	private boolean firstBehaviouralChange = true;
+	
 	/* (non-Javadoc)
 	 * @see HideAndSeek.GraphTraversingAgent#printRoundStats()
 	 */
@@ -680,13 +694,24 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 			
 			previousStrategy = currentStrategy;
 			
-			return currentStrategy.printRoundStats() + ",StrategyChange,1";
+			if ( firstBehaviouralChange ) {
+				
+				firstBehaviouralChange = false;
+				
+				return currentStrategy.printRoundStats() + ",BehaviouralChange,1,FirstBehaviouralChange,1";
+				
+			} else {
+				
+				return currentStrategy.printRoundStats() + ",BehaviouralChange,1,FirstBehaviouralChange,0";
+				
+			}
+			
 		
 		} else {
 		
 			previousStrategy = currentStrategy;
 			
-			return currentStrategy.printRoundStats() + ",StrategyChange,0";
+			return currentStrategy.printRoundStats() + ",BehaviouralChange,0,FirstBehaviouralChange,0";
 		
 		}
 		
@@ -726,9 +751,9 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 	 * @return
 	 */
 	@Override
-	public ArrayList<StringVertex> exploredNodes() {
+	public Hashtable<StringVertex, Integer> exploredNodesTable() {
 	
-		return currentStrategy.exploredNodes();
+		return currentStrategy.exploredNodesTable();
 	
 	}
 

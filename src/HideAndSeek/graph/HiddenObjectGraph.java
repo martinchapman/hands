@@ -37,6 +37,11 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	/**
 	 * 
 	 */
+	private boolean RECORD_PATH_DATA = false;
+	
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -860,31 +865,46 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 			
 			Hashtable<GraphTraverser, ArrayList<V>> thisRoundPathData = roundPaths.get(roundPaths.size() - 1);
 			
-			if (thisRoundPathData.containsKey(traverser)) {
+			if ( RECORD_PATH_DATA ) {
 				
-				ArrayList<V> traverserPath = thisRoundPathData.get(traverser);
-				
-				if (traverserPath.get(traverserPath.size() -1).equals(sourceVertex)) {
+				if (thisRoundPathData.containsKey(traverser)) {
 					
-					traverserPath.add(targetVertex);
+					ArrayList<V> traverserPath = thisRoundPathData.get(traverser);
+					
+					if (traverserPath.get(traverserPath.size() -1).equals(sourceVertex)) {
+						
+						traverserPath.add(targetVertex);
+						
+					} else {
+						
+						traverserPath.add(sourceVertex);
+						
+					}
+					
+					thisRoundPathData.put(traverser, traverserPath);
 					
 				} else {
+				
+					ArrayList<V> traverserPath = new ArrayList<V>();
 					
 					traverserPath.add(sourceVertex);
 					
+					traverserPath.add(targetVertex);
+					
+					thisRoundPathData.put(traverser, traverserPath);
+					
 				}
-				
-				thisRoundPathData.put(traverser, traverserPath);
-				
-			} else {
 			
-				ArrayList<V> traverserPath = new ArrayList<V>();
+			} else {
 				
-				traverserPath.add(sourceVertex);
-				
-				traverserPath.add(targetVertex);
-				
-				thisRoundPathData.put(traverser, traverserPath);
+				// ~MDC To prevent potential null exceptions
+				if (!thisRoundPathData.containsKey(traverser)) {
+					
+					ArrayList<V> traverserPath = new ArrayList<V>();
+					
+					thisRoundPathData.put(traverser, traverserPath);
+					
+				}
 				
 			}
 			

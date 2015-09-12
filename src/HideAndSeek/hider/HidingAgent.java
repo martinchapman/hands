@@ -162,6 +162,16 @@ public abstract class HidingAgent extends TraverserLocalGraph implements Runnabl
 	}
 	
 	/**
+	 * 
+	 */
+	private int erroneousNodeCount = 0;
+	
+	/**
+	 * 
+	 */
+	private static int ERRONEOUS_NODE_COUNT_THRESHOLD = 50;
+	
+	/**
 	 * @param searchPath
 	 * @return
 	 */
@@ -232,7 +242,19 @@ public abstract class HidingAgent extends TraverserLocalGraph implements Runnabl
 				
 				Utils.talk(toString(), "Error traversing supplied path from " + currentNode + " to " + nextNode);
 				
+				if ( erroneousNodeCount > ERRONEOUS_NODE_COUNT_THRESHOLD ) {
+					
+					throw new UnsupportedOperationException("Too many erroneous nodes supplied by strategy.");
+				
+				} else {
+					
+					erroneousNodeCount++;
+					
+				}
+				
 			} else {
+				
+				erroneousNodeCount = 0;
 				
 				atNextNode(nextNode);
 			
@@ -250,7 +272,7 @@ public abstract class HidingAgent extends TraverserLocalGraph implements Runnabl
 	@Override
 	public String printRoundStats() {
 		
-		return super.printRoundStats() + "Cost, " + graphController.latestRoundCosts(responsibleAgent, false) + ",Path," + exploredNodes.toString().replace(",", "");
+		return super.printRoundStats() + "Cost, " + graphController.latestRoundCosts(responsibleAgent, false) + ",Path," + exploredNodesTable().toString().replace(",", "");
 		
 	}
 	
@@ -277,7 +299,7 @@ public abstract class HidingAgent extends TraverserLocalGraph implements Runnabl
 		
 		super.hideLocations().clear();
 		
-		exploredNodes.clear();
+		exploredNodesTable().clear();
 		
 		precheckedHideLocations.clear();
 		

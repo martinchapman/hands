@@ -1,15 +1,18 @@
 package HideAndSeek;
 
-import bsh.*;
-
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import HideAndSeek.graph.GraphController;
 import HideAndSeek.graph.StringEdge;
@@ -388,6 +391,20 @@ public class Main {
 				
 				allHidingAgents.add(new UniqueRandomSetRepeat(graphController, numberOfHideLocations));
 			
+			}
+			
+			if (hiderType.getElement0().equals("UniqueRandomSetRepeatStrategyOver")) {
+				
+				allHidingAgents.add(new UniqueRandomSetRepeat(graphController, numberOfHideLocations) {
+					
+					public boolean strategyOverRound() {
+						
+						return true;
+						
+					}
+					
+				});
+			
 			} 
 			
 			if (hiderType.getElement0().equals("UniqueRandomSetRepeatRandomNodes")) {
@@ -635,7 +652,8 @@ public class Main {
 			
 			}
 			
-			if (hiderType.getElement0().equals("VariableDeceptiveNew")) {
+			if (hiderType.getElement0().equals(""
+					+ "New")) {
 				
 				allHidingAgents.add(new DeceptiveNew(graphController, "Deceptive", numberOfHideLocations, gameNumber) {
 					
@@ -853,7 +871,7 @@ public class Main {
 				
 			}
 			
-			if (hiderType.getElement0().equals("MetaRandom")) {
+			if (hiderType.getElement0().contains("MetaRandom")) {
 				
 				ArrayList<Pair<AdaptiveHider, Double>> strategyPortfolio = new ArrayList<Pair<AdaptiveHider, Double>>();
 				
@@ -861,11 +879,27 @@ public class Main {
 				
 				strategyPortfolio.add(new Pair<AdaptiveHider, Double>(new UniqueRandomSetRepeatAdaptable(graphController, numberOfHideLocations), 0.17));
 				
-				allHidingAgents.add(new AdaptiveHidingAgent<AdaptiveHider>(graphController, "MetaRandom", strategyPortfolio, totalRounds));
+				if (hiderType.getElement0().equals("MetaRandomStrategyOver")) {
+					
+					allHidingAgents.add(new AdaptiveHidingAgent<AdaptiveHider>(graphController, "MetaRandom", strategyPortfolio, totalRounds) {
+						
+						public boolean strategyOverRounds() {
+							
+							return true;
+							
+						}
+						
+					});
+					
+				} else {
+				
+					allHidingAgents.add(new AdaptiveHidingAgent<AdaptiveHider>(graphController, "MetaRandom", strategyPortfolio, totalRounds));
+				
+				}
 				
 			}
 			
-			if (hiderType.getElement0().equals("MetaConnected")) {
+			if (hiderType.getElement0().contains("MetaConnected")) {
 				
 				ArrayList<Pair<AdaptiveHider, Double>> strategyPortfolio = new ArrayList<Pair<AdaptiveHider, Double>>();
 				
@@ -887,7 +921,23 @@ public class Main {
 				
 				strategyPortfolio.add(new Pair<AdaptiveHider, Double>(new LeastConnectedAdaptable(graphController, numberOfHideLocations), 0.0));
 				
-				allHidingAgents.add(new AdaptiveHidingAgent<AdaptiveHider>(graphController, "MetaConnected", strategyPortfolio, totalRounds, "LeastConnectedAdaptable"));
+				if (hiderType.getElement0().equals("MetaConnectedStrategyOver")) {
+					
+					allHidingAgents.add(new AdaptiveHidingAgent<AdaptiveHider>(graphController, "MetaConnected", strategyPortfolio, totalRounds, "LeastConnectedAdaptable") {
+						
+						public boolean strategyOver() {
+							
+							return true;
+							
+						}
+						
+					});
+					
+				} else {
+					
+					allHidingAgents.add(new AdaptiveHidingAgent<AdaptiveHider>(graphController, "MetaConnected", strategyPortfolio, totalRounds, "LeastConnectedAdaptable"));
+					
+				}
 					
 			}
 			
@@ -1119,7 +1169,7 @@ public class Main {
 			
 			ArrayList<Pair<AdaptiveSeeker, Double>> strategyPortfolio = new ArrayList<Pair<AdaptiveSeeker, Double>>();
 			
-			if (seekerType.getElement0().equals("MetaProbability")) {
+			if (seekerType.getElement0().contains("MetaProbability")) {
 				
 				strategyPortfolio.clear();
 				
@@ -1127,18 +1177,45 @@ public class Main {
 				
 				strategyPortfolio.add(new Pair<AdaptiveSeeker, Double>(new HighProbabilityAdaptable(graphController), 0.67));
 				
-				allSeekingAgents.add(new AdaptiveSeekingAgent<AdaptiveSeeker>(graphController, "MetaProbability", strategyPortfolio, totalRounds, 0.5, false) {
-					
-					/* (non-Javadoc)
-					 * @see HideAndSeek.AdaptiveGraphTraversingAgent#confidenceLevel()
-					 */
-					protected double confidenceLevel() {
+				if (seekerType.getElement0().equals("MetaProbabilityStrategyOver")) {
+			
+					allSeekingAgents.add(new AdaptiveSeekingAgent<AdaptiveSeeker>(graphController, "MetaProbability", strategyPortfolio, totalRounds, 0.5, false) {
 						
-						return uniqueHideLocations().size() / (double)graphController.vertexSet().size();
-					
-					}
-					
-				});
+						/* ~MDC Should be moved into the actual strategy
+						 * (non-Javadoc)
+						 * @see HideAndSeek.AdaptiveGraphTraversingAgent#confidenceLevel()
+						 */
+						protected double confidenceLevel() {
+							
+							return uniqueHideLocations().size() / (double)graphController.vertexSet().size();
+						
+						}
+						
+						public boolean strategyOverRounds() {
+							
+							return true;
+							
+						}
+						
+					});
+				
+				} else {
+
+					allSeekingAgents.add(new AdaptiveSeekingAgent<AdaptiveSeeker>(graphController, "MetaProbability", strategyPortfolio, totalRounds, 0.5, false) {
+						
+						/* ~MDC Should be moved into the actual strategy
+						 * (non-Javadoc)
+						 * @see HideAndSeek.AdaptiveGraphTraversingAgent#confidenceLevel()
+						 */
+						protected double confidenceLevel() {
+							
+							return uniqueHideLocations().size() / (double)graphController.vertexSet().size();
+						
+						}
+						
+					});
+				
+				}
 				
 			}
 			
@@ -1554,6 +1631,32 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		
+		Logger logger = Logger.getLogger(Main.class.toString());  
+	    FileHandler fh;  
+
+	    try {  
+
+	        // This block configure the logger with handler and formatter  
+	        fh = new FileHandler(Utils.FILEPREFIX + "exceptions.log", true);  
+	        logger.addHandler(fh);
+	        SimpleFormatter formatter = new SimpleFormatter();  
+	        fh.setFormatter(formatter);  
+
+	    } catch (SecurityException e) {  
+	        e.printStackTrace();  
+	    } catch (IOException e) {  
+	        e.printStackTrace();  
+	    }  
+
+		Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() { 
+            public void uncaughtException(Thread t, Throwable e) { 
+                StringWriter sw = new StringWriter();
+                e.printStackTrace(new PrintWriter(sw));
+                String stacktrace = sw.toString();
+                logger.info(stacktrace); 
+            }
+        });  
 		
 		new Main(args);
 

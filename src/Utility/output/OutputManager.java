@@ -740,6 +740,12 @@ public class OutputManager {
 				//graph = new LineGraph(title);
 				graph = new GNULineGraph(title, textBased);
 			
+			} else if (graphType.equals("LineOne")) {
+					
+				graph = new GNULineGraph(title, textBased);
+				
+				((GNULineGraph)graph).startsAtOne();
+				
 			} else if (graphType.equals("3D")) {
 				
 				graph = new GNU3DCollection(title, textBased);
