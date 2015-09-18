@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Map.Entry;
@@ -58,9 +59,9 @@ public class ApproximatePayoffMatrix {
 		/**
 		 * @param opponent
 		 */
-		public double getOpponentPayoff(String opponent) {
+		public double getOpponentPayoff(String opponentStrategy) {
 			
-			return payoffAgainstOpponent.get(opponent);
+			return payoffAgainstOpponent.get(opponentStrategy);
 			
 		}
 		
@@ -237,7 +238,16 @@ public class ApproximatePayoffMatrix {
 			
 		}
 		
-		outputForLRS();
+		if ( GAMBIT ) {
+			
+			outputForGambit();
+		
+		} else {
+			
+			outputForLRS();
+			
+		}
+		
 		
 		return getGTData();
 		
@@ -254,7 +264,7 @@ public class ApproximatePayoffMatrix {
 		
 		try {
 			
-			nashOutputWriter = new FileWriter(Utils.FILEPREFIX + "/GTData", true);
+			nashOutputWriter = new FileWriter(Utils.FILEPREFIX + "GTData", true);
 			
 		} catch (IOException e) {
 			
@@ -263,6 +273,39 @@ public class ApproximatePayoffMatrix {
 		}
 		
 		for ( String bimatrixLine : formatAsBimatrix() ) Utils.writeToFile(nashOutputWriter, bimatrixLine);
+					
+		try {
+			
+			nashOutputWriter.close();
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+			
+		}
+		
+	}
+	
+	/**
+	 * 
+	 */
+	private void outputForGambit() {
+		
+		Utils.clearFile(Utils.FILEPREFIX + "GTData.nfg");
+		
+		FileWriter nashOutputWriter = null;
+		
+		try {
+			
+			nashOutputWriter = new FileWriter(Utils.FILEPREFIX + "GTData.nfg", true);
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+			
+		}
+		
+		for ( String bimatrixLine : formatAsTopDownMatrix() ) Utils.writeToFile(nashOutputWriter, bimatrixLine);
 					
 		try {
 			
@@ -334,9 +377,180 @@ public class ApproximatePayoffMatrix {
 	}
 	
 	/**
+	 * 
+	 */
+	private ArrayList<String> formatAsTopDownMatrix() {
+		
+		ArrayList<String> topDownLines = new ArrayList<String>();
+		
+		topDownLines.add("NFG 1 R \"Untitled Strategic Game\" { \"Player 1\" \"Player 2\" }");
+		
+		topDownLines.add("");
+		
+		if ( !playerToStrategies.containsKey("Hider") || !playerToStrategies.containsKey("Seeker") ) {
+			
+			System.out.println("No information for Hider and Seeker");
+			
+			return new ArrayList<String>();
+		
+		}
+		
+		ArrayList<StrategyPayoff> hiderStrategies = playerToStrategies.get("Hider");
+		
+		ArrayList<StrategyPayoff> seekerStrategies = playerToStrategies.get("Seeker");
+		
+		String hiderLine = "{ { ";
+		
+		for ( StrategyPayoff payoff : hiderStrategies ) hiderLine += "\"" + ( hiderStrategies.indexOf(payoff) + 1 ) + "\" ";
+		
+		hiderLine += "}";
+		
+		topDownLines.add(hiderLine);
+		
+		String seekerLine = "{ ";
+		
+		for ( StrategyPayoff payoff : seekerStrategies ) seekerLine += "\"" + ( seekerStrategies.indexOf(payoff) + 1 ) + "\" ";
+		
+		seekerLine += "}";
+		
+		topDownLines.add(seekerLine);
+		
+		topDownLines.add("}");
+		
+		topDownLines.add("\"\"");
+		
+		topDownLines.add("");
+		
+		topDownLines.add("{");
+		
+		for ( StrategyPayoff seekerPayoff : seekerStrategies ) {
+			
+			for ( StrategyPayoff hiderPayoff : hiderStrategies ) {
+				
+				topDownLines.add("{ \"\" " + hiderPayoff.getOpponentPayoff(seekerPayoff.getStrategyPlayed()) + ", " + seekerPayoff.getOpponentPayoff(hiderPayoff.getStrategyPlayed())+ " }");
+				
+			}
+		}
+		
+		topDownLines.add("}");
+		
+		String numberLine = "";
+		
+		for ( StrategyPayoff seekerPayoff : seekerStrategies ) numberLine += ( seekerStrategies.indexOf(seekerPayoff) + 1 ) + " ";
+		
+		return topDownLines;
+		
+	}
+	
+	private boolean GAMBIT = true;
+	
+	/**
 	 * @return
 	 */
 	public ArrayList<String> getGTData() {
+		
+		if ( GAMBIT ) {
+
+			return getGambitData();
+			
+		} else {
+			
+			return getLRSData();
+			
+		}
+		
+	}
+	
+	private ArrayList<String> getGambitData() {
+	
+		ArrayList<String> formattedData = new ArrayList<String>();
+		
+		ArrayList<String> GTData = Utils.runCommandWithReturn("/usr/bin/gambit-enumpoly " + Utils.FILEPREFIX + "GTData.nfg");
+	
+		ArrayList<StrategyPayoff> hiderStrategies = playerToStrategies.get("Hider");
+		
+		ArrayList<StrategyPayoff> seekerStrategies = playerToStrategies.get("Seeker");
+		
+		for ( String output : GTData ) {
+			
+			String hider = "";
+			
+			String seeker = "";
+			
+			double hiderUtility = 0.0;
+			
+			double seekerUtility = 0.0;
+			
+			if ( output.startsWith("NE") ) {
+				
+				ArrayList<String> splitNE = new ArrayList<String>(Arrays.asList(output.split(",")));
+				
+				splitNE.remove(0);
+				
+				ArrayList<String> hiderDistribution = new ArrayList<String>(splitNE.subList(0, hiderStrategies.size()));
+				
+				ArrayList<String> seekerDistribution = new ArrayList<String>(splitNE.subList(hiderStrategies.size(), hiderStrategies.size() + seekerStrategies.size()));
+				
+				for ( String hiderProb : hiderDistribution ) {
+					
+					for ( String seekerProb : seekerDistribution ) {
+					
+						double cellProb = Double.parseDouble(hiderProb) * Double.parseDouble(seekerProb);
+						
+						hiderUtility += hiderStrategies.get(hiderDistribution.indexOf(hiderProb)).getOpponentPayoff(seekerStrategies.get(seekerDistribution.indexOf(seekerProb)).getStrategyPlayed()) * cellProb;
+						
+						seekerUtility += seekerStrategies.get(seekerDistribution.indexOf(seekerProb)).getOpponentPayoff(hiderStrategies.get(hiderDistribution.indexOf(hiderProb)).getStrategyPlayed()) * cellProb;
+						
+					}
+					
+				}
+				
+				for ( String prob : hiderDistribution ) {
+					
+					if ( prob.contains("1.") ) {
+						
+						hider = hiderStrategies.get(hiderDistribution.indexOf(prob)).getStrategyPlayed() + " ";
+						
+						break;
+						
+					}
+					
+					if ( twoDecimalPlaces(Double.parseDouble(prob)).contains("0.00") ) continue;
+					
+					hider += hiderStrategies.get(hiderDistribution.indexOf(prob)).getStrategyPlayed() + " (" + twoDecimalPlaces(Double.parseDouble(prob)) + "\\%) ";
+					
+				}
+				
+				for ( String prob : seekerDistribution ) {
+					
+					if ( prob.contains("1.") ) {
+						
+						seeker = seekerStrategies.get(seekerDistribution.indexOf(prob)).getStrategyPlayed() + " ";
+						
+						break;
+						
+					}
+					
+					if ( twoDecimalPlaces(Double.parseDouble(prob)).contains("0.00") ) continue;
+					
+					seeker += seekerStrategies.get(seekerDistribution.indexOf(prob)).getStrategyPlayed() + " (" + twoDecimalPlaces(Double.parseDouble(prob)) + "\\%) ";
+					
+				}	
+				
+				formattedData.add("Hider: " + hider + "(Payoff: " + twoDecimalPlaces(hiderUtility) + ") and Seeker: " + seeker + "(Payoff: " + twoDecimalPlaces(seekerUtility) + ")");
+				
+			}
+			
+		}
+		
+		return formattedData;
+		
+	}
+	
+	/**
+	 * @return
+	 */
+	private ArrayList<String> getLRSData() {
 		
 		Utils.runCommand("/usr/local/bin/setnash " + Utils.FILEPREFIX + "GTData" + " " + Utils.FILEPREFIX + "Player1 " + Utils.FILEPREFIX + "Player2");
 		
@@ -470,7 +684,7 @@ public class ApproximatePayoffMatrix {
 	 */
 	public String twoDecimalPlaces(double original) {
 		
-	     DecimalFormat f = new DecimalFormat("##.00");
+	     DecimalFormat f = new DecimalFormat("##0.00");
 	     
 	     return f.format(original);
 	     
@@ -896,7 +1110,12 @@ public class ApproximatePayoffMatrix {
 			
 			}
 			
-			Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "/charts/figures.bib", true), "\n @FIG{" + outputPath + ", main = {" + captionString + "}, add = {}, file = {/Users/Martin/Dropbox/workspace/SearchGames/output/charts/" + outputPath + "}, source = {}}");
+
+			ArrayList<StrategyPayoff> hiderStrategies = playerToStrategies.get("Hider");
+			
+			ArrayList<StrategyPayoff> seekerStrategies = playerToStrategies.get("Seeker");
+			
+			Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "/charts/figures.bib", true), "\n @FIG{" + outputPath + ", main = {A strategic overview of the " + Utils.traverserNumberToWord(playerToStrategies.get("Hider").size()) + "hider strategies and the " + Utils.traverserNumberToWord(playerToStrategies.get("Seeker").size()) + "seeker strategies introduced in this section, on a X network. The equilibrium strategies for each player are as follows: " + captionString + "}, add = {}, file = {/Users/Martin/Dropbox/workspace/SearchGames/output/charts/" + outputPath + "}, source = {}}");
 		
 		} catch (IOException e) {
 			
@@ -914,7 +1133,7 @@ public class ApproximatePayoffMatrix {
 		
 		ApproximatePayoffMatrix HPM = new ApproximatePayoffMatrix("");
 		
-		HPM.addPayoff("Hider", "L", "L'", 2.6);
+		/*HPM.addPayoff("Hider", "L", "L'", 2.6);
 		HPM.addPayoff("Hider", "L", "R'", 0);
 		HPM.addPayoff("Hider", "M", "L'", 0);
 		HPM.addPayoff("Hider", "M", "R'", 0);
@@ -926,13 +1145,25 @@ public class ApproximatePayoffMatrix {
 		HPM.addPayoff("Seeker", "L'", "R", 3);
 		HPM.addPayoff("Seeker", "R'", "L", 0);
 		HPM.addPayoff("Seeker", "R'", "M", 1);
-		HPM.addPayoff("Seeker", "R'", "R", 3);
+		HPM.addPayoff("Seeker", "R'", "R", 3);*/
 		
-		//System.out.println(HPM);
+		HPM.addPayoff("Hider", "B", "B", 1.0);
+		HPM.addPayoff("Hider", "B", "F", 0.0);
+		HPM.addPayoff("Hider", "F", "B", 0.0);
+		HPM.addPayoff("Hider", "F", "F", 2.0);
+		
+		HPM.addPayoff("Seeker", "B", "B", 2.0);
+		HPM.addPayoff("Seeker", "F", "B", 0.0);
+		HPM.addPayoff("Seeker", "B", "F", 0.0);
+		HPM.addPayoff("Seeker", "F", "F", 1.0);
+		
+		System.out.println(HPM);
 		
 		//HPM.printTikzMatrix();
 		
-		System.out.println(HPM.GTAnalysis());
+		HPM.GTAnalysis();
+		
+		//System.out.println(HPM.GTAnalysis());
 	
 	}
 	

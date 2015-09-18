@@ -86,7 +86,14 @@ public class OutputManager {
 	/**
 	 * 
 	 */
-	public OutputManager() {
+	private String dataInput;
+	
+	/**
+	 * 
+	 */
+	public OutputManager(String dataInput) {
+		
+		this.dataInput = dataInput;
 		
 		cache = new ArrayList<ArrayList<HiderRecord>>();
 		
@@ -97,7 +104,7 @@ public class OutputManager {
 	 */
 	public ArrayList<Datafile> availableFiles() {
 		
-		ArrayList<Path> files = Utils.listFilesForFolder(new File(FILEPREFIX + "data"));
+		ArrayList<Path> files = Utils.listFilesForFolder(new File(FILEPREFIX + dataInput));
 		
 		if ( files.size() == 0 ) files.addAll(Utils.listFilesForFolder(new File(FILEPREFIX + "data-sample")));
 		
@@ -729,7 +736,7 @@ public class OutputManager {
 		
 		Hashtable<String, Double> maxForAttributeInAllSeries;
 		
-		if (graphType.equals("Line") || graphType.equals("3D")) {
+		if (graphType.contains("Line") || graphType.equals("3D")) {
 			
 			minForAttributeInAllSeries = minForAttributeInAllSeries(playerRecords, gameOrRound, GraphType.LINE);
 			
@@ -1069,7 +1076,6 @@ public class OutputManager {
 				
 			}
 	
-			
 			try {
 				
 				Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "charts/figures.bib", true), "\n @FIG{" + figureID + ", main = { " + setupCaptionString(playerRecords, traverserRecords) + " }, add = { " + title + " }, file = {/Users/Martin/Dropbox/workspace/SearchGames/output/charts/" + figureID + "}, source = {}}");
@@ -1191,29 +1197,16 @@ public class OutputManager {
 		
 		} else if ( traversers.size() == 1 ) {
 			
-			traverserList = "the " + hiderOrSeeker + " strategy " + (new ArrayList<String>(traversers).get(0));
+			traverserList = "the " + hiderOrSeeker + " strategy \texttt{" + (new ArrayList<String>(traversers).get(0)) + "}";
 			
 		} else {
 			
-			traverserList = "the " + traverserNumberToWord(traversers.size()) + hiderOrSeeker + " strategies " + Utils.listToProse(new ArrayList<String>(traversers));
+			traverserList = "the " + Utils.traverserNumberToWord(traversers.size()) + hiderOrSeeker + " strategies " + Utils.listToProse(new ArrayList<String>(traversers), "\texttt{", "}");
 			
 		}
 		
 		return traverserList;
 	
-	}
-	
-	/**
-	 * @param number
-	 * @return
-	 */
-	protected String traverserNumberToWord(int number) {
-		
-		if (number == 2) return "two ";
-		if (number == 3) return "three ";
-		
-		return "";
-			
 	}
 	
 	/**
@@ -1245,7 +1238,7 @@ public class OutputManager {
 	public void removeAllOutputFiles() {
 		
 		// Archive instead
-		for ( Path path : Utils.listFilesForFolder(new File(FILEPREFIX + "/data")) ) { 
+		for ( Path path : Utils.listFilesForFolder(new File(FILEPREFIX + dataInput)) ) { 
 			
 			File archivedFile = new File(FILEPREFIX + "/dataArchive/" + path.getFileName());
 			
@@ -1255,7 +1248,7 @@ public class OutputManager {
 			
 		}
 			
-		for ( Path path : Utils.listFilesForFolder(new File(FILEPREFIX + "/data/js/data")) ) deleteFile(path);
+		for ( Path path : Utils.listFilesForFolder(new File(FILEPREFIX + dataInput + "/js/data")) ) deleteFile(path);
 		
 	}
 	
@@ -1266,7 +1259,7 @@ public class OutputManager {
 		
 		ArrayList<String> CSVIDs = new ArrayList<String>();
 		
-		for ( Path path : Utils.listFilesForFolder(new File(FILEPREFIX + "/data")) ) { 
+		for ( Path path : Utils.listFilesForFolder(new File(FILEPREFIX + dataInput)) ) { 
 			
 			if ( !path.toString().contains(".") ) continue;
 			
@@ -1280,7 +1273,7 @@ public class OutputManager {
 		}
 		
 		// For all .html files, if no corresponding .csv ID recorded, remove.
-		for ( Path path : Utils.listFilesForFolder(new File(FILEPREFIX + "/data")) ) { 
+		for ( Path path : Utils.listFilesForFolder(new File(FILEPREFIX + dataInput)) ) { 
 			
 			if ( path.toString().contains("-") && !CSVIDs.contains( path.toString().substring(path.toString().lastIndexOf('/') + 1, path.toString().lastIndexOf('-')) )) {
 				
@@ -1291,7 +1284,7 @@ public class OutputManager {
 		}
 		
 		// Similar for .js files
-		for ( Path path : Utils.listFilesForFolder(new File(FILEPREFIX + "/data/js/data")) ) {
+		for ( Path path : Utils.listFilesForFolder(new File(FILEPREFIX + dataInput + "/js/data")) ) {
 			
 			if ( path.toString().contains("-") && !CSVIDs.contains( path.toString().substring(path.toString().lastIndexOf('/') + 1, path.toString().lastIndexOf('-')) )) {
 				

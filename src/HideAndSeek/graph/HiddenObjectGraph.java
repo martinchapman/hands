@@ -37,7 +37,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	/**
 	 * 
 	 */
-	private boolean RECORD_PATH_DATA = false;
+	private boolean RECORD_PATH_DATA = true;
 	
 	/**
 	 * 

@@ -5,8 +5,6 @@ nokill = False
 nodelete = False
 schedule_file_name = "simulationSchedule.txt"
 
-print sys.argv
-
 if ( len(sys.argv) > 0 ):
     for arg in sys.argv:
         if ( arg == "-ncp"):

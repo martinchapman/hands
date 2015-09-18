@@ -296,6 +296,8 @@ public class Runner extends JFrame {
 	
 	private JCheckBox resetPerRound;
 	
+	private JCheckBox strategyOverRounds;
+	
 	/**
 	 * Helper interface for specifying different actions
 	 * to take place once something has been deleted
@@ -498,11 +500,11 @@ public class Runner extends JFrame {
 		
 		if ( OFF_HEAP ) {
 			
-			outputManager = new OutputManagerOffHeap();
+			outputManager = new OutputManagerOffHeap(DATA_INPUT);
 			
 		} else {
 			
-			outputManager = new OutputManager();
+			outputManager = new OutputManager(DATA_INPUT);
 		
 		}
 		
@@ -1223,7 +1225,7 @@ public class Runner extends JFrame {
 		
 		JPanel simulationParameters = new JPanel();
 		
-		simulationParameters.setLayout(new GridLayout(3, 2));
+		simulationParameters.setLayout(new GridLayout(4, 2));
 		
 		simulationParameters.setBorder(new TitledBorder("Simulation Parameters"));
 		
@@ -1245,6 +1247,12 @@ public class Runner extends JFrame {
 		resetPerRound = new JCheckBox("Reset per round");
 		
 		simulationParameters.add(resetPerRound);
+		
+		simulationParameters.add(new JPanel());
+		
+		strategyOverRounds = new JCheckBox("Strategy over rounds");
+		
+		simulationParameters.add(strategyOverRounds);
 		
 		
 		//
@@ -2083,6 +2091,11 @@ public class Runner extends JFrame {
 	private String SIMULATION_SCHEDULE = "simulationSchedule.txt";
 	
 	/**
+	 * 
+	 */
+	private String DATA_INPUT = "data";
+	
+	/**
 	 * @param args
 	 */
 	public Runner(String[] args) {
@@ -2108,6 +2121,12 @@ public class Runner extends JFrame {
 			if ( argsList.contains("-nop")) {
 				
 				generateOutput = false;
+				
+			}
+			
+			if ( argsList.contains("-di")) {
+				
+				DATA_INPUT = argsList.get(argsList.indexOf("-di") + 1);;
 				
 			}
 			
@@ -2332,6 +2351,18 @@ public class Runner extends JFrame {
 					
 					} 
 					
+				} else if (paramPair.getElement0().equals("StrategyOverRounds")) {
+					
+					if ( Boolean.parseBoolean(paramPair.getElement1()) ) { 
+						
+						strategyOverRounds.setSelected(true); 
+						
+					} else { 
+						
+						strategyOverRounds.setSelected(false); 
+					
+					} 
+					
 				}
 	  
 			} else if (param.indexOf('[') != -1) {
@@ -2410,7 +2441,9 @@ public class Runner extends JFrame {
 			
 			"{MixSeekers," + mixSeekers.isSelected() + "}",
 			
-			"{ResetPerRound," + resetPerRound.isSelected() + "}"
+			"{ResetPerRound," + resetPerRound.isSelected() + "}",
+			
+			"{StrategyOverRounds," + strategyOverRounds.isSelected() + "}"
 			
 		};  
 		
@@ -2583,6 +2616,7 @@ public class Runner extends JFrame {
   				  "MixHiders", // Mix equally between the hide strategies
   				  "MixSeekers", // Mix equally between the search strategies
   				  "ResetPerRound", // Whether players knowledge should persist through rounds
+  				  "StrategyOverRounds", // Whether to double the number of round sets, in order to test strategies that evolve over all rounds
   				  "GenerateOutputFiles" // Whether to log results to file
 				  };
   				  
@@ -2598,6 +2632,7 @@ public class Runner extends JFrame {
 				 "false", // Mix equally between the hide strategies
 				 "false", // Mix equally between the search strategies
 				 "true", // Whether players knowledge should persist through rounds
+				 "false", // Whether to double the number of round sets, in order to test strategies that evolve over all rounds
 				  (generateOutput + "")
 		  		  };
 			

@@ -213,6 +213,20 @@ public class Utils {
 	}
 	
 	/**
+	 * @param number
+	 * @return
+	 */
+	public static String traverserNumberToWord(int number) {
+		
+		if (number == 2) return "two ";
+		if (number == 3) return "three ";
+		if (number == 4) return "four ";
+		
+		return "";
+			
+	}
+	
+	/**
 	 * @return
 	 */
 	public static String timestamp() {
@@ -267,7 +281,7 @@ public class Utils {
 	 * @param list
 	 * @return
 	 */
-	public static <E> String listToProse(ArrayList<E> list) {
+	public static <E> String listToProse(ArrayList<E> list, String prefix, String suffix) {
 		
 		String textList = "";
 		
@@ -277,11 +291,11 @@ public class Utils {
 				
 				textList = textList.substring(0, textList.length() - 2) + " ";
 				
-				textList += "and " + list.get(i);
+				textList += "and " + prefix + list.get(i) + suffix;
 				
 			} else {
 				
-				textList += list.get(i) + ", ";
+				textList += prefix + list.get(i) + suffix + ", ";
 			}
 			
 		}

@@ -90,15 +90,62 @@ public class BacktrackGreedy extends SeekingAgent {
 	 */
 	public StringVertex nextNode(StringVertex currentNode) {
 		
-		if ( unvisitedNodes.contains(currentNode) ) unvisitedNodes.remove(currentNode);
+		if (currentPath != null && currentPath.size() > 0 && ( !(currentPath.get(0).getSource() == currentNode) || !(currentPath.get(0).getTarget() == currentNode) )) currentPath.clear();
 		
+		ArrayList<StringVertex> connectedVertices = new ArrayList<StringVertex>();
+		
+		for (StringEdge edge : getConnectedEdges(currentNode) ) {
+			
+			connectedVertices.add(edgeToTarget(edge, currentNode));
+			
+		}
+		
+		/* ~MDC Hack to overcome the fact that other strategies use the BTG
+		 * mechanism may not always call nextNode, hence leaving visited
+		 * nodes in the unvisited list.
+		 */
+		
+		// Pretend node is connected so it will be removed below, as already visited.
+		/*for ( StringVertex node : unvisitedNodes ) {
+			
+			if ( exploredNodesTable().containsKey(node) ) {
+				
+				Utils.talk(toString(), "Additional vertex: " + node);
+				
+				connectedVertices.add(node);
+				
+			}
+		
+		}*/
+		
+		// ~MDC Not needed with hack
+		if ( unvisitedNodes.contains(currentNode) ) {
+			
+			unvisitedNodes.remove(currentNode);
+			
+		}
+		
+		// ~MDC End of hack
+
 		// If not on way back to a closer, and previously unvisited, node:
 		if ( currentPath.size() == 0 ) {
 		
-			for (StringEdge edge : getConnectedEdges(currentNode) ) {
+			//for (StringEdge edge : getConnectedEdges(currentNode) ) {
+			
+			for ( StringVertex vertex : connectedVertices) {
 				
 				// Do not relist nodes as unvisited if they have already been visited
-				if ( !exploredNodesTable().containsKey(edgeToTarget(edge, currentNode)) ) unvisitedNodes.add(edgeToTarget(edge, currentNode));
+				if ( !exploredNodesTable().containsKey(vertex) ) { // edgeToTarget(edge, currentNode)
+				
+					unvisitedNodes.add(vertex); // edgeToTarget(edge, currentNode)
+				
+				
+				} /*else {
+					
+					// ~MDC May fail most of the time. Part of hack.
+					if ( unvisitedNodes.contains(vertex) ) unvisitedNodes.remove(vertex);
+			
+				}*/
 				
 			}
 			
@@ -137,7 +184,11 @@ public class BacktrackGreedy extends SeekingAgent {
 			
 			
 			// If no path can be found, return adjacent node on lowest cost edge (ordered by methods below).
-			if ( dsp.getPathEdgeList().size() == 0 ) return connectedNode(currentNode);
+			if ( dsp.getPathEdgeList().size() == 0 ) {
+				
+				return connectedNode(currentNode);
+				
+			}
 			
 			currentPath = dsp.getPathEdgeList();
 			

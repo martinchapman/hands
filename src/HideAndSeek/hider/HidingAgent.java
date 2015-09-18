@@ -197,6 +197,8 @@ public abstract class HidingAgent extends TraverserLocalGraph implements Runnabl
 	        	
         		addHideLocation(currentNode);
 				
+        		Utils.talk(toString(), (graphController.numberOfHideLocations(responsibleAgent) == numberOfHideLocations) + "");
+        		
 				if (graphController.numberOfHideLocations(responsibleAgent) == numberOfHideLocations) break;
 			
         	}
@@ -205,7 +207,11 @@ public abstract class HidingAgent extends TraverserLocalGraph implements Runnabl
 				
 				nextNode = queuedNodes.remove(0);
 				
+		    	Utils.talk(toString(), "Returning to queued node " + nextNode);
+				
 			} else {
+				
+				Utils.talk(toString(), "Going in to next node");
 				
 			    nextNode = nextNode(currentNode);
 			    

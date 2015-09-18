@@ -30,8 +30,14 @@ public class DeceptiveNew extends RandomSet {
 		
 	}
 	
+	/**
+	 * 
+	 */
 	private ArrayList<StringVertex> deceptiveNodes;
 	
+	/**
+	 * 
+	 */
 	private int deceptionDuration;
 	
 	public DeceptiveNew(GraphController<StringVertex, StringEdge> graphController, String name, int numberOfHideLocations, GraphTraverser responsibleAgent, int deceptionDuration) {
@@ -57,6 +63,23 @@ public class DeceptiveNew extends RandomSet {
 			
 			return super.hideHere(currentNode);
 			
+		}
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see HideAndSeek.hider.singleshot.random.RandomSet#nextNode(HideAndSeek.graph.StringVertex)
+	 */
+	public StringVertex nextNode(StringVertex currentNode) {
+		
+		if ( deceptiveNodes.size() == 0 ) {
+			
+			return super.connectedNode(currentNode);
+			
+		} else {
+		
+			return super.nextNode(currentNode);
+					
 		}
 		
 	}

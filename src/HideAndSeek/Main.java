@@ -206,7 +206,9 @@ public class Main {
 		
 		boolean resetPerRound = Boolean.parseBoolean(args[13]);
 		
-		generateOutput = Boolean.parseBoolean(args[14]);
+		boolean strategyOverRounds = Boolean.parseBoolean(args[14]);
+		
+		generateOutput = Boolean.parseBoolean(args[15]);
 		
 		//
 		
@@ -220,7 +222,7 @@ public class Main {
 		
 		seekerList = args[3];
 		
-		startRounds(initHiders(hiderList, numberOfHideLocations, mixHiders), initSeekers(seekerList, mixSeekers), rounds, true, resetPerRound);
+		startRounds(initHiders(hiderList, numberOfHideLocations, mixHiders), initSeekers(seekerList, mixSeekers), rounds, true, resetPerRound, strategyOverRounds);
 		
 	}
 	
@@ -392,20 +394,6 @@ public class Main {
 				allHidingAgents.add(new UniqueRandomSetRepeat(graphController, numberOfHideLocations));
 			
 			}
-			
-			if (hiderType.getElement0().equals("UniqueRandomSetRepeatStrategyOver")) {
-				
-				allHidingAgents.add(new UniqueRandomSetRepeat(graphController, numberOfHideLocations) {
-					
-					public boolean strategyOverRound() {
-						
-						return true;
-						
-					}
-					
-				});
-			
-			} 
 			
 			if (hiderType.getElement0().equals("UniqueRandomSetRepeatRandomNodes")) {
 				
@@ -652,8 +640,7 @@ public class Main {
 			
 			}
 			
-			if (hiderType.getElement0().equals(""
-					+ "New")) {
+			if (hiderType.getElement0().equals("VariableDeceptiveNew")) {
 				
 				allHidingAgents.add(new DeceptiveNew(graphController, "Deceptive", numberOfHideLocations, gameNumber) {
 					
@@ -879,23 +866,7 @@ public class Main {
 				
 				strategyPortfolio.add(new Pair<AdaptiveHider, Double>(new UniqueRandomSetRepeatAdaptable(graphController, numberOfHideLocations), 0.17));
 				
-				if (hiderType.getElement0().equals("MetaRandomStrategyOver")) {
-					
-					allHidingAgents.add(new AdaptiveHidingAgent<AdaptiveHider>(graphController, "MetaRandom", strategyPortfolio, totalRounds) {
-						
-						public boolean strategyOverRounds() {
-							
-							return true;
-							
-						}
-						
-					});
-					
-				} else {
-				
-					allHidingAgents.add(new AdaptiveHidingAgent<AdaptiveHider>(graphController, "MetaRandom", strategyPortfolio, totalRounds));
-				
-				}
+				allHidingAgents.add(new AdaptiveHidingAgent<AdaptiveHider>(graphController, "MetaRandom", strategyPortfolio, totalRounds));
 				
 			}
 			
@@ -920,24 +891,8 @@ public class Main {
 				}, 0.0));
 				
 				strategyPortfolio.add(new Pair<AdaptiveHider, Double>(new LeastConnectedAdaptable(graphController, numberOfHideLocations), 0.0));
-				
-				if (hiderType.getElement0().equals("MetaConnectedStrategyOver")) {
 					
-					allHidingAgents.add(new AdaptiveHidingAgent<AdaptiveHider>(graphController, "MetaConnected", strategyPortfolio, totalRounds, "LeastConnectedAdaptable") {
-						
-						public boolean strategyOver() {
-							
-							return true;
-							
-						}
-						
-					});
-					
-				} else {
-					
-					allHidingAgents.add(new AdaptiveHidingAgent<AdaptiveHider>(graphController, "MetaConnected", strategyPortfolio, totalRounds, "LeastConnectedAdaptable"));
-					
-				}
+				allHidingAgents.add(new AdaptiveHidingAgent<AdaptiveHider>(graphController, "MetaConnected", strategyPortfolio, totalRounds, "LeastConnectedAdaptable"));
 					
 			}
 			
@@ -1177,45 +1132,19 @@ public class Main {
 				
 				strategyPortfolio.add(new Pair<AdaptiveSeeker, Double>(new HighProbabilityAdaptable(graphController), 0.67));
 				
-				if (seekerType.getElement0().equals("MetaProbabilityStrategyOver")) {
-			
-					allSeekingAgents.add(new AdaptiveSeekingAgent<AdaptiveSeeker>(graphController, "MetaProbability", strategyPortfolio, totalRounds, 0.5, false) {
+				allSeekingAgents.add(new AdaptiveSeekingAgent<AdaptiveSeeker>(graphController, "MetaProbability", strategyPortfolio, totalRounds, 0.5, false) {
+					
+					/* ~MDC Should be moved into the actual strategy
+					 * (non-Javadoc)
+					 * @see HideAndSeek.AdaptiveGraphTraversingAgent#confidenceLevel()
+					 */
+					protected double confidenceLevel() {
 						
-						/* ~MDC Should be moved into the actual strategy
-						 * (non-Javadoc)
-						 * @see HideAndSeek.AdaptiveGraphTraversingAgent#confidenceLevel()
-						 */
-						protected double confidenceLevel() {
-							
-							return uniqueHideLocations().size() / (double)graphController.vertexSet().size();
-						
-						}
-						
-						public boolean strategyOverRounds() {
-							
-							return true;
-							
-						}
-						
-					});
-				
-				} else {
-
-					allSeekingAgents.add(new AdaptiveSeekingAgent<AdaptiveSeeker>(graphController, "MetaProbability", strategyPortfolio, totalRounds, 0.5, false) {
-						
-						/* ~MDC Should be moved into the actual strategy
-						 * (non-Javadoc)
-						 * @see HideAndSeek.AdaptiveGraphTraversingAgent#confidenceLevel()
-						 */
-						protected double confidenceLevel() {
-							
-							return uniqueHideLocations().size() / (double)graphController.vertexSet().size();
-						
-						}
-						
-					});
-				
-				}
+						return uniqueHideLocations().size() / (double)graphController.vertexSet().size();
+					
+					}
+					
+				});
 				
 			}
 			
@@ -1242,7 +1171,7 @@ public class Main {
 	 * @param rounds
 	 * @param recordPerRound
 	 */
-	private void startRounds(List<Hider> hiders, List<Seeker> seekers, int rounds, boolean recordPerRound, boolean resetPerRound) {
+	private void startRounds(List<Hider> hiders, List<Seeker> seekers, int rounds, boolean recordPerRound, boolean resetPerRound, boolean strategyOverRounds) {
 		
 		// Pre-round outputting
 		
@@ -1276,18 +1205,22 @@ public class Main {
 		// Default repeat.
 		int repeatAllRounds = 1;
 		
+		int REPEAT_CONSTANT = rounds;
+		
+		if ( strategyOverRounds ) repeatAllRounds = REPEAT_CONSTANT;
+		
 		// Pre-checks for presence of strategy which is defined by a sequence of rounds,
 		// not individual ones (e.g. deceptive), and thus must be tested multiple times, as sets of rounds, in addition.
 		for ( Hider hider : hiders ) {
 			
-			// Dramatically affects the size of the output files
-			if (hider.strategyOverRounds()) repeatAllRounds = 10; //rounds;
+			// ~MDC Dramatically affects the size of the output files
+			if (hider.strategyOverRounds()) repeatAllRounds = REPEAT_CONSTANT; 
 			
 		}
 		
 		for ( Seeker  seeker : seekers ) {
 			
-			if (seeker.strategyOverRounds()) repeatAllRounds = 10; //rounds;
+			if (seeker.strategyOverRounds()) repeatAllRounds = REPEAT_CONSTANT;
 			
 		}
 		
@@ -1299,6 +1232,8 @@ public class Main {
 			/* If changes occur over a set of rounds (over a game), by nature of the strategy,
 			 * this process must repeat (i.e. to check how a strategy evolves over different 
 			 * rounds under a given parameter).
+			 * 
+			 * ~MDC This should occur for all multiple round games that aren't reset per round
 			 */
 			for (int roundRepeat = 0; roundRepeat < repeatAllRounds; roundRepeat++) {
 				

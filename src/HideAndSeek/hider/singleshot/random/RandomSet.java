@@ -1,6 +1,7 @@
 package HideAndSeek.hider.singleshot.random;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.TreeSet;
 
 import org.jgrapht.alg.DijkstraShortestPath;
@@ -185,8 +186,14 @@ public class RandomSet extends HidingAgent implements VariableTraversalStrategy 
 	@Override
 	public StringVertex nextNode(StringVertex currentNode) {
 		
+		Collections.sort(hideSet);
+		
+		System.out.println("HideSet: " + hideSet);
+		
 		// If we're on a path to a node in the random set, follow this first
 		if ( currentPath.size() > 0 ) {
+			
+			Utils.talk(toString(), "On path: " + currentPath);
 			
 			return edgeToTarget(currentPath.remove(0), currentNode);
 			
@@ -194,6 +201,8 @@ public class RandomSet extends HidingAgent implements VariableTraversalStrategy 
 		
 		// Otherwise, try and calculate a path to the next node in the set
 		if ( hideSet.size() > 0 && localGraph.containsVertex( hideSet.get(0) ) ) {
+			
+			Utils.talk(toString(), "Shortest path to next node " + currentNode + " " + hideSet.get(0));
 			
 			DijkstraShortestPath<StringVertex, StringEdge> dsp = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, hideSet.get(0));
 	    	
@@ -206,6 +215,7 @@ public class RandomSet extends HidingAgent implements VariableTraversalStrategy 
 			
 		}
 		
+		// Lastly explore efficiently.
 		return connectedNode(currentNode);
 		
 	}
