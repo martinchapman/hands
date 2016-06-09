@@ -37,7 +37,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 	/**
 	 * 
 	 */
-	private boolean RECORD_PATH_DATA = true;
+	private boolean RECORD_PATH_DATA = false;
 	
 	/**
 	 * 
@@ -877,7 +877,15 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 						
 					} else {
 						
-						traverserPath.add(sourceVertex);
+						try {
+							
+							traverserPath.add(sourceVertex);
+							
+						} catch (java.lang.OutOfMemoryError e) {
+							
+							throw new UnsupportedOperationException(e.getMessage() + " \n " + e.getCause() + " \n Out of memory error at traverser add to path (Line 880). \n Traverser: " + traverser + " Source Vertex: " + sourceVertex + " Target Vertex: " + targetVertex + " traverserPath.size(): + " + traverserPath.size());
+							
+						}
 						
 					}
 					

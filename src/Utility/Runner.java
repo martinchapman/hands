@@ -148,6 +148,7 @@ public class Runner extends JFrame {
 		  ////
 		  
 		  "DeceptiveNew",
+		  "DeceptiveTemp",
 		  "VariableDeceptiveNew",
 		  "SetDeceptiveNodes",
 		  "VariableDeceptiveNodes",
@@ -500,11 +501,11 @@ public class Runner extends JFrame {
 		
 		if ( OFF_HEAP ) {
 			
-			outputManager = new OutputManagerOffHeap(DATA_INPUT);
+			outputManager = new OutputManagerOffHeap(DATA_INPUT, recursiveSub);
 			
 		} else {
 			
-			outputManager = new OutputManager(DATA_INPUT);
+			outputManager = new OutputManager(DATA_INPUT, recursiveSub);
 		
 		}
 		
@@ -963,38 +964,86 @@ public class Runner extends JFrame {
 				ArrayList<TraverserRecord> allPlayers = new ArrayList<TraverserRecord>(selectedHiders);
 				allPlayers.addAll(selectedSeekers);
 				
-				if (seekers.isSelected()) {
+				if ( OVERWRITE_FIGURE && figureToOverwrite != null) {
 					
-					if (graphTypesCombo.getSelectedItem().equals("Line")) {
+					if (seekers.isSelected()) {
 						
-						outputManager.showLineGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected());
+						if (graphTypesCombo.getSelectedItem().equals("Line")) {
+							
+							outputManager.showLineGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
+					
+						} else if (graphTypesCombo.getSelectedItem().equals("LineOne")) {
+							
+							outputManager.showLineOneGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
+							
+						} else if (graphTypesCombo.getSelectedItem().equals("Bar")) {
+							
+							outputManager.showBarGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
+							
+						} else if (graphTypesCombo.getSelectedItem().equals("3D")) {
+							
+							outputManager.show3DGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
+							
+						}
+						
+					} else if (hiders.isSelected()) {
+						
+						if (graphTypesCombo.getSelectedItem().equals("Line")) {
+							
+							outputManager.showLineGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
+						
+						} else if (graphTypesCombo.getSelectedItem().equals("LineOne")) {
+								
+							outputManager.showLineOneGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
+								
+						} else if (graphTypesCombo.getSelectedItem().equals("Bar")) {
+							
+							outputManager.showBarGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
+							
+						} else if (graphTypesCombo.getSelectedItem().equals("3D")) {
+							
+							outputManager.show3DGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
+							
+						}
+						
+					}
+					
+				} else {
+					
+					if (seekers.isSelected()) {
+						
+						if (graphTypesCombo.getSelectedItem().equals("Line")) {
+							
+							outputManager.showLineGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected());
+					
+						} else if (graphTypesCombo.getSelectedItem().equals("Bar")) {
+							
+							outputManager.showBarGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
+							
+						} else if (graphTypesCombo.getSelectedItem().equals("3D")) {
+							
+							outputManager.show3DGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
+							
+						}
+						
+					} else if (hiders.isSelected()) {
+						
+						if (graphTypesCombo.getSelectedItem().equals("Line")) {
+							
+							outputManager.showLineGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected());
+							
+						} else if (graphTypesCombo.getSelectedItem().equals("Bar")) {
+							
+							outputManager.showBarGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
+							
+						} else if (graphTypesCombo.getSelectedItem().equals("3D")) {
+							
+							outputManager.show3DGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
+							
+						}
+						
+					}
 				
-					} else if (graphTypesCombo.getSelectedItem().equals("Bar")) {
-						
-						outputManager.showBarGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
-						
-					} else if (graphTypesCombo.getSelectedItem().equals("3D")) {
-						
-						outputManager.show3DGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
-						
-					}
-					
-				} else if (hiders.isSelected()) {
-					
-					if (graphTypesCombo.getSelectedItem().equals("Line")) {
-						
-						outputManager.showLineGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected());
-						
-					} else if (graphTypesCombo.getSelectedItem().equals("Bar")) {
-						
-						outputManager.showBarGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
-						
-					} else if (graphTypesCombo.getSelectedItem().equals("3D")) {
-						
-						outputManager.show3DGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
-						
-					}
-					
 				}
 				
 				if (graphTypesCombo.getSelectedItem().equals("Payoff Matrix")) {
@@ -1635,6 +1684,7 @@ public class Runner extends JFrame {
 		
 		while (true) {
 			
+			// ~MDC Casting things as Objects :-/
 			for ( Object item : itemsInList(queueListModel) ) {
 				
 				String itemText;
@@ -1723,9 +1773,23 @@ public class Runner extends JFrame {
 			
 			while ( response.equals("") || ( response.trim().split(" ").length > ( outputFeedbackList.getModel().getSize() - 1 ) ) ) {
 			
-				response = askQuestion("Enter pairs of player numbers (spaced list) or (back)", in);
+				response = askQuestion("Enter pairs of player numbers (all), (spaced list) or (back)", in);
 				
 				if ( checkForBack(response) ) break;
+				
+				if ( response.contains("all") ) {
+					
+					response = "";
+					
+					for ( int i = 0; i < itemsInList(outputFeedbackList.getModel()).size() - 1; i++ ) {
+						
+						response += i + " ";
+						
+					}
+					
+					response = response.substring(0, response.length() - 1);
+					
+				}
 				
 				for ( String pair : response.trim().split(" ") ) {
 					
@@ -1750,6 +1814,8 @@ public class Runner extends JFrame {
 					ArrayList<Integer> indices = new ArrayList<Integer>();
 					
 					for ( String index : response.trim().split(" ") ) {
+						
+						if ( index.contains("-----") ) continue;
 						
 						indices.add(Integer.parseInt(index));
 						
@@ -1789,6 +1855,11 @@ public class Runner extends JFrame {
 	 * 
 	 */
 	private boolean ASK_FOR_CATEGORY = false;
+	
+	/**
+	 * 
+	 */
+	private String figureToOverwrite;
 	
 	/**
 	 * @param in
@@ -1900,6 +1971,26 @@ public class Runner extends JFrame {
 							
 							return;
 							
+						}
+						
+						if ( OVERWRITE_FIGURE ) {
+							
+							response = askQuestion("Enter figure to overwrite: ", in);
+							
+							if ( !checkForBack(response) ) {
+								
+								if ( !checkForBlank(response) ) {
+									
+									figureToOverwrite = response;
+									
+								}
+								
+							} else {
+								
+								return;
+								
+							}
+						
 						}
 						
 						response = "";
@@ -2096,6 +2187,16 @@ public class Runner extends JFrame {
 	private String DATA_INPUT = "data";
 	
 	/**
+	 * 
+	 */
+	private boolean OVERWRITE_FIGURE = false;
+	
+	/**
+	 * 
+	 */
+	private boolean recursiveSub = false;
+	
+	/**
 	 * @param args
 	 */
 	public Runner(String[] args) {
@@ -2134,6 +2235,18 @@ public class Runner extends JFrame {
 				
 				SIMULATION_SCHEDULE = argsList.get(argsList.indexOf("-ss") + 1);
 			
+			}
+			
+			if ( argsList.contains("-overwrite")) {
+				
+				OVERWRITE_FIGURE = true;
+			
+			}
+			
+			if ( argsList.contains("-r") ) {
+				
+				recursiveSub = true;
+				
 			}
 			
 		}

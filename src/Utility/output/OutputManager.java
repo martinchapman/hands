@@ -91,20 +91,34 @@ public class OutputManager {
 	/**
 	 * 
 	 */
-	public OutputManager(String dataInput) {
+	public OutputManager(String dataInput, boolean recursiveSub) {
 		
 		this.dataInput = dataInput;
+		
+		this.recursiveSub = recursiveSub;
 		
 		cache = new ArrayList<ArrayList<HiderRecord>>();
 		
 	}
+	
+	private boolean recursiveSub = false;
 	
 	/**
 	 * @return
 	 */
 	public ArrayList<Datafile> availableFiles() {
 		
-		ArrayList<Path> files = Utils.listFilesForFolder(new File(FILEPREFIX + dataInput));
+		ArrayList<Path> files = new ArrayList<Path>();
+		
+		if ( recursiveSub ) {
+		
+			files = Utils.listFilesForFolder(new File(FILEPREFIX + dataInput), new ArrayList<Path>());
+			
+		} else {
+			
+			files = Utils.listFilesForFolder(new File(FILEPREFIX + dataInput));
+			
+		}
 		
 		if ( files.size() == 0 ) files.addAll(Utils.listFilesForFolder(new File(FILEPREFIX + "data-sample")));
 		
@@ -421,8 +435,34 @@ public class OutputManager {
 	
 	/**
 	 * @param traversers
+	 * @param players
+	 * @param gameOrRound
 	 * @param title
 	 * @param attribute
+	 * @param outputEnabled
+	 * @param figureToOverwrite
+	 */
+	public void showLineGraphForAttribute(ArrayList<TraverserRecord> traversers, ArrayList<TraverserRecord> players, String gameOrRound, String title, String attribute, boolean outputEnabled, String figureToOverwrite) {
+		
+		if ( gameOrRound.equals("Game") ) {
+			
+			showGraphForAttribute(traversers, players, gameOrRound, title, "Line", "Game Number", attribute, "", outputEnabled, figureToOverwrite);
+			
+		} else if ( gameOrRound.equals("Round") ) {
+			
+			showGraphForAttribute(traversers, players, gameOrRound, title, "Line", "Round Number", attribute, "", outputEnabled, figureToOverwrite);
+			
+		}
+		
+	}
+		
+	/**
+	 * @param traversers
+	 * @param players
+	 * @param gameOrRound
+	 * @param title
+	 * @param attribute
+	 * @param outputEnabled
 	 */
 	public void showLineGraphForAttribute(ArrayList<TraverserRecord> traversers, ArrayList<TraverserRecord> players, String gameOrRound, String title, String attribute, boolean outputEnabled) {
 		
@@ -437,11 +477,60 @@ public class OutputManager {
 		}
 		
 	}
+	
+	/**
+	 * @param traversers
+	 * @param players
+	 * @param gameOrRound
+	 * @param title
+	 * @param attribute
+	 * @param outputEnabled
+	 * @param figureToOverwrite
+	 */
+	public void showLineOneGraphForAttribute(ArrayList<TraverserRecord> traversers, ArrayList<TraverserRecord> players, String gameOrRound, String title, String attribute, boolean outputEnabled, String figureToOverwrite) {
+		
+		if ( gameOrRound.equals("Game") ) {
+			
+			showGraphForAttribute(traversers, players, gameOrRound, title, "LineOne", "Game Number", attribute, "", outputEnabled, figureToOverwrite);
+			
+		} else if ( gameOrRound.equals("Round") ) {
+			
+			showGraphForAttribute(traversers, players, gameOrRound, title, "LineOne", "Round Number", attribute, "", outputEnabled, figureToOverwrite);
+			
+		}
+		
+	}
+		
+	/**
+	 * @param traversers
+	 * @param players
+	 * @param gameOrRound
+	 * @param title
+	 * @param attribute
+	 * @param outputEnabled
+	 */
+	public void showLineOneGraphForAttribute(ArrayList<TraverserRecord> traversers, ArrayList<TraverserRecord> players, String gameOrRound, String title, String attribute, boolean outputEnabled) {
+		
+		if ( gameOrRound.equals("Game") ) {
+			
+			showGraphForAttribute(traversers, players, gameOrRound, title, "LineOne", "Game Number", attribute, "", outputEnabled);
+			
+		} else if ( gameOrRound.equals("Round") ) {
+			
+			showGraphForAttribute(traversers, players, gameOrRound, title, "LineOne", "Round Number", attribute, "", outputEnabled);
+			
+		}
+		
+	}
 
 	/**
 	 * @param traversers
+	 * @param players
+	 * @param gameOrRound
 	 * @param title
 	 * @param attribute
+	 * @param category
+	 * @param outputEnabled
 	 */
 	public void showBarGraphForAttribute(ArrayList<TraverserRecord> traversers, ArrayList<TraverserRecord> players, String gameOrRound, String title, String attribute, String category, boolean outputEnabled) {
 		
@@ -451,14 +540,47 @@ public class OutputManager {
 	
 	/**
 	 * @param traversers
+	 * @param players
 	 * @param gameOrRound
 	 * @param title
 	 * @param attribute
 	 * @param category
+	 * @param outputEnabled
+	 * @param figureToOverwrite
+	 */
+	public void showBarGraphForAttribute(ArrayList<TraverserRecord> traversers, ArrayList<TraverserRecord> players, String gameOrRound, String title, String attribute, String category, boolean outputEnabled, String figureToOverwrite) {
+		
+		showGraphForAttribute(traversers, players, gameOrRound, title, "Bar", "Game Number", attribute, category, outputEnabled, figureToOverwrite);
+		
+	}
+	
+	/**
+	 * @param traversers
+	 * @param players
+	 * @param gameOrRound
+	 * @param title
+	 * @param attribute
+	 * @param category
+	 * @param outputEnabled
 	 */
 	public void show3DGraphForAttribute(ArrayList<TraverserRecord> traversers, ArrayList<TraverserRecord> players, String gameOrRound, String title, String attribute, String category, boolean outputEnabled) {
 		
 		showGraphForAttribute(traversers, players, gameOrRound, title, "3D", "Game Number", attribute, category, outputEnabled);
+		
+	}
+	
+	/**
+	 * @param traversers
+	 * @param players
+	 * @param gameOrRound
+	 * @param title
+	 * @param attribute
+	 * @param category
+	 * @param outputEnabled
+	 */
+	public void show3DGraphForAttribute(ArrayList<TraverserRecord> traversers, ArrayList<TraverserRecord> players, String gameOrRound, String title, String attribute, String category, boolean outputEnabled, String figureToOverwrite) {
+		
+		showGraphForAttribute(traversers, players, gameOrRound, title, "3D", "Game Number", attribute, category, outputEnabled, figureToOverwrite);
 		
 	}
 	
@@ -695,6 +817,27 @@ public class OutputManager {
 	}
 	
 	/**
+	 * @param playerRecords
+	 * @param traverserRecords
+	 * @param gameOrRound
+	 * @param title
+	 * @param graphType
+	 * @param xLabel
+	 * @param yLabel
+	 * @param category
+	 * @param outputEnabled
+	 */
+	public void showGraphForAttribute(ArrayList<TraverserRecord> playerRecords, ArrayList<TraverserRecord> traverserRecords, String gameOrRound, String title, String graphType, String xLabel, String yLabel, String category, boolean outputEnabled) {
+		
+		String figureID = "figure" + new SimpleDateFormat("yyyyMMddHHmmss").format(Calendar.getInstance().getTime());
+		
+		showGraphForAttribute(playerRecords, traverserRecords, gameOrRound, title, graphType, xLabel, yLabel, category, outputEnabled, figureID);
+		
+	}
+	
+	private static boolean STRICT_RENAME = false;
+	
+	/**
 	 * @param playerRecords All players
 	 * @param traverserRecords Only those selected
 	 * @param gameOrRound
@@ -705,7 +848,7 @@ public class OutputManager {
 	 * @param category
 	 * @param outputEnabled
 	 */
-	public void showGraphForAttribute(ArrayList<TraverserRecord> playerRecords, ArrayList<TraverserRecord> traverserRecords, String gameOrRound, String title, String graphType, String xLabel, String yLabel, String category, boolean outputEnabled) {
+	public void showGraphForAttribute(ArrayList<TraverserRecord> playerRecords, ArrayList<TraverserRecord> traverserRecords, String gameOrRound, String title, String graphType, String xLabel, String yLabel, String category, boolean outputEnabled, String figureID) {
 		
 		if (traverserRecords.size() == 0 || playerRecords.size() == 0) {
 			
@@ -719,7 +862,7 @@ public class OutputManager {
 		
 		if ( graphType.equals("Bar") ) SHOW_OPPONENT = false;
 		
-		if ( graphType.equals("Line") ) SHOW_OPPONENT = true;
+		if ( graphType.contains("Line") ) SHOW_OPPONENT = true;
 		
 		if ( !SHOW_OPPONENT ) for ( TraverserRecord record : traverserRecords ) record.doNotShowOpponents();
 		
@@ -735,7 +878,7 @@ public class OutputManager {
 		Hashtable<String, Double> minForAttributeInAllSeries;
 		
 		Hashtable<String, Double> maxForAttributeInAllSeries;
-		
+	
 		if (graphType.contains("Line") || graphType.equals("3D")) {
 			
 			minForAttributeInAllSeries = minForAttributeInAllSeries(playerRecords, gameOrRound, GraphType.LINE);
@@ -748,7 +891,7 @@ public class OutputManager {
 				graph = new GNULineGraph(title, textBased);
 			
 			} else if (graphType.equals("LineOne")) {
-					
+				
 				graph = new GNULineGraph(title, textBased);
 				
 				((GNULineGraph)graph).startsAtOne();
@@ -806,7 +949,7 @@ public class OutputManager {
 				
 				multipleAttributeToValues.get(traverser.getTraverser()).add(attributeToValues);
 				
-				if (graphType.equals("Line")) {
+				if (graphType.contains("Line")) {
 					
 					((GNULineGraph) graph).addDataset(traverser.toString(), attributeToValues);
 					
@@ -986,63 +1129,73 @@ public class OutputManager {
 				
 			}
 			
+			ArrayList<Entry<TraverserRecord, Double>> crossCategoryData = new ArrayList<Entry<TraverserRecord, Double>>();
+			
+			for ( Entry<String, ArrayList<Entry<TraverserRecord, Double>>> storedTraverserAndData : categoryToTraverserAndData.entrySet() ) {
+			
+				crossCategoryData.addAll(storedTraverserAndData.getValue());
+				
+			}
+			
+			Hashtable<TraverserRecord, String> traverserToSignificanceClass = new Hashtable<TraverserRecord, String>();
+			
+			if ( yLabel.equals(Metric.COST.getText()) || yLabel.equals(Metric.PAYOFF.getText()) ) {
+				
+				outer:
+				for ( Entry<TraverserRecord, Double> traverserA : crossCategoryData ) {
+			
+					double cumulativeP = 0.0;
+					
+					traverserToSignificanceClass.put(traverserA.getKey(), "");
+					
+					for ( Entry<TraverserRecord, Double> traverserB : crossCategoryData ) {
+						
+						// exact same record
+						if ( crossCategoryData.indexOf(traverserA) == crossCategoryData.indexOf(traverserB)) continue;
+						//if ( traverserA.getKey() == traverserB.getKey() && traverserA.getKey().getOpponents() == traverserB.getKey().getOpponents ) continue;
+						
+						double pValue = 0.0;
+						
+						if ( yLabel.equals(Metric.COST.getText()) ) {
+						
+							if ( traverserA.getKey().pGroup(traverserB.getKey(), Metric.COST).equals("") ) continue outer;
+							
+							pValue = traverserA.getKey().pValue(traverserB.getKey(), Metric.COST);
+							
+							Utils.talk(toString(), traverserA.getKey() + " vs " + traverserB.getKey() + " : Percentage Difference - " + ( Utils.percentageChange(traverserB.getValue(), traverserA.getValue()) ) + " PValue - " + pValue);
+							
+							cumulativeP += pValue;
+							
+						} else if ( yLabel.equals(Metric.PAYOFF.getText()) ) {
+							
+							if ( traverserA.getKey().pGroup(traverserB.getKey(), minForAttributeInAllSeries, maxForAttributeInAllSeries ).equals("") ) continue outer;
+							
+							pValue = traverserA.getKey().pValue(traverserB.getKey(), minForAttributeInAllSeries, maxForAttributeInAllSeries );
+							
+							Utils.talk(toString(), traverserA.getKey() + " vs " + traverserB.getKey() + " : Percentage Difference - " + ( Utils.percentageChange(traverserB.getValue(), traverserA.getValue()) ) + " PValue - " + pValue);
+							
+							cumulativeP += pValue;
+							
+						}
+						
+						significanceTable.addPValue(traverserA.getKey().getTraverser() + " (vs. " + traverserA.getKey().getOpponents() + ")", traverserB.getKey().getTraverser() + " (vs. " + traverserB.getKey().getOpponents() + ")", traverserA.getValue(), traverserB.getValue(), pValue);
+						
+					}
+					
+					Utils.talk(toString(), "Average pValue against other traversers (" + crossCategoryData.size() + "): " + ( cumulativeP / crossCategoryData.size() ));
+					
+					traverserToSignificanceClass.put(traverserA.getKey(), StatisticalTest.getPGroup(cumulativeP / crossCategoryData.size()));
+					
+					Utils.talk(toString(), "Significance class of this value: " + traverserToSignificanceClass);
+					
+				}
+			
+			}
+			
 			// ~MDC 19/8 Could be neater
 			for ( Entry<String, ArrayList<Entry<TraverserRecord, Double>>> storedTraverserAndData : categoryToTraverserAndData.entrySet() ) {
 			
 				Utils.talk(this.toString(), "Adding bar: " + storedTraverserAndData.getValue() + " " + storedTraverserAndData.getKey());
-				
-				Hashtable<TraverserRecord, String> traverserToSignificanceClass = new Hashtable<TraverserRecord, String>();
-				
-				if ( yLabel.equals(Metric.COST.getText()) || yLabel.equals(Metric.PAYOFF.getText()) ) {
-					
-					outer:
-					for ( Entry<TraverserRecord, Double> traverserA : storedTraverserAndData.getValue() ) {
-				
-						double cumulativeP = 0.0;
-						
-						traverserToSignificanceClass.put(traverserA.getKey(), "");
-						
-						for ( Entry<TraverserRecord, Double> traverserB : storedTraverserAndData.getValue() ) {
-							
-							if ( traverserA.getKey() == traverserB.getKey() ) continue;
-							
-							double pValue = 0.0;
-							
-							if ( yLabel.equals(Metric.COST.getText()) ) {
-							
-								if ( traverserA.getKey().pGroup(traverserB.getKey(), Metric.COST).equals("") ) continue outer;
-								
-								pValue = traverserA.getKey().pValue(traverserB.getKey(), Metric.COST);
-								
-								Utils.talk(toString(), traverserA.getKey() + " vs " + traverserB.getKey() + " : Percentage Difference - " + ( Utils.percentageChange(traverserB.getValue(), traverserA.getValue()) ) + " PValue - " + pValue);
-								
-								cumulativeP += pValue;
-								
-							} else if ( yLabel.equals(Metric.PAYOFF.getText()) ) {
-								
-								if ( traverserA.getKey().pGroup(traverserB.getKey(), minForAttributeInAllSeries, maxForAttributeInAllSeries ).equals("") ) continue outer;
-								
-								pValue = traverserA.getKey().pValue(traverserB.getKey(), minForAttributeInAllSeries, maxForAttributeInAllSeries );
-								
-								Utils.talk(toString(), traverserA.getKey() + " vs " + traverserB.getKey() + " : Percentage Difference - " + ( Utils.percentageChange(traverserB.getValue(), traverserA.getValue()) ) + " PValue - " + pValue);
-								
-								cumulativeP += pValue;
-								
-							}
-							
-							significanceTable.addPValue(traverserA.getKey().getTraverser(), traverserB.getKey().getTraverser(), traverserA.getValue(), traverserB.getValue(), pValue);
-							
-						}
-						
-						Utils.talk(toString(), "Average pValue against other traversers (" + storedTraverserAndData.getValue().size() + "): " + ( cumulativeP / storedTraverserAndData.getValue().size() ));
-								
-						traverserToSignificanceClass.put(traverserA.getKey(), StatisticalTest.getPGroup(cumulativeP / storedTraverserAndData.getValue().size()));
-						
-						Utils.talk(toString(), "Significance class of this value: " + traverserToSignificanceClass);
-						
-					}
-				
-				}
 				
 				((GNUBarGraph) graph).addBars(storedTraverserAndData.getValue(), storedTraverserAndData.getKey(), traverserToSignificanceClass);
 			
@@ -1054,15 +1207,28 @@ public class OutputManager {
 		
 		graph.styleGraph();
 
-		String figureID = "figure" + new SimpleDateFormat("yyyyMMddHHmmss").format(Calendar.getInstance().getTime());
+		boolean increaseKAndN = false;
 		
-		graph.createChart("", xLabel, yLabel);
+		if ( graphType.equals("LineOne") ) {
+			
+			// ~MDC Assumes all graphs that start at one are showing K:N. For our purposes, this is true.
+			xLabel = "$K$ ($N = 2K$)";
+					
+			increaseKAndN = true;
+			
+			graph.createChart("", xLabel, yLabel);
+			
+		} else {
+			
+			graph.createChart("", xLabel, yLabel);
+			
+		}
+		
+		boolean overwriting = false;
 		
 		if ( outputEnabled ) {
-		
-			graph.exportChartAsEPS(Utils.FILEPREFIX + "charts/" + figureID + ".eps");
 			
-			graph.exportChartAsTikz(Utils.FILEPREFIX + "charts/" + figureID + ".tex");
+			ArrayList<String> affectedFiles = new ArrayList<String>();
 			
 			for ( TraverserRecord traverser : traverserRecords ) {
 				
@@ -1072,17 +1238,71 @@ public class OutputManager {
 				
 				graphedSuffix += ( "_" + figureID );
 				
-				traverser.getDatafile().toFile().renameTo(new File(traverser.getDatafile().toString().substring(0, traverser.getDatafile().toString().length() - 4) + graphedSuffix + ".csv"));
+				affectedFiles.add(traverser.getDatafile().toString());
+				
+				boolean result = traverser.getDatafile().toFile().renameTo(new File(traverser.getDatafile().toString().substring(0, traverser.getDatafile().toString().length() - 4) + graphedSuffix + ".csv"));
+				
+				if ( STRICT_RENAME && result == false ) {
+					
+					System.err.println("ERROR: Unable to rename file to include this figureID. YOUR OUTPUT HAS NOT BEEN WRITTEN. Exiting.");
+					
+					System.exit(0);
+					
+				}
 				
 			}
-	
-			try {
-				
-				Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "charts/figures.bib", true), "\n @FIG{" + figureID + ", main = { " + setupCaptionString(playerRecords, traverserRecords) + " }, add = { " + title + " }, file = {/Users/Martin/Dropbox/workspace/SearchGames/output/charts/" + figureID + "}, source = {}}");
 			
-			} catch (IOException e) {
+			File TEX = new File(Utils.FILEPREFIX + "charts/" + figureID + ".tex");
+			
+			File EPS = new File(Utils.FILEPREFIX + "charts/" + figureID + ".eps");
+			
+			if( TEX.exists() && !TEX.isDirectory() ) {
 				
-				e.printStackTrace();
+				overwriting = true;
+				
+				try {
+				
+					Utils.copyFile ( new File(Utils.FILEPREFIX + "charts/" + figureID + ".tex" ), new File( Utils.FILEPREFIX + "charts/" + figureID + "_copy.tex" ) );
+				
+				} catch (IOException e1) {
+
+					e1.printStackTrace();
+
+				}
+			
+			}
+			
+			if ( EPS.exists() && !EPS.isDirectory() ) {
+				
+				overwriting = true;
+				
+				try {
+				
+					Utils.copyFile ( new File(Utils.FILEPREFIX + "charts/" + figureID + ".eps" ), new File( Utils.FILEPREFIX + "charts/" + figureID + "_copy.eps" ) );
+				
+				} catch (IOException e1) {
+				
+					e1.printStackTrace();
+				
+				}
+			
+			}
+			
+			graph.exportChartAsEPS(Utils.FILEPREFIX + "charts/" + figureID + ".eps");
+			
+			graph.exportChartAsTikz(Utils.FILEPREFIX + "charts/" + figureID + ".tex");
+	
+			if ( !overwriting ) {
+				
+				try {
+					
+					Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "charts/figures.bib", true), "\n @FIG{" + figureID + ", main = { " + setupCaptionString(playerRecords, traverserRecords, increaseKAndN) + " }, add = { " + title + " " + affectedFiles + " }, file = {/Users/Martin/Dropbox/workspace/SearchGames/output/charts/" + figureID + "}, source = {}}");
+				
+				} catch (IOException e) {
+					
+					e.printStackTrace();
+				
+				}
 			
 			}
 			
@@ -1105,7 +1325,7 @@ public class OutputManager {
 	 * @param traverserRecords
 	 * @return
 	 */
-	protected String setupCaptionString(ArrayList<TraverserRecord> playerRecords, ArrayList<TraverserRecord> traverserRecords) {
+	protected String setupCaptionString(ArrayList<TraverserRecord> playerRecords, ArrayList<TraverserRecord> traverserRecords, boolean increaseKAndN) {
 		
 		HashSet<String> hiders = new HashSet<String>();
 		
@@ -1170,13 +1390,17 @@ public class OutputManager {
 		
 		//
 		
+		String suffix = ".";
+		
+		if ( increaseKAndN ) suffix = " at higher values of $K$ and $N$.";
+		
 		if ( hiderTarget ) {
 			
-			return "The performance of " + hiderList + " against " + seekerList + " on a " + traverserRecords.get(0).getTopology() + " network.";
+			return "The performance of " + hiderList + " against " + seekerList + " on a " + traverserRecords.get(0).getTopology() + " network" + suffix;
 			
 		} else {
 			
-			return "The performance of " + seekerList + " against " + hiderList + " on a " + traverserRecords.get(0).getTopology() + " network.";
+			return "The performance of " + seekerList + " against " + hiderList + " on a " + traverserRecords.get(0).getTopology() + " network" + suffix;
 			
 		}
 		
@@ -1197,7 +1421,8 @@ public class OutputManager {
 		
 		} else if ( traversers.size() == 1 ) {
 			
-			traverserList = "the " + hiderOrSeeker + " strategy \texttt{" + (new ArrayList<String>(traversers).get(0)) + "}";
+			// \\\texttt{
+			traverserList = "the " + hiderOrSeeker + " strategy " + (new ArrayList<String>(traversers).get(0)) + "";
 			
 		} else {
 			

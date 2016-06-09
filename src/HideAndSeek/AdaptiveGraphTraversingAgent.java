@@ -140,15 +140,6 @@ public abstract class AdaptiveGraphTraversingAgent<E extends GraphTraverser & Ad
 		
 	}
 	
-	/* (non-Javadoc)
-	 * @see HideAndSeek.GraphTraversingAgent#strategyOverRounds()
-	 */
-	public boolean strategyOverRounds() {
-		
-		return true;
-		
-	}
-	
 	/**
 	 * @param graphController
 	 * @param strategyPortfolio

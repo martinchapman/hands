@@ -19,8 +19,8 @@ if ( len(sys.argv) > 0 ):
         
 ts = time.time()
 
-dropbox_directory = "/Users/Martin/Dropbox/workspace/SearchGames"
-mounted_drive_directory = "/Volumes/Martin/Dropbox/workspace/SearchGames"
+dropbox_directory = "<Directory>"
+mounted_drive_directory = "<Directory>"
 
 print "Create new HANDS instance"
 var = raw_input("Use (1) Local dropbox (2) Mounted drive for copy ");
@@ -110,10 +110,10 @@ remote_directory = remote_prefix + target_name
     
 ssh = paramiko.SSHClient()
 ssh.load_system_host_keys()
-private_key = paramiko.RSAKey.from_private_key_file("/Users/Martin/Downloads/AWS4815.pem")
+private_key = paramiko.RSAKey.from_private_key_file("<Downloads>/<PEMfile>.pem")
 ssh.connect(IP, username='ec2-user', password='', pkey=private_key)
 
-connection_string = "ssh -X -i 'Downloads/AWS4815.pem' ec2-user@" + IP
+connection_string = "ssh -X -i '<Downloads>/<PEMfile>.pem' ec2-user@" + IP
 
 print "Connected using command: " + connection_string
 

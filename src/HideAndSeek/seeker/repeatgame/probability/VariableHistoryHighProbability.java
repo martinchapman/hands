@@ -37,7 +37,7 @@ public class VariableHistoryHighProbability extends HighProbability {
 		
 		
 		
-		// ~MDC Change back to true for more reliable results
+		// ~MDC Change back to true when parameters are varied per game
 		strategyOverRounds = false;
 		
 	}

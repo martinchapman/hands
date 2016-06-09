@@ -141,9 +141,13 @@ public class InverseHighProbabilityAdaptable extends VariableNodesInverseHighPro
 		
 		uniqueHideLocationsProgression.add(uniqueHideLocations().size());
 	
-		if ( uniqueHideLocations().size() > ( graphController.vertexSet().size() - estimatedNumberOfHideLocations() ) ) { 
+		// From IHP:
+		// if (allHideLocations().size() >= ( graphController.vertexSet().size() )) uniqueHideLocations().clear();
+		
+		// Was: uniqueHideLocations();
+		if ( allHideLocations().size() > ( graphController.vertexSet().size() - estimatedNumberOfHideLocations() ) ) { 
 			
-			uniqueHideLocations().clear();
+			allHideLocations().clear();
 			
 			uniqueHideLocationsProgression.clear();
 		

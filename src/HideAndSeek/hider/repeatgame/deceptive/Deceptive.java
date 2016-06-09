@@ -29,8 +29,8 @@ public class Deceptive extends RandomSet {
 		
 		super(graphController, name, numberOfHideLocations);
 		
-		// ~MDC Change back to true for more reliable results (currently added manually in 'main' for some strategies).
-		strategyOverRounds = true;
+		// ~MDC Change back to true when each game contains a different parameter results (currently added manually in 'main' for some strategies).
+		strategyOverRounds = false;
 		
 		this.deceptiveNodes = deceptiveNodes <= numberOfHideLocations ? deceptiveNodes : numberOfHideLocations;
 		

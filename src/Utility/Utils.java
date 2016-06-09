@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,6 +18,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
@@ -198,6 +200,67 @@ public class Utils {
 	}
 	
 	/**
+	 * @param path
+	 * @param files
+	 * @return
+	 */
+	public static ArrayList<Path> listFilesForFolder( final File folder, ArrayList<Path> files ) {
+
+        if (folder.listFiles() == null) return null;
+
+        for ( final File fileEntry : folder.listFiles() ) {
+        	
+        	files.add(Paths.get(fileEntry.getAbsolutePath()));
+            
+        	if ( fileEntry.isDirectory() ) {
+            	
+            	listFilesForFolder( fileEntry, files );
+             
+            } else {
+            
+            	if (!files.contains(Paths.get(fileEntry.getAbsolutePath()))) files.add(Paths.get(fileEntry.getAbsolutePath()));
+        
+            }
+       
+        }
+        
+        return files;
+        
+    }
+	
+	/**
+	 * @param sourceFile
+	 * @param destFile
+	 * @throws IOException
+	 */
+	@SuppressWarnings("resource")
+	public static void copyFile(File sourceFile, File destFile) throws IOException {
+	    
+		if ( !destFile.exists() ) destFile.createNewFile();
+
+	    FileChannel source = null;
+	    
+	    FileChannel destination = null;
+	    
+	    try {
+	    
+	    	source = new FileInputStream(sourceFile).getChannel();
+	    	
+	        destination = new FileOutputStream(destFile).getChannel();
+	        
+	        destination.transferFrom(source, 0, source.size());
+	    
+	    } finally {
+	    	
+	        if ( source != null ) source.close();
+	        
+	        if ( destination != null ) destination.close();
+	        
+	    }
+	    
+	}
+	
+	/**
 	 * @param integers
 	 * @return
 	 */
@@ -319,8 +382,11 @@ public class Utils {
 		shortenedNames.put("sBreadthFirstSearch", "sBFS");
 		shortenedNames.put("sBreadthFirstSearchGreedy", "sBFSGreedy");
 		shortenedNames.put("sSelfAvoidingRandomWalk", "sRandomWalk");
-		shortenedNames.put("sNotConnecting", "sNotConnected");
+		shortenedNames.put("hNotConnecting", "hNotConnected");
 		shortenedNames.put("hUniqueRandomSetRepeat", "hUniqueRandomSet");
+		shortenedNames.put("hStaticLocations", "hAllLocations");
+		shortenedNames.put("hVariableGraphKnowledgeMaxDistance", "hMaxDistance");
+		shortenedNames.put("hVariableGraphKnowledgeLeastConnected", "hLeastConnected");
 		
 		//
 		
@@ -1041,7 +1107,7 @@ public class Utils {
     }
 	
 	/**
-	 * Ancillary method for combiantions
+	 * Ancillary method for combinations
 	 * 
 	 * @param indices
 	 * @param n

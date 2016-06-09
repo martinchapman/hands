@@ -172,6 +172,9 @@ public class HighProbability extends SeekingAgent implements VariableTraversalSt
 	 */
 	private int numberInTopK = 0;
 
+	/**
+	 * 
+	 */
 	private boolean LOG_TOP_K = false;
 	
 	/* (non-Javadoc)

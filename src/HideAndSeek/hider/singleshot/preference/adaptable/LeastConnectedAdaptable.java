@@ -85,7 +85,7 @@ public class LeastConnectedAdaptable extends LeastConnected implements AdaptiveH
 	@Override
 	public AdaptiveWeightings getAdaptiveWeightings() {
 		
-		return new AdaptiveWeightings(0.8, 0.0, 0.2);
+		return new AdaptiveWeightings(1.0, 0.0, 0.0);
 		
 	}
 

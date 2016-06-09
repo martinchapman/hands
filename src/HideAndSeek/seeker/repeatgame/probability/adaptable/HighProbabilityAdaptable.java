@@ -140,8 +140,13 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 			   == (  uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 2) - uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 3) ) &&
 			   ( uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 1) -  uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 2) ) 
 			   == estimatedNumberOfHideLocations() 
-			   || uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 1) == graphController.vertexSet().size())  
-			   return 1.0;
+			   //|| uniqueHideLocationsProgression.get(uniqueHideLocationsProgression.size() - 1) == graphController.vertexSet().size()
+			   )  {
+			    
+				Utils.talk(toString(), "Social cue adapting!");
+				return 1.0;
+			   
+			}
 		
 		}
 		
@@ -195,9 +200,13 @@ public class HighProbabilityAdaptable extends HighProbability implements Adaptiv
 		
 		uniqueHideLocationsProgression.add(uniqueHideLocations().size());
 	
-		if ( uniqueHideLocations().size() > ( graphController.vertexSet().size() - estimatedNumberOfHideLocations() ) ) { 
+		// From IHP:
+		// if (allHideLocations().size() >= ( graphController.vertexSet().size() )) uniqueHideLocations().clear();
+				
+		// Was: uniqueHideLocations();
+		if ( allHideLocations().size() > ( graphController.vertexSet().size() - estimatedNumberOfHideLocations() ) ) { 
 			
-			uniqueHideLocations().clear();
+			allHideLocations().clear();
 			
 			uniqueHideLocationsProgression.clear();
 		

@@ -804,9 +804,9 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 		
 		} catch ( Exception e ) {
 			
-			System.out.println(this.name);
+			System.err.println(this.name);
 			
-			System.out.println(this.currentNode + " " + traverser.currentNode());
+			System.err.println(this.currentNode + " " + traverser.currentNode());
 			
 		}
 		
@@ -824,6 +824,7 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
 		
 		uniqueHideLocations.clear();
 		
+		Utils.talk(toString(), "traverser.uniqueHideLocations() " + traverser.uniqueHideLocations());
 		this.uniqueHideLocations.addAll(traverser.uniqueHideLocations());	
 		
 	}

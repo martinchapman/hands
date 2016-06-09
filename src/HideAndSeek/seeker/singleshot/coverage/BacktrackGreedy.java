@@ -151,7 +151,7 @@ public class BacktrackGreedy extends SeekingAgent {
 			
 			if ( unvisitedNodes.size() == 0 ) {
 				
-				Utils.talk(toString(), "\nNo unvisited nodes.\n" + this.getStatus());
+				Utils.talk(toString(), "\nNo unvisited nodes from this node, or to backtrack to.\n" + this.getStatus());
 				
 				return connectedNode(currentNode);
 				
@@ -184,7 +184,7 @@ public class BacktrackGreedy extends SeekingAgent {
 			
 			
 			// If no path can be found, return adjacent node on lowest cost edge (ordered by methods below).
-			if ( dsp.getPathEdgeList().size() == 0 ) {
+			if ( dsp != null && dsp.getPathEdgeList().size() == 0 ) {
 				
 				return connectedNode(currentNode);
 				

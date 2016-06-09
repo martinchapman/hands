@@ -1,6 +1,6 @@
-# rsync --progress -rave "ssh -i '/Users/Martin/Downloads/AWS4815.pem'" /Users/Martin/Dropbox/workspace/SearchGames/output/temp/files.zip ec2-user@<INSERTIP>:/home/ec2-user/
+# rsync --progress -rave "ssh -i '<DownloadsPath>/AWS4815.pem'" <WorkspacePath>/SearchGames/output/temp/files.zip ec2-user@<INSERTIP>:/home/ec2-user/
 # zip -r awscharts.zip output/charts 
-# scp awscharts.zip martin@px205.dcs.kcl.ac.uk:/Users/Martin/Downloads
+# scp awscharts.zip martin@px205.dcs.kcl.ac.uk:<DownloadsPath>
 
 ## TEMPLATE FOR A LINUX INSTANCE THAT CAN RUN HANDS
 

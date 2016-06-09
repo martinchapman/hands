@@ -54,6 +54,12 @@ public class Pair<K, V> {
 			return false;
 		return true;
 	}
+	
+	public String toString() {
+		
+		return element0 + " " + element1;
+		
+	}
 
     
 }

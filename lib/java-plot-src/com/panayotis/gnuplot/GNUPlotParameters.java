@@ -192,7 +192,7 @@ public class GNUPlotParameters extends PropertiesHolder implements Serializable 
          * Gather various "set" parameters
          */
         appendProperties(bf);
-
+        
         /*
          * Set Terminal (and it's parameters)
          */

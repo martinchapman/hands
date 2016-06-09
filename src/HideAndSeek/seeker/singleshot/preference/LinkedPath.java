@@ -172,11 +172,14 @@ public class LinkedPath extends SeekingAgent implements VariableTraversalStrateg
 			
 		} else {
 			
+			// Nodes we have already been to, that weren't visited during the exploration period
 			visitedNonExplorative.add(currentNode);
 			
 			// Record first node found to contain an object
 			if ( firstNode == null ) firstNode = hideLocations().get(0);
 			
+			// If we have reached the node connected to the previous, clear potentials
+			// And we've only been here once before, to avoid cycles
 			if ( hideLocations().contains(currentNode) && exploredNodesTable().containsKey(currentNode) && exploredNodesTable().get(currentNode) == 1) {
 				
 				potentialNodes.clear();
@@ -223,7 +226,8 @@ public class LinkedPath extends SeekingAgent implements VariableTraversalStrateg
 			if ( potentialNodes.size() > 0 ) {
 
 				dsp = new DijkstraShortestPath<StringVertex, StringEdge>(localGraph, currentNode, potentialNodes.remove(0));
-		    	
+		    
+			// Abstracted to return in the pseudocode
 			} else if ( hideLocationPath.size() > 1 ) {
 				
 				isFound = true;
@@ -237,11 +241,12 @@ public class LinkedPath extends SeekingAgent implements VariableTraversalStrateg
 			} else {
 				
 				Utils.talk(toString(), "Exploring because all path links exhausted.");
+				
 				return explorationMechanism.nextNode(currentNode);
 				
 			}
 			
-			// If no path available, return random connected node
+			// If no path available, then return to exploring
 			if ( dsp.getPathEdgeList() == null || dsp.getPathEdgeList().size() == 0 ) { 
 			
 				return explorationMechanism.nextNode(currentNode);

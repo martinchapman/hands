@@ -640,6 +640,12 @@ public class Main {
 			
 			}
 			
+			if (hiderType.getElement0().equals("DeceptiveTemp")) {
+				
+				allHidingAgents.add(new DeceptiveNew(graphController, "Deceptive", numberOfHideLocations, totalRounds - ( totalRounds / 10 )));
+			
+			}
+
 			if (hiderType.getElement0().equals("VariableDeceptiveNew")) {
 				
 				allHidingAgents.add(new DeceptiveNew(graphController, "Deceptive", numberOfHideLocations, gameNumber) {
@@ -862,9 +868,9 @@ public class Main {
 				
 				ArrayList<Pair<AdaptiveHider, Double>> strategyPortfolio = new ArrayList<Pair<AdaptiveHider, Double>>();
 				
-				strategyPortfolio.add(new Pair<AdaptiveHider, Double>(new RandomSetAdaptable(graphController, numberOfHideLocations), 0.83));
+				strategyPortfolio.add(new Pair<AdaptiveHider, Double>(new RandomSetAdaptable(graphController, numberOfHideLocations), 0.84));
 				
-				strategyPortfolio.add(new Pair<AdaptiveHider, Double>(new UniqueRandomSetRepeatAdaptable(graphController, numberOfHideLocations), 0.17));
+				strategyPortfolio.add(new Pair<AdaptiveHider, Double>(new UniqueRandomSetRepeatAdaptable(graphController, numberOfHideLocations), 0.16));
 				
 				allHidingAgents.add(new AdaptiveHidingAgent<AdaptiveHider>(graphController, "MetaRandom", strategyPortfolio, totalRounds));
 				
@@ -1128,9 +1134,9 @@ public class Main {
 				
 				strategyPortfolio.clear();
 				
-				strategyPortfolio.add(new Pair<AdaptiveSeeker, Double>(new InverseHighProbabilityAdaptable(graphController, Integer.MAX_VALUE), 0.33));
+				strategyPortfolio.add(new Pair<AdaptiveSeeker, Double>(new InverseHighProbabilityAdaptable(graphController, Integer.MAX_VALUE), 0.24));
 				
-				strategyPortfolio.add(new Pair<AdaptiveSeeker, Double>(new HighProbabilityAdaptable(graphController), 0.67));
+				strategyPortfolio.add(new Pair<AdaptiveSeeker, Double>(new HighProbabilityAdaptable(graphController), 0.76));
 				
 				allSeekingAgents.add(new AdaptiveSeekingAgent<AdaptiveSeeker>(graphController, "MetaProbability", strategyPortfolio, totalRounds, 0.5, false) {
 					
@@ -1318,6 +1324,18 @@ public class Main {
 		    		}
 		    		
 		    		//
+		    		
+		    		/*if ( recordPerRound) {
+		    			
+		    			Utils.talk("Main", hider.toString() + "," + hider.printRoundStats());
+		    			
+		    			for( Seeker seeker : seekers ) {
+		    				
+		    				Utils.talk("Main", seeker.toString() + "," + seeker.printRoundStats());
+		    				
+		    			}
+		    			
+		    		}*/
 		    		
 		    		if (generateOutput && recordPerRound) {
 		        		

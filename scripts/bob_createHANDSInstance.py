@@ -14,8 +14,8 @@ if ( len(sys.argv) > 0 ):
         
 ts = time.time()
 
-dropbox_directory = "/Users/Martin/Dropbox/workspace/SearchGames"
-mounted_drive_directory = "/Volumes/Martin/Dropbox/workspace/SearchGames"
+dropbox_directory = "<Directory>"
+mounted_drive_directory = "<Directory>"
 
 print "Create new HANDS instance"
 var = raw_input("Use (1) Local dropbox (2) Mounted drive for copy ");
@@ -31,7 +31,7 @@ jar_directory = root_copy_directory + "/bin"
 lib_directory = root_copy_directory + "/lib"
 schedule_file = root_copy_directory + "/output/simulationSchedule.txt"
 
-target_directory = "/Users/Martin/Desktop/" + datetime.datetime.fromtimestamp(ts).strftime('%Y%m%d_%H%M%S')
+target_directory = "<Desktop>" + datetime.datetime.fromtimestamp(ts).strftime('%Y%m%d_%H%M%S')
 
 print "Creating files at " + target_directory + "..."
 
@@ -79,9 +79,9 @@ print "Running HANDS..."
 
 try:
     if (nokill == True):
-        subprocess.call(['/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/bin/java', '-XX:-UseGCOverheadLimit', '-Xmx6g', '-Dfile.encoding=US-ASCII', '-classpath', target_directory + '/bin:/Users/Martin/Dropbox/workspace/SearchGames/lib/epsgraphics.jar:/Users/Martin/Dropbox/workspace/SearchGames/lib/jcommon-1.0.21.jar:/Users/Martin/Dropbox/workspace/SearchGames/lib/jfreechart-1.0.17.jar:/Users/Martin/Dropbox/workspace/SearchGames/lib/jgrapht-core-0.9.0.jar:/Users/Martin/Dropbox/workspace/SearchGames/lib/jgraph-sna.jar:/Users/Martin/Dropbox/workspace/SearchGames/lib/java-plot.jar:/Users/Martin/Dropbox/workspace/SearchGames/lib/commons-math3-3.4.1.jar:/Users/Martin/Dropbox/workspace/SearchGames/lib/bsh-2.0b4.jar:/Users/Martin/Dropbox/workspace/SearchGames/lib/mapdb.jar:/Users/Martin/Dropbox/workspace/SearchGames/lib/fst-2.38-onejar.jar', 'Utility.Runner', '-t'], env=my_env)
+        subprocess.call(['/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/bin/java', '-XX:-UseGCOverheadLimit', '-Xmx6g', '-Dfile.encoding=US-ASCII', '-classpath', target_directory + '/bin:<WorkspacePath>SearchGames/lib/epsgraphics.jar:<WorkspacePath>SearchGames/lib/jcommon-1.0.21.jar:<WorkspacePath>SearchGames/lib/jfreechart-1.0.17.jar:<WorkspacePath>SearchGames/lib/jgrapht-core-0.9.0.jar:<WorkspacePath>SearchGames/lib/jgraph-sna.jar:<WorkspacePath>SearchGames/lib/java-plot.jar:<WorkspacePath>SearchGames/lib/commons-math3-3.4.1.jar:<WorkspacePath>SearchGames/lib/bsh-2.0b4.jar:<WorkspacePath>SearchGames/lib/mapdb.jar:<WorkspacePath>SearchGames/lib/fst-2.38-onejar.jar', 'Utility.Runner', '-t'], env=my_env)
     else:
-        subprocess.call(['/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/bin/java', '-XX:-UseGCOverheadLimit', '-Xmx6g', '-Dfile.encoding=US-ASCII', '-classpath', target_directory + '/bin:/Users/Martin/Dropbox/workspace/SearchGames/lib/epsgraphics.jar:/Users/Martin/Dropbox/workspace/SearchGames/lib/jcommon-1.0.21.jar:/Users/Martin/Dropbox/workspace/SearchGames/lib/jfreechart-1.0.17.jar:/Users/Martin/Dropbox/workspace/SearchGames/lib/jgrapht-core-0.9.0.jar:/Users/Martin/Dropbox/workspace/SearchGames/lib/jgraph-sna.jar:/Users/Martin/Dropbox/workspace/SearchGames/lib/java-plot.jar:/Users/Martin/Dropbox/workspace/SearchGames/lib/commons-math3-3.4.1.jar:/Users/Martin/Dropbox/workspace/SearchGames/lib/bsh-2.0b4.jar:/Users/Martin/Dropbox/workspace/SearchGames/lib/mapdb.jar:/Users/Martin/Dropbox/workspace/SearchGames/lib/fst-2.38-onejar.jar', 'Utility.Runner', '-t', '-k'], env=my_env)
+        subprocess.call(['/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/bin/java', '-XX:-UseGCOverheadLimit', '-Xmx6g', '-Dfile.encoding=US-ASCII', '-classpath', target_directory + '/bin:<WorkspacePath>SearchGames/lib/epsgraphics.jar:<WorkspacePath>SearchGames/lib/jcommon-1.0.21.jar:<WorkspacePath>SearchGames/lib/jfreechart-1.0.17.jar:<WorkspacePath>SearchGames/lib/jgrapht-core-0.9.0.jar:<WorkspacePath>SearchGames/lib/jgraph-sna.jar:<WorkspacePath>SearchGames/lib/java-plot.jar:<WorkspacePath>SearchGames/lib/commons-math3-3.4.1.jar:<WorkspacePath>SearchGames/lib/bsh-2.0b4.jar:<WorkspacePath>SearchGames/lib/mapdb.jar:<WorkspacePath>SearchGames/lib/fst-2.38-onejar.jar', 'Utility.Runner', '-t', '-k'], env=my_env)
 except KeyboardInterrupt:
     print "Quitting HANDS."
     nocopy = True

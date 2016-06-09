@@ -11,4 +11,4 @@ This platform extends the JGraphT library to introduce the ability to run such g
 
 The platform is designed to eventually be evolved into a distributed game, in which participants can submit strategies to a central controller that runs them and evaluates their performance.
 
-An introduction to Search Games, and in particular, Hide-and-Seek from a simulation perspective, is available here: http://www.dcs.kcl.ac.uk/pg/chapm/papers/acyse2014.pdf
+An introduction to Search Games, and in particular, Hide-and-Seek from a simulation perspective, is available here: http://martinchapman.co.uk/papers/acyse2014.pdf
