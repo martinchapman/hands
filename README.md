@@ -4,6 +4,8 @@ A plugin for the JGraphT library facilitating the running of Search Game (Hide-a
 
 Cite as _[Cyber Hide-and-Seek](https://kclpure.kcl.ac.uk/portal/files/65641336/2016_Chapman_Martin_David_1156145_ethesis.pdf). Chapman, Martin. 2016._
 
+![](poster.jpg "HANDS")
+
 ### Crude running instructions
 
 `cd <repo path>`
