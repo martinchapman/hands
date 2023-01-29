@@ -3,7 +3,6 @@ package org.kclhi.hands.hider.singleshot.random;
 import org.kclhi.hands.graph.GraphController;
 import org.kclhi.hands.graph.StringEdge;
 import org.kclhi.hands.graph.StringVertex;
-import org.kclhi.hands.hider.HidingAgent;
 
 /**
  * 

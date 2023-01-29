@@ -1,16 +1,8 @@
 package org.kclhi.hands.seeker.singleshot.coverage.efficiency;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.jgrapht.alg.DijkstraShortestPath;
-
-import org.kclhi.hands.utility.Utils;
 import org.kclhi.hands.graph.GraphController;
 import org.kclhi.hands.graph.StringEdge;
 import org.kclhi.hands.graph.StringVertex;
-import org.kclhi.hands.seeker.SeekingAgent;
 
 /**
  * @author Martin

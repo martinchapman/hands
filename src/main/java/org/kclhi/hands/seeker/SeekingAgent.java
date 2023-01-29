@@ -1,8 +1,5 @@
 package org.kclhi.hands.seeker;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-
 import org.kclhi.hands.utility.Utils;
 import org.kclhi.hands.GraphTraverser;
 import org.kclhi.hands.TraverserLocalGraph;

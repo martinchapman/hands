@@ -3,7 +3,6 @@ package org.kclhi.hands.seeker.singleshot.preference;
 import java.util.Collections;
 import java.util.List;
 
-import org.kclhi.hands.utility.Utils;
 import org.kclhi.hands.graph.GraphController;
 import org.kclhi.hands.graph.StringEdge;
 import org.kclhi.hands.graph.StringVertex;

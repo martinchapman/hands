@@ -1,6 +1,5 @@
 package org.kclhi.hands.seeker.singleshot.preference;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.kclhi.hands.OpenTraverserStrategy;

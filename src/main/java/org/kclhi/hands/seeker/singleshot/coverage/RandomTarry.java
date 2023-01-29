@@ -3,8 +3,6 @@ package org.kclhi.hands.seeker.singleshot.coverage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
-import java.util.LinkedHashMap;
-import java.util.Map.Entry;
 
 import org.kclhi.hands.utility.Utils;
 import org.kclhi.hands.GraphTraverser;

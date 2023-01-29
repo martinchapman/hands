@@ -1,7 +1,6 @@
 package org.kclhi.hands.utility.output;
 
 import java.io.File;
-import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;

@@ -8,7 +8,6 @@ import org.kclhi.hands.AdaptiveGraphTraversingAgent;
 import org.kclhi.hands.graph.GraphController;
 import org.kclhi.hands.graph.StringEdge;
 import org.kclhi.hands.graph.StringVertex;
-import org.kclhi.hands.seeker.Seeker;
 
 /**
  * @author Martin

@@ -1,6 +1,5 @@
 package org.kclhi.hands.utility.output;
 
-import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.ArrayList;
 

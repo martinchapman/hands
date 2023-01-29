@@ -19,10 +19,6 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import org.mapdb.BTreeMap;
-import org.mapdb.HTreeMap;
-import org.mapdb.DB;
-
 import org.kclhi.hands.utility.ComparatorResult;
 import org.kclhi.hands.utility.Metric;
 import org.kclhi.hands.utility.Pair;

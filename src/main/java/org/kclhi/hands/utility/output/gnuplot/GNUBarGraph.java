@@ -12,7 +12,6 @@ import com.panayotis.gnuplot.plot.DataSetPlot;
 import com.panayotis.gnuplot.plot.Plot;
 import com.panayotis.gnuplot.style.FillStyle;
 import com.panayotis.gnuplot.style.PlotStyle;
-import com.panayotis.gnuplot.style.RgbPlotColor;
 import com.panayotis.gnuplot.style.Style;
 
 /**

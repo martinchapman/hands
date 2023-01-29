@@ -2,15 +2,7 @@ package org.kclhi.hands.utility;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Hashtable;
-import java.util.Map;
 
-import javax.swing.JFrame;
-import javax.swing.JTabbedPane;
-
-import org.jfree.ui.RefineryUtilities;
-
-import org.kclhi.hands.utility.output.BarGraph;
 import org.kclhi.hands.graph.StringVertex;
 
 /**

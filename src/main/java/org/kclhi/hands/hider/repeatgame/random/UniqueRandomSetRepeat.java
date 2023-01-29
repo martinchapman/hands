@@ -1,14 +1,11 @@
 package org.kclhi.hands.hider.repeatgame.random;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.TreeSet;
 
-import org.kclhi.hands.utility.Utils;
 import org.kclhi.hands.graph.GraphController;
 import org.kclhi.hands.graph.StringEdge;
 import org.kclhi.hands.graph.StringVertex;
-import org.kclhi.hands.hider.singleshot.random.RandomSet;
 
 /**
  * Same as grandparent, but never produces sets with the

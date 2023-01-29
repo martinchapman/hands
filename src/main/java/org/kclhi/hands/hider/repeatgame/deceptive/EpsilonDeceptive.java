@@ -1,13 +1,9 @@
 package org.kclhi.hands.hider.repeatgame.deceptive;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.kclhi.hands.utility.Utils;
 import org.kclhi.hands.graph.GraphController;
 import org.kclhi.hands.graph.StringEdge;
 import org.kclhi.hands.graph.StringVertex;
-import org.kclhi.hands.hider.singleshot.random.RandomSet;
 
 /**
  * Chooses to hide in a certain 'bias set' according to a factor

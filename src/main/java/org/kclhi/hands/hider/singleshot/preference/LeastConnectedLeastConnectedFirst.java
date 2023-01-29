@@ -1,13 +1,11 @@
 package org.kclhi.hands.hider.singleshot.preference;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 import org.kclhi.hands.OpenTraverserStrategy;
 import org.kclhi.hands.graph.GraphController;
 import org.kclhi.hands.graph.StringEdge;
 import org.kclhi.hands.graph.StringVertex;
-import org.kclhi.hands.seeker.singleshot.coverage.BacktrackGreedyMechanism;
 import org.kclhi.hands.seeker.singleshot.preference.LeastConnectedFirstMechanism;
 
 /**

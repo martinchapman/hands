@@ -8,8 +8,6 @@ import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import javax.swing.WindowConstants;
 
-import org.jfree.ui.RefineryUtilities;
-
 import org.kclhi.hands.utility.output.BarGraph;
 import org.kclhi.hands.graph.StringVertex;
 

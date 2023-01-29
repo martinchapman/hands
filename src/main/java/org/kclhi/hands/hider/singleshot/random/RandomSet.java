@@ -1,7 +1,6 @@
 package org.kclhi.hands.hider.singleshot.random;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.TreeSet;
 
 import org.jgrapht.alg.DijkstraShortestPath;

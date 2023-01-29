@@ -19,14 +19,6 @@
 
 package org.kclhi.hands.utility.output.gnuplot;
 
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
-
-import javax.swing.JPanel;
-
 import com.panayotis.gnuplot.terminal.TextFileTerminal;
 
 /**

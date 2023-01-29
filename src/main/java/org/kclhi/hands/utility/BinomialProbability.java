@@ -3,7 +3,6 @@ package org.kclhi.hands.utility;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
-import org.kclhi.hands.utility.output.gnuplot.GNUGraph;
 import org.kclhi.hands.utility.output.gnuplot.GNULineGraph;
 
 /**

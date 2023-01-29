@@ -6,8 +6,6 @@ import java.util.TreeMap;
 
 import org.jgrapht.alg.DijkstraShortestPath;
 
-import org.kclhi.hands.utility.Utils;
-import org.kclhi.hands.GraphTraverser;
 import org.kclhi.hands.graph.GraphController;
 import org.kclhi.hands.graph.HiddenObjectGraph;
 import org.kclhi.hands.graph.StringEdge;

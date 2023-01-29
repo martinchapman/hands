@@ -2,8 +2,6 @@ package org.kclhi.hands.utility.output;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.GradientPaint;
-import java.util.ArrayList;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;

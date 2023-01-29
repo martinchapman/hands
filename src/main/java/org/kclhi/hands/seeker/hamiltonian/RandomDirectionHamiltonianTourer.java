@@ -1,15 +1,10 @@
 package org.kclhi.hands.seeker.hamiltonian;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
-
-import org.jgrapht.alg.EulerianCircuit;
 
 import org.kclhi.hands.graph.GraphController;
 import org.kclhi.hands.graph.StringEdge;
 import org.kclhi.hands.graph.StringVertex;
-import org.kclhi.hands.seeker.SeekingAgent;
 
 /**
  * If a Hamiltonian circuit exists in the graph, follow it

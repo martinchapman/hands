@@ -1,16 +1,8 @@
 package org.kclhi.hands.seeker.repeatgame.probability;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.jgrapht.alg.DijkstraShortestPath;
-
-import org.kclhi.hands.utility.BehaviourPrediction;
-import org.kclhi.hands.utility.Utils;
 import org.kclhi.hands.graph.GraphController;
 import org.kclhi.hands.graph.StringEdge;
 import org.kclhi.hands.graph.StringVertex;
-import org.kclhi.hands.seeker.SeekingAgent;
 
 /**
  * If the parent strategy, which is tuned to exploiting hiders that attempt

@@ -2,7 +2,6 @@ package org.kclhi.hands.utility.output;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Map.Entry;
 

@@ -1,9 +1,6 @@
 package org.kclhi.hands.graph;
 
-import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DefaultWeightedEdge;
-
-import org.kclhi.hands.GraphTraversingAgent;
 
 public class StringEdge extends DefaultWeightedEdge implements Comparable<StringEdge> {
 

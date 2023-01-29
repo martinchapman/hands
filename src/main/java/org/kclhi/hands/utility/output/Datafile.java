@@ -4,8 +4,6 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import org.kclhi.hands.utility.ComparatorResult;
-
 /**
  * @author Martin
  *

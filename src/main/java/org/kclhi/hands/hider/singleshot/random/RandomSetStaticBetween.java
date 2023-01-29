@@ -1,14 +1,8 @@
 package org.kclhi.hands.hider.singleshot.random;
 
-import java.util.ArrayList;
-
-import org.jgrapht.alg.DijkstraShortestPath;
-
-import org.kclhi.hands.utility.Utils;
 import org.kclhi.hands.graph.GraphController;
 import org.kclhi.hands.graph.StringEdge;
 import org.kclhi.hands.graph.StringVertex;
-import org.kclhi.hands.hider.HidingAgent;
 
 /**
  * Produces a K size set of random nodes and then

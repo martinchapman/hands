@@ -3,14 +3,10 @@ import java.util.ArrayList;
 
 import org.kclhi.hands.utility.Utils;
 
-import com.panayotis.gnuplot.dataset.DataSet;
 import com.panayotis.gnuplot.plot.AbstractPlot;
 import com.panayotis.gnuplot.plot.DataSetPlot;
-import com.panayotis.gnuplot.style.FillStyle;
 import com.panayotis.gnuplot.style.PlotStyle;
-import com.panayotis.gnuplot.style.RgbPlotColor;
 import com.panayotis.gnuplot.style.Style;
-import com.panayotis.gnuplot.terminal.PostscriptTerminal;
 
 /**
  * 

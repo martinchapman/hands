@@ -3,8 +3,6 @@ package org.kclhi.hands.utility;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.jfree.util.StringUtils;
-
 public class FixScale {
 
 	public FixScale() {

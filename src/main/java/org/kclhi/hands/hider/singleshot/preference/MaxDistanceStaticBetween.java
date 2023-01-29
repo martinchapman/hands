@@ -1,14 +1,8 @@
 package org.kclhi.hands.hider.singleshot.preference;
 
-import java.util.HashSet;
-
-import org.jgrapht.alg.DijkstraShortestPath;
-
-import org.kclhi.hands.utility.Utils;
 import org.kclhi.hands.graph.GraphController;
 import org.kclhi.hands.graph.StringEdge;
 import org.kclhi.hands.graph.StringVertex;
-import org.kclhi.hands.hider.HidingAgent;
 
 /**
  * Attempts to hide nodes with a maximum possible distance 

@@ -1,10 +1,7 @@
 package org.kclhi.hands.hider;
 
-import java.util.ArrayList;
-
 import org.kclhi.hands.GraphTraverser;
 import org.kclhi.hands.graph.StringVertex;
-import org.kclhi.hands.seeker.Seeker;
 
 public interface Hider extends GraphTraverser {
 

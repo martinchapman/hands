@@ -1,7 +1,6 @@
 package org.kclhi.hands;
 
 import org.kclhi.hands.graph.StringVertex;
-import org.kclhi.hands.hider.HidingAgent;
 
 /**
  * Implement to have a player (hider or seeker) who 

@@ -1,6 +1,5 @@
 package org.kclhi.hands.seeker.repeatgame.probability;
 
-import org.kclhi.hands.utility.BehaviourPrediction;
 import org.kclhi.hands.utility.BehaviourPredictionRepetitionCheck;
 import org.kclhi.hands.graph.GraphController;
 import org.kclhi.hands.graph.StringEdge;

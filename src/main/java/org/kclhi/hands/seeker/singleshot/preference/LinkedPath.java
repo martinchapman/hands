@@ -1,7 +1,6 @@
 package org.kclhi.hands.seeker.singleshot.preference;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.jgrapht.alg.DijkstraShortestPath;

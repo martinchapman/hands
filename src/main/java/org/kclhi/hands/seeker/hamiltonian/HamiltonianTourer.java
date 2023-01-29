@@ -3,7 +3,6 @@ package org.kclhi.hands.seeker.hamiltonian;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jgrapht.alg.EulerianCircuit;
 import org.jgrapht.alg.HamiltonianCycle;
 
 import org.kclhi.hands.graph.GraphController;
