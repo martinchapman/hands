@@ -6,8 +6,8 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Map.Entry;
 
-import org.mapdblocal.BTreeMap;
-import org.mapdblocal.DB;
+import org.mapdb.BTreeMap;
+import org.mapdb.DB;
 
 import org.kclhi.hands.utility.Pair;
 import org.kclhi.hands.utility.Utils;

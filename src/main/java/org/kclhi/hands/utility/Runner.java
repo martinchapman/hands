@@ -41,7 +41,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.mapdblocal.BTreeMap;
+import org.mapdb.BTreeMap;
 
 import org.kclhi.hands.utility.GameTheoretic.ApproximatePayoffMatrix;
 import org.kclhi.hands.utility.output.Datafile;

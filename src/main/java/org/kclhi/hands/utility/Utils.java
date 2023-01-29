@@ -48,10 +48,10 @@ import org.jgrapht.GraphPath;
 import org.jgrapht.alg.FloydWarshallShortestPaths;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jibble.epsgraphics.EpsGraphics2D;
-import org.mapdblocal.BTreeMap;
-import org.mapdblocal.DB;
-import org.mapdblocal.DBMaker;
-import org.mapdblocal.Serializer;
+import org.mapdb.BTreeMap;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.kclhi.hands.utility.output.Serializer;
 
 import org.kclhi.hands.utility.output.HiderRecord;
 import org.kclhi.hands.utility.output.TraverserRecord;

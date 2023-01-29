@@ -1,4 +1,4 @@
-package org.mapdblocal;
+package org.kclhi.hands.utility.output;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -7,6 +7,12 @@ import java.util.Random;
 import org.kclhi.hands.utility.Pair;
 import org.kclhi.hands.utility.output.HiderRecord;
 import org.kclhi.hands.utility.output.TraverserRecord;
+
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.mapdb.HTreeMap;
+import org.kclhi.hands.utility.output.Serializer;
+import org.mapdb.Store;
 
 /**
  * This example shows how-to create off-heap cache,
