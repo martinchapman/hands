@@ -1,0 +1,1 @@
+1, [MaxDistance,1], [LeastConnectedFirst,1], {Topology,random}, {NumberOfNodes,10}, {NumberOfHideLocations,5}, {Rounds,1}, {EdgeWeight,10.0}, {FixedOrUpperWeight,random}, {EdgeTraversalDecrement,0}, {MixHiders,false}, {MixSeekers,false}, {ResetPerRound,false}
