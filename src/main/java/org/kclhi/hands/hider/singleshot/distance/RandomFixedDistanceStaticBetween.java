@@ -5,31 +5,31 @@ import org.kclhi.hands.graph.StringEdge;
 import org.kclhi.hands.graph.StringVertex;
 
 /**
- *
- * 
- *
- * @author Martin
- *
- */
+*
+* 
+*
+* @author Martin
+*
+*/
 public class RandomFixedDistanceStaticBetween extends RandomFixedDistance implements Runnable {
-
-	/**
-	 * @param graph
-	 */
-	public RandomFixedDistanceStaticBetween(GraphController <StringVertex, StringEdge> graphController, int numberOfHideLocations) {
-
-		super(graphController, numberOfHideLocations);
-
-	}
-
-	/* (non-Javadoc)
-	 * @see HideAndSeek.hider.Hider#startNode()
-	 */
-	@Override
-	public StringVertex startNode() {
-
-		return currentNode();
-
-	}
-
+  
+  /**
+  * @param graph
+  */
+  public RandomFixedDistanceStaticBetween(GraphController <StringVertex, StringEdge> graphController, int numberOfHideLocations) {
+    
+    super(graphController, numberOfHideLocations);
+    
+  }
+  
+  /* (non-Javadoc)
+  * @see HideAndSeek.hider.Hider#startNode()
+  */
+  @Override
+  public StringVertex startNode() {
+    
+    return currentNode();
+    
+  }
+  
 }

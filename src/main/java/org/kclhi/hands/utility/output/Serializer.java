@@ -49,5 +49,5 @@ public abstract class Serializer<A> extends org.mapdb.Serializer<A> {
       }
     }
   };*/
-
+  
 }
