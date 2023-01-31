@@ -932,226 +932,237 @@ public class Main {
     
     for( Pair<String, String> seekerType : Utils.stringToArray(agentList, "(\\[([0-9a-zA-Z]+),([0-9]+)\\])") ) {
       
-      // Single-shot:
-      
-      if (seekerType.getElement0().equals("RandomWalk")) {
+      for( int seekerCount = 0; seekerCount < Integer.parseInt(seekerType.getElement1()); seekerCount++ ) {
+
+        // Single-shot:
         
-        allSeekingAgents.add(new RandomWalk(graphController));
-        
-      }
-      
-      if (seekerType.getElement0().equals("SelfAvoidingRandomWalk")) {
-        
-        allSeekingAgents.add(new SelfAvoidingRandomWalk(graphController));
-        
-      }
-      
-      if (seekerType.getElement0().equals("SelfAvoidingRandomWalkGreedy")) {
-        
-        allSeekingAgents.add(new SelfAvoidingRandomWalkGreedy(graphController));
-        
-      }
-      
-      if (seekerType.getElement0().equals("FixedStartRandomWalk")) {
-        
-        allSeekingAgents.add(new FixedStartRandomWalk(graphController));
-        
-      }
-      
-      if (seekerType.getElement0().equals("Greedy")) {
-        
-        allSeekingAgents.add(new Greedy(graphController));
-        
-      }
-      
-      if (seekerType.getElement0().equals("RepeatGreedy")) {
-        
-        allSeekingAgents.add(new Greedy(graphController) {
+        if (seekerType.getElement0().equals("RandomWalk")) {
           
-          public StringVertex nextNode(StringVertex currentNode) {
-            
-            uniquelyVisitNodes = false;
-            
-            return super.nextNode(currentNode);
-            
-          }
+          allSeekingAgents.add(new RandomWalk(graphController));
           
-        });
-        
-      }
-      
-      if (seekerType.getElement0().equals("DepthFirstSearch")) {
-        
-        allSeekingAgents.add(new DepthFirstSearch(graphController));
-        
-      }
-      
-      if (seekerType.getElement0().equals("DepthFirstSearchGreedy")) {
-        
-        allSeekingAgents.add(new DepthFirstSearchGreedy(graphController));
-        
-      }
-      
-      if (seekerType.getElement0().equals("BreadthFirstSearch")) {
-        
-        allSeekingAgents.add(new BreadthFirstSearch(graphController));
-        
-      }
-      
-      if (seekerType.getElement0().equals("BreadthFirstSearchGreedy")) {
-        
-        allSeekingAgents.add(new BreadthFirstSearchGreedy(graphController));
-        
-      }
-      
-      /*if (seekerType.getElement0().equals("LeastConnectedFirst")) {
-        
-        allSeekingAgents.add(new LeastConnectedFirst(graphController));
-        
-      }*/
-      // Instead:
-      if (seekerType.getElement0().equals("LeastConnectedFirst")) {
-        
-        allSeekingAgents.add(new org.kclhi.hands.seeker.singleshot.preference.LeastConnected(graphController, "LeastConnectedFirst", 1.0));
-        
-      }
-      
-      if (seekerType.getElement0().equals("VariableLeastConnectedFirst")) {
-        
-        allSeekingAgents.add(new org.kclhi.hands.seeker.singleshot.preference.LeastConnected(graphController, "VariableLeastConnectedFirst", gameNumber / (float)totalGames));
-        
-      }
-      
-      if (seekerType.getElement0().equals("MostConnectedFirst")) {
-        
-        allSeekingAgents.add(new MostConnectedFirst(graphController));
-        
-      }
-      
-      if (seekerType.getElement0().equals("ApproximateLeastConnectedNodes")) {
-        
-        allSeekingAgents.add(new ApproximateLeastConnectedNodes(graphController));
-        
-      }
-      
-      if (seekerType.getElement0().equals("MaxDistanceFirst")) {
-        
-        allSeekingAgents.add(new org.kclhi.hands.seeker.singleshot.preference.MaxDistance(graphController, "MaxDistanceFirst", 1.0));
-        
-      }
-      
-      if (seekerType.getElement0().equals("LinkedPath")) {
-        
-        allSeekingAgents.add(new LinkedPath(graphController, 0));
-        
-      }
-      
-      if (seekerType.getElement0().equals("BacktrackPath")) {
-        
-        allSeekingAgents.add(new BacktrackPath(graphController));
-        
-      }
-      
-      if (seekerType.getElement0().equals("VariableBacktrackPath")) {
-        
-        allSeekingAgents.add(new VariableBacktrackPath(graphController, gameNumber));
-        
-      }
-      
-      // Optimal backtrack path -- found by experimentation
-      if (seekerType.getElement0().equals("OptimalBacktrackPath")) {
-        
-        allSeekingAgents.add(new VariableBacktrackPath(graphController, "OptimalBacktrackPath", 1));
-        
-      }
-      
-      if (seekerType.getElement0().equals("BacktrackGreedy")) {
-        
-        allSeekingAgents.add(new BacktrackGreedy(graphController));
-        
-      }
-      
-      if (seekerType.getElement0().equals("NearestNeighbour")) {
-        
-        final class BacktrackGreedyWithoutBacktracking extends BacktrackGreedy {
-          public BacktrackGreedyWithoutBacktracking(GraphController<StringVertex, StringEdge> graphController) { super(graphController); }
-          public boolean backtracks() { return false; }
         }
         
-        allSeekingAgents.add(new BacktrackGreedyWithoutBacktracking(graphController));
-        
-      }
-      
-      if (seekerType.getElement0().equals("RandomTarry")) {
-        
-        allSeekingAgents.add(new RandomTarry(graphController));
-        
-      }
-      
-      // Repeat-game: 
-      
-      if (seekerType.getElement0().equals("HighProbability")) {
-        
-        allSeekingAgents.add(new HighProbability(graphController));
-        
-      }
-      
-      if (seekerType.getElement0().equals("HighProbabilityK")) {
-        
-        allSeekingAgents.add(new VariableNodesHighProbability(graphController, "HighProbabilityK", numberOfHideLocations, false));
-        
-      }
-      
-      if (seekerType.getElement0().equals("VariableNodesHighProbability")) {
-        
-        allSeekingAgents.add(new VariableNodesHighProbability(graphController, gameNumber, true));
-        
-      }
-      
-      if (seekerType.getElement0().equals("VariableHistoryHighProbability")) {
-        
-        allSeekingAgents.add(new VariableHistoryHighProbability(graphController, gameNumber));
-        
-      }
-      
-      if (seekerType.getElement0().equals("HighProbabilityRepetitionCheck")) {
-        
-        allSeekingAgents.add(new HighProbabilityRepetitionCheck(graphController, 2, numberOfHideLocations));
-        
-      }
-      
-      if (seekerType.getElement0().equals("InverseHighProbability")) {
-        
-        allSeekingAgents.add(new InverseHighProbability(graphController));
-        
-      }
-      
-      // Adaptive:
-      
-      ArrayList<Pair<AdaptiveSeeker, Double>> strategyPortfolio = new ArrayList<Pair<AdaptiveSeeker, Double>>();
-      
-      if (seekerType.getElement0().contains("MetaProbability")) {
-        
-        strategyPortfolio.clear();
-        
-        strategyPortfolio.add(new Pair<AdaptiveSeeker, Double>(new InverseHighProbabilityAdaptable(graphController, Integer.MAX_VALUE), 0.24));
-        
-        strategyPortfolio.add(new Pair<AdaptiveSeeker, Double>(new HighProbabilityAdaptable(graphController), 0.76));
-        
-        allSeekingAgents.add(new AdaptiveSeekingAgent<AdaptiveSeeker>(graphController, "MetaProbability", strategyPortfolio, totalRounds, 0.5, false) {
+        if (seekerType.getElement0().equals("SelfAvoidingRandomWalk")) {
           
-          /* ~MDC Should be moved into the actual strategy
-          * (non-Javadoc)
-          * @see HideAndSeek.AdaptiveGraphTraversingAgent#confidenceLevel()
-          */
-          protected double confidenceLevel() {
+          allSeekingAgents.add(new SelfAvoidingRandomWalk(graphController));
+          
+        }
+        
+        if (seekerType.getElement0().equals("SelfAvoidingRandomWalkGreedy")) {
+          
+          allSeekingAgents.add(new SelfAvoidingRandomWalkGreedy(graphController));
+          
+        }
+        
+        if (seekerType.getElement0().equals("FixedStartRandomWalk")) {
+          
+          allSeekingAgents.add(new FixedStartRandomWalk(graphController));
+          
+        }
+        
+        if (seekerType.getElement0().equals("Greedy")) {
+          
+          allSeekingAgents.add(new Greedy(graphController));
+          
+        }
+        
+        if (seekerType.getElement0().equals("RepeatGreedy")) {
+          
+          allSeekingAgents.add(new Greedy(graphController) {
             
-            return uniqueHideLocations().size() / (double)graphController.vertexSet().size();
+            public StringVertex nextNode(StringVertex currentNode) {
+              
+              uniquelyVisitNodes = false;
+              
+              return super.nextNode(currentNode);
+              
+            }
             
+          });
+          
+        }
+        
+        if (seekerType.getElement0().equals("DepthFirstSearch")) {
+          
+          allSeekingAgents.add(new DepthFirstSearch(graphController));
+          
+        }
+        
+        if (seekerType.getElement0().equals("DepthFirstSearchGreedy")) {
+          
+          allSeekingAgents.add(new DepthFirstSearchGreedy(graphController));
+          
+        }
+        
+        if (seekerType.getElement0().equals("BreadthFirstSearch")) {
+          
+          allSeekingAgents.add(new BreadthFirstSearch(graphController));
+          
+        }
+        
+        if (seekerType.getElement0().equals("BreadthFirstSearchGreedy")) {
+          
+          allSeekingAgents.add(new BreadthFirstSearchGreedy(graphController));
+          
+        }
+        
+        /*if (seekerType.getElement0().equals("LeastConnectedFirst")) {
+          
+          allSeekingAgents.add(new LeastConnectedFirst(graphController));
+          
+        }*/
+        // Instead:
+        if (seekerType.getElement0().equals("LeastConnectedFirst")) {
+          
+          allSeekingAgents.add(new org.kclhi.hands.seeker.singleshot.preference.LeastConnected(graphController, "LeastConnectedFirst", 1.0));
+          
+        }
+        
+        if (seekerType.getElement0().equals("VariableLeastConnectedFirst")) {
+          
+          allSeekingAgents.add(new org.kclhi.hands.seeker.singleshot.preference.LeastConnected(graphController, "VariableLeastConnectedFirst", gameNumber / (float)totalGames));
+          
+        }
+        
+        if (seekerType.getElement0().equals("MostConnectedFirst")) {
+          
+          allSeekingAgents.add(new MostConnectedFirst(graphController));
+          
+        }
+        
+        if (seekerType.getElement0().equals("ApproximateLeastConnectedNodes")) {
+          
+          allSeekingAgents.add(new ApproximateLeastConnectedNodes(graphController));
+          
+        }
+        
+        if (seekerType.getElement0().equals("MaxDistanceFirst")) {
+          
+          allSeekingAgents.add(new org.kclhi.hands.seeker.singleshot.preference.MaxDistance(graphController, "MaxDistanceFirst", 1.0));
+          
+        }
+        
+        if (seekerType.getElement0().equals("LinkedPath")) {
+          
+          allSeekingAgents.add(new LinkedPath(graphController, 0));
+          
+        }
+        
+        if (seekerType.getElement0().equals("BacktrackPath")) {
+          
+          allSeekingAgents.add(new BacktrackPath(graphController));
+          
+        }
+        
+        if (seekerType.getElement0().equals("VariableBacktrackPath")) {
+          
+          allSeekingAgents.add(new VariableBacktrackPath(graphController, gameNumber));
+          
+        }
+        
+        // Optimal backtrack path -- found by experimentation
+        if (seekerType.getElement0().equals("OptimalBacktrackPath")) {
+          
+          allSeekingAgents.add(new VariableBacktrackPath(graphController, "OptimalBacktrackPath", 1));
+          
+        }
+        
+        if (seekerType.getElement0().equals("BacktrackGreedy")) {
+          
+          allSeekingAgents.add(new BacktrackGreedy(graphController));
+          
+        }
+        
+        if (seekerType.getElement0().equals("NearestNeighbour")) {
+          
+          final class BacktrackGreedyWithoutBacktracking extends BacktrackGreedy {
+            public BacktrackGreedyWithoutBacktracking(GraphController<StringVertex, StringEdge> graphController) { super(graphController); }
+            public boolean backtracks() { return false; }
           }
           
-        });
+          allSeekingAgents.add(new BacktrackGreedyWithoutBacktracking(graphController));
+          
+        }
         
+        if (seekerType.getElement0().equals("RandomTarry")) {
+          
+          allSeekingAgents.add(new RandomTarry(graphController));
+          
+        }
+        
+        // Repeat-game: 
+        
+        if (seekerType.getElement0().equals("HighProbability")) {
+          
+          allSeekingAgents.add(new HighProbability(graphController));
+          
+        }
+        
+        if (seekerType.getElement0().equals("HighProbabilityK")) {
+          
+          allSeekingAgents.add(new VariableNodesHighProbability(graphController, "HighProbabilityK", numberOfHideLocations, false));
+          
+        }
+        
+        if (seekerType.getElement0().equals("VariableNodesHighProbability")) {
+          
+          allSeekingAgents.add(new VariableNodesHighProbability(graphController, gameNumber, true));
+          
+        }
+        
+        if (seekerType.getElement0().equals("VariableHistoryHighProbability")) {
+          
+          allSeekingAgents.add(new VariableHistoryHighProbability(graphController, gameNumber));
+          
+        }
+        
+        if (seekerType.getElement0().equals("HighProbabilityRepetitionCheck")) {
+          
+          allSeekingAgents.add(new HighProbabilityRepetitionCheck(graphController, 2, numberOfHideLocations));
+          
+        }
+        
+        if (seekerType.getElement0().equals("InverseHighProbability")) {
+          
+          allSeekingAgents.add(new InverseHighProbability(graphController));
+          
+        }
+        
+        // Adaptive:
+        
+        ArrayList<Pair<AdaptiveSeeker, Double>> strategyPortfolio = new ArrayList<Pair<AdaptiveSeeker, Double>>();
+        
+        if (seekerType.getElement0().contains("MetaProbability")) {
+          
+          strategyPortfolio.clear();
+          
+          strategyPortfolio.add(new Pair<AdaptiveSeeker, Double>(new InverseHighProbabilityAdaptable(graphController, Integer.MAX_VALUE), 0.24));
+          
+          strategyPortfolio.add(new Pair<AdaptiveSeeker, Double>(new HighProbabilityAdaptable(graphController), 0.76));
+          
+          allSeekingAgents.add(new AdaptiveSeekingAgent<AdaptiveSeeker>(graphController, "MetaProbability", strategyPortfolio, totalRounds, 0.5, false) {
+            
+            /* ~MDC Should be moved into the actual strategy
+            * (non-Javadoc)
+            * @see HideAndSeek.AdaptiveGraphTraversingAgent#confidenceLevel()
+            */
+            protected double confidenceLevel() {
+              
+              return uniqueHideLocations().size() / (double)graphController.vertexSet().size();
+              
+            }
+            
+          });
+          
+        }
+
+        if (seekerCount > 0) {
+          Seeker lastAddedSeeker = allSeekingAgents.get(allSeekingAgents.size()-1);
+          lastAddedSeeker.label(seekerCount);
+          // ~MDC 31/01 Our duplicate seeker won't have been registered initially as the name will have matched, so re-register
+          graphController.registerTraversingAgent(lastAddedSeeker.getResponsibleAgent());
+        }
+
       }
       
     }

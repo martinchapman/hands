@@ -3,6 +3,7 @@ package org.kclhi.hands.utility.output;
 import java.io.File;
 import java.io.Serializable;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
@@ -209,13 +210,27 @@ public class TraverserRecord implements Comparable<TraverserRecord>, Serializabl
   /**
   * @param record
   */
-  public void integrateRecord(TraverserRecord record) {
+  public void integrateRecords(ArrayList<TraverserRecord> records) {
     
-    for ( Entry<AttributeSetIdentifier, Hashtable<String, Double>> gameToAttributes : record.getAttributeToValue().entrySet() ) {
+    for ( TraverserRecord record : records ) {
+
+      for ( Entry<AttributeSetIdentifier, Hashtable<String, Double>> gameToAttributes : record.getAttributeToValue().entrySet() ) {
+      
+        for ( Entry<String,Double> attributeToValue : gameToAttributes.getValue().entrySet() ) {
+          
+          this.attributeToValue.computeIfAbsent(gameToAttributes.getKey(), k -> new Hashtable<String, Double>()).put(attributeToValue.getKey(), this.attributeToValue.get(gameToAttributes.getKey()).getOrDefault(attributeToValue.getKey(), 0.0) + attributeToValue.getValue());
+          
+        }
+        
+      }
+
+    }
+
+    for ( Entry<AttributeSetIdentifier, Hashtable<String, Double>> gameToAttributes : this.getAttributeToValue().entrySet() ) {
       
       for ( Entry<String,Double> attributeToValue : gameToAttributes.getValue().entrySet() ) {
         
-        this.attributeToValue.get(gameToAttributes.getKey()).put(attributeToValue.getKey(), this.attributeToValue.get(gameToAttributes.getKey()).get(attributeToValue.getKey()) + attributeToValue.getValue());
+        this.attributeToValue.get(gameToAttributes.getKey()).put(attributeToValue.getKey(), this.attributeToValue.get(gameToAttributes.getKey()).get(attributeToValue.getKey()) / records.size() );
         
       }
       

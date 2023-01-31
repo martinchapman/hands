@@ -134,5 +134,10 @@ public interface GraphTraverser extends Comparable<GraphTraverser>, Runnable {
   * @return
   */
   public String getName();
+
+  /**
+  * @return
+  */
+  public void label(int id);
   
 }

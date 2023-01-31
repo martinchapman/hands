@@ -2,9 +2,14 @@ package org.kclhi.hands.utility.output;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.kclhi.hands.utility.Metric;
 import org.kclhi.hands.utility.TraverserDataset;
@@ -27,7 +32,14 @@ public class HiderRecord extends TraverserRecord {
   */
   public ArrayList<TraverserRecord> getSeekersAndAttributes() {
     
-    return seekersAndAttributes;
+    ArrayList<TraverserRecord> localSeekersAndAttributes = new ArrayList<TraverserRecord>();
+    Map<String, List<TraverserRecord>> seekersAndAttributesGrouped = seekersAndAttributes.stream().collect(Collectors.groupingBy(traverserRecord -> traverserRecord.getTraverser().split("-")[0]));
+    for( Entry<String, List<TraverserRecord>> traverserRecords : seekersAndAttributesGrouped.entrySet() ) {
+      TraverserRecord jointRecord = new TraverserRecord(traverserRecords.getKey(), new LinkedHashMap<AttributeSetIdentifier, Hashtable<String, Double>>(), traverserRecords.getValue().get(0).getAttributes());
+      jointRecord.integrateRecords((ArrayList<TraverserRecord>)traverserRecords.getValue());
+      localSeekersAndAttributes.add(jointRecord);
+    }
+    return localSeekersAndAttributes;
     
   }
   
@@ -99,7 +111,7 @@ public class HiderRecord extends TraverserRecord {
     
     seekersAndAttributes.add(seekerRecord);
     
-    opponents = seekersAndAttributes.toString().replace("[", "").replace("]", "").replace(",", "");
+    opponents = getSeekersAndAttributes().toString().replace("[", "").replace("]", "").replace(",", "");
     
   }
   
@@ -128,7 +140,7 @@ public class HiderRecord extends TraverserRecord {
   */
   public HashSet<String> getSeekerAttributes() {
     
-    return seekersAndAttributes.get(0).getAttributes();
+    return getSeekersAndAttributes().get(0).getAttributes();
     
   }
   
@@ -145,7 +157,7 @@ public class HiderRecord extends TraverserRecord {
       
       double cumulativeSeekerDataEntry = 0.0;
       
-      for ( TraverserRecord seeker : seekersAndAttributes ) {
+      for ( TraverserRecord seeker : getSeekersAndAttributes() ) {
         
         Utils.printSystemStats();
         
@@ -155,7 +167,7 @@ public class HiderRecord extends TraverserRecord {
         
       }
       
-      payoffData.addItemToDataset( ( cumulativeSeekerDataEntry / (double)seekersAndAttributes.size() ) - hiderData.getDataset().get(i) ); 
+      payoffData.addItemToDataset( ( cumulativeSeekerDataEntry / (double)getSeekersAndAttributes().size() ) - hiderData.getDataset().get(i) ); 
       
     }
     
@@ -191,7 +203,7 @@ public class HiderRecord extends TraverserRecord {
     
     returner += "\n" + traverser + " " + attributeToGameMeasure(TraverserDatasetMeasure.MEAN) + "\n";
     
-    for ( TraverserRecord seeker : seekersAndAttributes ) returner += "\n" + seeker.printGameAverage() + "\n";
+    for ( TraverserRecord seeker : getSeekersAndAttributes() ) returner += "\n" + seeker.printGameAverage() + "\n";
     
     returner += "\n-------------------\n";
     returner += "\nSeries:\n";
@@ -199,7 +211,7 @@ public class HiderRecord extends TraverserRecord {
     
     returner += "\n" + traverser + " " + showGameSeries() + "\n";
     
-    for ( TraverserRecord seeker : seekersAndAttributes ) returner += "\n" + seeker.printSeries() + "\n";
+    for ( TraverserRecord seeker : getSeekersAndAttributes() ) returner += "\n" + seeker.printSeries() + "\n";
     
     return returner;
     

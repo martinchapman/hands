@@ -158,6 +158,12 @@ public abstract class GraphTraversingAgent implements GraphTraverser {
     this.name = name;
     
   }
+
+  public void label(int id) {
+
+    this.name = name + "-" + id;
+
+  }
   
   /**
   * @param graphController
