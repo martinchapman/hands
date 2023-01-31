@@ -931,232 +931,231 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
         
       }
       
-      /**
-      * @param traverser
-      * @param sourceVertex
-      * @param targetVertex
-      * @return
-      */
-      public List<E> pathFromVertexToVertex(V sourceVertex, V targetVertex) {
-        
-        return DijkstraShortestPath.findPathBetween(this, sourceVertex, targetVertex);
-        
-      }
+  /**
+  * @param traverser
+  * @param sourceVertex
+  * @param targetVertex
+  * @return
+  */
+  public List<E> pathFromVertexToVertex(V sourceVertex, V targetVertex) {
+    
+    return DijkstraShortestPath.findPathBetween(this, sourceVertex, targetVertex);
+    
+  }
+  
+  /**
+  * Request the costs associated with a particular edge, *without* actually traversing 
+  * that edge
+  * 
+  * @param traverser
+  * @param sourceVertex
+  * @param targetVertex
+  * @return
+  */
+  public double traverserEdgeCost(GraphTraverser traverser, V sourceVertex, V targetVertex) {
+    
+    if ( containsEdge(sourceVertex, targetVertex) ) {
       
-      /**
-      * Request the costs associated with a particular edge, *without* actually traversing 
-      * that edge
-      * 
-      * @param traverser
-      * @param sourceVertex
-      * @param targetVertex
-      * @return
-      */
-      public double traverserEdgeCost(GraphTraverser traverser, V sourceVertex, V targetVertex) {
-        
-        if ( containsEdge(sourceVertex, targetVertex) ) {
-          
-          return traverserEdgeCosts.get( traverser ).get( getEdge(sourceVertex, targetVertex) );
-          
-        } 
-        
-        return -1;
-        
-      }
+      return traverserEdgeCosts.get( traverser ).get( getEdge(sourceVertex, targetVertex) );
       
-      /**
-      * Maintain a list of traversers, and the cost they
-      * have accrued searching this graph
-      */
-      private HashMap<GraphTraverser, Double> traverserCost;
+    } 
+    
+    return -1;
+    
+  }
+  
+  /**
+  * Maintain a list of traversers, and the cost they
+  * have accrued searching this graph
+  */
+  private HashMap<GraphTraverser, Double> traverserCost;
+  
+  /**
+  * @param traverser
+  * @return
+  */
+  public double averageGameCosts(GraphTraverser traverser) {
+    
+    return traverserCost.get(traverser) / roundNumber;
+    
+  }
+  
+  /**
+  * 
+  */
+  private HashMap<GraphTraverser, Integer> traverserPathLength;
+  
+  /**
+  * @param traverser
+  * @return
+  */
+  public double averagePathLength(GraphTraverser traverser) {
+    
+    return traverserPathLength.get(traverser) / roundNumber;
+    
+  }
+  
+  /**
+  * @param hider
+  * @return
+  */
+  public double averageHiderPayoff(GraphTraverser hider) {
+    
+    Double cumulativePayoffs = 0.0;
+    
+    for (Entry<Integer, Hashtable<GraphTraverser, Double>> entry : hiderRoundPayoffs.entrySet()) {
       
-      /**
-      * @param traverser
-      * @return
-      */
-      public double averageGameCosts(GraphTraverser traverser) {
-        
-        return traverserCost.get(traverser) / roundNumber;
-        
-      }
-      
-      /**
-      * 
-      */
-      private HashMap<GraphTraverser, Integer> traverserPathLength;
-      
-      /**
-      * @param traverser
-      * @return
-      */
-      public double averagePathLength(GraphTraverser traverser) {
-        
-        return traverserPathLength.get(traverser) / roundNumber;
-        
-      }
-      
-      /**
-      * @param hider
-      * @return
-      */
-      public double averageHiderPayoff(GraphTraverser hider) {
-        
-        Double cumulativePayoffs = 0.0;
-        
-        for (Entry<Integer, Hashtable<GraphTraverser, Double>> entry : hiderRoundPayoffs.entrySet()) {
-          
-          cumulativePayoffs += entry.getValue().get(hider);
-          
-        }
-        
-        // -1 because first round yields 0 (only under current metric though)
-        return cumulativePayoffs / roundNumber; //(roundNumber - 1);
-        
-      }
-      
-      /**
-      * @param seeker
-      * @return
-      */
-      public double averageSeekerPayoff(GraphTraverser seeker) {
-        
-        Double cumulativePayoffs = 0.0;
-        
-        for (Entry<Integer, Hashtable<GraphTraverser, Double>> entry : seekerRoundPayoffs.entrySet()) {
-          
-          cumulativePayoffs += entry.getValue().get(seeker);
-          
-        }
-        
-        return cumulativePayoffs / roundNumber;
-        
-      }
-      
-      /**
-      * 
-      */
-      private HashSet<GraphTraverser> traversers;
-      
-      /**
-      * For each Traverser, maintain an individual cost value for each
-      * edge which is based on the number of times they have traversed that 
-      * edge before
-      */
-      private HashMap<GraphTraverser, HashMap<E, Double>> traverserEdgeCosts;
-      
-      /**
-      * Resets for experiment with 'next hider'
-      */
-      public void resetGameEnvironment() {
-        
-        roundNumber = 0;
-        
-        setup();
-        
-        HashSet<GraphTraverser> localTraversers = new HashSet<GraphTraverser>(traversers);
-        
-        for (GraphTraverser traverser : traversers) {
-          
-          resetTraversingAgent(traverser);
-          
-        }
-        
-      }
-      
-      private void resetTraversingAgent(GraphTraverser traverser) {
-        
-        // Set initial costs (path length resp.) to 0.0
-        traverserCost.put(traverser, 0.0);
-        
-        // Set initial path lengths to 0
-        traverserPathLength.put(traverser, 0);
-        
-        // Add a new unique edge cost mapping for this traverser
-        traverserEdgeCosts.put(traverser, new HashMap<E, Double>());
-        
-        // To begin with, set each edge mapping to its default weight
-        for ( E edge : edgeSet() ) {
-          
-          traverserEdgeCosts.get(traverser).put(edge, getEdgeWeight(edge));
-          
-        }
-        
-      }
-      
-      /* (non-Javadoc)
-      * @see org.jgrapht.graph.AbstractGraph#toString()
-      */
-      public String toString() {
-        
-        return "Graph";
-        
-      }
-      
-      /**
-      * @param traverser
-      */
-      public void registerTraversingAgent(GraphTraverser traverser) {
-        
-        if ( traversers.contains(traverser) ) return; //throw new UnsupportedOperationException("Attempted to register the same traverser twice.");
-        
-        Utils.talk(toString(), "Registering " + traverser);
-        
-        // Keep track of who is traversing the graph
-        traversers.add(traverser);
-        
-        resetTraversingAgent(traverser);
-        
-      }
-      
-      /**
-      * @param traverser
-      */
-      public void deregisterTraversingAgent(GraphTraverser traverser) {
-        
-        // Keep track of who is traversing the graph
-        traversers.remove(traverser);
-        
-        // Set initial costs (path length resp.) to 0.0
-        traverserCost.remove(traverser);
-        
-        // Set initial path lengths to 0
-        traverserPathLength.remove(traverser);
-        
-        // Add a new unique edge cost mapping for this traverser
-        traverserEdgeCosts.remove(traverser);
-        
-      }
-      
-      /**
-      * @param traverser
-      * @return
-      */
-      public double totalEdgeCosts(GraphTraverser traverser) {
-        
-        double totalEdgeCost = 0.0;
-        
-        for ( Entry<E, Double> edgeWeight : traverserEdgeCosts.get(traverser).entrySet() ) {
-          
-          totalEdgeCost += edgeWeight.getValue();
-          
-        }
-        
-        return totalEdgeCost;
-        
-      }
-      
-      /**
-      * @param target
-      * @param source
-      * @param fixedOrUpperValue
-      */
-      public void addEdgeWithWeight(V source, V target, double weight) {
-        
-        this.addEdge(source, target);
-        
-        setEdgeWeight(this.getEdge(source, target), weight);
-        
-      }
+      cumulativePayoffs += entry.getValue().get(hider);
       
     }
     
+    // -1 because first round yields 0 (only under current metric though)
+    return cumulativePayoffs / roundNumber; //(roundNumber - 1);
+    
+  }
+  
+  /**
+  * @param seeker
+  * @return
+  */
+  public double averageSeekerPayoff(GraphTraverser seeker) {
+    
+    Double cumulativePayoffs = 0.0;
+    
+    for (Entry<Integer, Hashtable<GraphTraverser, Double>> entry : seekerRoundPayoffs.entrySet()) {
+      
+      cumulativePayoffs += entry.getValue().get(seeker);
+      
+    }
+    
+    return cumulativePayoffs / roundNumber;
+    
+  }
+  
+  /**
+  * 
+  */
+  private HashSet<GraphTraverser> traversers;
+  
+  /**
+  * For each Traverser, maintain an individual cost value for each
+  * edge which is based on the number of times they have traversed that 
+  * edge before
+  */
+  private HashMap<GraphTraverser, HashMap<E, Double>> traverserEdgeCosts;
+  
+  /**
+  * Resets for experiment with 'next hider'
+  */
+  public void resetGameEnvironment() {
+    
+    roundNumber = 0;
+    
+    setup();
+    
+    HashSet<GraphTraverser> localTraversers = new HashSet<GraphTraverser>(traversers);
+    
+    for (GraphTraverser traverser : traversers) {
+      
+      resetTraversingAgent(traverser);
+      
+    }
+    
+  }
+  
+  private void resetTraversingAgent(GraphTraverser traverser) {
+    
+    // Set initial costs (path length resp.) to 0.0
+    traverserCost.put(traverser, 0.0);
+    
+    // Set initial path lengths to 0
+    traverserPathLength.put(traverser, 0);
+    
+    // Add a new unique edge cost mapping for this traverser
+    traverserEdgeCosts.put(traverser, new HashMap<E, Double>());
+    
+    // To begin with, set each edge mapping to its default weight
+    for ( E edge : edgeSet() ) {
+      
+      traverserEdgeCosts.get(traverser).put(edge, getEdgeWeight(edge));
+      
+    }
+    
+  }
+  
+  /* (non-Javadoc)
+  * @see org.jgrapht.graph.AbstractGraph#toString()
+  */
+  public String toString() {
+    
+    return "Graph";
+    
+  }
+  
+  /**
+  * @param traverser
+  */
+  public void registerTraversingAgent(GraphTraverser traverser) {
+    
+    if ( traversers.contains(traverser) ) return; //throw new UnsupportedOperationException("Attempted to register the same traverser twice.");
+    
+    Utils.talk(toString(), "Registering " + traverser);
+    
+    // Keep track of who is traversing the graph
+    traversers.add(traverser);
+    
+    resetTraversingAgent(traverser);
+    
+  }
+  
+  /**
+  * @param traverser
+  */
+  public void deregisterTraversingAgent(GraphTraverser traverser) {
+    
+    // Keep track of who is traversing the graph
+    traversers.remove(traverser);
+    
+    // Set initial costs (path length resp.) to 0.0
+    traverserCost.remove(traverser);
+    
+    // Set initial path lengths to 0
+    traverserPathLength.remove(traverser);
+    
+    // Add a new unique edge cost mapping for this traverser
+    traverserEdgeCosts.remove(traverser);
+    
+  }
+  
+  /**
+  * @param traverser
+  * @return
+  */
+  public double totalEdgeCosts(GraphTraverser traverser) {
+    
+    double totalEdgeCost = 0.0;
+    
+    for ( Entry<E, Double> edgeWeight : traverserEdgeCosts.get(traverser).entrySet() ) {
+      
+      totalEdgeCost += edgeWeight.getValue();
+      
+    }
+    
+    return totalEdgeCost;
+    
+  }
+  
+  /**
+  * @param target
+  * @param source
+  * @param fixedOrUpperValue
+  */
+  public void addEdgeWithWeight(V source, V target, double weight) {
+    
+    this.addEdge(source, target);
+    
+    setEdgeWeight(this.getEdge(source, target), weight);
+    
+  }
+  
+}
