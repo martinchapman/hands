@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Map.Entry;
+import java.util.stream.Stream;
 import java.util.Scanner;
 
 import javax.swing.ButtonGroup;
@@ -43,6 +44,7 @@ import javax.swing.event.ListSelectionListener;
 
 import org.mapdb.BTreeMap;
 
+import org.kclhi.hands.Main;
 import org.kclhi.hands.utility.GameTheoretic.ApproximatePayoffMatrix;
 import org.kclhi.hands.utility.output.Datafile;
 import org.kclhi.hands.utility.output.GroupedHiderRecords;
@@ -2849,9 +2851,9 @@ public class Runner extends JFrame {
         System.out.println(paramString);
         
         /***********/
-        
-        Utils.runCommand("java -cp target/hands-1.0-SNAPSHOT.jar org.kclhi.hands.Main " + i + " " + GAMES + " " + paramString);
-        
+      
+        Main.main(Stream.concat(Arrays.stream(new String[]{i+"", GAMES+""}), Arrays.stream(paramString.split(" "))).toArray(String[]::new));
+
         System.out.println("-----------------------------------------------------------------");
         
         if ( i < GAMES - 1); {
