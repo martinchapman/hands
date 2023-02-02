@@ -983,581 +983,579 @@ public class OutputManager {
               
               ((GNU3DCollection) graph).addDataset(individualAttributeToValues.getKey(), individualAttributeToValues.getValue());
               
-              //}
+            //}
               
-              ((GNU3DCollection) graph).setZAxisLabel(yLabel);
-              
-              // ~MDC 20/8 May need putting back in if 'variable' in traverser name 
-              /*if ( traverserRecord.getTraverser().toString().contains("Variable") ) {
-                
-                String traverser = traverserRecord.getTraverser().toString();
-                
-                traverser = traverser.substring(traverser.indexOf("Variable"), traverser.length());
-                
-                String[] labels = traverser.split("Variable");
-                
-                for ( int i = 0; i < labels.length; i++ ) {
-                  
-                  if ( labels[i].contains("-") ) {
-                    
-                    labels[i] = labels[i].substring(0, labels[i].indexOf("-"));
-                    
-                  }
-                  
-                }
-                
-                if (labels.length > 2 ) {
-                  
-                  yLabel = labels[1]; 
-                  
-                  xLabel = labels[2];
-                  
-                }
-                
-              }*/
-              
-            }
+            ((GNU3DCollection) graph).setZAxisLabel(yLabel);
             
-          }
-          
-          //}
-          
-        } else if (graphType.equals("Bar")) {
-          
-          graph = new GNUBarGraph(title, textBased);
-          
-          TreeMap<String, ArrayList<Entry<TraverserRecord, Double>>> categoryToTraverserAndData = new TreeMap<String, ArrayList<Entry<TraverserRecord, Double>>>();
-          
-          ArrayList<Entry<TraverserRecord, Double>> traverserAndData = new ArrayList<Entry<TraverserRecord, Double>>();
-          
-          minForAttributeInAllSeries = minForAttributeInAllSeries(playerRecords, gameOrRound, GraphType.BAR);
-          
-          maxForAttributeInAllSeries = maxForAttributeInAllSeries(playerRecords, gameOrRound, GraphType.BAR);
-          
-          /* Sort so that check for new category is accurate (i.e. last category is
-          * definitely exhausted).
-          */
-          if ( category.equals("Topology") ) {
-            
-            Collections.sort(traverserRecords, new Comparator<TraverserRecord>() {
+            // ~MDC 20/8 May need putting back in if 'variable' in traverser name 
+            /*if ( traverserRecord.getTraverser().toString().contains("Variable") ) {
               
-              @Override
-              public int compare(TraverserRecord o1, TraverserRecord o2) {
+              String traverser = traverserRecord.getTraverser().toString();
+              
+              traverser = traverser.substring(traverser.indexOf("Variable"), traverser.length());
+              
+              String[] labels = traverser.split("Variable");
+              
+              for ( int i = 0; i < labels.length; i++ ) {
                 
-                if ( o1.getTopology().compareTo(o2.getTopology()) > ComparatorResult.EQUAL ) {
+                if ( labels[i].contains("-") ) {
                   
-                  return ComparatorResult.AFTER;
-                  
-                } else if ( o1.getTopology().compareTo(o2.getTopology()) < ComparatorResult.EQUAL ) {
-                  
-                  return ComparatorResult.BEFORE;
-                  
-                } else {
-                  
-                  return ComparatorResult.EQUAL;
+                  labels[i] = labels[i].substring(0, labels[i].indexOf("-"));
                   
                 }
                 
               }
               
-            });
-            
-          } else if ( category.equals("Opponent") ) {
-            
-            Collections.sort(traverserRecords, new Comparator<TraverserRecord>() {
-              
-              @Override
-              public int compare(TraverserRecord o1, TraverserRecord o2) {
+              if (labels.length > 2 ) {
                 
-                if ( o1.getOpponents().substring(1).compareTo(o2.getOpponents().substring(1)) < ComparatorResult.EQUAL ) {
-                  
-                  return ComparatorResult.AFTER;
-                  
-                } else if ( o1.getOpponents().substring(1).compareTo(o2.getOpponents().substring(1)) > ComparatorResult.EQUAL ) {
-                  
-                  return ComparatorResult.BEFORE;
-                  
-                } else {
-                  
-                  return ComparatorResult.EQUAL;
-                  
-                }
+                yLabel = labels[1]; 
+                
+                xLabel = labels[2];
                 
               }
               
-            });
+            }*/
             
           }
           
-          String localCategory = "";
+        }
           
-          for ( TraverserRecord traverser : traverserRecords ) {
+      //}
+    
+    } else if (graphType.equals("Bar")) {
+    
+      graph = new GNUBarGraph(title, textBased);
+      
+      TreeMap<String, ArrayList<Entry<TraverserRecord, Double>>> categoryToTraverserAndData = new TreeMap<String, ArrayList<Entry<TraverserRecord, Double>>>();
+      
+      ArrayList<Entry<TraverserRecord, Double>> traverserAndData = new ArrayList<Entry<TraverserRecord, Double>>();
+      
+      minForAttributeInAllSeries = minForAttributeInAllSeries(playerRecords, gameOrRound, GraphType.BAR);
+      
+      maxForAttributeInAllSeries = maxForAttributeInAllSeries(playerRecords, gameOrRound, GraphType.BAR);
+      
+      /* Sort so that check for new category is accurate (i.e. last category is
+      * definitely exhausted).
+      */
+      if ( category.equals("Topology") ) {
+        
+        Collections.sort(traverserRecords, new Comparator<TraverserRecord>() {
+          
+          @Override
+          public int compare(TraverserRecord o1, TraverserRecord o2) {
             
-            Utils.talk(toString(), "Processing " + traverser);
-            
-            //if ( traverser instanceof HiderRecord ) ((HiderRecord)traverser).switchShowSeekers();
-            
-            if ( category.equals("Topology") ) {
+            if ( o1.getTopology().compareTo(o2.getTopology()) > ComparatorResult.EQUAL ) {
               
-              if ( !traverser.getTopology().equals(localCategory) ) traverserAndData.clear(); 
+              return ComparatorResult.AFTER;
               
-              localCategory = traverser.getTopology();
+            } else if ( o1.getTopology().compareTo(o2.getTopology()) < ComparatorResult.EQUAL ) {
               
-            } else if ( category.equals("Opponent") ) {
-              
-              if ( !traverser.getOpponents().equals(localCategory) ) traverserAndData.clear(); 
-              
-              localCategory = traverser.getOpponents();
-              
-            }
-            
-            if ( yLabel.contains("Payoff") ) {
-              
-              traverserAndData.add(traverserPayoff(traverser, minForAttributeInAllSeries, maxForAttributeInAllSeries));
+              return ComparatorResult.BEFORE;
               
             } else {
               
-              traverserAndData.add(new AbstractMap.SimpleEntry<TraverserRecord, Double>(traverser, traverser.getAttributeToGameAverage(yLabel)));	
-              
-            }
-            
-            categoryToTraverserAndData.put(localCategory, new ArrayList<Entry<TraverserRecord, Double>>(traverserAndData));
-            
-          }
-          
-          ArrayList<Entry<TraverserRecord, Double>> crossCategoryData = new ArrayList<Entry<TraverserRecord, Double>>();
-          
-          for ( Entry<String, ArrayList<Entry<TraverserRecord, Double>>> storedTraverserAndData : categoryToTraverserAndData.entrySet() ) {
-            
-            crossCategoryData.addAll(storedTraverserAndData.getValue());
-            
-          }
-          
-          Hashtable<TraverserRecord, String> traverserToSignificanceClass = new Hashtable<TraverserRecord, String>();
-          
-          if ( yLabel.equals(Metric.COST.getText()) || yLabel.equals(Metric.PAYOFF.getText()) ) {
-            
-            outer:
-            for ( Entry<TraverserRecord, Double> traverserA : crossCategoryData ) {
-              
-              double cumulativeP = 0.0;
-              
-              traverserToSignificanceClass.put(traverserA.getKey(), "");
-              
-              for ( Entry<TraverserRecord, Double> traverserB : crossCategoryData ) {
-                
-                // exact same record
-                if ( crossCategoryData.indexOf(traverserA) == crossCategoryData.indexOf(traverserB)) continue;
-                //if ( traverserA.getKey() == traverserB.getKey() && traverserA.getKey().getOpponents() == traverserB.getKey().getOpponents ) continue;
-                
-                double pValue = 0.0;
-                
-                if ( yLabel.equals(Metric.COST.getText()) ) {
-                  
-                  if ( traverserA.getKey().pGroup(traverserB.getKey(), Metric.COST).equals("") ) continue outer;
-                  
-                  pValue = traverserA.getKey().pValue(traverserB.getKey(), Metric.COST);
-                  
-                  Utils.talk(toString(), traverserA.getKey() + " vs " + traverserB.getKey() + " : Percentage Difference - " + ( Utils.percentageChange(traverserB.getValue(), traverserA.getValue()) ) + " PValue - " + pValue);
-                  
-                  cumulativeP += pValue;
-                  
-                } else if ( yLabel.equals(Metric.PAYOFF.getText()) ) {
-                  
-                  if ( traverserA.getKey().pGroup(traverserB.getKey(), minForAttributeInAllSeries, maxForAttributeInAllSeries ).equals("") ) continue outer;
-                  
-                  pValue = traverserA.getKey().pValue(traverserB.getKey(), minForAttributeInAllSeries, maxForAttributeInAllSeries );
-                  
-                  Utils.talk(toString(), traverserA.getKey() + " vs " + traverserB.getKey() + " : Percentage Difference - " + ( Utils.percentageChange(traverserB.getValue(), traverserA.getValue()) ) + " PValue - " + pValue);
-                  
-                  cumulativeP += pValue;
-                  
-                }
-                
-                significanceTable.addPValue(traverserA.getKey().getTraverser() + " (vs. " + traverserA.getKey().getOpponents() + ")", traverserB.getKey().getTraverser() + " (vs. " + traverserB.getKey().getOpponents() + ")", traverserA.getValue(), traverserB.getValue(), pValue);
-                
-              }
-              
-              Utils.talk(toString(), "Average pValue against other traversers (" + crossCategoryData.size() + "): " + ( cumulativeP / crossCategoryData.size() ));
-              
-              traverserToSignificanceClass.put(traverserA.getKey(), StatisticalTest.getPGroup(cumulativeP / crossCategoryData.size()));
-              
-              Utils.talk(toString(), "Significance class of this value: " + traverserToSignificanceClass);
+              return ComparatorResult.EQUAL;
               
             }
             
           }
           
-          // ~MDC 19/8 Could be neater
-          for ( Entry<String, ArrayList<Entry<TraverserRecord, Double>>> storedTraverserAndData : categoryToTraverserAndData.entrySet() ) {
-            
-            Utils.talk(this.toString(), "Adding bar: " + storedTraverserAndData.getValue() + " " + storedTraverserAndData.getKey());
-            
-            ((GNUBarGraph) graph).addBars(storedTraverserAndData.getValue(), storedTraverserAndData.getKey(), traverserToSignificanceClass);
-            
-          }
-          
-          xLabel = "Strategy";
-          
-        }
+        });
         
-        graph.styleGraph();
+      } else if ( category.equals("Opponent") ) {
         
-        boolean increaseKAndN = false;
-        
-        if ( graphType.equals("LineOne") ) {
+        Collections.sort(traverserRecords, new Comparator<TraverserRecord>() {
           
-          // ~MDC Assumes all graphs that start at one are showing K:N. For our purposes, this is true.
-          xLabel = "$K$ ($N = 2K$)";
-          
-          increaseKAndN = true;
-          
-          graph.createChart("", xLabel, yLabel);
-          
-        } else {
-          
-          graph.createChart("", xLabel, yLabel);
-          
-        }
-        
-        boolean overwriting = false;
-        
-        if ( outputEnabled ) {
-          
-          ArrayList<String> affectedFiles = new ArrayList<String>();
-          
-          for ( TraverserRecord traverser : traverserRecords ) {
+          @Override
+          public int compare(TraverserRecord o1, TraverserRecord o2) {
             
-            String graphedSuffix = "";
-            
-            if ( !traverser.getDatafile().toString().contains("GRAPHED") ) graphedSuffix += "_GRAPHED";
-            
-            graphedSuffix += ( "_" + figureID );
-            
-            affectedFiles.add(traverser.getDatafile().toString());
-            
-            boolean result = traverser.getDatafile().toFile().renameTo(new File(traverser.getDatafile().toString().substring(0, traverser.getDatafile().toString().length() - 4) + graphedSuffix + ".csv"));
-            
-            if ( STRICT_RENAME && result == false ) {
+            if ( o1.getOpponents().substring(1).compareTo(o2.getOpponents().substring(1)) < ComparatorResult.EQUAL ) {
               
-              System.err.println("ERROR: Unable to rename file to include this figureID. YOUR OUTPUT HAS NOT BEEN WRITTEN. Exiting.");
+              return ComparatorResult.AFTER;
               
-              System.exit(0);
+            } else if ( o1.getOpponents().substring(1).compareTo(o2.getOpponents().substring(1)) > ComparatorResult.EQUAL ) {
+              
+              return ComparatorResult.BEFORE;
+              
+            } else {
+              
+              return ComparatorResult.EQUAL;
               
             }
             
           }
           
-          File TEX = new File(Utils.FILEPREFIX + "charts/" + figureID + ".tex");
-          
-          File EPS = new File(Utils.FILEPREFIX + "charts/" + figureID + ".eps");
-          
-          if( TEX.exists() && !TEX.isDirectory() ) {
-            
-            overwriting = true;
-            
-            try {
-              
-              Utils.copyFile ( new File(Utils.FILEPREFIX + "charts/" + figureID + ".tex" ), new File( Utils.FILEPREFIX + "charts/" + figureID + "_copy.tex" ) );
-              
-            } catch (IOException e1) {
-              
-              e1.printStackTrace();
-              
-            }
-            
-          }
-          
-          if ( EPS.exists() && !EPS.isDirectory() ) {
-            
-            overwriting = true;
-            
-            try {
-              
-              Utils.copyFile ( new File(Utils.FILEPREFIX + "charts/" + figureID + ".eps" ), new File( Utils.FILEPREFIX + "charts/" + figureID + "_copy.eps" ) );
-              
-            } catch (IOException e1) {
-              
-              e1.printStackTrace();
-              
-            }
-            
-          }
-          
-          graph.exportChartAsEPS(Utils.FILEPREFIX + "charts/" + figureID + ".eps");
-          
-          graph.exportChartAsTikz(Utils.FILEPREFIX + "charts/" + figureID + ".tex");
-          
-          if ( !overwriting ) {
-            
-            try {
-              
-              Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "charts/figures.bib", true), "\n @FIG{" + figureID + ", main = { " + setupCaptionString(playerRecords, traverserRecords, increaseKAndN) + " }, add = { " + title + " " + affectedFiles + " }, file = {/Users/Martin/Dropbox/workspace/SearchGames/output/charts/" + figureID + "}, source = {}}");
-              
-            } catch (IOException e) {
-              
-              e.printStackTrace();
-              
-            }
-            
-          }
-          
-          if ( graphType.equals("Bar") ) significanceTable.outputPValueTable(figureID, "pValues for the graph shown in \\fbref{" + figureID + "}.");
-          
-        }
+        });
         
-        // Reshow opponents on UI
-        if ( !SHOW_OPPONENT ) for ( TraverserRecord record : expandTraverserRecords(traverserRecords) ) record.showOpponents();
-        
-        /*graph.pack();
-        
-        RefineryUtilities.centerFrameOnScreen(graph);
-        
-        graph.setVisible(true);*/
-        
-      } 
+      }
       
-      /**
-      * @param traverserRecords
-      * @return
-      */
-      protected String setupCaptionString(ArrayList<TraverserRecord> playerRecords, ArrayList<TraverserRecord> traverserRecords, boolean increaseKAndN) {
+      String localCategory = "";
+      
+      for ( TraverserRecord traverser : traverserRecords ) {
         
-        HashSet<String> hiders = new HashSet<String>();
+        Utils.talk(toString(), "Processing " + traverser);
         
-        HashSet<String> seekers = new HashSet<String>();
+        //if ( traverser instanceof HiderRecord ) ((HiderRecord)traverser).switchShowSeekers();
         
-        boolean hiderTarget;
-        
-        if (traverserRecords.get(0) instanceof HiderRecord) {
+        if ( category.equals("Topology") ) {
           
-          hiderTarget = true;
+          if ( !traverser.getTopology().equals(localCategory) ) traverserAndData.clear(); 
           
-        } else {
+          localCategory = traverser.getTopology();
           
-          hiderTarget = false;
+        } else if ( category.equals("Opponent") ) {
+          
+          if ( !traverser.getOpponents().equals(localCategory) ) traverserAndData.clear(); 
+          
+          localCategory = traverser.getOpponents();
           
         }
         
-        //
+        if ( yLabel.contains("Payoff") ) {
+          
+          traverserAndData.add(traverserPayoff(traverser, minForAttributeInAllSeries, maxForAttributeInAllSeries));
+          
+        } else {
+          
+          traverserAndData.add(new AbstractMap.SimpleEntry<TraverserRecord, Double>(traverser, traverser.getAttributeToGameAverage(yLabel)));	
+          
+        }
         
-        for (TraverserRecord traverser : Utils.expandTraverserRecords(traverserRecords)) {
+        categoryToTraverserAndData.put(localCategory, new ArrayList<Entry<TraverserRecord, Double>>(traverserAndData));
+        
+      }
+      
+      ArrayList<Entry<TraverserRecord, Double>> crossCategoryData = new ArrayList<Entry<TraverserRecord, Double>>();
+      
+      for ( Entry<String, ArrayList<Entry<TraverserRecord, Double>>> storedTraverserAndData : categoryToTraverserAndData.entrySet() ) {
+        
+        crossCategoryData.addAll(storedTraverserAndData.getValue());
+        
+      }
+      
+      Hashtable<TraverserRecord, String> traverserToSignificanceClass = new Hashtable<TraverserRecord, String>();
+      
+      if ( yLabel.equals(Metric.COST.getText()) || yLabel.equals(Metric.PAYOFF.getText()) ) {
+        
+        outer:
+        for ( Entry<TraverserRecord, Double> traverserA : crossCategoryData ) {
           
-          if ( traverser instanceof HiderRecord ) {
-            
-            hiders.add(traverser.getTraverser());
-            
-          } else {
-            
-            seekers.add(traverser.getTraverser());
-            
-          }
+          double cumulativeP = 0.0;
           
-          /* If no hiders, are found, traverserRecords must be all seekers, 
-          * in which case we have to look through all player records, and find those
-          * hiders that are associated to the seekers in traverser records (~MDC 10/8 design needs
-          * updating to account for this)
-          */
-          if ( hiders.size() == 0 ) {
+          traverserToSignificanceClass.put(traverserA.getKey(), "");
+          
+          for ( Entry<TraverserRecord, Double> traverserB : crossCategoryData ) {
             
-            for ( TraverserRecord hider : playerRecords ) {
+            // exact same record
+            if ( crossCategoryData.indexOf(traverserA) == crossCategoryData.indexOf(traverserB)) continue;
+            //if ( traverserA.getKey() == traverserB.getKey() && traverserA.getKey().getOpponents() == traverserB.getKey().getOpponents ) continue;
+            
+            double pValue = 0.0;
+            
+            if ( yLabel.equals(Metric.COST.getText()) ) {
               
-              if (hider instanceof HiderRecord) {
-                
-                if ( ((HiderRecord)hider).containsSeeker(traverser) ) {
-                  
-                  hiders.add(hider.getTraverser());
-                  
-                }
-                
-              }
+              if ( traverserA.getKey().pGroup(traverserB.getKey(), Metric.COST).equals("") ) continue outer;
+              
+              pValue = traverserA.getKey().pValue(traverserB.getKey(), Metric.COST);
+              
+              Utils.talk(toString(), traverserA.getKey() + " vs " + traverserB.getKey() + " : Percentage Difference - " + ( Utils.percentageChange(traverserB.getValue(), traverserA.getValue()) ) + " PValue - " + pValue);
+              
+              cumulativeP += pValue;
+              
+            } else if ( yLabel.equals(Metric.PAYOFF.getText()) ) {
+              
+              if ( traverserA.getKey().pGroup(traverserB.getKey(), minForAttributeInAllSeries, maxForAttributeInAllSeries ).equals("") ) continue outer;
+              
+              pValue = traverserA.getKey().pValue(traverserB.getKey(), minForAttributeInAllSeries, maxForAttributeInAllSeries );
+              
+              Utils.talk(toString(), traverserA.getKey() + " vs " + traverserB.getKey() + " : Percentage Difference - " + ( Utils.percentageChange(traverserB.getValue(), traverserA.getValue()) ) + " PValue - " + pValue);
+              
+              cumulativeP += pValue;
               
             }
             
+            significanceTable.addPValue(traverserA.getKey().getTraverser() + " (vs. " + traverserA.getKey().getOpponents() + ")", traverserB.getKey().getTraverser() + " (vs. " + traverserB.getKey().getOpponents() + ")", traverserA.getValue(), traverserB.getValue(), pValue);
+            
           }
           
-        }
-        
-        //
-        
-        String hiderList = traverserList(hiders, "hider");
-        
-        String seekerList = traverserList(seekers, "seeker");
-        
-        //
-        
-        String suffix = ".";
-        
-        if ( increaseKAndN ) suffix = " at higher values of $K$ and $N$.";
-        
-        if ( hiderTarget ) {
+          Utils.talk(toString(), "Average pValue against other traversers (" + crossCategoryData.size() + "): " + ( cumulativeP / crossCategoryData.size() ));
           
-          return "The performance of " + hiderList + " against " + seekerList + " on a " + traverserRecords.get(0).getTopology() + " network" + suffix;
+          traverserToSignificanceClass.put(traverserA.getKey(), StatisticalTest.getPGroup(cumulativeP / crossCategoryData.size()));
           
-        } else {
-          
-          return "The performance of " + seekerList + " against " + hiderList + " on a " + traverserRecords.get(0).getTopology() + " network" + suffix;
+          Utils.talk(toString(), "Significance class of this value: " + traverserToSignificanceClass);
           
         }
         
       }
       
-      /**
-      * @param traversers
-      * @param hiderOrSeeker
-      * @return
-      */
-      protected String traverserList(HashSet<String> traversers, String hiderOrSeeker) {
+      // ~MDC 19/8 Could be neater
+      for ( Entry<String, ArrayList<Entry<TraverserRecord, Double>>> storedTraverserAndData : categoryToTraverserAndData.entrySet() ) {
         
-        String traverserList;
+        Utils.talk(this.toString(), "Adding bar: " + storedTraverserAndData.getValue() + " " + storedTraverserAndData.getKey());
         
-        if ( traversers.size() > 3 ) {
-          
-          traverserList = "several " + hiderOrSeeker + " strategies";
-          
-        } else if ( traversers.size() == 1 ) {
-          
-          // \\\texttt{
-            traverserList = "the " + hiderOrSeeker + " strategy " + (new ArrayList<String>(traversers).get(0)) + "";
-            
-          } else {
-            
-            traverserList = "the " + Utils.traverserNumberToWord(traversers.size()) + hiderOrSeeker + " strategies " + Utils.listToProse(new ArrayList<String>(traversers), "\texttt{", "}");
-            
-          }
-          
-          return traverserList;
-          
-        }
+        ((GNUBarGraph) graph).addBars(storedTraverserAndData.getValue(), storedTraverserAndData.getKey(), traverserToSignificanceClass);
         
-        /**
-        * @return
-        */
-        public String printAllStats() {
-          
-          String returner = "";
-          
-          for ( ArrayList<HiderRecord> hiderRecords : cache ) {
-            
-            for ( HiderRecord hiderRecord : hiderRecords ) {
-              
-              returner += "\n" + hiderRecord.getTopology();
-              
-              returner += "\n" + hiderRecord.printStats();
-              
-            }
-            
-          }
-          
-          return returner;
-          
-        }
+      }
+      
+      xLabel = "Strategy";
+      
+    }
+  
+    graph.styleGraph();
+  
+    boolean increaseKAndN = false;
+  
+    if ( graphType.equals("LineOne") ) {
+      
+      // ~MDC Assumes all graphs that start at one are showing K:N. For our purposes, this is true.
+      xLabel = "$K$ ($N = 2K$)";
+      
+      increaseKAndN = true;
+      
+      graph.createChart("", xLabel, yLabel);
+      
+    } else {
+      
+      graph.createChart("", xLabel, yLabel);
+      
+    }
+    
+    boolean overwriting = false;
+  
+    if ( outputEnabled ) {
+      
+      ArrayList<String> affectedFiles = new ArrayList<String>();
+      
+      for ( TraverserRecord traverser : traverserRecords ) {
         
-        /**
-        * 
-        */
-        public void removeAllOutputFiles() {
-          
-          // Archive instead
-          for ( Path path : Utils.listFilesForFolder(new File(FILEPREFIX + dataInput)) ) { 
-            
-            File archivedFile = new File(FILEPREFIX + "/dataArchive/" + path.getFileName());
-            
-            moveFile(path, Paths.get(archivedFile.getAbsolutePath()));
-            
-            // deleteFile(path);
-            
-          }
-          
-          for ( Path path : Utils.listFilesForFolder(new File(FILEPREFIX + dataInput + "/js/data")) ) deleteFile(path);
-          
-        }
+        String graphedSuffix = "";
         
-        /**
-        * Remove relating .js and .html files if .csv have been removed
-        */
-        public void removeOrphaned() {
-          
-          ArrayList<String> CSVIDs = new ArrayList<String>();
-          
-          for ( Path path : Utils.listFilesForFolder(new File(FILEPREFIX + dataInput)) ) { 
-            
-            if ( !path.toString().contains(".") ) continue;
-            
-            // If this is a .csv file, track its ID
-            if ( path.toString().substring(path.toString().lastIndexOf("."), path.toString().length()).equals(".csv")) {
-              
-              CSVIDs.add(path.toString().substring(path.toString().lastIndexOf('/') + 1, path.toString().lastIndexOf('.')));
-              
-            }
-            
-          }
-          
-          // For all .html files, if no corresponding .csv ID recorded, remove.
-          for ( Path path : Utils.listFilesForFolder(new File(FILEPREFIX + dataInput)) ) { 
-            
-            if ( path.toString().contains("-") && !CSVIDs.contains( path.toString().substring(path.toString().lastIndexOf('/') + 1, path.toString().lastIndexOf('-')) )) {
-              
-              deleteFile(path);
-              
-            }
-            
-          }
-          
-          // Similar for .js files
-          for ( Path path : Utils.listFilesForFolder(new File(FILEPREFIX + dataInput + "/js/data")) ) {
-            
-            if ( path.toString().contains("-") && !CSVIDs.contains( path.toString().substring(path.toString().lastIndexOf('/') + 1, path.toString().lastIndexOf('-')) )) {
-              
-              deleteFile(path);
-              
-            }
-            
-          }
-          
-          
-        }
+        if ( !traverser.getDatafile().toString().contains("GRAPHED") ) graphedSuffix += "_GRAPHED";
         
-        /**
-        * 
-        */
-        protected final static String FILEPREFIX = "output/";
+        graphedSuffix += ( "_" + figureID );
         
-        /**
-        * @param source
-        * @param target
-        */
-        public void moveFile(Path source, Path target) {
-          
-          try {
-            
-            Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
-            
-          } catch (IOException e) {
-            
-            e.printStackTrace();
-            
-          }
-          
-        }
+        affectedFiles.add(traverser.getDatafile().toString());
         
-        /**
-        * @param path
-        */
-        public void deleteFile(Path path) {
-          
-          Utils.deleteFile(path);
-          
-        }
+        boolean result = traverser.getDatafile().toFile().renameTo(new File(traverser.getDatafile().toString().substring(0, traverser.getDatafile().toString().length() - 4) + graphedSuffix + ".csv"));
         
-        /* (non-Javadoc)
-        * @see java.lang.Object#toString()
-        */
-        public String toString() {
+        if ( STRICT_RENAME && result == false ) {
           
-          return "OutputManager";
+          System.err.println("ERROR: Unable to rename file to include this figureID. YOUR OUTPUT HAS NOT BEEN WRITTEN. Exiting.");
+          
+          System.exit(0);
           
         }
         
       }
       
+      File TEX = new File(Utils.FILEPREFIX + "charts/" + figureID + ".tex");
+      
+      File EPS = new File(Utils.FILEPREFIX + "charts/" + figureID + ".eps");
+      
+      if( TEX.exists() && !TEX.isDirectory() ) {
+        
+        overwriting = true;
+        
+        try {
+          
+          Utils.copyFile ( new File(Utils.FILEPREFIX + "charts/" + figureID + ".tex" ), new File( Utils.FILEPREFIX + "charts/" + figureID + "_copy.tex" ) );
+          
+        } catch (IOException e1) {
+          
+          e1.printStackTrace();
+          
+        }
+        
+      }
+      
+      if ( EPS.exists() && !EPS.isDirectory() ) {
+        
+        overwriting = true;
+        
+        try {
+          
+          Utils.copyFile ( new File(Utils.FILEPREFIX + "charts/" + figureID + ".eps" ), new File( Utils.FILEPREFIX + "charts/" + figureID + "_copy.eps" ) );
+          
+        } catch (IOException e1) {
+          
+          e1.printStackTrace();
+          
+        }
+        
+      }
+      
+      graph.exportChartAsEPS(Utils.FILEPREFIX + "charts/" + figureID + ".eps");
+      
+      graph.exportChartAsTikz(Utils.FILEPREFIX + "charts/" + figureID + ".tex");
+      
+      if ( !overwriting ) {
+        
+        try {
+          
+          Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "charts/figures.bib", true), "\n @FIG{" + figureID + ", main = { " + setupCaptionString(playerRecords, traverserRecords, increaseKAndN) + " }, add = { " + title + " " + affectedFiles + " }, file = {/Users/Martin/Dropbox/workspace/SearchGames/output/charts/" + figureID + "}, source = {}}");
+          
+        } catch (IOException e) {
+          
+          e.printStackTrace();
+          
+        }
+        
+      }
+      
+      if ( graphType.equals("Bar") ) significanceTable.outputPValueTable(figureID, "pValues for the graph shown in \\fbref{" + figureID + "}.");
+      
+    }
+    
+    // Reshow opponents on UI
+    if ( !SHOW_OPPONENT ) for ( TraverserRecord record : expandTraverserRecords(traverserRecords) ) record.showOpponents();
+  
+    /*graph.pack();
+    
+    RefineryUtilities.centerFrameOnScreen(graph);
+    
+    graph.setVisible(true);*/
+    
+  } 
+
+  /**
+  * @param traverserRecords
+  * @return
+  */
+  protected String setupCaptionString(ArrayList<TraverserRecord> playerRecords, ArrayList<TraverserRecord> traverserRecords, boolean increaseKAndN) {
+    
+    HashSet<String> hiders = new HashSet<String>();
+    
+    HashSet<String> seekers = new HashSet<String>();
+    
+    boolean hiderTarget;
+    
+    if (traverserRecords.get(0) instanceof HiderRecord) {
+      
+      hiderTarget = true;
+      
+    } else {
+      
+      hiderTarget = false;
+      
+    }
+    
+    //
+    
+    for (TraverserRecord traverser : Utils.expandTraverserRecords(traverserRecords)) {
+      
+      if ( traverser instanceof HiderRecord ) {
+        
+        hiders.add(traverser.getTraverser());
+        
+      } else {
+        
+        seekers.add(traverser.getTraverser());
+        
+      }
+      
+      /* If no hiders, are found, traverserRecords must be all seekers, 
+      * in which case we have to look through all player records, and find those
+      * hiders that are associated to the seekers in traverser records (~MDC 10/8 design needs
+      * updating to account for this)
+      */
+      if ( hiders.size() == 0 ) {
+        
+        for ( TraverserRecord hider : playerRecords ) {
+          
+          if (hider instanceof HiderRecord) {
+            
+            if ( ((HiderRecord)hider).containsSeeker(traverser) ) {
+              
+              hiders.add(hider.getTraverser());
+              
+            }
+            
+          }
+          
+        }
+        
+      }
+      
+    }
+    
+    //
+    
+    String hiderList = traverserList(hiders, "hider");
+    
+    String seekerList = traverserList(seekers, "seeker");
+    
+    //
+    
+    String suffix = ".";
+    
+    if ( increaseKAndN ) suffix = " at higher values of $K$ and $N$.";
+    
+    if ( hiderTarget ) {
+      
+      return "The performance of " + hiderList + " against " + seekerList + " on a " + traverserRecords.get(0).getTopology() + " network" + suffix;
+      
+    } else {
+      
+      return "The performance of " + seekerList + " against " + hiderList + " on a " + traverserRecords.get(0).getTopology() + " network" + suffix;
+      
+    }
+    
+  }
+
+  /**
+  * @param traversers
+  * @param hiderOrSeeker
+  * @return
+  */
+  protected String traverserList(HashSet<String> traversers, String hiderOrSeeker) {
+    
+    String traverserList;
+    
+    if ( traversers.size() > 3 ) {
+      
+      traverserList = "several " + hiderOrSeeker + " strategies";
+      
+    } else if ( traversers.size() == 1 ) {
+      
+      // \\\texttt{
+      traverserList = "the " + hiderOrSeeker + " strategy " + (new ArrayList<String>(traversers).get(0)) + "";
+      
+    } else {
+      
+      traverserList = "the " + Utils.traverserNumberToWord(traversers.size()) + hiderOrSeeker + " strategies " + Utils.listToProse(new ArrayList<String>(traversers), "\texttt{", "}");
+      
+    }
+    
+    return traverserList;
+    
+  }
+    
+  /**
+  * @return
+  */
+  public String printAllStats() {
+    
+    String returner = "";
+    
+    for ( ArrayList<HiderRecord> hiderRecords : cache ) {
+      
+      for ( HiderRecord hiderRecord : hiderRecords ) {
+        
+        returner += "\n" + hiderRecord.getTopology();
+        
+        returner += "\n" + hiderRecord.printStats();
+        
+      }
+      
+    }
+    
+    return returner;
+    
+  }
+  
+  /**
+  * 
+  */
+  public void removeAllOutputFiles() {
+    
+    // Archive instead
+    for ( Path path : Utils.listFilesForFolder(new File(FILEPREFIX + dataInput)) ) { 
+      
+      File archivedFile = new File(FILEPREFIX + "/dataArchive/" + path.getFileName());
+      
+      moveFile(path, Paths.get(archivedFile.getAbsolutePath()));
+      
+      // deleteFile(path);
+      
+    }
+    
+    for ( Path path : Utils.listFilesForFolder(new File(FILEPREFIX + dataInput + "/js/data")) ) deleteFile(path);
+    
+  }
+  
+  /**
+  * Remove relating .js and .html files if .csv have been removed
+  */
+  public void removeOrphaned() {
+    
+    ArrayList<String> CSVIDs = new ArrayList<String>();
+    
+    for ( Path path : Utils.listFilesForFolder(new File(FILEPREFIX + dataInput)) ) { 
+      
+      if ( !path.toString().contains(".") ) continue;
+      
+      // If this is a .csv file, track its ID
+      if ( path.toString().substring(path.toString().lastIndexOf("."), path.toString().length()).equals(".csv")) {
+        
+        CSVIDs.add(path.toString().substring(path.toString().lastIndexOf('/') + 1, path.toString().lastIndexOf('.')));
+        
+      }
+      
+    }
+    
+    // For all .html files, if no corresponding .csv ID recorded, remove.
+    for ( Path path : Utils.listFilesForFolder(new File(FILEPREFIX + dataInput)) ) { 
+      
+      if ( path.toString().contains("-") && !CSVIDs.contains( path.toString().substring(path.toString().lastIndexOf('/') + 1, path.toString().lastIndexOf('-')) )) {
+        
+        deleteFile(path);
+        
+      }
+      
+    }
+    
+    // Similar for .js files
+    for ( Path path : Utils.listFilesForFolder(new File(FILEPREFIX + dataInput + "/js/data")) ) {
+      
+      if ( path.toString().contains("-") && !CSVIDs.contains( path.toString().substring(path.toString().lastIndexOf('/') + 1, path.toString().lastIndexOf('-')) )) {
+        
+        deleteFile(path);
+        
+      }
+      
+    }
+    
+  }
+  
+  /**
+  * 
+  */
+  protected final static String FILEPREFIX = "output/";
+  
+  /**
+  * @param source
+  * @param target
+  */
+  public void moveFile(Path source, Path target) {
+    
+    try {
+      
+      Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
+      
+    } catch (IOException e) {
+      
+      e.printStackTrace();
+      
+    }
+    
+  }
+  
+  /**
+  * @param path
+  */
+  public void deleteFile(Path path) {
+    
+    Utils.deleteFile(path);
+    
+  }
+  
+  /* (non-Javadoc)
+  * @see java.lang.Object#toString()
+  */
+  public String toString() {
+    
+    return "OutputManager";
+    
+  }
+  
+}
