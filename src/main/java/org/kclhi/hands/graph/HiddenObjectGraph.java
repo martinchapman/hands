@@ -13,10 +13,13 @@ import org.jgrapht.alg.DijkstraShortestPath;
 import org.jgrapht.graph.ClassBasedEdgeFactory;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
-
 import org.kclhi.hands.utility.Metric;
 import org.kclhi.hands.utility.Utils;
+import org.kclhi.hands.Gas;
 import org.kclhi.hands.GraphTraverser;
+import org.kclhi.hands.Gas.GasGraphTraverser;
+import org.kclhi.hands.Gas.HighGasGraphTraverser;
+import org.kclhi.hands.Gas.MediumGasGraphTraverser;
 import org.kclhi.hands.hider.Hider;
 import org.kclhi.hands.seeker.Seeker;
 
@@ -656,7 +659,14 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
     this.edgeTraversalDecrement = 1.0 - (edgeTraversalDecrement / 100.0);
     
   }
-  
+
+  /**
+   * Track the amount of 'gas' each traverser has. Gas is subtracted
+   * from upon traversal rather than adding to cost.
+   * 
+   */
+  private HashMap<GraphTraverser, Double> traverserGas;
+
   /**
   * @param ef
   */
@@ -699,6 +709,8 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
   private void setup() {
     
     traverserEdgeCosts = new HashMap<GraphTraverser, HashMap<E, Double>>();
+
+    traverserGas = new HashMap<GraphTraverser, Double>();
     
     //
     
@@ -837,7 +849,11 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
         
         // The new cost, based upon the edge that is currently being traversed
         newCost = uniqueCost * edgeTraversalDecrement;
-        
+        if(traverser instanceof GasGraphTraverser) {
+          this.traverserGas.put(traverser, traverserGas.get(traverser) - newCost);
+          newCost = traverserGas.get(traverser) > 0 ? 0 : newCost;
+        }
+
         //} else {
           
           //newCost = uniqueCost;
@@ -1081,6 +1097,8 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
       
     }
     
+    if(traverser instanceof GasGraphTraverser) traverserGas.put(traverser, (traverser instanceof HighGasGraphTraverser ? this.totalEdgeCosts(traverser) / Gas.HIGH_GAS_PROPORTION : traverser instanceof MediumGasGraphTraverser ? this.totalEdgeCosts(traverser) / Gas.MEDIUM_GAS_PROPORTION : this.totalEdgeCosts(traverser) / Gas.LOW_GAS_PROPORTION));
+
   }
   
   /* (non-Javadoc)
@@ -1124,6 +1142,8 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
     
     // Add a new unique edge cost mapping for this traverser
     traverserEdgeCosts.remove(traverser);
+
+    traverserGas.remove(traverser);
     
   }
   
