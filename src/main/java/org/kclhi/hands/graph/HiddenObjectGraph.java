@@ -854,98 +854,98 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
           newCost = traverserGas.get(traverser) > 0 ? 0 : newCost;
         }
 
-        //} else {
+      // } else {
+        
+        // newCost = uniqueCost;
+        
+      // }
+        
+      // Update round costs
+      
+      Hashtable<GraphTraverser, Double> thisRoundCostData = roundCosts.get(roundCosts.size() - 1);
+      
+      if (thisRoundCostData.containsKey(traverser)) {
+        
+        thisRoundCostData.put(traverser, thisRoundCostData.get(traverser) + newCost);
+        
+      } else {
+        
+        thisRoundCostData.put(traverser, newCost);
+        
+      }
+      
+      // Update round path
+      
+      Hashtable<GraphTraverser, ArrayList<V>> thisRoundPathData = roundPaths.get(roundPaths.size() - 1);
+      
+      if ( RECORD_PATH_DATA ) {
+        
+        if (thisRoundPathData.containsKey(traverser)) {
           
-          //newCost = uniqueCost;
+          ArrayList<V> traverserPath = thisRoundPathData.get(traverser);
           
-          //}
-          
-          // Update round costs
-          
-          Hashtable<GraphTraverser, Double> thisRoundCostData = roundCosts.get(roundCosts.size() - 1);
-          
-          if (thisRoundCostData.containsKey(traverser)) {
+          if (traverserPath.get(traverserPath.size() -1).equals(sourceVertex)) {
             
-            thisRoundCostData.put(traverser, thisRoundCostData.get(traverser) + newCost);
+            traverserPath.add(targetVertex);
             
           } else {
             
-            thisRoundCostData.put(traverser, newCost);
-            
-          }
-          
-          // Update round path
-          
-          Hashtable<GraphTraverser, ArrayList<V>> thisRoundPathData = roundPaths.get(roundPaths.size() - 1);
-          
-          if ( RECORD_PATH_DATA ) {
-            
-            if (thisRoundPathData.containsKey(traverser)) {
-              
-              ArrayList<V> traverserPath = thisRoundPathData.get(traverser);
-              
-              if (traverserPath.get(traverserPath.size() -1).equals(sourceVertex)) {
-                
-                traverserPath.add(targetVertex);
-                
-              } else {
-                
-                try {
-                  
-                  traverserPath.add(sourceVertex);
-                  
-                } catch (java.lang.OutOfMemoryError e) {
-                  
-                  throw new UnsupportedOperationException(e.getMessage() + " \n " + e.getCause() + " \n Out of memory error at traverser add to path (Line 880). \n Traverser: " + traverser + " Source Vertex: " + sourceVertex + " Target Vertex: " + targetVertex + " traverserPath.size(): + " + traverserPath.size());
-                  
-                }
-                
-              }
-              
-              thisRoundPathData.put(traverser, traverserPath);
-              
-            } else {
-              
-              ArrayList<V> traverserPath = new ArrayList<V>();
+            try {
               
               traverserPath.add(sourceVertex);
               
-              traverserPath.add(targetVertex);
+            } catch (java.lang.OutOfMemoryError e) {
               
-              thisRoundPathData.put(traverser, traverserPath);
-              
-            }
-            
-          } else {
-            
-            // ~MDC To prevent potential null exceptions
-            if (!thisRoundPathData.containsKey(traverser)) {
-              
-              ArrayList<V> traverserPath = new ArrayList<V>();
-              
-              thisRoundPathData.put(traverser, traverserPath);
+              throw new UnsupportedOperationException(e.getMessage() + " \n " + e.getCause() + " \n Out of memory error at traverser add to path (Line 880). \n Traverser: " + traverser + " Source Vertex: " + sourceVertex + " Target Vertex: " + targetVertex + " traverserPath.size(): + " + traverserPath.size());
               
             }
             
           }
           
-          // Update total costs and path length
+          thisRoundPathData.put(traverser, traverserPath);
           
-          traverserCost.put( traverser, traverserCost.get(traverser) + newCost );
+        } else {
           
-          traverserPathLength.put( traverser, traverserPathLength.get(traverser) + 1 );
+          ArrayList<V> traverserPath = new ArrayList<V>();
           
-          // Update future weights
+          traverserPath.add(sourceVertex);
           
-          traverserEdgeCosts.get( traverser ).put( traversedEdge , newCost );
+          traverserPath.add(targetVertex);
           
-          return true;
+          thisRoundPathData.put(traverser, traverserPath);
           
-        } 
+        }
         
-        return false;
+      } else {
+        
+        // ~MDC To prevent potential null exceptions
+        if (!thisRoundPathData.containsKey(traverser)) {
+          
+          ArrayList<V> traverserPath = new ArrayList<V>();
+          
+          thisRoundPathData.put(traverser, traverserPath);
+          
+        }
         
       }
+      
+      // Update total costs and path length
+      
+      traverserCost.put( traverser, traverserCost.get(traverser) + newCost );
+      
+      traverserPathLength.put( traverser, traverserPathLength.get(traverser) + 1 );
+      
+      // Update future weights
+      
+      traverserEdgeCosts.get( traverser ).put( traversedEdge , newCost );
+      
+      return true;
+      
+    } 
+    
+    return false;
+    
+  }
       
   /**
   * @param traverser
