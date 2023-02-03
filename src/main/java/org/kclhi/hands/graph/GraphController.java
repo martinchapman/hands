@@ -717,6 +717,16 @@ public class GraphController<V , E> {
     return graph.latestRoundCosts(traverser, normalised);
     
   }
+
+  /**
+   * @param traverser
+   * @return
+   */
+  public double successfulRoundTraversal(GraphTraverser traverser) {
+    
+    return graph.successfulRoundTraversal(traverser);
+    
+  }
   
   /**
   * @param traverser
@@ -726,6 +736,16 @@ public class GraphController<V , E> {
     
     return graph.averageGameCosts(traverser);
     
+  }
+
+  /**
+   * @param traverser
+   * @return
+   */
+  public double successfulGameTraversal(GraphTraverser traverser) {
+
+    return graph.successfulGameTraversal(traverser);
+
   }
   
   /**

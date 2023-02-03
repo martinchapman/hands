@@ -128,6 +128,16 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
     return 0.0;
     
   }
+
+  /**
+   * @param traverser
+   * @return
+   */
+  public double successfulRoundTraversal(GraphTraverser traverser) {
+
+    return latestRoundCosts(traverser, false) < totalEdgeCosts(traverser) ? 1 : 0;
+
+  }
   
   /**
   * @param traverser
@@ -994,6 +1004,16 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
     
     return traverserCost.get(traverser) / roundNumber;
     
+  }
+
+  /**
+   * @param traverser
+   * @return
+   */
+  public double successfulGameTraversal(GraphTraverser traverser) {
+
+    return averageGameCosts(traverser) < totalEdgeCosts(traverser) ? 1 : 0;
+
   }
   
   /**

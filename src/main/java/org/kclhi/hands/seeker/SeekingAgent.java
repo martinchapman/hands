@@ -193,7 +193,11 @@ public abstract class SeekingAgent extends TraverserLocalGraph implements Runnab
     
     //System.out.println("Seeker cost: " + graphController.latestRoundCosts(responsibleAgent, false));
     
-    return super.printRoundStats() + "Cost," + graphController.latestRoundCosts(responsibleAgent, false) + ",Explored," + exploredNodesSize() + ",Path," + exploredNodesTable().toString().replace(",", "");
+    return super.printRoundStats() + 
+    "Cost," + graphController.latestRoundCosts(responsibleAgent, false) + 
+    ", Explored," + exploredNodesSize() + 
+    ", Path," + exploredNodesTable().toString().replace(",", "") +
+    ", Success, " + graphController.successfulRoundTraversal(responsibleAgent);
     
   }
   
@@ -204,8 +208,9 @@ public abstract class SeekingAgent extends TraverserLocalGraph implements Runnab
   public String printGameStats() {
     
     return super.printGameStats() +
-    "Cost, " + graphController.averageGameCosts(responsibleAgent)  +  
-    ", PathLength, " + graphController.averagePathLength(responsibleAgent);
+    "Cost, " + graphController.averageGameCosts(responsibleAgent) +  
+    ", PathLength, " + graphController.averagePathLength(responsibleAgent) +
+    ", Success, " + graphController.successfulGameTraversal(responsibleAgent);
     
   }
   
