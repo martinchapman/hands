@@ -14,6 +14,11 @@ public enum Metric {
   /**
   * 
   */
+  SUCCESS("Success"),
+
+  /**
+  * 
+  */
   PAYOFF("Payoff"),
   
   /**

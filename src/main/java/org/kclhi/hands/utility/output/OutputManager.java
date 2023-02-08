@@ -10,6 +10,7 @@ import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -19,6 +20,8 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import org.kclhi.hands.Success;
+import org.kclhi.hands.seeker.Seeker;
 import org.kclhi.hands.utility.ComparatorResult;
 import org.kclhi.hands.utility.Metric;
 import org.kclhi.hands.utility.Pair;
@@ -412,7 +415,23 @@ public class OutputManager {
             
             gameOrRound = "Round";
             
-            // If we come across an attribute entry
+          } else if ( word.startsWith("org") ) {
+
+            if ( lastTraverser.equals("hider") ) {
+            
+              hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).setTraverserType(word);
+              
+              if ( GARBAGE ) System.gc();
+              
+            } else if ( lastTraverser.equals("seeker") ) {
+              
+              hiderRecords.get(hiderRecords.indexOf(new HiderRecord(lastHider))).getSeeker(lastSeeker).setTraverserType(word);
+              
+              if ( GARBAGE ) System.gc();
+              
+            } 
+
+          // If we come across an attribute entry
           } else {
             
             lastAttribute = word;
@@ -762,7 +781,34 @@ public class OutputManager {
     
   }
   
-  
+  public AbstractMap.SimpleEntry<TraverserRecord, Double> traverserSuccessPayoff(TraverserRecord traverser) {
+
+    if ( !(traverser instanceof HiderRecord) ) {
+      
+      Class<? extends Seeker> seekerClass = null;
+      try {
+        seekerClass = (Class<? extends Seeker>)Class.forName(traverser.getTraverserType());
+      } catch (ClassNotFoundException e) {
+        e.printStackTrace();
+      }
+
+      double decrement = String.join(",", Arrays.stream(seekerClass.getInterfaces()).map(i -> i.getName()).toArray(String[]::new)).contains("ResourceImmune") ? Success.RESOURCE_IMMUNE_PROPORTION : 1;
+
+      double payoff = -1 + traverser.getAttributeToGameAverage(Metric.SUCCESS.getText());
+      payoff = decrement * payoff;
+
+      Utils.talk(toString(), traverser + " payoff: " + payoff);
+
+      return new AbstractMap.SimpleEntry<TraverserRecord, Double>(traverser, payoff);
+      
+    } else {
+
+      return new AbstractMap.SimpleEntry<TraverserRecord, Double>(traverser, -1.0);
+
+    }
+
+  }
+
   /**
   * @param traverser
   * @param minForAttributeInAllSeries
@@ -1111,10 +1157,14 @@ public class OutputManager {
           
         }
         
-        if ( yLabel.contains("Payoff") ) {
+        if ( yLabel.contains("Success Payoff") ) {
+          
+          traverserAndData.add(traverserSuccessPayoff(traverser));
+            
+        } else if ( yLabel.contains("Payoff") ) {
           
           traverserAndData.add(traverserPayoff(traverser, minForAttributeInAllSeries, maxForAttributeInAllSeries));
-          
+
         } else {
           
           traverserAndData.add(new AbstractMap.SimpleEntry<TraverserRecord, Double>(traverser, traverser.getAttributeToGameAverage(yLabel)));	

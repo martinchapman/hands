@@ -39,7 +39,30 @@ public class TraverserRecord implements Comparable<TraverserRecord>, Serializabl
     this.traverser = Utils.shortenOutputName(traverser);
     
   }
-  
+
+  /**
+   * 
+   */
+  private String traverserType;
+
+  /**
+   * @param type
+   */
+  public void setTraverserType(String traverserType) {
+
+    this.traverserType = traverserType;
+
+  }
+
+  /**
+   * @return
+   */
+  public String getTraverserType() {
+
+    return traverserType;
+
+  }
+
   /**
   * 
   */
@@ -196,9 +219,23 @@ public class TraverserRecord implements Comparable<TraverserRecord>, Serializabl
   * @param attributes
   */
   public TraverserRecord(String traverser, LinkedHashMap<AttributeSetIdentifier, Hashtable<String, Double>> attributeToValue, HashSet<String> attributes) {
+
+    this(traverser, "", attributeToValue, attributes);
+
+  }
+
+  /**
+  * @param traverser
+  * @param traverserType
+  * @param attributeToValue
+  * @param attributes
+  */
+  public TraverserRecord(String traverser, String traverserType, LinkedHashMap<AttributeSetIdentifier, Hashtable<String, Double>> attributeToValue, HashSet<String> attributes) {
     
     this.traverser = traverser;
     
+    this.traverserType = traverserType;
+
     this.attributeToValue = attributeToValue;
     
     this.attributes = attributes;
@@ -246,6 +283,8 @@ public class TraverserRecord implements Comparable<TraverserRecord>, Serializabl
     this.attributeToValue = record.getAttributeToValue();
     
     this.traverser = record.getTraverser();
+
+    this.traverserType = record.getTraverserType();
     
     this.opponents = record.getOpponents();
     

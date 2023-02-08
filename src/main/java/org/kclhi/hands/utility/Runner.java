@@ -479,6 +479,8 @@ public class Runner extends JFrame {
     
     if ( seekers.isSelected() ) {
       
+      measure.addItem("Success Payoff");
+
       for ( String attribute : outputFeedbackList.getSelectedValue().getSeekerAttributes() ) {
         
         measure.addItem(attribute);
@@ -811,6 +813,8 @@ public class Runner extends JFrame {
         measure.removeAllItems();
         
         measure.addItem("Payoff");
+
+        measure.addItem("Success Payoff");
         
         for ( String attribute : outputFeedbackList.getSelectedValue().getSeekerAttributes() ) {
           

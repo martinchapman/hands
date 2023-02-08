@@ -94,6 +94,7 @@ import org.kclhi.hands.seeker.singleshot.random.FixedStartRandomWalk;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalk;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkHighGas;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkLowGas;
+import org.kclhi.hands.seeker.singleshot.random.RandomWalkLowGasResourceImmune;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkMediumGas;
 import org.kclhi.hands.seeker.singleshot.random.SelfAvoidingRandomWalk;
 import org.kclhi.hands.seeker.singleshot.random.SelfAvoidingRandomWalkGreedy;
@@ -945,7 +946,8 @@ public class Main {
           
           allSeekingAgents.add(
             seekerName.contains("HighGas") ? new RandomWalkHighGas(graphController) : 
-            seekerName.contains("MediumGas") ? new RandomWalkMediumGas(graphController) : 
+            seekerName.contains("MediumGas") ? new RandomWalkMediumGas(graphController) :
+            seekerName.contains("LowGasResourceImmune") ? new RandomWalkLowGasResourceImmune(graphController) : 
             seekerName.contains("LowGas") ? new RandomWalkLowGas(graphController) : 
             new RandomWalk(graphController)
           );
@@ -1360,13 +1362,13 @@ public class Main {
           
           if (generateOutput && recordPerRound) {
             
-            Utils.writeToFile(mainOutputWriter, "R, " + hider.toString() + "," + hider.printRoundStats() + ",");
+            Utils.writeToFile(mainOutputWriter, "R, " + hider.toString() + "," + hider.getClass().getName() + "," + hider.printRoundStats() + ",");
             
             Utils.talk("Main", hider.toString() + "," + hider.printRoundStats());
             
             for( Seeker seeker : seekers ) {
               
-              Utils.writeToFile(mainOutputWriter, seeker.toString() + "," + seeker.printRoundStats() + ",");
+              Utils.writeToFile(mainOutputWriter, seeker.toString() + "," + seeker.getClass().getName() + "," + seeker.printRoundStats() + ",");
               
               Utils.talk("Main", seeker.toString() + "," + seeker.printRoundStats());
               
@@ -1435,7 +1437,7 @@ public class Main {
         
         //if ( !recordPerRound ) {
           
-          if (lastRoundRepeat) if ( generateOutput ) Utils.writeToFile(mainOutputWriter, "G, " + hider.toString() + "," + hider.printGameStats() + ",");
+          if (lastRoundRepeat) if ( generateOutput ) Utils.writeToFile(mainOutputWriter, "G, " + hider.toString() + "," + hider.getClass().getName() + "," + hider.printGameStats() + ",");
           
           // Output costs for Seekers
           
@@ -1449,7 +1451,7 @@ public class Main {
               
               // Cost per round
               
-              if ( generateOutput ) Utils.writeToFile(mainOutputWriter, seeker.toString() + "," + seeker.printGameStats() + ",");
+              if ( generateOutput ) Utils.writeToFile(mainOutputWriter, seeker.toString() + "," + seeker.getClass().getName() + "," + seeker.printGameStats() + ",");
               
             }
             

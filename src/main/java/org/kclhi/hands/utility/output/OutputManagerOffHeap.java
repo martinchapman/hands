@@ -377,8 +377,30 @@ public class OutputManagerOffHeap extends OutputManager {
           } else if ( word.equals("R") ) {
             
             gameOrRound = "Round";
+
+          } else if ( word.startsWith("org") ) {
+
+            if ( lastTraverser.equals("hider") ) {
             
-            // If we come across an attribute entry
+              HiderRecord hider = hiderList.get(lastHider).getElement1();
+            
+              hider.setTraverserType(word);
+
+              hiderRecords.put(hiderList.get(lastHider).getElement0(), hider);
+              
+            } else if ( lastTraverser.equals("seeker") ) {
+              
+              HiderRecord hider = hiderList.get(lastHider).getElement1();
+            
+              TraverserRecord seeker = hider.getSeeker(lastSeeker);
+              
+              seeker.setTraverserType(word);
+
+              hiderRecords.put(hiderList.get(lastHider).getElement0(), hider);
+              
+            } 
+            
+          // If we come across an attribute entry
           } else {
             
             lastAttribute = word;
