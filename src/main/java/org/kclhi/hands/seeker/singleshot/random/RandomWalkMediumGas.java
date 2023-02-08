@@ -16,5 +16,10 @@ public class RandomWalkMediumGas extends RandomWalk implements MediumGasGraphTra
   public RandomWalkMediumGas(GraphController<StringVertex, StringEdge> graphController) {
     super(graphController);
   }
+
+  @Override
+  public boolean useGas() {
+    return true;
+  }
     
 }

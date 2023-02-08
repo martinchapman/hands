@@ -17,5 +17,10 @@ public class RandomWalkLowGasResourceImmune extends RandomWalk implements LowGas
   public RandomWalkLowGasResourceImmune(GraphController<StringVertex, StringEdge> graphController) {
     super(graphController);
   }
+
+  @Override
+  public boolean useGas() {
+    return true;
+  }
     
 }

@@ -16,6 +16,10 @@ public class RandomWalkHighGas extends RandomWalk implements HighGasGraphTravers
   public RandomWalkHighGas(GraphController<StringVertex, StringEdge> graphController) {
     super(graphController);
   }
-  
-    
+
+  @Override
+  public boolean useGas() {
+    return true;
+  }
+   
 }
