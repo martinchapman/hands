@@ -95,7 +95,8 @@ import org.kclhi.hands.seeker.singleshot.random.RandomWalk;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkHighGas;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkLowGas;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkLowGasResourceImmune;
-import org.kclhi.hands.seeker.singleshot.random.RandomWalkLowGasVariableUse;
+import org.kclhi.hands.seeker.singleshot.random.RandomWalkLowGasResourceImmuneVariableImmune;
+import org.kclhi.hands.seeker.singleshot.random.RandomWalkLowGasVariableGas;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkMediumGas;
 import org.kclhi.hands.seeker.singleshot.random.SelfAvoidingRandomWalk;
 import org.kclhi.hands.seeker.singleshot.random.SelfAvoidingRandomWalkGreedy;
@@ -948,8 +949,9 @@ public class Main {
           allSeekingAgents.add(
             seekerName.contains("HighGas") ? new RandomWalkHighGas(graphController) : 
             seekerName.contains("MediumGas") ? new RandomWalkMediumGas(graphController) :
+            seekerName.contains("LowGasVariableGas") ? new RandomWalkLowGasVariableGas(graphController) : 
+            seekerName.contains("LowGasResourceImmuneVariableImmune") ? new RandomWalkLowGasResourceImmuneVariableImmune(graphController) :
             seekerName.contains("LowGasResourceImmune") ? new RandomWalkLowGasResourceImmune(graphController) : 
-            seekerName.contains("LowGasVariableUse") ? new RandomWalkLowGasVariableUse(graphController) : 
             seekerName.contains("LowGas") ? new RandomWalkLowGas(graphController) : 
             new RandomWalk(graphController)
           );

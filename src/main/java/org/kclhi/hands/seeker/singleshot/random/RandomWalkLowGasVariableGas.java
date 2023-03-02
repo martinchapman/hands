@@ -11,11 +11,11 @@ import org.kclhi.hands.graph.StringVertex;
 * @author Martin
 *
 */
-public class RandomWalkLowGasVariableUse extends RandomWalk implements LowGasGraphTraverser {
+public class RandomWalkLowGasVariableGas extends RandomWalk implements LowGasGraphTraverser {
 
   private double USAGE_UPPER = 0.6;
 
-  public RandomWalkLowGasVariableUse(GraphController<StringVertex, StringEdge> graphController) {
+  public RandomWalkLowGasVariableGas(GraphController<StringVertex, StringEdge> graphController) {
     super(graphController);
   }
 

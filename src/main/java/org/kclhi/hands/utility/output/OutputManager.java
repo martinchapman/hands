@@ -792,7 +792,7 @@ public class OutputManager {
         e.printStackTrace();
       }
 
-      double decrement = String.join(",", Arrays.stream(seekerClass.getInterfaces()).map(i -> i.getName()).toArray(String[]::new)).contains("ResourceImmune") ? Success.RESOURCE_IMMUNE_PROPORTION : 1;
+      double decrement = String.join(",", Arrays.stream(seekerClass.getInterfaces()).map(i -> i.getName()).toArray(String[]::new)).contains("ResourceImmune") && Success.LEVERAGE_IMMUNITY(traverser.getTraverser()) ? Success.RESOURCE_IMMUNE_PROPORTION : 1;
 
       double payoff = -1 + traverser.getAttributeToGameAverage(Metric.SUCCESS.getText());
       payoff = decrement * payoff;
