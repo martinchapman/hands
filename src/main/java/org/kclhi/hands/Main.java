@@ -78,6 +78,8 @@ import org.kclhi.hands.seeker.repeatgame.probability.VariableHistoryHighProbabil
 import org.kclhi.hands.seeker.repeatgame.probability.VariableNodesHighProbability;
 import org.kclhi.hands.seeker.repeatgame.probability.adaptable.HighProbabilityAdaptable;
 import org.kclhi.hands.seeker.repeatgame.probability.adaptable.InverseHighProbabilityAdaptable;
+import org.kclhi.hands.seeker.singleshot.adaptable.MaxDistanceAdaptable;
+import org.kclhi.hands.seeker.singleshot.adaptable.RandomWalkAdaptable;
 import org.kclhi.hands.seeker.singleshot.cost.Greedy;
 import org.kclhi.hands.seeker.singleshot.coverage.BacktrackGreedy;
 import org.kclhi.hands.seeker.singleshot.coverage.BacktrackPath;
@@ -1165,6 +1167,34 @@ public class Main {
             protected double confidenceLevel() {
               
               return uniqueHideLocations().size() / (double)graphController.vertexSet().size();
+              
+            }
+            
+          });
+          
+        }
+
+        // Random selection:
+
+        ArrayList<Pair<AdaptiveSeeker, Double>> strategyPortfolioRandomSelection = new ArrayList<Pair<AdaptiveSeeker, Double>>();
+        
+        if (seekerName.contains("MetaRandom")) {
+          
+          strategyPortfolioRandomSelection.clear();
+          
+          strategyPortfolioRandomSelection.add(new Pair<AdaptiveSeeker, Double>(new RandomWalkAdaptable(graphController), 0.5));
+          
+          strategyPortfolioRandomSelection.add(new Pair<AdaptiveSeeker, Double>(new MaxDistanceAdaptable(graphController, numberOfHideLocations), 0.5));
+          
+          allSeekingAgents.add(new AdaptiveSeekingAgent<AdaptiveSeeker>(graphController, "MetaRandom", strategyPortfolioRandomSelection, totalRounds, 1, false) {
+            
+            /* ~MDC Should be moved into the actual strategy
+            * (non-Javadoc)
+            * @see HideAndSeek.AdaptiveGraphTraversingAgent#confidenceLevel()
+            */
+            protected double confidenceLevel() {
+              
+              return 0;
               
             }
             
