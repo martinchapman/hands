@@ -678,6 +678,21 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
   private HashMap<GraphTraverser, Double> traverserGas;
 
   /**
+   * Proportion used to determine base gas (if any) given to
+   * traversers
+   */
+  private double baseGasProportion = 0.0;
+
+  /**
+   * 
+   */
+  public void setBaseGraphProportion(double baseGasProportion) {
+    
+    this.baseGasProportion = baseGasProportion;
+
+  }
+
+  /**
   * @param ef
   */
   public HiddenObjectGraph(EdgeFactory<V, E> ef) {
@@ -1117,7 +1132,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
       
     }
     
-    if(traverser instanceof GasGraphTraverser) traverserGas.put(traverser, (traverser instanceof HighGasGraphTraverser ? this.totalEdgeCosts(traverser) / Gas.HIGH_GAS_PROPORTION : traverser instanceof MediumGasGraphTraverser ? this.totalEdgeCosts(traverser) / Gas.MEDIUM_GAS_PROPORTION : this.totalEdgeCosts(traverser) / Gas.LOW_GAS_PROPORTION));
+    if(traverser instanceof GasGraphTraverser) traverserGas.put(traverser, (baseGasProportion * this.totalEdgeCosts(traverser)) + (traverser instanceof HighGasGraphTraverser ? this.totalEdgeCosts(traverser) / Gas.HIGH_GAS_PROPORTION : traverser instanceof MediumGasGraphTraverser ? this.totalEdgeCosts(traverser) / Gas.MEDIUM_GAS_PROPORTION : this.totalEdgeCosts(traverser) / Gas.LOW_GAS_PROPORTION));
 
   }
   

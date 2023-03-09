@@ -7,7 +7,7 @@ import java.util.Map.Entry;
 
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
-
+import org.kclhi.hands.Success;
 import org.kclhi.hands.utility.Pair;
 import org.kclhi.hands.utility.Utils;
 
@@ -188,6 +188,8 @@ public class OutputManagerOffHeap extends OutputManager {
     String topology = "";
     
     int rounds = -1;
+
+    double resourceImmuneProportion = Success.RESOURCE_IMMUNE_PROPORTION;
     
     for ( String parameter : parameters.split(" ") ) {
       
@@ -195,12 +197,16 @@ public class OutputManagerOffHeap extends OutputManager {
       
       if ( keyAndValue[0].replace("{", "").equals("Topology") ) {
         
-        topology = keyAndValue[1].replace("}", "");
+        topology = keyAndValue[1].replace("}]", "").replace("}", "");
         
       } else if ( keyAndValue[0].replace("{", "").equals("Rounds") ) {
         
-        rounds = Integer.parseInt(keyAndValue[1].replace("}", ""));
+        rounds = Integer.parseInt(keyAndValue[1].replace("}]", "").replace("}", ""));
         
+      } else if ( keyAndValue[0].replace("{", "").equals("ResourceImmuneProportion") ) {
+
+        resourceImmuneProportion = Double.parseDouble(keyAndValue[1].replace("}]", "").replace("}", ""));
+
       }
       
     }
@@ -269,6 +275,8 @@ public class OutputManagerOffHeap extends OutputManager {
                 newHider.setTopology(topology);
                 
                 newHider.setRounds(rounds);
+
+                newHider.setResourceImmuneProportion(resourceImmuneProportion); 
                 
                 newHider.setParameters(parameters);
                 
@@ -299,6 +307,8 @@ public class OutputManagerOffHeap extends OutputManager {
                 
                 newHider.setRounds(rounds);
                 
+                newHider.setResourceImmuneProportion(resourceImmuneProportion);
+
                 newHider.setParameters(parameters);
                 
                 newHider.setDatafile(path);
@@ -333,6 +343,8 @@ public class OutputManagerOffHeap extends OutputManager {
                 record.getSeeker("MixedSeekerStrats").setTopology(topology);
                 
                 record.getSeeker("MixedSeekerStrats").setRounds(rounds);
+
+                record.getSeeker("MixedSeekerStrats").setResourceImmuneProportion(resourceImmuneProportion);
                 
                 record.getSeeker("MixedSeekerStrats").setDatafile(path);
                 
@@ -356,6 +368,8 @@ public class OutputManagerOffHeap extends OutputManager {
                 record.getSeeker(word).setTopology(topology);
                 
                 record.getSeeker(word).setRounds(rounds);
+
+                record.getSeeker(word).setResourceImmuneProportion(resourceImmuneProportion);
                 
                 record.getSeeker(word).setDatafile(path);
                 

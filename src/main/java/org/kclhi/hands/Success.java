@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class Success {
 
-  public static final double RESOURCE_IMMUNE_PROPORTION = 0.8;
+  public static final double RESOURCE_IMMUNE_PROPORTION = 0.0;
 
   public interface ResourceImmuneTraverser {}
   

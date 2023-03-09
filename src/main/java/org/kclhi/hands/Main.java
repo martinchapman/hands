@@ -206,17 +206,21 @@ public class Main {
       
     }
     
-    initGraph(topology, numberOfVertices, numberOfHideLocations, fixedOrUpperBound, fixedOrUpperValue, edgeTraversalDecrement);
+    double baseGasProportion = Double.parseDouble(args[15]);
+
+    initGraph(topology, numberOfVertices, numberOfHideLocations, fixedOrUpperBound, fixedOrUpperValue, edgeTraversalDecrement, baseGasProportion);
     
     mixHiders = Boolean.parseBoolean(args[11]);
     
     mixSeekers = Boolean.parseBoolean(args[12]);
     
     boolean resetPerRound = Boolean.parseBoolean(args[13]);
+
+    double resourceImmuneProportion = Double.parseDouble(args[14]);
+
+    boolean strategyOverRounds = Boolean.parseBoolean(args[16]);
     
-    boolean strategyOverRounds = Boolean.parseBoolean(args[14]);
-    
-    generateOutput = Boolean.parseBoolean(args[15]);
+    generateOutput = Boolean.parseBoolean(args[17]);
     
     //
     
@@ -237,9 +241,9 @@ public class Main {
   /**
   * @param args
   */
-  private void initGraph(String topology, int numberOfVertices, int numberOfHideLocations, String fixedOrUpperBound, double fixedOrUpperValue, int edgeTraversalDecrement) {
+  private void initGraph(String topology, int numberOfVertices, int numberOfHideLocations, String fixedOrUpperBound, double fixedOrUpperValue, int edgeTraversalDecrement, double baseGasProportion) {
     
-    graphController = new GraphController<StringVertex, StringEdge>(topology, numberOfVertices, numberOfHideLocations, fixedOrUpperBound, fixedOrUpperValue, edgeTraversalDecrement);
+    graphController = new GraphController<StringVertex, StringEdge>(topology, numberOfVertices, numberOfHideLocations, fixedOrUpperBound, fixedOrUpperValue, edgeTraversalDecrement, baseGasProportion);
     
   }
   

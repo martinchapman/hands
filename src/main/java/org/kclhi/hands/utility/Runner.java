@@ -2735,6 +2735,8 @@ public class Runner extends JFrame {
         "MixHiders", // Mix equally between the hide strategies
         "MixSeekers", // Mix equally between the search strategies
         "ResetPerRound", // Whether players knowledge should persist through rounds
+        "ResourceImmuneProportion", // The proportion of immunity from poor success payoff (0.0 = no immunity)
+        "BaseGasProportion", // Additional gas to provide to all gas traversers (as a proportion of total edge costs)
         "StrategyOverRounds", // Whether to double the number of round sets, in order to test strategies that evolve over all rounds
         "GenerateOutputFiles" // Whether to log results to file
       };
@@ -2751,6 +2753,8 @@ public class Runner extends JFrame {
         "false", // Mix equally between the hide strategies
         "false", // Mix equally between the search strategies
         "true", // Whether players knowledge should persist through rounds
+        "0.0", // The proportion of immunity from poor success payoff (0.0 = no immunity)
+        "0.0", // Additional gas to provide to all gas traversers (as a proportion of total edge costs)
         "false", // Whether to double the number of round sets, in order to test strategies that evolve over all rounds
         (generateOutput + "")
       };
@@ -2862,11 +2866,11 @@ public class Runner extends JFrame {
         
         if ( i < GAMES - 1); {
           
-          Utils.runCommand("clear");
+          // Utils.runCommand("clear");
           
-          Utils.runCommand("printf '\\\\e[3J'");
+          // Utils.runCommand("printf '\\\\e[3J'");
           
-          Utils.runCommand("printf '\\\\ec'");
+          // Utils.runCommand("printf '\\\\ec'");
           
         }
         

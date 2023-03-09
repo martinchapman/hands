@@ -243,6 +243,8 @@ public class OutputManager {
     String topology = "";
     
     int rounds = -1;
+
+    double resourceImmuneProportion = Success.RESOURCE_IMMUNE_PROPORTION;
     
     for ( String parameter : parameters.split(" ") ) {
       
@@ -256,6 +258,10 @@ public class OutputManager {
         
         rounds = Integer.parseInt(keyAndValue[1].replace("}", ""));
         
+      } else if ( keyAndValue[0].replace("{", "").equals("ResourceImmuneProportion") ) {
+
+        resourceImmuneProportion = Double.parseDouble(keyAndValue[1].replace("}", ""));
+
       }
       
     }
@@ -316,6 +322,8 @@ public class OutputManager {
                 hiderRecords.get(hiderRecords.size() - 1 ).setTopology(topology);
                 
                 hiderRecords.get(hiderRecords.size() - 1 ).setRounds(rounds);
+
+                hiderRecords.get(hiderRecords.size() - 1 ).setResourceImmuneProportion(resourceImmuneProportion);                
                 
                 hiderRecords.get(hiderRecords.size() - 1 ).setParameters(parameters);
                 
@@ -340,6 +348,8 @@ public class OutputManager {
                 hiderRecords.get(hiderRecords.size() - 1 ).setTopology(topology);
                 
                 hiderRecords.get(hiderRecords.size() - 1 ).setRounds(rounds);
+
+                hiderRecords.get(hiderRecords.size() - 1 ).setResourceImmuneProportion(resourceImmuneProportion);
                 
                 hiderRecords.get(hiderRecords.size() - 1 ).setParameters(parameters);
                 
@@ -371,6 +381,8 @@ public class OutputManager {
                 record.getSeeker("MixedSeekerStrats").setTopology(topology);
                 
                 record.getSeeker("MixedSeekerStrats").setRounds(rounds);
+
+                record.getSeeker("MixedSeekerStrats").setResourceImmuneProportion(resourceImmuneProportion);
                 
                 record.getSeeker("MixedSeekerStrats").setDatafile(path);
                 
@@ -396,7 +408,9 @@ public class OutputManager {
                 record.getSeeker(word).setTopology(topology);
                 
                 record.getSeeker(word).setRounds(rounds);
-                
+
+                record.getSeeker(word).setResourceImmuneProportion(resourceImmuneProportion);
+
                 record.getSeeker(word).setDatafile(path);
                 
               }
@@ -792,7 +806,7 @@ public class OutputManager {
         e.printStackTrace();
       }
 
-      double decrement = String.join(",", Arrays.stream(seekerClass.getInterfaces()).map(i -> i.getName()).toArray(String[]::new)).contains("ResourceImmune") && Success.LEVERAGE_IMMUNITY(traverser.getTraverser()) ? Success.RESOURCE_IMMUNE_PROPORTION : 1;
+      double decrement = String.join(",", Arrays.stream(seekerClass.getInterfaces()).map(i -> i.getName()).toArray(String[]::new)).contains("ResourceImmune") && Success.LEVERAGE_IMMUNITY(traverser.getTraverser()) ? (1 - traverser.getResourceImmuneProportion()) : 1;
 
       double payoff = -1 + traverser.getAttributeToGameAverage(Metric.SUCCESS.getText());
       payoff = decrement * payoff;

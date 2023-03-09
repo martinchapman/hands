@@ -85,6 +85,20 @@ public class GraphController<V , E> {
     
   }
   
+   /**
+  * 
+  */
+  private double baseGasProportion;
+  
+  /**
+  * @return
+  */
+  public double getBaseGraphProportion() {
+    
+    return baseGasProportion;
+    
+  }
+  
   /* (non-Javadoc)
   * @see java.lang.Object#toString()
   */
@@ -97,13 +111,15 @@ public class GraphController<V , E> {
   /**
   * @param graph
   */
-  public GraphController(String topology, int numberOfVertices, int numberOfHideLocations, String fixedOrUpperBound, double fixedOrUpperValue, int edgeTraversalDecrement) {
+  public GraphController(String topology, int numberOfVertices, int numberOfHideLocations, String fixedOrUpperBound, double fixedOrUpperValue, int edgeTraversalDecrement, double baseGasProportion) {
     
     this.fixedOrUpperValue = fixedOrUpperValue;
     
     this.fixedOrUpperBound = fixedOrUpperBound;
     
     this.edgeTraversalValue = edgeTraversalDecrement;
+
+    this.baseGasProportion = baseGasProportion;
     
     this.numberOfHideLocations = numberOfHideLocations;
     
@@ -116,6 +132,8 @@ public class GraphController<V , E> {
     graph = new HiddenObjectGraph<StringVertex, StringEdge>(StringEdge.class);
     
     graph.setEdgeTraversalDecrement(edgeTraversalDecrement);
+    
+    graph.setBaseGraphProportion(baseGasProportion);
     
     generateGraph(topology, numberOfVertices);
     
