@@ -1646,13 +1646,14 @@ public class Main {
     */
     public static void main(String[] args) {
       
+      System.setProperty("jdk.internal.FileHandlerLogging.maxLocks", Integer.MAX_VALUE + "");
       Logger logger = Logger.getLogger(Main.class.toString());  
       FileHandler fh;  
       
       try {  
         
         // This block configure the logger with handler and formatter  
-        fh = new FileHandler(Utils.FILEPREFIX + "exceptions.log", true);  
+        fh = new FileHandler(Utils.FILEPREFIX + "log/exceptions.log", true);  
         logger.addHandler(fh);
         SimpleFormatter formatter = new SimpleFormatter();  
         fh.setFormatter(formatter);  
