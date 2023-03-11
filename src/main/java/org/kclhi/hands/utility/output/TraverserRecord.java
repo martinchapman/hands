@@ -195,7 +195,7 @@ public class TraverserRecord implements Comparable<TraverserRecord>, Serializabl
   /**
   * 
   */
-  private String datafile;
+  private String datafile = "";
   
   /**
   * @param datafile
