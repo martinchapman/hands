@@ -1,6 +1,8 @@
 package org.kclhi.hands.utility.output;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,6 +19,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
+import java.util.Properties;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
@@ -32,6 +35,8 @@ import org.kclhi.hands.utility.output.gnuplot.GNUBarGraph;
 import org.kclhi.hands.utility.output.gnuplot.GNUGraph;
 import org.kclhi.hands.utility.output.gnuplot.GNULineGraph;
 import org.kclhi.hands.utility.output.gnuplot.GraphType;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
 * @author Martin
@@ -86,7 +91,12 @@ public class OutputManager {
   * 
   */
   private String dataInput;
-  
+
+  /*
+   * 
+   */
+  private JSONObject plugin = null;
+
   /**
   * 
   */
@@ -97,6 +107,16 @@ public class OutputManager {
     this.recursiveSub = recursiveSub;
     
     cache = new ArrayList<ArrayList<HiderRecord>>();
+
+    Properties config = new Properties();
+    try (FileInputStream configInputStream = new FileInputStream("output/config.config")) {
+      config.load(configInputStream);
+    } catch (FileNotFoundException ex) {
+    } catch (IOException ex) {}
+
+    if(config.getProperty("app.plugin") != null) {
+      plugin = new JSONObject(String.join("\n", Utils.readFromFile(System.getProperty("user.dir") + "/plugins/" + config.getProperty("app.plugin") + ".json")));
+    }
     
   }
   
@@ -1257,18 +1277,37 @@ public class OutputManager {
         
         Utils.talk(this.toString(), "Adding bar: " + storedTraverserAndData.getValue() + " " + storedTraverserAndData.getKey());
         
-        ((GNUBarGraph) graph).addBars(storedTraverserAndData.getValue(), storedTraverserAndData.getKey(), traverserToSignificanceClass);
+        String traverserName = storedTraverserAndData.getKey();
+        try {
+          traverserName = plugin == null ? storedTraverserAndData.getKey() : plugin.getJSONObject(storedTraverserAndData.getKey().startsWith("h") ? "hiders" : "seekers").getString(storedTraverserAndData.getKey());
+        } catch(JSONException e) {
+          System.out.println("WARN: Plugin file incomplete: " + e.getMessage());
+        }
+
+        for( Entry<TraverserRecord, Double> matchedTraverserAndData : storedTraverserAndData.getValue() ) {
+          
+          try {
+            matchedTraverserAndData.getKey().setTraverser(plugin == null ? matchedTraverserAndData.getKey().getTraverser() : plugin.getJSONObject(matchedTraverserAndData.getKey().getTraverser().startsWith("h") ? "hiders" : "seekers").getString(matchedTraverserAndData.getKey().getTraverser()));
+          } catch(JSONException e) {
+            System.out.println("WARN: Plugin file incomplete: " + e.getMessage());
+          }
+        
+        }
+
+        ((GNUBarGraph) graph).addBars(storedTraverserAndData.getValue(), traverserName, traverserToSignificanceClass);
         
       }
-      
-      xLabel = "Strategy";
+
+      xLabel = plugin == null ? xLabel : plugin.getJSONObject("graph").getJSONObject("bar").getString("xLabel");
       
     }
   
     graph.styleGraph();
   
     boolean increaseKAndN = false;
-  
+    
+    yLabel = plugin == null ? yLabel : plugin.getJSONObject("graph").getJSONObject("bar").getString("yLabel");
+    
     if ( graphType.equals("LineOne") ) {
       
       // ~MDC Assumes all graphs that start at one are showing K:N. For our purposes, this is true.
