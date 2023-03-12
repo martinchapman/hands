@@ -808,7 +808,7 @@ public class OutputManager {
 
       double decrement = String.join(",", Arrays.stream(seekerClass.getInterfaces()).map(i -> i.getName()).toArray(String[]::new)).contains("ResourceImmune") && Success.LEVERAGE_IMMUNITY(traverser.getTraverser()) ? (1 - traverser.getResourceImmuneProportion()) : 1;
 
-      double payoff = -1 + traverser.getAttributeToGameAverage(Metric.SUCCESS.getText());
+      double payoff = traverser.getAttributeToGameAverage(Metric.SUCCESS.getText());
       payoff = decrement * payoff;
 
       Utils.talk(toString(), traverser + " payoff: " + payoff);
