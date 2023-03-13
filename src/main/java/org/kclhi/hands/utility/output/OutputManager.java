@@ -264,7 +264,7 @@ public class OutputManager {
     
     int rounds = -1;
 
-    double resourceImmuneProportion = Success.RESOURCE_IMMUNE_PROPORTION;
+    double additionalResourceImmunity = 0.0;
     
     for ( String parameter : parameters.split(" ") ) {
       
@@ -278,9 +278,9 @@ public class OutputManager {
         
         rounds = Integer.parseInt(keyAndValue[1].replace("}", ""));
         
-      } else if ( keyAndValue[0].replace("{", "").equals("ResourceImmuneProportion") ) {
+      } else if ( keyAndValue[0].replace("{", "").equals("AdditionalResourceImmunity") ) {
 
-        resourceImmuneProportion = Double.parseDouble(keyAndValue[1].replace("}", ""));
+        additionalResourceImmunity = Double.parseDouble(keyAndValue[1].replace("}", ""));
 
       }
       
@@ -343,7 +343,7 @@ public class OutputManager {
                 
                 hiderRecords.get(hiderRecords.size() - 1 ).setRounds(rounds);
 
-                hiderRecords.get(hiderRecords.size() - 1 ).setResourceImmuneProportion(resourceImmuneProportion);                
+                hiderRecords.get(hiderRecords.size() - 1 ).setAdditionalResourceImmunity(additionalResourceImmunity);                
                 
                 hiderRecords.get(hiderRecords.size() - 1 ).setParameters(parameters);
                 
@@ -369,7 +369,7 @@ public class OutputManager {
                 
                 hiderRecords.get(hiderRecords.size() - 1 ).setRounds(rounds);
 
-                hiderRecords.get(hiderRecords.size() - 1 ).setResourceImmuneProportion(resourceImmuneProportion);
+                hiderRecords.get(hiderRecords.size() - 1 ).setAdditionalResourceImmunity(additionalResourceImmunity);
                 
                 hiderRecords.get(hiderRecords.size() - 1 ).setParameters(parameters);
                 
@@ -402,7 +402,7 @@ public class OutputManager {
                 
                 record.getSeeker("MixedSeekerStrats").setRounds(rounds);
 
-                record.getSeeker("MixedSeekerStrats").setResourceImmuneProportion(resourceImmuneProportion);
+                record.getSeeker("MixedSeekerStrats").setAdditionalResourceImmunity(additionalResourceImmunity);
                 
                 record.getSeeker("MixedSeekerStrats").setDatafile(path);
                 
@@ -429,7 +429,7 @@ public class OutputManager {
                 
                 record.getSeeker(word).setRounds(rounds);
 
-                record.getSeeker(word).setResourceImmuneProportion(resourceImmuneProportion);
+                record.getSeeker(word).setAdditionalResourceImmunity(additionalResourceImmunity);
 
                 record.getSeeker(word).setDatafile(path);
                 
@@ -826,14 +826,36 @@ public class OutputManager {
         e.printStackTrace();
       }
 
-      double decrement = String.join(",", Arrays.stream(seekerClass.getInterfaces()).map(i -> i.getName()).toArray(String[]::new)).contains("ResourceImmune") && Success.LEVERAGE_IMMUNITY(traverser.getTraverser()) ? (1 - traverser.getResourceImmuneProportion()) : 1;
+      String seekerClassInterfaces = String.join(",", Arrays.stream(seekerClass.getInterfaces()).map(i -> i.getName()).toArray(String[]::new));
 
-      double payoff = traverser.getAttributeToGameAverage(Metric.SUCCESS.getText());
+      // Traversers are, by default, affected by unsuccessful games to a degree reflected by BASE_NON_RESOURCE_IMMUNITY. 
+      // This immunity may be improved by additional game-wide traverser immunity, subject to behaviour. 
+      // ResourceImmune traversers are less affected, to a degree reflected by the BASE_RESOURCE_IMMUNITY decrement.
+      double decrement = 
+        seekerClassInterfaces.contains("ResourceImmune") 
+          ? 
+            1 - Success.BASE_RESOURCE_IMMUNITY 
+          : 
+            1 - Math.min( Success.BASE_NON_RESOURCE_IMMUNITY + 
+              ( seekerClassInterfaces.contains("VariableImmune") 
+                ? 
+                  ( Success.LEVERAGE_IMMUNITY(traverser.getTraverser()) 
+                    ? 
+                      ( traverser.getAdditionalResourceImmunity() * Success.BASE_NON_RESOURCE_IMMUNITY ) 
+                    : 
+                      0 ) 
+                : 
+                  ( traverser.getAdditionalResourceImmunity() * Success.BASE_NON_RESOURCE_IMMUNITY ) 
+              )
+            , 
+            Success.BASE_RESOURCE_IMMUNITY);
+
+      double payoff = -1 + traverser.getAttributeToGameAverage(Metric.SUCCESS.getText());
       payoff = decrement * payoff;
 
       Utils.talk(toString(), traverser + " payoff: " + payoff);
 
-      return new AbstractMap.SimpleEntry<TraverserRecord, Double>(traverser, payoff);
+      return new AbstractMap.SimpleEntry<TraverserRecord, Double>(traverser, 1 + payoff);
       
     } else {
 
