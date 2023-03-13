@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.Scanner;
 
@@ -2297,11 +2298,14 @@ public class Runner extends JFrame {
         // Collect list of simulations
         simulations = Utils.readFromFile(Utils.FILEPREFIX + SIMULATION_SCHEDULE);
         
+        simulations = simulations.stream().filter(simulation->!simulation.startsWith("#")).collect(Collectors
+        .toCollection(ArrayList::new));
+
         for (String simulation : simulations) { 
+
+            queueListModel.addElement(simulation);
           
-          queueListModel.addElement(simulation);
-          
-          startQueue.setEnabled(true);
+            startQueue.setEnabled(true);
           
         }
         
@@ -2359,6 +2363,9 @@ public class Runner extends JFrame {
                 Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + SIMULATION_SCHEDULE, true), Arrays.toString(getUISettings()).substring(1, Arrays.toString(getUISettings()).length() - 1) + "\n");
                 
                 simulations = Utils.readFromFile(Utils.FILEPREFIX + SIMULATION_SCHEDULE);
+
+                simulations.stream().filter(simulation->!simulation.startsWith("#")).collect(Collectors
+                .toCollection(ArrayList::new));
                 
               } catch (IOException e1) {
                 
