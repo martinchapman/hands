@@ -1,0 +1,30 @@
+{
+    "graph": {
+        "bar": {
+            "xLabel": "",
+            "yLabel": ""
+        }
+    },
+    "hiders" :{
+        "hiderName": ""
+    },
+    "seekers": {
+        "seekerName": ""
+    },
+    "baseline": {
+        "_comment": "Allows for payoff to be contextualised by real data",
+        "environment": "",
+        "_comment_environment": "The environment (hider) in which the baseline data is taken",
+        "graph": {
+            "bar": {
+                "yLabel": ""
+            }
+        },
+        "seekerName": {
+            "data": 0,
+            "_comment_data": "Where the baseline data was drawn from",
+            "payoff": 0,
+            "_comment_payoff": "Details of the HANDS simulation used to derive the baseline payoff to which the data is matched"
+        }
+    }
+}

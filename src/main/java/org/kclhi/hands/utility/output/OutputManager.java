@@ -815,7 +815,7 @@ public class OutputManager {
     
   }
   
-  public AbstractMap.SimpleEntry<TraverserRecord, Double> traverserSuccessPayoff(TraverserRecord traverser) {
+  public AbstractMap.SimpleEntry<TraverserRecord, Double> traverserSuccessPayoff(TraverserRecord traverser, boolean useBaseline) {
 
     if ( !(traverser instanceof HiderRecord) ) {
       
@@ -851,11 +851,24 @@ public class OutputManager {
             Success.BASE_RESOURCE_IMMUNITY);
 
       double payoff = -1 + traverser.getAttributeToGameAverage(Metric.SUCCESS.getText());
-      payoff = decrement * payoff;
+      payoff = 1 + (decrement * payoff);
+
+      if(useBaseline) {
+        JSONObject baseline = plugin.getJSONObject("baseline");
+        // We are graphing the baseline, so just show the baseline data
+        if(traverser.getOpponents().contains(baseline.getString("environment").toString())) {
+          payoff = baseline.getJSONObject(traverser.getTraverser()).getInt("data");
+        // Otherwise, use change from baseline payoff to increase or decrease the baseline data
+        } else if(baseline.has(traverser.getTraverser())) {
+          JSONObject baselineTraverser = baseline.getJSONObject(traverser.getTraverser());
+          double change = (payoff - baselineTraverser.getDouble("payoff")) / baselineTraverser.getDouble("payoff");
+          payoff = baseline.getJSONObject(traverser.getTraverser()).getInt("data") + (change * baseline.getJSONObject(traverser.getTraverser()).getInt("data"));
+        }
+      }
 
       Utils.talk(toString(), traverser + " payoff: " + payoff);
 
-      return new AbstractMap.SimpleEntry<TraverserRecord, Double>(traverser, 1 + payoff);
+      return new AbstractMap.SimpleEntry<TraverserRecord, Double>(traverser, payoff);
       
     } else {
 
@@ -1213,9 +1226,13 @@ public class OutputManager {
           
         }
         
-        if ( yLabel.contains("Success Payoff") ) {
+        if ( yLabel.contains("Baseline Success Payoff") ) {
           
-          traverserAndData.add(traverserSuccessPayoff(traverser));
+          traverserAndData.add(traverserSuccessPayoff(traverser, true));
+        
+        } else if ( yLabel.contains("Success Payoff") ) {
+          
+          traverserAndData.add(traverserSuccessPayoff(traverser, false));
             
         } else if ( yLabel.contains("Payoff") ) {
           
@@ -1328,7 +1345,7 @@ public class OutputManager {
   
     boolean increaseKAndN = false;
     
-    yLabel = plugin == null ? yLabel : plugin.getJSONObject("graph").getJSONObject("bar").getString("yLabel");
+    yLabel = plugin == null ? yLabel : yLabel.contains("Baseline") ? plugin.getJSONObject("baseline").getJSONObject("graph").getJSONObject("bar").getString("yLabel") : plugin.getJSONObject("graph").getJSONObject("bar").getString("yLabel");
     
     if ( graphType.equals("LineOne") ) {
       
