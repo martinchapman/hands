@@ -1,7 +1,6 @@
 package org.kclhi.hands.seeker.singleshot.random;
 
 import org.kclhi.hands.Gas.LowGasGraphTraverser;
-import org.kclhi.hands.Success.ResourceImmuneTraverser;
 import org.kclhi.hands.Success.VariableImmuneTraverser;
 import org.kclhi.hands.graph.GraphController;
 import org.kclhi.hands.graph.StringEdge;

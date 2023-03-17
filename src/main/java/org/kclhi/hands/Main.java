@@ -79,7 +79,13 @@ import org.kclhi.hands.seeker.repeatgame.probability.VariableNodesHighProbabilit
 import org.kclhi.hands.seeker.repeatgame.probability.adaptable.HighProbabilityAdaptable;
 import org.kclhi.hands.seeker.repeatgame.probability.adaptable.InverseHighProbabilityAdaptable;
 import org.kclhi.hands.seeker.singleshot.adaptable.MaxDistanceAdaptable;
+import org.kclhi.hands.seeker.singleshot.adaptable.MaxDistanceAdaptableHighGas;
+import org.kclhi.hands.seeker.singleshot.adaptable.MaxDistanceAdaptableLowGas;
+import org.kclhi.hands.seeker.singleshot.adaptable.MaxDistanceAdaptableMediumGas;
 import org.kclhi.hands.seeker.singleshot.adaptable.RandomWalkAdaptable;
+import org.kclhi.hands.seeker.singleshot.adaptable.RandomWalkAdaptableHighGas;
+import org.kclhi.hands.seeker.singleshot.adaptable.RandomWalkAdaptableLowGas;
+import org.kclhi.hands.seeker.singleshot.adaptable.RandomWalkAdaptableMediumGas;
 import org.kclhi.hands.seeker.singleshot.cost.Greedy;
 import org.kclhi.hands.seeker.singleshot.coverage.BacktrackGreedy;
 import org.kclhi.hands.seeker.singleshot.coverage.BacktrackPath;
@@ -91,6 +97,9 @@ import org.kclhi.hands.seeker.singleshot.coverage.DepthFirstSearchMechanism;
 import org.kclhi.hands.seeker.singleshot.coverage.RandomTarry;
 import org.kclhi.hands.seeker.singleshot.coverage.VariableBacktrackPath;
 import org.kclhi.hands.seeker.singleshot.preference.LinkedPath;
+import org.kclhi.hands.seeker.singleshot.preference.MaxDistanceHighGas;
+import org.kclhi.hands.seeker.singleshot.preference.MaxDistanceLowGas;
+import org.kclhi.hands.seeker.singleshot.preference.MaxDistanceMediumGas;
 import org.kclhi.hands.seeker.singleshot.preference.MostConnectedFirst;
 import org.kclhi.hands.seeker.singleshot.random.FixedStartRandomWalk;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalk;
@@ -950,31 +959,11 @@ public class Main {
     
     for( Pair<String, String> seekerType : Utils.stringToArray(agentList, "(\\[([0-9a-zA-Z]+),([0-9]+)\\])") ) {
       
-      for( int seekerCount = 0; seekerCount < Integer.parseInt(seekerType.getElement1()); seekerCount++ ) {
+      for( int seekerCount = 0; seekerCount <= Integer.parseInt(seekerType.getElement1()); seekerCount++ ) {
 
         String seekerName = seekerType.getElement0(); 
 
         // Single-shot:
-        
-        if (seekerName.contains("RandomWalk")) {
-          
-          allSeekingAgents.add(
-            seekerName.contains("HighGasVariableImmune") ? new RandomWalkHighGasVariableImmune(graphController) :
-            seekerName.contains("HighGasResourceImmune") ? new RandomWalkHighGasResourceImmune(graphController) :
-            seekerName.contains("HighGasVariableGas") ? new RandomWalkHighGasVariableGas(graphController) :  
-            seekerName.contains("HighGas") ? new RandomWalkHighGas(graphController) : 
-            seekerName.contains("MediumGasVariableImmune") ? new RandomWalkMediumGasVariableImmune(graphController) :
-            seekerName.contains("MediumGasResourceImmune") ? new RandomWalkMediumGasResourceImmune(graphController) :
-            seekerName.contains("MediumGasVariableGas") ? new RandomWalkMediumGasVariableGas(graphController) :
-            seekerName.contains("MediumGas") ? new RandomWalkMediumGas(graphController) :
-            seekerName.contains("LowGasVariableImmune") ? new RandomWalkLowGasVariableImmune(graphController) :
-            seekerName.contains("LowGasResourceImmune") ? new RandomWalkLowGasResourceImmune(graphController) : 
-            seekerName.contains("LowGasVariableGas") ? new RandomWalkLowGasVariableGas(graphController) : 
-            seekerName.contains("LowGas") ? new RandomWalkLowGas(graphController) : 
-            new RandomWalk(graphController)
-          );
-          
-        }
         
         if (seekerName.equals("SelfAvoidingRandomWalk")) {
           
@@ -1200,11 +1189,21 @@ public class Main {
           
           double leverageMaxDistanceProbability = Utils.getPlugin().getJSONObject("seekers").getJSONObject("variablesByType").getJSONObject("behaviour").getJSONObject("MetaRandom").getDouble("leverageProbability");
 
-          strategyPortfolioRandomSelection.add(new Pair<AdaptiveSeeker, Double>(new MaxDistanceAdaptable(graphController, numberOfHideLocations), leverageMaxDistanceProbability));
+          strategyPortfolioRandomSelection.add(new Pair<AdaptiveSeeker, Double>(
+            seekerName.contains("MetaRandomHighGas") ? new MaxDistanceAdaptableHighGas(graphController) :
+            seekerName.contains("MetaRandomMediumGas") ? new MaxDistanceAdaptableMediumGas(graphController) :
+            seekerName.contains("MetaRandomLowGas") ? new MaxDistanceAdaptableLowGas(graphController) :
+            new MaxDistanceAdaptable(graphController, 1.0), 
+          leverageMaxDistanceProbability));
 
-          strategyPortfolioRandomSelection.add(new Pair<AdaptiveSeeker, Double>(new RandomWalkAdaptable(graphController), 1 - leverageMaxDistanceProbability));
+          strategyPortfolioRandomSelection.add(new Pair<AdaptiveSeeker, Double>(
+            seekerName.contains("MetaRandomHighGas") ? new RandomWalkAdaptableHighGas(graphController) :
+            seekerName.contains("MetaRandomMediumGas") ? new RandomWalkAdaptableMediumGas(graphController) :
+            seekerName.contains("MetaRandomLowGas") ? new RandomWalkAdaptableLowGas(graphController) :
+            new RandomWalkAdaptable(graphController), 
+          1 - leverageMaxDistanceProbability));
           
-          allSeekingAgents.add(new AdaptiveSeekingAgent<AdaptiveSeeker>(graphController, "MetaRandom", strategyPortfolioRandomSelection, totalRounds, 1, false) {
+          allSeekingAgents.add(new AdaptiveSeekingAgent<AdaptiveSeeker>(graphController, seekerName, strategyPortfolioRandomSelection, totalRounds, 1, false) {
             
             /* 
             * (non-Javadoc)
@@ -1225,6 +1224,37 @@ public class Main {
           lastAddedSeeker.label(seekerCount);
           // ~MDC 31/01 Our duplicate seeker won't have been registered initially as the name will have matched, so re-register
           graphController.registerTraversingAgent(lastAddedSeeker.getResponsibleAgent());
+        }
+
+        if (seekerName.contains("RandomWalk")) {
+          
+          allSeekingAgents.add(
+            seekerName.contains("HighGasVariableImmune") ? new RandomWalkHighGasVariableImmune(graphController) :
+            seekerName.contains("HighGasResourceImmune") ? new RandomWalkHighGasResourceImmune(graphController) :
+            seekerName.contains("HighGasVariableGas") ? new RandomWalkHighGasVariableGas(graphController) :  
+            seekerName.contains("HighGas") ? new RandomWalkHighGas(graphController) : 
+            seekerName.contains("MediumGasVariableImmune") ? new RandomWalkMediumGasVariableImmune(graphController) :
+            seekerName.contains("MediumGasResourceImmune") ? new RandomWalkMediumGasResourceImmune(graphController) :
+            seekerName.contains("MediumGasVariableGas") ? new RandomWalkMediumGasVariableGas(graphController) :
+            seekerName.contains("MediumGas") ? new RandomWalkMediumGas(graphController) :
+            seekerName.contains("LowGasVariableImmune") ? new RandomWalkLowGasVariableImmune(graphController) :
+            seekerName.contains("LowGasResourceImmune") ? new RandomWalkLowGasResourceImmune(graphController) : 
+            seekerName.contains("LowGasVariableGas") ? new RandomWalkLowGasVariableGas(graphController) : 
+            seekerName.contains("LowGas") ? new RandomWalkLowGas(graphController) : 
+            new RandomWalk(graphController)
+          );
+          
+        }
+
+        if (seekerName.contains("MaxDistance")) {
+
+          allSeekingAgents.add(
+            seekerName.contains("HighGas") ? new MaxDistanceHighGas(graphController) :
+            seekerName.contains("MediumGas") ? new MaxDistanceMediumGas(graphController) :
+            seekerName.contains("LowGas") ? new MaxDistanceLowGas(graphController) :
+            new org.kclhi.hands.seeker.singleshot.preference.MaxDistance(graphController, "MaxDistanceFirst", 1.0)
+          );
+
         }
 
       }

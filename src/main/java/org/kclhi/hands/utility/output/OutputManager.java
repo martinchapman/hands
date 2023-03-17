@@ -1,8 +1,6 @@
 package org.kclhi.hands.utility.output;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,7 +17,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
-import java.util.Properties;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
@@ -826,35 +823,45 @@ public class OutputManager {
       double decrement = 
         seekerClassInterfaces.contains("ResourceImmune") 
           ? 
+            // Lower decrement is better, but higher base immunities (resource immune and other traverers) is better, so subtract immunities from 1
             1 - Success.BASE_RESOURCE_IMMUNITY 
           : 
             1 - Math.min( Success.BASE_NON_RESOURCE_IMMUNITY + 
+              // Aim to increase immunity via additional resource immunity in environment
               ( seekerClassInterfaces.contains("VariableImmune") 
                 ? 
                   ( Success.LEVERAGE_IMMUNITY(traverser.getTraverser()) 
                     ? 
-                      ( traverser.getAdditionalResourceImmunity() * Success.BASE_NON_RESOURCE_IMMUNITY ) 
+                      ( Math.max( traverser.getAdditionalResourceImmunity(), traverser.getAdditionalResourceImmunity() * Success.BASE_NON_RESOURCE_IMMUNITY ) )
                     : 
                       0 ) 
                 : 
-                  ( traverser.getAdditionalResourceImmunity() * Success.BASE_NON_RESOURCE_IMMUNITY ) 
+                  // Interventions aim to increase immunity of non-resource immune traversers by a proportion of their existing immunity
+                  // If base immunity of non-immune traversers is zero, this will have no effect, so just use the additional immunity
+                  ( Math.max( traverser.getAdditionalResourceImmunity(), traverser.getAdditionalResourceImmunity() * Success.BASE_NON_RESOURCE_IMMUNITY ) ) 
               )
             , 
             Success.BASE_RESOURCE_IMMUNITY);
 
-      double payoff = -1 + traverser.getAttributeToGameAverage(Metric.SUCCESS.getText());
-      payoff = 1 + (decrement * payoff);
+      double successfulGames = traverser.getAttributeToGameAverage(Metric.SUCCESS.getText());
+      double unsuccessfulGames = 1 - successfulGames;
+      // Extent of seeker (negative) payoff is determined by number of unsuccessful games
+      double payoff = -1 * unsuccessfulGames;
+      // As such, a lower decrement is better for payoff (moves it closer to zero)
+      payoff = decrement * payoff;
+      // Put on positive scale for graph
+      payoff = 1 + payoff;
 
       if(useBaseline) {
         JSONObject baseline = plugin.getJSONObject("baseline");
         // We are graphing the baseline, so just show the baseline data
         if(traverser.getOpponents().contains(baseline.getString("environment").toString())) {
-          payoff = baseline.getJSONObject(traverser.getTraverser()).getInt("data");
+          if(baseline.has(traverser.getTraverser())) payoff = baseline.getJSONObject(traverser.getTraverser()).getInt("data");
         // Otherwise, use change from baseline payoff to increase or decrease the baseline data
         } else if(baseline.has(traverser.getTraverser())) {
           JSONObject baselineTraverser = baseline.getJSONObject(traverser.getTraverser());
           double change = (payoff - baselineTraverser.getDouble("payoff")) / baselineTraverser.getDouble("payoff");
-          payoff = baseline.getJSONObject(traverser.getTraverser()).getInt("data") + (change * baseline.getJSONObject(traverser.getTraverser()).getInt("data"));
+          if(baseline.has(traverser.getTraverser())) payoff = baseline.getJSONObject(traverser.getTraverser()).getInt("data") + (change * baseline.getJSONObject(traverser.getTraverser()).getInt("data"));
         }
       }
 

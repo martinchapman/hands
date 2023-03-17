@@ -16,6 +16,10 @@ public class MaxDistanceAdaptable extends MaxDistance implements AdaptiveSeeker 
         super(graphController, graphPortion);
     }
 
+    public MaxDistanceAdaptable(GraphController<StringVertex, StringEdge> graphController, String name, double graphPortion) {
+        super(graphController, name, graphPortion);
+    }
+
     @Override
     public AdaptiveMeasure environmentalMeasure() {
         return new AdaptiveMeasure(0.0);

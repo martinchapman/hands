@@ -7,9 +7,10 @@ import org.kclhi.hands.utility.Utils;
 
 public class Success {
 
-  // For seekers that aren't immune from poor payoff due to failed games, what is the extent of this lack of immunity (resp. for seekers that are immune)
-  public static double BASE_NON_RESOURCE_IMMUNITY = 0.0;
-  public static double BASE_RESOURCE_IMMUNITY = 1.0;
+  // For seekers that aren't immune from poor payoff due to failed games, what is their baseline immunity (higher better; 0.0 a natural choice)
+  public static double BASE_NON_RESOURCE_IMMUNITY = 0.0; 
+  // What is the immunity of immune seekers (higher better; 1.0 a natural choice)
+  public static double BASE_RESOURCE_IMMUNITY = 1.0; 
   
   public static double DEFAULT_LEVERAGE_PROBABILITY = 0.6;
 
