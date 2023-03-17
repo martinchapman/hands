@@ -103,7 +103,7 @@ public class Utils {
     } catch (IOException ex) {}
 
     if(config.getProperty("app.plugin") != null) {
-      return new JSONObject(String.join("\n", Utils.readFromFile(System.getProperty("user.dir") + "/plugins/" + config.getProperty("app.plugin") + ".json")));
+      return new JSONObject(String.join("\n", Utils.readFromFile(System.getProperty("user.dir") + "/plugins/" + config.getProperty("app.plugin") + "/" + config.getProperty("app.plugin") + ".json")));
     }
     return null;
   }

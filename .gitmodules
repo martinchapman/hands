@@ -1,3 +1,6 @@
 [submodule "local-maven-repo"]
 	path = local-maven-repo
 	url = git@gitlab.com:martinchapman/hands-maven.git
+[submodule "plugins/winter"]
+	path = plugins/winter
+	url = git@gitlab.com:digitalmimic/winter.git
