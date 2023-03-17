@@ -95,7 +95,8 @@ import org.kclhi.hands.seeker.singleshot.preference.MostConnectedFirst;
 import org.kclhi.hands.seeker.singleshot.random.FixedStartRandomWalk;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalk;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkHighGas;
-import org.kclhi.hands.seeker.singleshot.random.RandomWalkHighGasResourceVulnerable;
+import org.kclhi.hands.seeker.singleshot.random.RandomWalkHighGasResourceImmune;
+import org.kclhi.hands.seeker.singleshot.random.RandomWalkHighGasVariableGas;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkHighGasVariableImmune;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkLowGas;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkLowGasResourceImmune;
@@ -103,6 +104,7 @@ import org.kclhi.hands.seeker.singleshot.random.RandomWalkLowGasVariableImmune;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkLowGasVariableGas;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkMediumGas;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkMediumGasResourceImmune;
+import org.kclhi.hands.seeker.singleshot.random.RandomWalkMediumGasVariableGas;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkMediumGasVariableImmune;
 import org.kclhi.hands.seeker.singleshot.random.SelfAvoidingRandomWalk;
 import org.kclhi.hands.seeker.singleshot.random.SelfAvoidingRandomWalkGreedy;
@@ -957,14 +959,17 @@ public class Main {
         if (seekerName.contains("RandomWalk")) {
           
           allSeekingAgents.add(
-            seekerName.contains("HighGasVariableImmune") ? new RandomWalkHighGasVariableImmune(graphController) :  
-            seekerName.contains("HighGasResourceImmune") ? new RandomWalkHighGasResourceVulnerable(graphController) : 
+            seekerName.contains("HighGasVariableImmune") ? new RandomWalkHighGasVariableImmune(graphController) :
+            seekerName.contains("HighGasResourceImmune") ? new RandomWalkHighGasResourceImmune(graphController) :
+            seekerName.contains("HighGasVariableGas") ? new RandomWalkHighGasVariableGas(graphController) :  
             seekerName.contains("HighGas") ? new RandomWalkHighGas(graphController) : 
             seekerName.contains("MediumGasVariableImmune") ? new RandomWalkMediumGasVariableImmune(graphController) :
             seekerName.contains("MediumGasResourceImmune") ? new RandomWalkMediumGasResourceImmune(graphController) :
+            seekerName.contains("MediumGasVariableGas") ? new RandomWalkMediumGasVariableGas(graphController) :
             seekerName.contains("MediumGas") ? new RandomWalkMediumGas(graphController) :
             seekerName.contains("LowGasVariableImmune") ? new RandomWalkLowGasVariableImmune(graphController) :
             seekerName.contains("LowGasResourceImmune") ? new RandomWalkLowGasResourceImmune(graphController) : 
+            seekerName.contains("LowGasVariableGas") ? new RandomWalkLowGasVariableGas(graphController) : 
             seekerName.contains("LowGas") ? new RandomWalkLowGas(graphController) : 
             new RandomWalk(graphController)
           );
@@ -1193,13 +1198,15 @@ public class Main {
           
           strategyPortfolioRandomSelection.clear();
           
-          strategyPortfolioRandomSelection.add(new Pair<AdaptiveSeeker, Double>(new RandomWalkAdaptable(graphController), 0.5));
-          
-          strategyPortfolioRandomSelection.add(new Pair<AdaptiveSeeker, Double>(new MaxDistanceAdaptable(graphController, numberOfHideLocations), 0.5));
+          double leverageMaxDistanceProbability = Utils.getPlugin().getJSONObject("seekers").getJSONObject("variablesByType").getJSONObject("behaviour").getJSONObject("MetaRandom").getDouble("leverageProbability");
+
+          strategyPortfolioRandomSelection.add(new Pair<AdaptiveSeeker, Double>(new MaxDistanceAdaptable(graphController, numberOfHideLocations), leverageMaxDistanceProbability));
+
+          strategyPortfolioRandomSelection.add(new Pair<AdaptiveSeeker, Double>(new RandomWalkAdaptable(graphController), 1 - leverageMaxDistanceProbability));
           
           allSeekingAgents.add(new AdaptiveSeekingAgent<AdaptiveSeeker>(graphController, "MetaRandom", strategyPortfolioRandomSelection, totalRounds, 1, false) {
             
-            /* ~MDC Should be moved into the actual strategy
+            /* 
             * (non-Javadoc)
             * @see HideAndSeek.AdaptiveGraphTraversingAgent#confidenceLevel()
             */

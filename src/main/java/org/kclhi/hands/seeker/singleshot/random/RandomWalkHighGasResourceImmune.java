@@ -12,9 +12,9 @@ import org.kclhi.hands.graph.StringVertex;
 * @author Martin
 *
 */
-public class RandomWalkHighGasResourceVulnerable extends RandomWalk implements HighGasGraphTraverser, ResourceImmuneTraverser {
+public class RandomWalkHighGasResourceImmune extends RandomWalk implements HighGasGraphTraverser, ResourceImmuneTraverser {
 
-  public RandomWalkHighGasResourceVulnerable(GraphController<StringVertex, StringEdge> graphController) {
+  public RandomWalkHighGasResourceImmune(GraphController<StringVertex, StringEdge> graphController) {
     super(graphController);
   }
 
@@ -22,5 +22,5 @@ public class RandomWalkHighGasResourceVulnerable extends RandomWalk implements H
   public boolean useGas() {
     return true;
   }
-   
+    
 }

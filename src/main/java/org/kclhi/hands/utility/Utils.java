@@ -37,6 +37,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Map.Entry;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
@@ -48,6 +49,7 @@ import org.jgrapht.GraphPath;
 import org.jgrapht.alg.FloydWarshallShortestPaths;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jibble.epsgraphics.EpsGraphics2D;
+import org.json.JSONObject;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -92,6 +94,19 @@ public class Utils {
   * 
   */
   public static String KEY = "trFdcuAh"; 
+  
+  public static JSONObject getPlugin() {
+    Properties config = new Properties();
+    try (FileInputStream configInputStream = new FileInputStream("output/config.config")) {
+      config.load(configInputStream);
+    } catch (FileNotFoundException ex) {
+    } catch (IOException ex) {}
+
+    if(config.getProperty("app.plugin") != null) {
+      return new JSONObject(String.join("\n", Utils.readFromFile(System.getProperty("user.dir") + "/plugins/" + config.getProperty("app.plugin") + ".json")));
+    }
+    return null;
+  }
   
   /**
   * @param cacheSizeInGB

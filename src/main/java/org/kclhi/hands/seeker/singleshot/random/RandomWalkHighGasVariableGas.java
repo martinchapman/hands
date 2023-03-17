@@ -2,7 +2,7 @@ package org.kclhi.hands.seeker.singleshot.random;
 
 import org.json.JSONObject;
 import org.kclhi.hands.Gas;
-import org.kclhi.hands.Gas.LowGasGraphTraverser;
+import org.kclhi.hands.Gas.HighGasGraphTraverser;
 import org.kclhi.hands.graph.GraphController;
 import org.kclhi.hands.graph.StringEdge;
 import org.kclhi.hands.graph.StringVertex;
@@ -14,9 +14,9 @@ import org.kclhi.hands.utility.Utils;
 * @author Martin
 *
 */
-public class RandomWalkLowGasVariableGas extends RandomWalk implements LowGasGraphTraverser {
+public class RandomWalkHighGasVariableGas extends RandomWalk implements HighGasGraphTraverser {
 
-  public RandomWalkLowGasVariableGas(GraphController<StringVertex, StringEdge> graphController) {
+  public RandomWalkHighGasVariableGas(GraphController<StringVertex, StringEdge> graphController) {
     super(graphController);
   }
 

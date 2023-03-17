@@ -108,15 +108,7 @@ public class OutputManager {
     
     cache = new ArrayList<ArrayList<HiderRecord>>();
 
-    Properties config = new Properties();
-    try (FileInputStream configInputStream = new FileInputStream("output/config.config")) {
-      config.load(configInputStream);
-    } catch (FileNotFoundException ex) {
-    } catch (IOException ex) {}
-
-    if(config.getProperty("app.plugin") != null) {
-      plugin = new JSONObject(String.join("\n", Utils.readFromFile(System.getProperty("user.dir") + "/plugins/" + config.getProperty("app.plugin") + ".json")));
-    }
+    plugin = Utils.getPlugin();
     
   }
   
@@ -1318,7 +1310,7 @@ public class OutputManager {
         
         String traverserName = storedTraverserAndData.getKey();
         try {
-          traverserName = plugin == null ? storedTraverserAndData.getKey() : plugin.getJSONObject(storedTraverserAndData.getKey().startsWith("h") ? "hiders" : "seekers").getString(storedTraverserAndData.getKey());
+          traverserName = plugin == null ? storedTraverserAndData.getKey() : plugin.getJSONObject(storedTraverserAndData.getKey().startsWith("h") ? "hiders" : "seekers").getJSONObject("mapping").getString(storedTraverserAndData.getKey());
         } catch(JSONException e) {
           System.out.println("WARN: Plugin file incomplete: " + e.getMessage());
         }
@@ -1326,7 +1318,7 @@ public class OutputManager {
         for( Entry<TraverserRecord, Double> matchedTraverserAndData : storedTraverserAndData.getValue() ) {
           
           try {
-            matchedTraverserAndData.getKey().setTraverser(plugin == null ? matchedTraverserAndData.getKey().getTraverser() : plugin.getJSONObject(matchedTraverserAndData.getKey().getTraverser().startsWith("h") ? "hiders" : "seekers").getString(matchedTraverserAndData.getKey().getTraverser()));
+            matchedTraverserAndData.getKey().setTraverser(plugin == null ? matchedTraverserAndData.getKey().getTraverser() : plugin.getJSONObject(matchedTraverserAndData.getKey().getTraverser().startsWith("h") ? "hiders" : "seekers").getJSONObject("mapping").getString(matchedTraverserAndData.getKey().getTraverser()));
           } catch(JSONException e) {
             System.out.println("WARN: Plugin file incomplete: " + e.getMessage());
           }
