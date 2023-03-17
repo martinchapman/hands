@@ -15,10 +15,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.Scanner;
+import java.util.Set;
 
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListCellRenderer;
@@ -570,7 +572,20 @@ public class Runner extends JFrame {
           
           if ( Runner.this.textBased ) System.out.println("\nWriting processed results:");
           
-          for (Entry<Integer, BTreeMap<Integer, HiderRecord>> fileHiderRecord : ((OutputManagerOffHeap)outputManager).getOffHeapCache().entrySet()) {
+          Set<Entry<Integer, BTreeMap<Integer, HiderRecord>>> fileHiderRecords = ((OutputManagerOffHeap)outputManager).getOffHeapCache().entrySet();
+
+          ArrayList<Entry<Integer, BTreeMap<Integer, HiderRecord>>> sortedFileHiderRecords = fileHiderRecords.stream().sorted(new Comparator<Entry<Integer, BTreeMap<Integer, HiderRecord>>>() {
+            @Override
+            public int compare(Entry<Integer, BTreeMap<Integer, HiderRecord>> record1, Entry<Integer, BTreeMap<Integer, HiderRecord>> record2) {
+                String[] record1AllParams = record1.getValue().get(0).getParameters().split(",");
+                String record1ConfigId = record1AllParams[record1AllParams.length - 1].replace("}]", "");
+                String[] record2AllParams = record2.getValue().get(0).getParameters().split(",");
+                String record2ConfigId = record2AllParams[record2AllParams.length - 1].replace("}]", "");
+                return Integer.parseInt(record1ConfigId) - Integer.parseInt(record2ConfigId);
+            }
+          }).collect(Collectors.toCollection(ArrayList::new));
+            
+          for (Entry<Integer, BTreeMap<Integer, HiderRecord>> fileHiderRecord : sortedFileHiderRecords) {
             
             Utils.printSystemStats();
             
@@ -2754,7 +2769,8 @@ public class Runner extends JFrame {
         "AdditionalResourceImmunity", // Additional resource immunity across all traversers (proportion of existing immunity to add (e.g. 1.0 = double))
         "BaseGasProportion", // Additional gas to provide to all gas traversers (as a proportion of total edge costs)
         "StrategyOverRounds", // Whether to double the number of round sets, in order to test strategies that evolve over all rounds
-        "GenerateOutputFiles" // Whether to log results to file
+        "GenerateOutputFiles", // Whether to log results to file
+        "ConfigId" // Unique ID for simulation configuration
       };
       
       String[] defaultParameters = { simulationParameters[1],
@@ -2772,7 +2788,8 @@ public class Runner extends JFrame {
         "0.0", // Additional resource immunity across all traversers (proportion of existing immunity to add (e.g. 1.0 = double))
         "0.0", // Additional gas to provide to all gas traversers (as a proportion of total edge costs)
         "false", // Whether to double the number of round sets, in order to test strategies that evolve over all rounds
-        (generateOutput + "")
+        (generateOutput + ""),
+        "000"
       };
       
       /***********/
