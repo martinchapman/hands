@@ -51,5 +51,3 @@ buildNumber.properties
 .vscode/
 /output
 !/output/simulationSchedule-template.txt
-plugins/
-!plugins/plugin-template.json

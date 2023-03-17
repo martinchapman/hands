@@ -95,15 +95,24 @@ public class Utils {
   */
   public static String KEY = "trFdcuAh"; 
   
-  public static JSONObject getPlugin() {
+  public static String getActivePlugin() {
     Properties config = new Properties();
     try (FileInputStream configInputStream = new FileInputStream("output/config.config")) {
       config.load(configInputStream);
     } catch (FileNotFoundException ex) {
-    } catch (IOException ex) {}
+      return null;
+    } catch (IOException ex) {
+      return null;
+    }
 
-    if(config.getProperty("app.plugin") != null) {
-      return new JSONObject(String.join("\n", Utils.readFromFile(System.getProperty("user.dir") + "/plugins/" + config.getProperty("app.plugin") + "/" + config.getProperty("app.plugin") + ".json")));
+    if(config.getProperty("app.plugin") != null) return config.getProperty("app.plugin");
+    return null;
+  }
+
+  public static JSONObject getPlugin() {
+    String activePlugin = getActivePlugin();
+    if(activePlugin != null) {
+      return new JSONObject(String.join("\n", Utils.readFromFile(System.getProperty("user.dir") + "/plugins/" + activePlugin + "/" + activePlugin + ".json")));
     }
     return null;
   }

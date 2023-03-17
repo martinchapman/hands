@@ -1488,7 +1488,7 @@ public class Runner extends JFrame {
             
             try {
               
-              writer = new FileWriter(Utils.FILEPREFIX + SIMULATION_SCHEDULE);
+              writer = new FileWriter(simulationSchedule);
               
               writer.write("");
               
@@ -2192,7 +2192,7 @@ public class Runner extends JFrame {
       /**
       * 
       */
-      private String SIMULATION_SCHEDULE = "simulationSchedule.txt";
+      private String simulationSchedule = Utils.FILEPREFIX + "simulationSchedule.txt";
       
       /**
       * 
@@ -2215,6 +2215,9 @@ public class Runner extends JFrame {
       public Runner(String[] args) {
         
         super("HANDS");
+
+        String activePlugin = Utils.getActivePlugin();
+        if(activePlugin!=null) simulationSchedule = "plugins/" + activePlugin + "/" + simulationSchedule;
         
         if ( args.length > 0 ) {
           
@@ -2246,7 +2249,7 @@ public class Runner extends JFrame {
           
           if ( argsList.contains("-ss")) {
             
-            SIMULATION_SCHEDULE = argsList.get(argsList.indexOf("-ss") + 1);
+            simulationSchedule = argsList.get(argsList.indexOf("-ss") + 1);
             
           }
           
@@ -2299,7 +2302,7 @@ public class Runner extends JFrame {
         generateGUI();
         
         // Collect list of simulations
-        simulations = Utils.readFromFile(Utils.FILEPREFIX + SIMULATION_SCHEDULE);
+        simulations = Utils.readFromFile(simulationSchedule);
         
         simulations = simulations.stream().filter(simulation->!simulation.startsWith("#")).collect(Collectors
         .toCollection(ArrayList::new));
@@ -2363,9 +2366,9 @@ public class Runner extends JFrame {
               
               try {
                 
-                Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + SIMULATION_SCHEDULE, true), Arrays.toString(getUISettings()).substring(1, Arrays.toString(getUISettings()).length() - 1) + "\n");
+                Utils.writeToFile(new FileWriter(simulationSchedule, true), Arrays.toString(getUISettings()).substring(1, Arrays.toString(getUISettings()).length() - 1) + "\n");
                 
-                simulations = Utils.readFromFile(Utils.FILEPREFIX + SIMULATION_SCHEDULE);
+                simulations = Utils.readFromFile(simulationSchedule);
 
                 simulations.stream().filter(simulation->!simulation.startsWith("#")).collect(Collectors
                 .toCollection(ArrayList::new));
