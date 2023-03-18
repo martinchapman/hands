@@ -81,11 +81,20 @@ import org.kclhi.hands.seeker.repeatgame.probability.adaptable.InverseHighProbab
 import org.kclhi.hands.seeker.singleshot.adaptable.MaxDistanceAdaptable;
 import org.kclhi.hands.seeker.singleshot.adaptable.MaxDistanceAdaptableHighGas;
 import org.kclhi.hands.seeker.singleshot.adaptable.MaxDistanceAdaptableLowGas;
+import org.kclhi.hands.seeker.singleshot.adaptable.MaxDistanceAdaptableLowerGas;
 import org.kclhi.hands.seeker.singleshot.adaptable.MaxDistanceAdaptableMediumGas;
+import org.kclhi.hands.seeker.singleshot.adaptable.MaxDistanceAdaptableUpperGas;
 import org.kclhi.hands.seeker.singleshot.adaptable.RandomWalkAdaptable;
 import org.kclhi.hands.seeker.singleshot.adaptable.RandomWalkAdaptableHighGas;
 import org.kclhi.hands.seeker.singleshot.adaptable.RandomWalkAdaptableLowGas;
+import org.kclhi.hands.seeker.singleshot.adaptable.RandomWalkAdaptableLowerGas;
 import org.kclhi.hands.seeker.singleshot.adaptable.RandomWalkAdaptableMediumGas;
+import org.kclhi.hands.seeker.singleshot.adaptable.RandomWalkAdaptableUpperGas;
+import org.kclhi.hands.seeker.singleshot.adaptable.RandomWalkStationaryChanceAdaptableHighGas;
+import org.kclhi.hands.seeker.singleshot.adaptable.RandomWalkStationaryChanceAdaptableLowGas;
+import org.kclhi.hands.seeker.singleshot.adaptable.RandomWalkStationaryChanceAdaptableLowerGas;
+import org.kclhi.hands.seeker.singleshot.adaptable.RandomWalkStationaryChanceAdaptableMediumGas;
+import org.kclhi.hands.seeker.singleshot.adaptable.RandomWalkStationaryChanceAdaptableUpperGas;
 import org.kclhi.hands.seeker.singleshot.cost.Greedy;
 import org.kclhi.hands.seeker.singleshot.coverage.BacktrackGreedy;
 import org.kclhi.hands.seeker.singleshot.coverage.BacktrackPath;
@@ -106,15 +115,34 @@ import org.kclhi.hands.seeker.singleshot.random.RandomWalk;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkHighGas;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkHighGasResourceImmune;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkHighGasVariableGas;
+import org.kclhi.hands.seeker.singleshot.random.RandomWalkStationaryChanceHighGasVariableGas;
+import org.kclhi.hands.seeker.singleshot.random.RandomWalkStationaryChanceLowGas;
+import org.kclhi.hands.seeker.singleshot.random.RandomWalkStationaryChanceLowGasVariableGas;
+import org.kclhi.hands.seeker.singleshot.random.RandomWalkStationaryChanceLowerGas;
+import org.kclhi.hands.seeker.singleshot.random.RandomWalkStationaryChanceLowerGasVariableGas;
+import org.kclhi.hands.seeker.singleshot.random.RandomWalkStationaryChanceMediumGas;
+import org.kclhi.hands.seeker.singleshot.random.RandomWalkStationaryChanceMediumGasVariableGas;
+import org.kclhi.hands.seeker.singleshot.random.RandomWalkStationaryChanceUpperGas;
+import org.kclhi.hands.seeker.singleshot.random.RandomWalkStationaryChanceUpperGasVariableGas;
+import org.kclhi.hands.seeker.singleshot.random.RandomWalkUpperGas;
+import org.kclhi.hands.seeker.singleshot.random.RandomWalkUpperGasResourceImmune;
+import org.kclhi.hands.seeker.singleshot.random.RandomWalkUpperGasVariableGas;
+import org.kclhi.hands.seeker.singleshot.random.RandomWalkUpperGasVariableImmune;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkHighGasVariableImmune;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkLowGas;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkLowGasResourceImmune;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkLowGasVariableImmune;
+import org.kclhi.hands.seeker.singleshot.random.RandomWalkLowerGas;
+import org.kclhi.hands.seeker.singleshot.random.RandomWalkLowerGasResourceImmune;
+import org.kclhi.hands.seeker.singleshot.random.RandomWalkLowerGasVariableGas;
+import org.kclhi.hands.seeker.singleshot.random.RandomWalkLowerGasVariableImmune;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkLowGasVariableGas;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkMediumGas;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkMediumGasResourceImmune;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkMediumGasVariableGas;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalkMediumGasVariableImmune;
+import org.kclhi.hands.seeker.singleshot.random.RandomWalkStationaryChance;
+import org.kclhi.hands.seeker.singleshot.random.RandomWalkStationaryChanceHighGas;
 import org.kclhi.hands.seeker.singleshot.random.SelfAvoidingRandomWalk;
 import org.kclhi.hands.seeker.singleshot.random.SelfAvoidingRandomWalkGreedy;
 
@@ -962,6 +990,7 @@ public class Main {
       for( int seekerCount = 0; seekerCount <= Integer.parseInt(seekerType.getElement1()); seekerCount++ ) {
 
         String seekerName = seekerType.getElement0(); 
+        int currentNumberOfSeekingAgents = allSeekingAgents.size();
 
         // Single-shot:
         
@@ -980,6 +1009,12 @@ public class Main {
         if (seekerName.equals("FixedStartRandomWalk")) {
           
           allSeekingAgents.add(new FixedStartRandomWalk(graphController));
+          
+        }
+
+        if (seekerName.equals("RandomWalkStationaryChance")) {
+          
+          allSeekingAgents.add(new RandomWalkStationaryChance(graphController));
           
         }
         
@@ -1183,6 +1218,46 @@ public class Main {
 
         ArrayList<Pair<AdaptiveSeeker, Double>> strategyPortfolioRandomSelection = new ArrayList<Pair<AdaptiveSeeker, Double>>();
         
+        if (seekerName.contains("MetaRandomStationaryChance")) {
+          
+          strategyPortfolioRandomSelection.clear();
+          
+          double leverageMaxDistanceProbability = Utils.getPlugin().getJSONObject("seekers").getJSONObject("variablesByType").getJSONObject("behaviour").getJSONObject("MetaRandom").getDouble("leverageProbability");
+
+          strategyPortfolioRandomSelection.add(new Pair<AdaptiveSeeker, Double>(
+            seekerName.contains("MetaRandomStationaryChanceHighGas") ? new MaxDistanceAdaptableHighGas(graphController) :
+            seekerName.contains("MetaRandomStationaryChanceMediumGas") ? new MaxDistanceAdaptableMediumGas(graphController) :
+            seekerName.contains("MetaRandomStationaryChanceLowGas") ? new MaxDistanceAdaptableLowGas(graphController) :
+            seekerName.contains("MetaRandomStationaryChanceLowerGas") ? new MaxDistanceAdaptableLowerGas(graphController) :
+            seekerName.contains("MetaRandomStationaryChanceUpperGas") ? new MaxDistanceAdaptableUpperGas(graphController) :
+            new MaxDistanceAdaptable(graphController, 1.0), 
+          leverageMaxDistanceProbability));
+
+          strategyPortfolioRandomSelection.add(new Pair<AdaptiveSeeker, Double>(
+            seekerName.contains("MetaRandomStationaryChanceHighGas") ? new RandomWalkStationaryChanceAdaptableHighGas(graphController) :
+            seekerName.contains("MetaRandomStationaryChanceMediumGas") ? new RandomWalkStationaryChanceAdaptableMediumGas(graphController) :
+            seekerName.contains("MetaRandomStationaryChanceLowGas") ? new RandomWalkStationaryChanceAdaptableLowGas(graphController) :
+            seekerName.contains("MetaRandomStationaryChanceLowerGas") ? new RandomWalkStationaryChanceAdaptableLowerGas(graphController) :
+            seekerName.contains("MetaRandomStationaryChanceUpperGas") ? new RandomWalkStationaryChanceAdaptableUpperGas(graphController) :
+            new RandomWalkAdaptable(graphController), 
+          1 - leverageMaxDistanceProbability));
+          
+          allSeekingAgents.add(new AdaptiveSeekingAgent<AdaptiveSeeker>(graphController, seekerName, strategyPortfolioRandomSelection, totalRounds, 1, false) {
+            
+            /* 
+            * (non-Javadoc)
+            * @see HideAndSeek.AdaptiveGraphTraversingAgent#confidenceLevel()
+            */
+            protected double confidenceLevel() {
+              
+              return 0;
+              
+            }
+            
+          });
+          
+        }
+
         if (seekerName.contains("MetaRandom")) {
           
           strategyPortfolioRandomSelection.clear();
@@ -1193,6 +1268,8 @@ public class Main {
             seekerName.contains("MetaRandomHighGas") ? new MaxDistanceAdaptableHighGas(graphController) :
             seekerName.contains("MetaRandomMediumGas") ? new MaxDistanceAdaptableMediumGas(graphController) :
             seekerName.contains("MetaRandomLowGas") ? new MaxDistanceAdaptableLowGas(graphController) :
+            seekerName.contains("MetaRandomLowerGas") ? new MaxDistanceAdaptableLowerGas(graphController) :
+            seekerName.contains("MetaRandomUpperGas") ? new MaxDistanceAdaptableUpperGas(graphController) :
             new MaxDistanceAdaptable(graphController, 1.0), 
           leverageMaxDistanceProbability));
 
@@ -1200,6 +1277,8 @@ public class Main {
             seekerName.contains("MetaRandomHighGas") ? new RandomWalkAdaptableHighGas(graphController) :
             seekerName.contains("MetaRandomMediumGas") ? new RandomWalkAdaptableMediumGas(graphController) :
             seekerName.contains("MetaRandomLowGas") ? new RandomWalkAdaptableLowGas(graphController) :
+            seekerName.contains("MetaRandomLowerGas") ? new RandomWalkAdaptableLowerGas(graphController) :
+            seekerName.contains("MetaRandomUpperGas") ? new RandomWalkAdaptableUpperGas(graphController) :
             new RandomWalkAdaptable(graphController), 
           1 - leverageMaxDistanceProbability));
           
@@ -1226,7 +1305,7 @@ public class Main {
           graphController.registerTraversingAgent(lastAddedSeeker.getResponsibleAgent());
         }
 
-        if (seekerName.contains("RandomWalk")) {
+        if (seekerName.contains("RandomWalk") && !seekerName.contains("StationaryChance")) {
           
           allSeekingAgents.add(
             seekerName.contains("HighGasVariableImmune") ? new RandomWalkHighGasVariableImmune(graphController) :
@@ -1241,7 +1320,33 @@ public class Main {
             seekerName.contains("LowGasResourceImmune") ? new RandomWalkLowGasResourceImmune(graphController) : 
             seekerName.contains("LowGasVariableGas") ? new RandomWalkLowGasVariableGas(graphController) : 
             seekerName.contains("LowGas") ? new RandomWalkLowGas(graphController) : 
+            seekerName.contains("UpperGasVariableImmune") ? new RandomWalkUpperGasVariableImmune(graphController) :
+            seekerName.contains("UpperGasResourceImmune") ? new RandomWalkUpperGasResourceImmune(graphController) :
+            seekerName.contains("UpperGasVariableGas") ? new RandomWalkUpperGasVariableGas(graphController) :  
+            seekerName.contains("UpperGas") ? new RandomWalkUpperGas(graphController) :
+            seekerName.contains("LowerGasVariableImmune") ? new RandomWalkLowerGasVariableImmune(graphController) :
+            seekerName.contains("LowerGasResourceImmune") ? new RandomWalkLowerGasResourceImmune(graphController) : 
+            seekerName.contains("LowerGasVariableGas") ? new RandomWalkLowerGasVariableGas(graphController) : 
+            seekerName.contains("LowerGas") ? new RandomWalkLowerGas(graphController) : 
             new RandomWalk(graphController)
+          );
+
+        }
+        
+        if (seekerName.contains("RandomWalk") && seekerName.contains("StationaryChance")) {
+
+          allSeekingAgents.add(
+            seekerName.contains("HighGasVariableGas") ? new RandomWalkStationaryChanceHighGasVariableGas(graphController) :  
+            seekerName.contains("HighGas") ? new RandomWalkStationaryChanceHighGas(graphController) : 
+            seekerName.contains("MediumGasVariableGas") ? new RandomWalkStationaryChanceMediumGasVariableGas(graphController) :
+            seekerName.contains("MediumGas") ? new RandomWalkStationaryChanceMediumGas(graphController) :
+            seekerName.contains("LowGasVariableGas") ? new RandomWalkStationaryChanceLowGasVariableGas(graphController) : 
+            seekerName.contains("LowGas") ? new RandomWalkStationaryChanceLowGas(graphController) : 
+            seekerName.contains("UpperGasVariableGas") ? new RandomWalkStationaryChanceUpperGasVariableGas(graphController) :  
+            seekerName.contains("UpperGas") ? new RandomWalkStationaryChanceUpperGas(graphController) :
+            seekerName.contains("LowerGasVariableGas") ? new RandomWalkStationaryChanceLowerGasVariableGas(graphController) : 
+            seekerName.contains("LowerGas") ? new RandomWalkStationaryChanceLowerGas(graphController) : 
+            new RandomWalkStationaryChance(graphController)
           );
           
         }
@@ -1256,6 +1361,8 @@ public class Main {
           );
 
         }
+
+        if( currentNumberOfSeekingAgents == allSeekingAgents.size() ) System.out.println("WARN: Seeker " + seekerName + " not found.");
 
       }
       

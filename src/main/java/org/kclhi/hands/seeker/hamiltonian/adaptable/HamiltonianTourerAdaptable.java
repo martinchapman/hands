@@ -1,4 +1,4 @@
-package org.kclhi.hands.seeker.hamiltonain.adaptable;
+package org.kclhi.hands.seeker.hamiltonian.adaptable;
 
 import java.util.ArrayList;
 

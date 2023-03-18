@@ -1132,7 +1132,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
       
     }
     
-    if(traverser instanceof GasGraphTraverser) traverserGas.put(traverser, (baseGasProportion * this.totalEdgeCosts(traverser)) + (traverser instanceof HighGasGraphTraverser ? Gas.getHighGasProportion() * this.totalEdgeCosts(traverser) : traverser instanceof MediumGasGraphTraverser ? Gas.getMediumGasProportion() * this.totalEdgeCosts(traverser) : Gas.getLowGasProportion() * this.totalEdgeCosts(traverser)));
+    if(traverser instanceof GasGraphTraverser) traverserGas.put(traverser, (baseGasProportion * this.totalEdgeCosts(traverser)) + (Gas.getGasProportion(traverser) * this.totalEdgeCosts(traverser)));
 
   }
   
