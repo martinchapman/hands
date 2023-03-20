@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import java.util.TreeMap;
 
 import org.kclhi.hands.Success;
@@ -856,12 +857,17 @@ public class OutputManager {
         JSONObject baseline = plugin.getJSONObject("baseline");
         // We are graphing the baseline, so just show the baseline data
         if(traverser.getOpponents().contains(baseline.getString("environment").toString())) {
-          if(baseline.has(traverser.getTraverser())) payoff = baseline.getJSONObject(traverser.getTraverser()).getInt("data");
+          if(baseline.has(traverser.getTraverser())) payoff = baseline.getJSONObject(traverser.getTraverser()).getDouble("data");
         // Otherwise, use change from baseline payoff to increase or decrease the baseline data
         } else if(baseline.has(traverser.getTraverser())) {
           JSONObject baselineTraverser = baseline.getJSONObject(traverser.getTraverser());
           double change = (payoff - baselineTraverser.getDouble("payoff")) / baselineTraverser.getDouble("payoff");
-          if(baseline.has(traverser.getTraverser())) payoff = baseline.getJSONObject(traverser.getTraverser()).getInt("data") + (change * baseline.getJSONObject(traverser.getTraverser()).getInt("data"));
+          if(baseline.has(traverser.getTraverser())) { 
+            double data = baseline.getJSONObject(traverser.getTraverser()).getDouble("data");
+            double additional = change * baseline.getJSONObject(traverser.getTraverser()).getDouble("data");
+            boolean invert = baseline.getBoolean("invert");
+            payoff = invert ? data - additional : data + additional; 
+          }
         }
       }
 
@@ -1336,7 +1342,18 @@ public class OutputManager {
         
       }
 
-      xLabel = plugin == null ? xLabel : plugin.getJSONObject("graph").getJSONObject("bar").getString("xLabel");
+      String suffix = "";
+      JSONObject xLabelGame = plugin.getJSONObject("game").getJSONObject("graph").getJSONObject("xLabel");
+      
+      // Determine if seeker present that indicates relabelling
+      ArrayList<String> pluginSeekers = Arrays.stream(JSONObject.getNames(xLabelGame.getJSONObject("seekers"))).filter(pluginSeeker -> traverserRecords.stream().filter(storedSeeker -> storedSeeker.getTraverserType().contains(pluginSeeker)).count() > 0).collect(Collectors.toCollection(ArrayList::new));
+      if(pluginSeekers.size() > 0) suffix += xLabelGame.getJSONObject("seekers").getString(pluginSeekers.get(0));
+
+      // Determine if config present that indicates relabelling
+      ArrayList<String> pluginConfigs = Arrays.stream(JSONObject.getNames(xLabelGame.getJSONObject("config"))).filter(pluginConfig -> playerRecords.stream().filter(playerRecord -> playerRecord.getParameters() != null).collect(Collectors.toList()).get(0).getParameters().contains(pluginConfig)).collect(Collectors.toCollection(ArrayList::new));
+      if(pluginConfigs.size() > 0) suffix += xLabelGame.getJSONObject("config").getString(pluginConfigs.get(0));
+
+      xLabel = plugin == null ? xLabel : plugin.getJSONObject("graph").getJSONObject("bar").getString("xLabel") + ( suffix.length() > 0 ? " (" + suffix + ")" : "" );
       
     }
   

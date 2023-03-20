@@ -108,7 +108,9 @@ import org.kclhi.hands.seeker.singleshot.coverage.VariableBacktrackPath;
 import org.kclhi.hands.seeker.singleshot.preference.LinkedPath;
 import org.kclhi.hands.seeker.singleshot.preference.MaxDistanceHighGas;
 import org.kclhi.hands.seeker.singleshot.preference.MaxDistanceLowGas;
+import org.kclhi.hands.seeker.singleshot.preference.MaxDistanceLowerGas;
 import org.kclhi.hands.seeker.singleshot.preference.MaxDistanceMediumGas;
+import org.kclhi.hands.seeker.singleshot.preference.MaxDistanceUpperGas;
 import org.kclhi.hands.seeker.singleshot.preference.MostConnectedFirst;
 import org.kclhi.hands.seeker.singleshot.random.FixedStartRandomWalk;
 import org.kclhi.hands.seeker.singleshot.random.RandomWalk;
@@ -1357,6 +1359,8 @@ public class Main {
             seekerName.contains("HighGas") ? new MaxDistanceHighGas(graphController) :
             seekerName.contains("MediumGas") ? new MaxDistanceMediumGas(graphController) :
             seekerName.contains("LowGas") ? new MaxDistanceLowGas(graphController) :
+            seekerName.contains("UpperGas") ? new MaxDistanceUpperGas(graphController) :
+            seekerName.contains("LowerGas") ? new MaxDistanceLowerGas(graphController) :
             new org.kclhi.hands.seeker.singleshot.preference.MaxDistance(graphController, "MaxDistanceFirst", 1.0)
           );
 
