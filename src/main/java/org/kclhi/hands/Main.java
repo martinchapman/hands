@@ -69,6 +69,11 @@ import org.kclhi.hands.hider.singleshot.random.RandomVariableHidePotential;
 import org.kclhi.hands.hider.singleshot.staticlocations.StaticLocations;
 import org.kclhi.hands.seeker.AdaptiveSeeker;
 import org.kclhi.hands.seeker.AdaptiveSeekingAgent;
+import org.kclhi.hands.seeker.AdaptiveSeekingAgentHighGas;
+import org.kclhi.hands.seeker.AdaptiveSeekingAgentLowGas;
+import org.kclhi.hands.seeker.AdaptiveSeekingAgentLowerGas;
+import org.kclhi.hands.seeker.AdaptiveSeekingAgentMediumGas;
+import org.kclhi.hands.seeker.AdaptiveSeekingAgentUpperGas;
 import org.kclhi.hands.seeker.Seeker;
 import org.kclhi.hands.seeker.repeatgame.preference.ApproximateLeastConnectedNodes;
 import org.kclhi.hands.seeker.repeatgame.probability.HighProbability;
@@ -1217,12 +1222,9 @@ public class Main {
         }
 
         // Random selection:
-
-        ArrayList<Pair<AdaptiveSeeker, Double>> strategyPortfolioRandomSelection = new ArrayList<Pair<AdaptiveSeeker, Double>>();
-        
         if (seekerName.contains("MetaRandomStationaryChance")) {
           
-          strategyPortfolioRandomSelection.clear();
+          ArrayList<Pair<AdaptiveSeeker, Double>> strategyPortfolioRandomSelection = new ArrayList<Pair<AdaptiveSeeker, Double>>();
           
           double leverageMaxDistanceProbability = Utils.getPlugin().getJSONObject("seekers").getJSONObject("variablesByType").getJSONObject("behaviour").getJSONObject("MetaRandom").getDouble("leverageProbability");
 
@@ -1244,25 +1246,20 @@ public class Main {
             new RandomWalkAdaptable(graphController), 
           1 - leverageMaxDistanceProbability));
           
-          allSeekingAgents.add(new AdaptiveSeekingAgent<AdaptiveSeeker>(graphController, seekerName, strategyPortfolioRandomSelection, totalRounds, 1, false) {
-            
-            /* 
-            * (non-Javadoc)
-            * @see HideAndSeek.AdaptiveGraphTraversingAgent#confidenceLevel()
-            */
-            protected double confidenceLevel() {
-              
-              return 0;
-              
-            }
-            
+          allSeekingAgents.add(
+            seekerName.contains("Lower") ? new AdaptiveSeekingAgentLowerGas<AdaptiveSeeker>(graphController, seekerName, strategyPortfolioRandomSelection, totalRounds, 1, false) :
+            seekerName.contains("Upper") ? new AdaptiveSeekingAgentUpperGas<AdaptiveSeeker>(graphController, seekerName, strategyPortfolioRandomSelection, totalRounds, 1, false) :
+            seekerName.contains("Low") ? new AdaptiveSeekingAgentLowGas<AdaptiveSeeker>(graphController, seekerName, strategyPortfolioRandomSelection, totalRounds, 1, false) :
+            seekerName.contains("Medium") ? new AdaptiveSeekingAgentMediumGas<AdaptiveSeeker>(graphController, seekerName, strategyPortfolioRandomSelection, totalRounds, 1, false) :
+            seekerName.contains("High") ? new AdaptiveSeekingAgentHighGas<AdaptiveSeeker>(graphController, seekerName, strategyPortfolioRandomSelection, totalRounds, 1, false) :
+            new AdaptiveSeekingAgent<AdaptiveSeeker>(graphController, seekerName, strategyPortfolioRandomSelection, totalRounds, 1, false) { protected double confidenceLevel() { return 0; }
           });
           
         }
 
         if (seekerName.contains("MetaRandom")) {
           
-          strategyPortfolioRandomSelection.clear();
+          ArrayList<Pair<AdaptiveSeeker, Double>> strategyPortfolioRandomSelection = new ArrayList<Pair<AdaptiveSeeker, Double>>();
           
           double leverageMaxDistanceProbability = Utils.getPlugin().getJSONObject("seekers").getJSONObject("variablesByType").getJSONObject("behaviour").getJSONObject("MetaRandom").getDouble("leverageProbability");
 
@@ -1284,27 +1281,15 @@ public class Main {
             new RandomWalkAdaptable(graphController), 
           1 - leverageMaxDistanceProbability));
           
-          allSeekingAgents.add(new AdaptiveSeekingAgent<AdaptiveSeeker>(graphController, seekerName, strategyPortfolioRandomSelection, totalRounds, 1, false) {
-            
-            /* 
-            * (non-Javadoc)
-            * @see HideAndSeek.AdaptiveGraphTraversingAgent#confidenceLevel()
-            */
-            protected double confidenceLevel() {
-              
-              return 0;
-              
-            }
-            
+          allSeekingAgents.add(
+            seekerName.contains("Lower") ? new AdaptiveSeekingAgentLowerGas<AdaptiveSeeker>(graphController, seekerName, strategyPortfolioRandomSelection, totalRounds, 1, false) :
+            seekerName.contains("Upper") ? new AdaptiveSeekingAgentUpperGas<AdaptiveSeeker>(graphController, seekerName, strategyPortfolioRandomSelection, totalRounds, 1, false) :
+            seekerName.contains("Low") ? new AdaptiveSeekingAgentLowGas<AdaptiveSeeker>(graphController, seekerName, strategyPortfolioRandomSelection, totalRounds, 1, false) :
+            seekerName.contains("Medium") ? new AdaptiveSeekingAgentMediumGas<AdaptiveSeeker>(graphController, seekerName, strategyPortfolioRandomSelection, totalRounds, 1, false) :
+            seekerName.contains("High") ? new AdaptiveSeekingAgentHighGas<AdaptiveSeeker>(graphController, seekerName, strategyPortfolioRandomSelection, totalRounds, 1, false) :
+            new AdaptiveSeekingAgent<AdaptiveSeeker>(graphController, seekerName, strategyPortfolioRandomSelection, totalRounds, 1, false) { protected double confidenceLevel() { return 0; }
           });
           
-        }
-
-        if (seekerCount > 0) {
-          Seeker lastAddedSeeker = allSeekingAgents.get(allSeekingAgents.size()-1);
-          lastAddedSeeker.label(seekerCount);
-          // ~MDC 31/01 Our duplicate seeker won't have been registered initially as the name will have matched, so re-register
-          graphController.registerTraversingAgent(lastAddedSeeker.getResponsibleAgent());
         }
 
         if (seekerName.contains("RandomWalk") && !seekerName.contains("StationaryChance")) {
@@ -1367,6 +1352,13 @@ public class Main {
         }
 
         if( currentNumberOfSeekingAgents == allSeekingAgents.size() ) System.out.println("WARN: Seeker " + seekerName + " not found.");
+
+        if (seekerCount > 0) {
+          Seeker lastAddedSeeker = allSeekingAgents.get(allSeekingAgents.size()-1);
+          lastAddedSeeker.label(seekerCount);
+          // ~MDC 31/01 Our duplicate seeker won't have been registered initially as the name will have matched, so re-register
+          graphController.registerTraversingAgent(lastAddedSeeker.getResponsibleAgent());
+        }
 
       }
       

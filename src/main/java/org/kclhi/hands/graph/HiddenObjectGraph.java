@@ -18,10 +18,10 @@ import org.kclhi.hands.utility.Utils;
 import org.kclhi.hands.Gas;
 import org.kclhi.hands.GraphTraverser;
 import org.kclhi.hands.Gas.GasGraphTraverser;
-import org.kclhi.hands.Gas.HighGasGraphTraverser;
-import org.kclhi.hands.Gas.MediumGasGraphTraverser;
 import org.kclhi.hands.hider.Hider;
+import org.kclhi.hands.seeker.AdaptiveSeekingAgent;
 import org.kclhi.hands.seeker.Seeker;
+import org.kclhi.hands.seeker.SeekingAgent;
 
 /**
 * Emphasis is put on the graph as the controller, with whom seekers and hiders
@@ -871,7 +871,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
       
       // ~MDC TEMPORARY: only decrement costs for Hiders
       // if ( !(traverser instanceof Seeker) ) {
-        
+
         // The new cost, based upon the edge that is currently being traversed
         newCost = uniqueCost * edgeTraversalDecrement;
         if(traverser instanceof GasGraphTraverser && ((GasGraphTraverser)traverser).useGas()) {
