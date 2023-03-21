@@ -245,9 +245,9 @@ public class BinomialProbability {
     
     graph.createChart("", "$\\delta$ ($K$)", "$P$");
     
-    graph.exportChartAsEPS(Utils.FILEPREFIX + "data/charts/binomial.eps");
+    graph.exportChartAsEPS(Utils.FILEPREFIX + "data/charts/figures/binomial.eps");
     
-    graph.exportChartAsTikz(Utils.FILEPREFIX + "data/charts/binomial.tex");
+    graph.exportChartAsTikz(Utils.FILEPREFIX + "data/charts/figures/binomial.tex");
     
   }
   

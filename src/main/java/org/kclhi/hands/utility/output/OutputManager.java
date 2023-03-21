@@ -868,6 +868,8 @@ public class OutputManager {
             boolean invert = baseline.getBoolean("invert");
             payoff = invert ? data - additional : data + additional; 
           }
+        } else {
+          System.out.println("WARN: Baseline requested but no baseline data available.");
         }
       }
 
@@ -1406,9 +1408,9 @@ public class OutputManager {
         
       }
       
-      File TEX = new File(Utils.FILEPREFIX + "charts/" + figureID + ".tex");
+      File TEX = new File(Utils.FILEPREFIX + "charts/figures/" + figureID + ".tex");
       
-      File EPS = new File(Utils.FILEPREFIX + "charts/" + figureID + ".eps");
+      File EPS = new File(Utils.FILEPREFIX + "charts/figures/" + figureID + ".eps");
       
       if( TEX.exists() && !TEX.isDirectory() ) {
         
@@ -1416,7 +1418,7 @@ public class OutputManager {
         
         try {
           
-          Utils.copyFile ( new File(Utils.FILEPREFIX + "charts/" + figureID + ".tex" ), new File( Utils.FILEPREFIX + "charts/" + figureID + "_copy.tex" ) );
+          Utils.copyFile ( new File(Utils.FILEPREFIX + "charts/figures/" + figureID + ".tex" ), new File( Utils.FILEPREFIX + "charts/figures/" + figureID + "_copy.tex" ) );
           
         } catch (IOException e1) {
           
@@ -1432,7 +1434,7 @@ public class OutputManager {
         
         try {
           
-          Utils.copyFile ( new File(Utils.FILEPREFIX + "charts/" + figureID + ".eps" ), new File( Utils.FILEPREFIX + "charts/" + figureID + "_copy.eps" ) );
+          Utils.copyFile ( new File(Utils.FILEPREFIX + "charts/figures/" + figureID + ".eps" ), new File( Utils.FILEPREFIX + "charts/figures/" + figureID + "_copy.eps" ) );
           
         } catch (IOException e1) {
           
@@ -1442,15 +1444,15 @@ public class OutputManager {
         
       }
       
-      graph.exportChartAsEPS(Utils.FILEPREFIX + "charts/" + figureID + ".eps");
+      graph.exportChartAsEPS(Utils.FILEPREFIX + "charts/figures/" + figureID + ".eps");
       
-      graph.exportChartAsTikz(Utils.FILEPREFIX + "charts/" + figureID + ".tex");
+      graph.exportChartAsTikz(Utils.FILEPREFIX + "charts/figures/" + figureID + ".tex");
       
       if ( !overwriting ) {
         
         try {
           
-          Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "charts/figures.bib", true), "\n @FIG{" + figureID + ", main = { " + setupCaptionString(playerRecords, traverserRecords, increaseKAndN) + " }, add = { " + title + " " + affectedFiles + " }, file = {/Users/Martin/Dropbox/workspace/SearchGames/output/charts/" + figureID + "}, source = {}}");
+          Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "charts/figures.bib", true), "\n @FIG{" + figureID + ", main = { " + setupCaptionString(playerRecords, traverserRecords, increaseKAndN) + " }, add = { " + title + " " + affectedFiles + " }, file = {/Users/Martin/Dropbox/workspace/SearchGames/output/charts/figures/" + figureID + "}, source = {}}");
           
         } catch (IOException e) {
           

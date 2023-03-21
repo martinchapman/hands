@@ -12,9 +12,8 @@ HANDS
 1. Run `git submodule init`
 2. Run `git submodule update`
 3. Create folder `output/data`
-4. Create folder `output/charts`
-5. Create folder `output/charts/tables`
-6. Create `output/simulationSchedule.txt` (template provided)
+4. Create folder `output/charts/tables` and `output/charts/figures`
+5. Create `output/simulationSchedule.txt` (template provided)
 
 * Build and Run
 

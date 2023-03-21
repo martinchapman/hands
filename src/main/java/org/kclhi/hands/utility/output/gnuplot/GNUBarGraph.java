@@ -77,6 +77,8 @@ public class GNUBarGraph extends GNUGraph {
     final int existingBars = barDatasets.size();
     
     barDatasets.add(barData);
+
+    barData.sort((Entry<TraverserRecord, Double> entryA, Entry<TraverserRecord, Double> entryB) -> entryA.getKey().getTraverser().compareTo(entryB.getKey().getTraverser()));
     
     AbstractPlot barPlot = new DataSetPlot( new DataSet() {
       

@@ -1076,7 +1076,7 @@ public class ApproximatePayoffMatrix {
     
     try {
       
-      tikzOutputWriter = new FileWriter(Utils.FILEPREFIX + "charts/" + outputPath + ".tex", true);
+      tikzOutputWriter = new FileWriter(Utils.FILEPREFIX + "charts/figures/" + outputPath + ".tex", true);
       
     } catch (IOException e) {
       
@@ -1115,7 +1115,7 @@ public class ApproximatePayoffMatrix {
       
       ArrayList<StrategyPayoff> seekerStrategies = playerToStrategies.get("Seeker");
       
-      Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "/charts/figures.bib", true), "\n @FIG{" + outputPath + ", main = {A strategic overview of the " + Utils.traverserNumberToWord(playerToStrategies.get("Hider").size()) + "hider strategies and the " + Utils.traverserNumberToWord(playerToStrategies.get("Seeker").size()) + "seeker strategies introduced in this section, on a X network. The equilibrium strategies for each player are as follows: " + captionString + "}, add = {}, file = {/Users/Martin/Dropbox/workspace/SearchGames/output/charts/" + outputPath + "}, source = {}}");
+      Utils.writeToFile(new FileWriter(Utils.FILEPREFIX + "/charts/figures.bib", true), "\n @FIG{" + outputPath + ", main = {A strategic overview of the " + Utils.traverserNumberToWord(playerToStrategies.get("Hider").size()) + "hider strategies and the " + Utils.traverserNumberToWord(playerToStrategies.get("Seeker").size()) + "seeker strategies introduced in this section, on a X network. The equilibrium strategies for each player are as follows: " + captionString + "}, add = {}, file = {/Users/Martin/Dropbox/workspace/SearchGames/output/charts/figures/" + outputPath + "}, source = {}}");
       
     } catch (IOException e) {
       

@@ -482,10 +482,11 @@ public class Runner extends JFrame {
     
     if ( seekers.isSelected() ) {
       
-      measure.addItem("Success Payoff");
-      measure.setSelectedItem("Success Payoff");
       
       measure.addItem("Baseline Success Payoff");
+      measure.setSelectedItem("Baseline Success Payoff");
+      
+      measure.addItem("Success Payoff");
 
       for ( String attribute : outputFeedbackList.getSelectedValue().getSeekerAttributes() ) {
         
@@ -833,10 +834,10 @@ public class Runner extends JFrame {
         
         measure.addItem("Payoff");
 
-        measure.addItem("Success Payoff");
-        measure.setSelectedItem("Success Payoff");
-
         measure.addItem("Baseline Success Payoff");
+        measure.setSelectedItem("Baseline Success Payoff");
+
+        measure.addItem("Success Payoff");
         
         for ( String attribute : outputFeedbackList.getSelectedValue().getSeekerAttributes() ) {
           
@@ -2207,7 +2208,7 @@ public class Runner extends JFrame {
       /**
       * 
       */
-      private String simulationSchedule = Utils.FILEPREFIX + "simulationSchedule.txt";
+      private String simulationSchedule = Utils.FILEPREFIX + "simulationSchedule-resp.txt";
       
       /**
       * 
