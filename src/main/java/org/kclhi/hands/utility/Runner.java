@@ -505,6 +505,181 @@ public class Runner extends JFrame {
     }
   }
 
+  private void generateGraph(ArrayList<HiderRecord> recordsFromList) {
+
+    // Allows for selection of multiple hiders or multiple seekers from list
+    ArrayList<TraverserRecord> selectedHiders = new ArrayList<TraverserRecord>();
+        
+    selectedSeekers = new ArrayList<TraverserRecord>();
+    
+    String title = "";
+
+    ArrayList<HiderRecord> recordsForGraph = new ArrayList<HiderRecord>();
+        
+    for ( HiderRecord record : recordsFromList ) {
+      
+      if ( record instanceof GroupedHiderRecords ) { 
+        
+        recordsForGraph.addAll(((GroupedHiderRecords)record).allHiders());
+        
+      } else {
+        
+        recordsForGraph.add(record);
+        
+      }
+      
+    }
+    
+    for ( HiderRecord hider : recordsForGraph ) {
+      
+      if (hider.toString().equals("-----")) continue;
+      
+      title += "Topology: " + hider.getTopology() + " Hider: " + hider;
+      
+      for ( TraverserRecord hidersSeeker : hider.getSeekersAndAttributes() ) {
+        
+        //if ( hidersSeekers.toString().contains("(")) hidersSeekers.setTraverser(hidersSeekers.toString().substring(0, hidersSeekers.toString().indexOf(" ")));
+        
+        hidersSeeker.setTraverser(hidersSeeker.getTraverser());
+        
+        hidersSeeker.setOpponents(hider.getTraverser());
+        
+        selectedHiders.add(hider);
+        
+        //if (selectedSeekers.contains(hidersSeekers)) {
+          
+          //selectedSeekers.get(selectedSeekers.indexOf(hidersSeekers)).integrateRecord(hidersSeekers);
+          
+        //} else {
+          
+        selectedSeekers.add(selectedSeekers.size(), hidersSeeker);
+          
+        //}
+            
+      }
+          
+    }
+        
+    ArrayList<TraverserRecord> allPlayers = new ArrayList<TraverserRecord>(selectedHiders);
+    allPlayers.addAll(selectedSeekers);
+    
+    if ( OVERWRITE_FIGURE && figureToOverwrite != null) {
+      
+      if (seekers.isSelected()) {
+        
+        if (graphTypesCombo.getSelectedItem().equals("Line")) {
+          
+          outputManager.showLineGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
+          
+        } else if (graphTypesCombo.getSelectedItem().equals("LineOne")) {
+          
+          outputManager.showLineOneGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
+          
+        } else if (graphTypesCombo.getSelectedItem().equals("Bar")) {
+          
+          outputManager.showBarGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
+          
+        } else if (graphTypesCombo.getSelectedItem().equals("3D")) {
+          
+          outputManager.show3DGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
+          
+        }
+        
+      } else if (hiders.isSelected()) {
+        
+        if (graphTypesCombo.getSelectedItem().equals("Line")) {
+          
+          outputManager.showLineGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
+          
+        } else if (graphTypesCombo.getSelectedItem().equals("LineOne")) {
+          
+          outputManager.showLineOneGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
+          
+        } else if (graphTypesCombo.getSelectedItem().equals("Bar")) {
+          
+          outputManager.showBarGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
+          
+        } else if (graphTypesCombo.getSelectedItem().equals("3D")) {
+          
+          outputManager.show3DGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
+          
+        }
+        
+      }
+      
+    } else {
+      
+      if (seekers.isSelected()) {
+        
+        if (graphTypesCombo.getSelectedItem().equals("Line")) {
+          
+          outputManager.showLineGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected());
+          
+        } else if (graphTypesCombo.getSelectedItem().equals("Bar")) {
+          
+          outputManager.showBarGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected(), outputPermutations.isSelected());
+          
+        } else if (graphTypesCombo.getSelectedItem().equals("3D")) {
+          
+          outputManager.show3DGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
+          
+        }
+        
+      } else if (hiders.isSelected()) {
+        
+        if (graphTypesCombo.getSelectedItem().equals("Line")) {
+          
+          outputManager.showLineGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected());
+          
+        } else if (graphTypesCombo.getSelectedItem().equals("Bar")) {
+          
+          outputManager.showBarGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
+          
+        } else if (graphTypesCombo.getSelectedItem().equals("3D")) {
+          
+          outputManager.show3DGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
+          
+        }
+        
+      }
+      
+    }
+    
+    if (graphTypesCombo.getSelectedItem().equals("Payoff Matrix")) {
+      
+      ApproximatePayoffMatrix HPM = new ApproximatePayoffMatrix("");
+      
+      for ( Pair<TraverserRecord, Double> seekerPayoff : outputManager.matrixPayoff(selectedSeekers, allPlayers) ) {
+        
+        HPM.addPayoff("Seeker", seekerPayoff.getElement0().toString().split(" vs ")[0], seekerPayoff.getElement0().toString().split(" vs ")[1], seekerPayoff.getElement1());
+        
+      }
+      
+      for ( Pair<TraverserRecord, Double> hiderPayoff : outputManager.matrixPayoff(selectedHiders, allPlayers) ) {
+        
+        HPM.addPayoff("Hider", hiderPayoff.getElement0().toString().split(" vs ")[0], hiderPayoff.getElement0().toString().split(" vs ")[1], hiderPayoff.getElement1());
+        
+        
+      }
+      
+      System.out.println(HPM);
+      
+      for ( String line : HPM.GTAnalysis() ) { 
+        
+        System.out.println(line);
+        
+      }
+      
+      if ( outputEnabled.isSelected() ) {
+        
+        HPM.printTikzMatrixToFile();
+        
+      }
+      
+    }
+
+  }
+
   /**
   * @param tabbedPane
   */
@@ -799,7 +974,7 @@ public class Runner extends JFrame {
     
     //
     
-    JPanel centerPaneRightCenter = new JPanel(new GridLayout(12, 4));
+    JPanel centerPaneRightCenter = new JPanel(new GridLayout(13, 4));
     
     centerPaneRight.add(centerPaneRightCenter, BorderLayout.CENTER);
     
@@ -926,6 +1101,12 @@ public class Runner extends JFrame {
     
     //
     
+    outputPermutations = new JCheckBox("Output permutations");
+    
+    centerPaneRightCenter.add(outputPermutations);
+
+    //
+    
     generateGraph = new JButton("Generate graph");
     
     generateGraph.addActionListener(new ActionListener() {
@@ -935,177 +1116,22 @@ public class Runner extends JFrame {
         
         if (outputFeedbackList.getSelectedIndex() == -1 || outputFeedbackList.getSelectedValue().toString().equals("-----")) return;
         
-        // Allows for selection of multiple hiders or multiple seekers from list
-        ArrayList<TraverserRecord> selectedHiders = new ArrayList<TraverserRecord>();
-        
-        selectedSeekers = new ArrayList<TraverserRecord>();
-        
-        String title = "";
-        
         ArrayList<HiderRecord> recordsFromList = new ArrayList<HiderRecord>(outputFeedbackList.getSelectedValuesList());
+        
+        if (outputPermutations.isSelected()) {
 
-        ArrayList<HiderRecord> recordsForGraph = new ArrayList<HiderRecord>();
-        
-        for ( HiderRecord record : recordsFromList ) {
+          ArrayList<ArrayList<HiderRecord>> recordsFromListSublists = Utils.getAllSublists(recordsFromList);
           
-          if ( record instanceof GroupedHiderRecords ) { 
-            
-            recordsForGraph.addAll(((GroupedHiderRecords)record).allHiders());
-            
-          } else {
-            
-            recordsForGraph.add(record);
-            
+          for(ArrayList<HiderRecord> recordsFromListSublist : recordsFromListSublists) {
+          
+            generateGraph(recordsFromListSublist);
+          
           }
-          
-        }
-        
-        for ( HiderRecord hider : recordsForGraph ) {
-          
-          if (hider.toString().equals("-----")) continue;
-          
-          title += "Topology: " + hider.getTopology() + " Hider: " + hider;
-          
-          for ( TraverserRecord hidersSeeker : hider.getSeekersAndAttributes() ) {
-            
-            //if ( hidersSeekers.toString().contains("(")) hidersSeekers.setTraverser(hidersSeekers.toString().substring(0, hidersSeekers.toString().indexOf(" ")));
-            
-            hidersSeeker.setTraverser(hidersSeeker.getTraverser());
-            
-            hidersSeeker.setOpponents(hider.getTraverser());
-            
-            selectedHiders.add(hider);
-            
-            //if (selectedSeekers.contains(hidersSeekers)) {
-              
-              //selectedSeekers.get(selectedSeekers.indexOf(hidersSeekers)).integrateRecord(hidersSeekers);
-              
-            //} else {
-              
-            selectedSeekers.add(selectedSeekers.size(), hidersSeeker);
-              
-            //}
-                
-          }
-              
-        }
-            
-        ArrayList<TraverserRecord> allPlayers = new ArrayList<TraverserRecord>(selectedHiders);
-        allPlayers.addAll(selectedSeekers);
-        
-        if ( OVERWRITE_FIGURE && figureToOverwrite != null) {
-          
-          if (seekers.isSelected()) {
-            
-            if (graphTypesCombo.getSelectedItem().equals("Line")) {
-              
-              outputManager.showLineGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
-              
-            } else if (graphTypesCombo.getSelectedItem().equals("LineOne")) {
-              
-              outputManager.showLineOneGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
-              
-            } else if (graphTypesCombo.getSelectedItem().equals("Bar")) {
-              
-              outputManager.showBarGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
-              
-            } else if (graphTypesCombo.getSelectedItem().equals("3D")) {
-              
-              outputManager.show3DGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
-              
-            }
-            
-          } else if (hiders.isSelected()) {
-            
-            if (graphTypesCombo.getSelectedItem().equals("Line")) {
-              
-              outputManager.showLineGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
-              
-            } else if (graphTypesCombo.getSelectedItem().equals("LineOne")) {
-              
-              outputManager.showLineOneGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
-              
-            } else if (graphTypesCombo.getSelectedItem().equals("Bar")) {
-              
-              outputManager.showBarGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
-              
-            } else if (graphTypesCombo.getSelectedItem().equals("3D")) {
-              
-              outputManager.show3DGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
-              
-            }
-            
-          }
-          
+
         } else {
           
-          if (seekers.isSelected()) {
-            
-            if (graphTypesCombo.getSelectedItem().equals("Line")) {
-              
-              outputManager.showLineGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected());
-              
-            } else if (graphTypesCombo.getSelectedItem().equals("Bar")) {
-              
-              outputManager.showBarGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
-              
-            } else if (graphTypesCombo.getSelectedItem().equals("3D")) {
-              
-              outputManager.show3DGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
-              
-            }
-            
-          } else if (hiders.isSelected()) {
-            
-            if (graphTypesCombo.getSelectedItem().equals("Line")) {
-              
-              outputManager.showLineGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected());
-              
-            } else if (graphTypesCombo.getSelectedItem().equals("Bar")) {
-              
-              outputManager.showBarGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
-              
-            } else if (graphTypesCombo.getSelectedItem().equals("3D")) {
-              
-              outputManager.show3DGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
-              
-            }
-            
-          }
-          
-        }
+          generateGraph(recordsFromList);
         
-        if (graphTypesCombo.getSelectedItem().equals("Payoff Matrix")) {
-          
-          ApproximatePayoffMatrix HPM = new ApproximatePayoffMatrix("");
-          
-          for ( Pair<TraverserRecord, Double> seekerPayoff : outputManager.matrixPayoff(selectedSeekers, allPlayers) ) {
-            
-            HPM.addPayoff("Seeker", seekerPayoff.getElement0().toString().split(" vs ")[0], seekerPayoff.getElement0().toString().split(" vs ")[1], seekerPayoff.getElement1());
-            
-          }
-          
-          for ( Pair<TraverserRecord, Double> hiderPayoff : outputManager.matrixPayoff(selectedHiders, allPlayers) ) {
-            
-            HPM.addPayoff("Hider", hiderPayoff.getElement0().toString().split(" vs ")[0], hiderPayoff.getElement0().toString().split(" vs ")[1], hiderPayoff.getElement1());
-            
-            
-          }
-          
-          System.out.println(HPM);
-          
-          for ( String line : HPM.GTAnalysis() ) { 
-            
-            System.out.println(line);
-            
-          }
-          
-          if ( outputEnabled.isSelected() ) {
-            
-            HPM.printTikzMatrixToFile();
-            
-          }
-          
         }
         
         showFiles.doClick();
@@ -1698,6 +1724,8 @@ public class Runner extends JFrame {
   private JComboBox<String> gameOrRound;
   
   private JCheckBox outputEnabled;
+
+  private JCheckBox outputPermutations;
   
   private JButton generateGraph;
   

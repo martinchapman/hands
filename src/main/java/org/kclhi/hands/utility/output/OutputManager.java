@@ -17,6 +17,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.TreeMap;
@@ -571,9 +572,25 @@ public class OutputManager {
   * @param category
   * @param outputEnabled
   */
+  public void showBarGraphForAttribute(ArrayList<TraverserRecord> traversers, ArrayList<TraverserRecord> players, String gameOrRound, String title, String attribute, String category, boolean outputEnabled, boolean outputPermutations) {
+    
+    showGraphForAttribute(traversers, players, gameOrRound, title, "Bar", "Game Number", attribute, category, outputEnabled, outputPermutations);
+    
+  }
+
+  /**
+  * @param traversers
+  * @param players
+  * @param gameOrRound
+  * @param title
+  * @param attribute
+  * @param category
+  * @param outputEnabled
+  * @param outputPermutations
+  */
   public void showBarGraphForAttribute(ArrayList<TraverserRecord> traversers, ArrayList<TraverserRecord> players, String gameOrRound, String title, String attribute, String category, boolean outputEnabled) {
     
-    showGraphForAttribute(traversers, players, gameOrRound, title, "Bar", "Game Number", attribute, category, outputEnabled);
+    showBarGraphForAttribute(traversers, players, gameOrRound, title, attribute, category, outputEnabled, false);
     
   }
   
@@ -947,7 +964,32 @@ public class OutputManager {
   */
   public void showGraphForAttribute(ArrayList<TraverserRecord> playerRecords, ArrayList<TraverserRecord> traverserRecords, String gameOrRound, String title, String graphType, String xLabel, String yLabel, String category, boolean outputEnabled) {
     
-    String figureID = "figure" + new SimpleDateFormat("yyyyMMddHHmmss").format(Calendar.getInstance().getTime());
+    showGraphForAttribute(playerRecords, traverserRecords, gameOrRound, title, graphType, xLabel, yLabel, category, outputEnabled, false);
+    
+  }
+
+  /**
+  * @param playerRecords
+  * @param traverserRecords
+  * @param gameOrRound
+  * @param title
+  * @param graphType
+  * @param xLabel
+  * @param yLabel
+  * @param category
+  * @param outputEnabled
+  * @param permutationsEnabled
+  */
+  public void showGraphForAttribute(ArrayList<TraverserRecord> playerRecords, ArrayList<TraverserRecord> traverserRecords, String gameOrRound, String title, String graphType, String xLabel, String yLabel, String category, boolean outputEnabled, boolean permutationsEnabled) {
+    
+    String figureID;
+    if( permutationsEnabled ) {
+      Set<String> players = new HashSet<String>(traverserRecords.stream().map(traverserRecord->traverserRecord.getTraverser()).collect(Collectors.toList()));
+      Set<String> opponents = new HashSet<String>(traverserRecords.stream().map(traverserRecord->traverserRecord.getOpponents()).collect(Collectors.toList()));
+      figureID = players.toString().replaceAll(" ", "-").replaceAll("\\[", "").replaceAll("\\]", "").replaceAll(",", "") + "_" + opponents.toString().replaceAll(" ", "-").replaceAll("\\[", "").replaceAll("\\]", "").replaceAll(",", "");
+    } else {
+      figureID = "figure" + new SimpleDateFormat("yyyyMMddHHmmss").format(Calendar.getInstance().getTime());
+    }
     
     showGraphForAttribute(playerRecords, traverserRecords, gameOrRound, title, graphType, xLabel, yLabel, category, outputEnabled, figureID);
     

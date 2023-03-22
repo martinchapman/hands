@@ -28,6 +28,7 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.AbstractCollection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -42,7 +43,9 @@ import java.util.Map.Entry;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
+import org.apache.commons.math3.util.CombinatoricsUtils;
 import org.jfree.chart.JFreeChart;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.GraphPath;
@@ -95,6 +98,28 @@ public class Utils {
   */
   public static String KEY = "trFdcuAh"; 
   
+  public static ArrayList<ArrayList<HiderRecord>> getAllSublists(ArrayList<HiderRecord> list) {
+
+    ArrayList<ArrayList<HiderRecord>> sublists = new ArrayList<ArrayList<HiderRecord>>();
+    for(int k = 1; k < list.size(); k++) {
+      Iterator<int[]> iterator = CombinatoricsUtils.combinationsIterator(list.size(), k);
+      while (iterator.hasNext()) {
+          ArrayList<Integer> combination = Arrays.stream(iterator.next()).boxed().collect(Collectors.toCollection(ArrayList::new));
+          if( combination.size()==1 ) { 
+            sublists.add(new ArrayList<HiderRecord>(Arrays.asList(list.get(combination.get(0))))); 
+          } else {
+            // We can't filter due to the way in which hider records are compared
+            ArrayList<HiderRecord> sublist = new ArrayList<HiderRecord>();
+            for(Integer i : combination) sublist.add(list.get(i));
+            sublists.add(sublist); 
+          }
+      }
+    }
+    sublists.add(list);
+    return sublists;
+
+  }
+
   public static String getActivePlugin() {
     Properties config = new Properties();
     try (FileInputStream configInputStream = new FileInputStream("output/config.config")) {
