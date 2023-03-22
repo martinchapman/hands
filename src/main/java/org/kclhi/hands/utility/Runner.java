@@ -504,7 +504,7 @@ public class Runner extends JFrame {
       
     }
   }
-  
+
   /**
   * @param tabbedPane
   */
@@ -943,7 +943,7 @@ public class Runner extends JFrame {
         String title = "";
         
         ArrayList<HiderRecord> recordsFromList = new ArrayList<HiderRecord>(outputFeedbackList.getSelectedValuesList());
-        
+
         ArrayList<HiderRecord> recordsForGraph = new ArrayList<HiderRecord>();
         
         for ( HiderRecord record : recordsFromList ) {
@@ -980,947 +980,991 @@ public class Runner extends JFrame {
               
               //selectedSeekers.get(selectedSeekers.indexOf(hidersSeekers)).integrateRecord(hidersSeekers);
               
-              //} else {
-                
-                selectedSeekers.add(selectedSeekers.size(), hidersSeeker);
-                
-                //}
-                
-              }
+            //} else {
               
-            }
-            
-            ArrayList<TraverserRecord> allPlayers = new ArrayList<TraverserRecord>(selectedHiders);
-            allPlayers.addAll(selectedSeekers);
-            
-            if ( OVERWRITE_FIGURE && figureToOverwrite != null) {
+            selectedSeekers.add(selectedSeekers.size(), hidersSeeker);
               
-              if (seekers.isSelected()) {
+            //}
                 
-                if (graphTypesCombo.getSelectedItem().equals("Line")) {
-                  
-                  outputManager.showLineGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
-                  
-                } else if (graphTypesCombo.getSelectedItem().equals("LineOne")) {
-                  
-                  outputManager.showLineOneGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
-                  
-                } else if (graphTypesCombo.getSelectedItem().equals("Bar")) {
-                  
-                  outputManager.showBarGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
-                  
-                } else if (graphTypesCombo.getSelectedItem().equals("3D")) {
-                  
-                  outputManager.show3DGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
-                  
-                }
-                
-              } else if (hiders.isSelected()) {
-                
-                if (graphTypesCombo.getSelectedItem().equals("Line")) {
-                  
-                  outputManager.showLineGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
-                  
-                } else if (graphTypesCombo.getSelectedItem().equals("LineOne")) {
-                  
-                  outputManager.showLineOneGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
-                  
-                } else if (graphTypesCombo.getSelectedItem().equals("Bar")) {
-                  
-                  outputManager.showBarGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
-                  
-                } else if (graphTypesCombo.getSelectedItem().equals("3D")) {
-                  
-                  outputManager.show3DGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
-                  
-                }
-                
-              }
-              
-            } else {
-              
-              if (seekers.isSelected()) {
-                
-                if (graphTypesCombo.getSelectedItem().equals("Line")) {
-                  
-                  outputManager.showLineGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected());
-                  
-                } else if (graphTypesCombo.getSelectedItem().equals("Bar")) {
-                  
-                  outputManager.showBarGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
-                  
-                } else if (graphTypesCombo.getSelectedItem().equals("3D")) {
-                  
-                  outputManager.show3DGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
-                  
-                }
-                
-              } else if (hiders.isSelected()) {
-                
-                if (graphTypesCombo.getSelectedItem().equals("Line")) {
-                  
-                  outputManager.showLineGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected());
-                  
-                } else if (graphTypesCombo.getSelectedItem().equals("Bar")) {
-                  
-                  outputManager.showBarGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
-                  
-                } else if (graphTypesCombo.getSelectedItem().equals("3D")) {
-                  
-                  outputManager.show3DGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
-                  
-                }
-                
-              }
-              
-            }
-            
-            if (graphTypesCombo.getSelectedItem().equals("Payoff Matrix")) {
-              
-              ApproximatePayoffMatrix HPM = new ApproximatePayoffMatrix("");
-              
-              for ( Pair<TraverserRecord, Double> seekerPayoff : outputManager.matrixPayoff(selectedSeekers, allPlayers) ) {
-                
-                HPM.addPayoff("Seeker", seekerPayoff.getElement0().toString().split(" vs ")[0], seekerPayoff.getElement0().toString().split(" vs ")[1], seekerPayoff.getElement1());
-                
-              }
-              
-              for ( Pair<TraverserRecord, Double> hiderPayoff : outputManager.matrixPayoff(selectedHiders, allPlayers) ) {
-                
-                HPM.addPayoff("Hider", hiderPayoff.getElement0().toString().split(" vs ")[0], hiderPayoff.getElement0().toString().split(" vs ")[1], hiderPayoff.getElement1());
-                
-                
-              }
-              
-              System.out.println(HPM);
-              
-              for ( String line : HPM.GTAnalysis() ) { 
-                
-                System.out.println(line);
-                
-              }
-              
-              if ( outputEnabled.isSelected() ) {
-                
-                HPM.printTikzMatrixToFile();
-                
-              }
-              
-            }
-            
-            showFiles.doClick();
-            
           }
-          
-        });
-        
-        centerPaneRight.add(generateGraph, BorderLayout.SOUTH);
-        
-      }
-      
-      private void setupTab(JTabbedPane tabbedPane) {
-        
-        //////
-        
-        JPanel setupTab = new JPanel();
-        
-        setupTab.setLayout(new GridLayout(2, 2));
-        
-        tabbedPane.addTab("Setup", setupTab);
-        
-        ////
-        
-        JPanel parameters = new JPanel();
-        
-        parameters.setLayout(new GridLayout(6, 2));
-        
-        parameters.setBorder(new TitledBorder("Parameters"));
-        
-        //
-        
-        parameters.add(new JLabel("Topology:"));
-        
-        topologies = new JComboBox<String>();
-        
-        for ( String topology : graphTypes ) {
-          
-          topologies.addItem(topology);
-          
+              
         }
-        
-        parameters.add(topologies);
-        
-        //
-        
-        parameters.add(new JLabel("Number of nodes:"));
-        
-        numberOfNodes = new JTextField("100");
-        
-        parameters.add(numberOfNodes);
-        
-        //
-        
-        parameters.add(new JLabel("Number of hide locations:"));
-        
-        numberOfHiddenItems = new JTextField("5");
-        
-        parameters.add(numberOfHiddenItems);
-        
-        // 
-        
-        parameters.add(new JLabel("Cost of traversing an edge:"));
-        
-        costOfEdgeTraversal = new JTextField("10.0");
-        
-        parameters.add(costOfEdgeTraversal);
-        
-        //
-        
-        parameters.add(new JLabel("Fixed or random cost:"));
-        
-        fixedOrRandom = new JComboBox<String>();
-        
-        fixedOrRandom.addItem("random");
-        fixedOrRandom.addItem("fixed");
-        
-        parameters.add(fixedOrRandom);
-        
-        //
-        
-        parameters.add(new JLabel("Edge traversal decrement:"));
-        
-        edgeTraversalDecrement = new JTextField("0");
-        
-        parameters.add(edgeTraversalDecrement);
-        
-        //
-        
-        setupTab.add(parameters);
-        
-        ////
-        
-        JPanel hiders = new JPanel();
-        
-        hiders.setLayout(new GridLayout(3, 1));
-        
-        hiders.setBorder(new TitledBorder("Hiders"));
-        
-        //
-        
-        hiders.add(new JLabel("Hider types:"));
-        
-        //
-        
-        JPanel hiderListAndButton = new JPanel();
-        
-        hiderListAndButton.setLayout(new FlowLayout(FlowLayout.LEFT));
-        
-        final JComboBox<String> hiderList = new JComboBox<String>();
-        
-        ComboboxToolTipRenderer hiderListRenderer = new ComboboxToolTipRenderer();
-        
-        hiderList.setRenderer(hiderListRenderer);
-        
-        ArrayList<String> hiderTooltips = new ArrayList<String>();
-        
-        for ( String hiderType : hiderTypes ) {
-          
-          hiderList.addItem(hiderType);
-          
-          hiderTooltips.add(" ");
-          
-        }
-        
-        hiderListRenderer.setTooltips(hiderTooltips);
-        
-        hiderListAndButton.add(hiderList);
-        
-        //
-        
-        mixHiders = new JCheckBox("Mix hiders");
-        
-        hiderListAndButton.add(mixHiders);
-        
-        //
-        
-        JButton addHider = new JButton("Add hider");
-        
-        hiderListAndButton.add(addHider);
-        
-        hiders.add(hiderListAndButton);
-        
-        //
-        
-        simulationHidersModel = new DefaultListModel<String>();
-        
-        simulationHidersModel.addElement("RandomSet");
-        
-        JList<String> simulationHiders = new JList<String>(simulationHidersModel);
-        
-        JScrollPane simulationHidersPane = new JScrollPane(simulationHiders);
-        
-        simulationHidersPane.setPreferredSize(new Dimension(100, 100));
-        
-        deleteOnClick(simulationHiders, simulationHidersModel, new PostDelete() {
-          
-          @Override
-          public void postDelete(Object deleted) {
             
-            if (simulationHidersModel.toArray().length == 1) { 
+        ArrayList<TraverserRecord> allPlayers = new ArrayList<TraverserRecord>(selectedHiders);
+        allPlayers.addAll(selectedSeekers);
+        
+        if ( OVERWRITE_FIGURE && figureToOverwrite != null) {
+          
+          if (seekers.isSelected()) {
+            
+            if (graphTypesCombo.getSelectedItem().equals("Line")) {
               
-              start.setEnabled(false);
+              outputManager.showLineGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
               
-              queue.setEnabled(false);
+            } else if (graphTypesCombo.getSelectedItem().equals("LineOne")) {
+              
+              outputManager.showLineOneGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
+              
+            } else if (graphTypesCombo.getSelectedItem().equals("Bar")) {
+              
+              outputManager.showBarGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
+              
+            } else if (graphTypesCombo.getSelectedItem().equals("3D")) {
+              
+              outputManager.show3DGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
+              
+            }
+            
+          } else if (hiders.isSelected()) {
+            
+            if (graphTypesCombo.getSelectedItem().equals("Line")) {
+              
+              outputManager.showLineGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
+              
+            } else if (graphTypesCombo.getSelectedItem().equals("LineOne")) {
+              
+              outputManager.showLineOneGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
+              
+            } else if (graphTypesCombo.getSelectedItem().equals("Bar")) {
+              
+              outputManager.showBarGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
+              
+            } else if (graphTypesCombo.getSelectedItem().equals("3D")) {
+              
+              outputManager.show3DGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected(), figureToOverwrite);
               
             }
             
           }
           
-        });
-        
-        hiders.add(simulationHidersPane);
-        
-        addHider.addActionListener(new ActionListener() {
+        } else {
           
-          @Override
-          public void actionPerformed(ActionEvent e) {
+          if (seekers.isSelected()) {
             
-            if (!simulationHidersModel.contains(hiderList.getSelectedItem().toString())) simulationHidersModel.addElement(hiderList.getSelectedItem().toString());
-            
-            start.setEnabled(true);
-            
-            queue.setEnabled(true);
-            
-          }
-          
-        });
-        
-        //
-        
-        setupTab.add(hiders);
-        
-        ////
-        
-        JPanel simulationParameters = new JPanel();
-        
-        simulationParameters.setLayout(new GridLayout(4, 2));
-        
-        simulationParameters.setBorder(new TitledBorder("Simulation Parameters"));
-        
-        //
-        
-        simulationParameters.add(new JLabel("Number of rounds:"));
-        
-        numberOfRounds = new JTextField("1");
-        
-        numberOfRounds.setPreferredSize(new Dimension(100, 10));
-        
-        simulationParameters.add(numberOfRounds);
-        
-        //
-        
-        // Blank space in grid layout
-        simulationParameters.add(new JPanel());
-        
-        resetPerRound = new JCheckBox("Reset per round");
-        
-        simulationParameters.add(resetPerRound);
-        
-        simulationParameters.add(new JPanel());
-        
-        strategyOverRounds = new JCheckBox("Strategy over rounds");
-        
-        simulationParameters.add(strategyOverRounds);
-        
-        
-        //
-        
-        simulationParameters.add(new JLabel("Number of games:"));
-        
-        numberOfGames = new JTextField("1");
-        
-        simulationParameters.add(numberOfGames);
-        
-        //
-        
-        setupTab.add(simulationParameters);
-        
-        ////
-        
-        JPanel seekers = new JPanel();
-        
-        seekers.setLayout(new GridLayout(3, 1));
-        
-        seekers.setBorder(new TitledBorder("Seekers"));
-        
-        //
-        
-        seekers.add(new JLabel("Seeker types:"));
-        
-        //
-        
-        JPanel seekerListAndButton = new JPanel();
-        
-        seekerListAndButton.setLayout(new FlowLayout(FlowLayout.LEFT));
-        
-        final JComboBox<String> seekerList = new JComboBox<String>();
-        
-        ComboboxToolTipRenderer seekerListRenderer = new ComboboxToolTipRenderer();
-        
-        seekerList.setRenderer(seekerListRenderer);
-        
-        ArrayList<String> seekerTooltips = new ArrayList<String>();
-        
-        for ( String seekerType : seekerTypes ) {
-          
-          seekerList.addItem(seekerType);
-          
-          seekerTooltips.add(" ");
-          
-        }
-        
-        seekerListRenderer.setTooltips(seekerTooltips);
-        
-        seekerListAndButton.add(seekerList);
-        
-        //
-        
-        mixSeekers = new JCheckBox("Mix seekers");
-        
-        seekerListAndButton.add(mixSeekers);
-        
-        //
-        
-        JButton addSeeker = new JButton("Add seeker");
-        
-        seekerListAndButton.add(addSeeker);
-        
-        seekers.add(seekerListAndButton);
-        
-        //
-        
-        simulationSeekersModel = new DefaultListModel<String>();
-        
-        simulationSeekersModel.addElement("ConstrainedRandomWalk");
-        
-        JList<String> simulationSeekers = new JList<String>(simulationSeekersModel);
-        
-        JScrollPane simulationSeekersPane = new JScrollPane(simulationSeekers);
-        
-        simulationSeekersPane.setPreferredSize(new Dimension(100, 100));
-        
-        deleteOnClick(simulationSeekers, simulationSeekersModel, new PostDelete() {
-          
-          @Override
-          public void postDelete(Object deleted) {
-            
-            if (simulationSeekersModel.toArray().length == 1) { 
+            if (graphTypesCombo.getSelectedItem().equals("Line")) {
               
-              start.setEnabled(false);
+              outputManager.showLineGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected());
               
-              queue.setEnabled(false);
+            } else if (graphTypesCombo.getSelectedItem().equals("Bar")) {
+              
+              outputManager.showBarGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
+              
+            } else if (graphTypesCombo.getSelectedItem().equals("3D")) {
+              
+              outputManager.show3DGraphForAttribute(allPlayers, selectedSeekers, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
               
             }
             
-          }
-          
-        });
-        
-        seekers.add(simulationSeekersPane);
-        
-        addSeeker.addActionListener(new ActionListener() {
-          
-          @Override
-          public void actionPerformed(ActionEvent e) {
+          } else if (hiders.isSelected()) {
             
-            if (!simulationSeekersModel.contains(seekerList.getSelectedItem().toString())) simulationSeekersModel.addElement(seekerList.getSelectedItem().toString());
-            
-            start.setEnabled(true);
-            
-            queue.setEnabled(true);
-            
-          }
-          
-        });
-        
-        //
-        
-        setupTab.add(seekers);
-        
-        ////////
-        
-      }
-      
-      private void simulationsTab(JTabbedPane tabbedPane) {
-        
-        //////
-        
-        JPanel simulationsTab = new JPanel();
-        
-        simulationsTab.setLayout(new BorderLayout());
-        
-        tabbedPane.addTab("Simulations", simulationsTab);
-        
-        ////
-        
-        queueListModel = new DefaultListModel<String>();
-        
-        queueList = new JList<String>(queueListModel);
-        
-        JScrollPane queueListScroll = new JScrollPane(queueList);
-        
-        queueListScroll.setPreferredSize(new Dimension(800, 200));
-        
-        queueList.addListSelectionListener(new ListSelectionListener() {
-          
-          @Override
-          public void valueChanged(ListSelectionEvent e) {
-            
-            updateUISettings(queueList.getSelectedValue());
-            
-            startSelected.setEnabled(true);
-            
-          }
-          
-        });
-        
-        deleteOnClick(queueList, queueListModel, new PostDelete() {
-          
-          @Override
-          public void postDelete(Object deleted) {
-            
-            if (queueListModel.toArray().length == 1) { 
+            if (graphTypesCombo.getSelectedItem().equals("Line")) {
               
-              startQueue.setEnabled(false);
+              outputManager.showLineGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), outputEnabled.isSelected());
               
-              startSelected.setEnabled(false);
+            } else if (graphTypesCombo.getSelectedItem().equals("Bar")) {
+              
+              outputManager.showBarGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
+              
+            } else if (graphTypesCombo.getSelectedItem().equals("3D")) {
+              
+              outputManager.show3DGraphForAttribute(allPlayers, selectedHiders, (String)gameOrRound.getSelectedItem(), title, (String)measure.getSelectedItem(), (String)categories.getSelectedItem(), outputEnabled.isSelected());
               
             }
-            
-            simulations.remove(deleted);
-            
-            // Empty the file
-            FileWriter writer;
-            
-            try {
-              
-              writer = new FileWriter(simulationSchedule);
-              
-              writer.write("");
-              
-              // ~MDC Note: this removing process may lead to duplicate errors i.e. may not be order proof
-              for (String simulation : simulations) { 
-                
-                writer.append(simulation + "\n");
-                
-              }
-              
-              writer.close();
-              
-            } catch (IOException e) {
-              
-              e.printStackTrace();
-              
-            }
-            
-          }
-          
-        });
-        
-        simulationsTab.add(queueListScroll, BorderLayout.CENTER);
-        
-        ////////
-        
-        JPanel controls = new JPanel();
-        
-        controls.setLayout(new FlowLayout(FlowLayout.RIGHT));
-        
-        JButton resetUI = new JButton("Reset");
-        
-        resetUI.addActionListener(new ActionListener() {
-          
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            
-            topologies.setSelectedIndex(0);
-            
-            numberOfNodes.setText("100");
-            
-            numberOfHiddenItems.setText("5");
-            
-            costOfEdgeTraversal.setText("10.0");
-            
-            fixedOrRandom.setSelectedIndex(0);
-            
-            edgeTraversalDecrement.setText("0.0");
-            
-            numberOfRounds.setText("1");
-            
-            numberOfGames.setText("1");
-            
-            simulationHidersModel.clear();
-            
-            simulationHidersModel.addElement("Random");
-            
-            simulationSeekersModel.clear();
-            
-            simulationSeekersModel.addElement("Random Walk");
-            
-          }
-          
-        });
-        
-        controls.add(resetUI);
-        
-        startSelected = new JButton("Start selected");
-        
-        startSelected.setEnabled(false);
-        
-        controls.add(startSelected);
-        
-        start = new JButton("Start setup");
-        
-        controls.add(start);
-        
-        queue = new JButton("Queue simulation");
-        
-        controls.add(queue);
-        
-        startQueue = new JButton("Start queue");
-        
-        startQueue.setEnabled(false);
-        
-        controls.add(startQueue);
-        
-        //
-        
-        simulationsTab.add(controls, BorderLayout.SOUTH);
-        
-        ////
-        
-      }
-      
-      /**
-      * 
-      */
-      private ArrayList<String> simulations;
-      
-      /**
-      * @param input
-      * @return
-      */
-      private boolean checkForBack(String input) {
-        
-        if ( input.contains("back") ) return true;
-        
-        return false;
-        
-      }
-      
-      /**
-      * @param input
-      * @return
-      */
-      private boolean checkForBlank(String input) {
-        
-        if ( input.trim().length() == 0 ) return true;
-        
-        return false;
-        
-      }
-      
-      /**
-      * @param question
-      * @return
-      */
-      private String askQuestion(String question, Scanner in) {
-        
-        System.out.println(question);
-        
-        String response = "";
-        
-        while(true) {
-          
-          try {
-            
-            response = in.nextLine();
-            
-            break;
-            
-          } catch ( java.util.NoSuchElementException e ) {
-            
-            continue;
             
           }
           
         }
         
-        return response;
-        
-      }
-      
-      /**
-      * @param listModel
-      * @return
-      */
-      private <E> ArrayList<Object> itemsInList(ListModel<E> listModel) {
-        
-        ArrayList<Object> itemsInList = new ArrayList<Object>();
-        
-        for ( int i = 0; i < listModel.getSize(); i++ ) {
+        if (graphTypesCombo.getSelectedItem().equals("Payoff Matrix")) {
           
-          itemsInList.add(listModel.getElementAt(i));
+          ApproximatePayoffMatrix HPM = new ApproximatePayoffMatrix("");
+          
+          for ( Pair<TraverserRecord, Double> seekerPayoff : outputManager.matrixPayoff(selectedSeekers, allPlayers) ) {
+            
+            HPM.addPayoff("Seeker", seekerPayoff.getElement0().toString().split(" vs ")[0], seekerPayoff.getElement0().toString().split(" vs ")[1], seekerPayoff.getElement1());
+            
+          }
+          
+          for ( Pair<TraverserRecord, Double> hiderPayoff : outputManager.matrixPayoff(selectedHiders, allPlayers) ) {
+            
+            HPM.addPayoff("Hider", hiderPayoff.getElement0().toString().split(" vs ")[0], hiderPayoff.getElement0().toString().split(" vs ")[1], hiderPayoff.getElement1());
+            
+            
+          }
+          
+          System.out.println(HPM);
+          
+          for ( String line : HPM.GTAnalysis() ) { 
+            
+            System.out.println(line);
+            
+          }
+          
+          if ( outputEnabled.isSelected() ) {
+            
+            HPM.printTikzMatrixToFile();
+            
+          }
           
         }
         
-        return itemsInList;
+        showFiles.doClick();
+            
+      }
+          
+    });
+        
+    centerPaneRight.add(generateGraph, BorderLayout.SOUTH);
+        
+  }
+  
+  private void setupTab(JTabbedPane tabbedPane) {
+    
+    //////
+    
+    JPanel setupTab = new JPanel();
+    
+    setupTab.setLayout(new GridLayout(2, 2));
+    
+    tabbedPane.addTab("Setup", setupTab);
+    
+    ////
+    
+    JPanel parameters = new JPanel();
+    
+    parameters.setLayout(new GridLayout(6, 2));
+    
+    parameters.setBorder(new TitledBorder("Parameters"));
+    
+    //
+    
+    parameters.add(new JLabel("Topology:"));
+    
+    topologies = new JComboBox<String>();
+    
+    for ( String topology : graphTypes ) {
+      
+      topologies.addItem(topology);
+      
+    }
+    
+    parameters.add(topologies);
+    
+    //
+    
+    parameters.add(new JLabel("Number of nodes:"));
+    
+    numberOfNodes = new JTextField("100");
+    
+    parameters.add(numberOfNodes);
+    
+    //
+    
+    parameters.add(new JLabel("Number of hide locations:"));
+    
+    numberOfHiddenItems = new JTextField("5");
+    
+    parameters.add(numberOfHiddenItems);
+    
+    // 
+    
+    parameters.add(new JLabel("Cost of traversing an edge:"));
+    
+    costOfEdgeTraversal = new JTextField("10.0");
+    
+    parameters.add(costOfEdgeTraversal);
+    
+    //
+    
+    parameters.add(new JLabel("Fixed or random cost:"));
+    
+    fixedOrRandom = new JComboBox<String>();
+    
+    fixedOrRandom.addItem("random");
+    fixedOrRandom.addItem("fixed");
+    
+    parameters.add(fixedOrRandom);
+    
+    //
+    
+    parameters.add(new JLabel("Edge traversal decrement:"));
+    
+    edgeTraversalDecrement = new JTextField("0");
+    
+    parameters.add(edgeTraversalDecrement);
+    
+    //
+    
+    setupTab.add(parameters);
+    
+    ////
+    
+    JPanel hiders = new JPanel();
+    
+    hiders.setLayout(new GridLayout(3, 1));
+    
+    hiders.setBorder(new TitledBorder("Hiders"));
+    
+    //
+    
+    hiders.add(new JLabel("Hider types:"));
+    
+    //
+    
+    JPanel hiderListAndButton = new JPanel();
+    
+    hiderListAndButton.setLayout(new FlowLayout(FlowLayout.LEFT));
+    
+    final JComboBox<String> hiderList = new JComboBox<String>();
+    
+    ComboboxToolTipRenderer hiderListRenderer = new ComboboxToolTipRenderer();
+    
+    hiderList.setRenderer(hiderListRenderer);
+    
+    ArrayList<String> hiderTooltips = new ArrayList<String>();
+    
+    for ( String hiderType : hiderTypes ) {
+      
+      hiderList.addItem(hiderType);
+      
+      hiderTooltips.add(" ");
+      
+    }
+    
+    hiderListRenderer.setTooltips(hiderTooltips);
+    
+    hiderListAndButton.add(hiderList);
+    
+    //
+    
+    mixHiders = new JCheckBox("Mix hiders");
+    
+    hiderListAndButton.add(mixHiders);
+    
+    //
+    
+    JButton addHider = new JButton("Add hider");
+    
+    hiderListAndButton.add(addHider);
+    
+    hiders.add(hiderListAndButton);
+    
+    //
+    
+    simulationHidersModel = new DefaultListModel<String>();
+    
+    simulationHidersModel.addElement("RandomSet");
+    
+    JList<String> simulationHiders = new JList<String>(simulationHidersModel);
+    
+    JScrollPane simulationHidersPane = new JScrollPane(simulationHiders);
+    
+    simulationHidersPane.setPreferredSize(new Dimension(100, 100));
+    
+    deleteOnClick(simulationHiders, simulationHidersModel, new PostDelete() {
+      
+      @Override
+      public void postDelete(Object deleted) {
+        
+        if (simulationHidersModel.toArray().length == 1) { 
+          
+          start.setEnabled(false);
+          
+          queue.setEnabled(false);
+          
+        }
         
       }
       
-      private JButton showFiles;
+    });
+    
+    hiders.add(simulationHidersPane);
+    
+    addHider.addActionListener(new ActionListener() {
       
-      private JComboBox<Datafile> files;
-      
-      private JButton collateOutput;
-      
-      private JList<HiderRecord> outputFeedbackList;
-      
-      private JRadioButton seekers;
-      
-      private JRadioButton hiders;
-      
-      private JComboBox<String> measure;
-      
-      private JComboBox<String> graphTypesCombo;
-      
-      private JComboBox<String> categories;
-      
-      private JComboBox<String> gameOrRound;
-      
-      private JCheckBox outputEnabled;
-      
-      private JButton generateGraph;
-      
-      private final static boolean SHORT_TEXT_UI = true;
-      
-      private boolean textBased = false;
-      
-      private boolean killAfterSim = false;
-      
-      public void simulationSchedule(Scanner in) throws NumberFormatException {
+      @Override
+      public void actionPerformed(ActionEvent e) {
         
-        String response;
+        if (!simulationHidersModel.contains(hiderList.getSelectedItem().toString())) simulationHidersModel.addElement(hiderList.getSelectedItem().toString());
+        
+        start.setEnabled(true);
+        
+        queue.setEnabled(true);
+        
+      }
+      
+    });
+    
+    //
+    
+    setupTab.add(hiders);
+    
+    ////
+    
+    JPanel simulationParameters = new JPanel();
+    
+    simulationParameters.setLayout(new GridLayout(4, 2));
+    
+    simulationParameters.setBorder(new TitledBorder("Simulation Parameters"));
+    
+    //
+    
+    simulationParameters.add(new JLabel("Number of rounds:"));
+    
+    numberOfRounds = new JTextField("1");
+    
+    numberOfRounds.setPreferredSize(new Dimension(100, 10));
+    
+    simulationParameters.add(numberOfRounds);
+    
+    //
+    
+    // Blank space in grid layout
+    simulationParameters.add(new JPanel());
+    
+    resetPerRound = new JCheckBox("Reset per round");
+    
+    simulationParameters.add(resetPerRound);
+    
+    simulationParameters.add(new JPanel());
+    
+    strategyOverRounds = new JCheckBox("Strategy over rounds");
+    
+    simulationParameters.add(strategyOverRounds);
+    
+    
+    //
+    
+    simulationParameters.add(new JLabel("Number of games:"));
+    
+    numberOfGames = new JTextField("1");
+    
+    simulationParameters.add(numberOfGames);
+    
+    //
+    
+    setupTab.add(simulationParameters);
+    
+    ////
+    
+    JPanel seekers = new JPanel();
+    
+    seekers.setLayout(new GridLayout(3, 1));
+    
+    seekers.setBorder(new TitledBorder("Seekers"));
+    
+    //
+    
+    seekers.add(new JLabel("Seeker types:"));
+    
+    //
+    
+    JPanel seekerListAndButton = new JPanel();
+    
+    seekerListAndButton.setLayout(new FlowLayout(FlowLayout.LEFT));
+    
+    final JComboBox<String> seekerList = new JComboBox<String>();
+    
+    ComboboxToolTipRenderer seekerListRenderer = new ComboboxToolTipRenderer();
+    
+    seekerList.setRenderer(seekerListRenderer);
+    
+    ArrayList<String> seekerTooltips = new ArrayList<String>();
+    
+    for ( String seekerType : seekerTypes ) {
+      
+      seekerList.addItem(seekerType);
+      
+      seekerTooltips.add(" ");
+      
+    }
+    
+    seekerListRenderer.setTooltips(seekerTooltips);
+    
+    seekerListAndButton.add(seekerList);
+    
+    //
+    
+    mixSeekers = new JCheckBox("Mix seekers");
+    
+    seekerListAndButton.add(mixSeekers);
+    
+    //
+    
+    JButton addSeeker = new JButton("Add seeker");
+    
+    seekerListAndButton.add(addSeeker);
+    
+    seekers.add(seekerListAndButton);
+    
+    //
+    
+    simulationSeekersModel = new DefaultListModel<String>();
+    
+    simulationSeekersModel.addElement("ConstrainedRandomWalk");
+    
+    JList<String> simulationSeekers = new JList<String>(simulationSeekersModel);
+    
+    JScrollPane simulationSeekersPane = new JScrollPane(simulationSeekers);
+    
+    simulationSeekersPane.setPreferredSize(new Dimension(100, 100));
+    
+    deleteOnClick(simulationSeekers, simulationSeekersModel, new PostDelete() {
+      
+      @Override
+      public void postDelete(Object deleted) {
+        
+        if (simulationSeekersModel.toArray().length == 1) { 
+          
+          start.setEnabled(false);
+          
+          queue.setEnabled(false);
+          
+        }
+        
+      }
+      
+    });
+    
+    seekers.add(simulationSeekersPane);
+    
+    addSeeker.addActionListener(new ActionListener() {
+      
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        
+        if (!simulationSeekersModel.contains(seekerList.getSelectedItem().toString())) simulationSeekersModel.addElement(seekerList.getSelectedItem().toString());
+        
+        start.setEnabled(true);
+        
+        queue.setEnabled(true);
+        
+      }
+      
+    });
+    
+    //
+    
+    setupTab.add(seekers);
+    
+    ////////
+    
+  }
+  
+  private void simulationsTab(JTabbedPane tabbedPane) {
+    
+    //////
+    
+    JPanel simulationsTab = new JPanel();
+    
+    simulationsTab.setLayout(new BorderLayout());
+    
+    tabbedPane.addTab("Simulations", simulationsTab);
+    
+    ////
+    
+    queueListModel = new DefaultListModel<String>();
+    
+    queueList = new JList<String>(queueListModel);
+    
+    JScrollPane queueListScroll = new JScrollPane(queueList);
+    
+    queueListScroll.setPreferredSize(new Dimension(800, 200));
+    
+    queueList.addListSelectionListener(new ListSelectionListener() {
+      
+      @Override
+      public void valueChanged(ListSelectionEvent e) {
+        
+        updateUISettings(queueList.getSelectedValue());
+        
+        startSelected.setEnabled(true);
+        
+      }
+      
+    });
+    
+    deleteOnClick(queueList, queueListModel, new PostDelete() {
+      
+      @Override
+      public void postDelete(Object deleted) {
+        
+        if (queueListModel.toArray().length == 1) { 
+          
+          startQueue.setEnabled(false);
+          
+          startSelected.setEnabled(false);
+          
+        }
+        
+        simulations.remove(deleted);
+        
+        // Empty the file
+        FileWriter writer;
+        
+        try {
+          
+          writer = new FileWriter(simulationSchedule);
+          
+          writer.write("");
+          
+          // ~MDC Note: this removing process may lead to duplicate errors i.e. may not be order proof
+          for (String simulation : simulations) { 
+            
+            writer.append(simulation + "\n");
+            
+          }
+          
+          writer.close();
+          
+        } catch (IOException e) {
+          
+          e.printStackTrace();
+          
+        }
+        
+      }
+      
+    });
+    
+    simulationsTab.add(queueListScroll, BorderLayout.CENTER);
+    
+    ////////
+    
+    JPanel controls = new JPanel();
+    
+    controls.setLayout(new FlowLayout(FlowLayout.RIGHT));
+    
+    JButton resetUI = new JButton("Reset");
+    
+    resetUI.addActionListener(new ActionListener() {
+      
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        
+        topologies.setSelectedIndex(0);
+        
+        numberOfNodes.setText("100");
+        
+        numberOfHiddenItems.setText("5");
+        
+        costOfEdgeTraversal.setText("10.0");
+        
+        fixedOrRandom.setSelectedIndex(0);
+        
+        edgeTraversalDecrement.setText("0.0");
+        
+        numberOfRounds.setText("1");
+        
+        numberOfGames.setText("1");
+        
+        simulationHidersModel.clear();
+        
+        simulationHidersModel.addElement("Random");
+        
+        simulationSeekersModel.clear();
+        
+        simulationSeekersModel.addElement("Random Walk");
+        
+      }
+      
+    });
+    
+    controls.add(resetUI);
+    
+    startSelected = new JButton("Start selected");
+    
+    startSelected.setEnabled(false);
+    
+    controls.add(startSelected);
+    
+    start = new JButton("Start setup");
+    
+    controls.add(start);
+    
+    queue = new JButton("Queue simulation");
+    
+    controls.add(queue);
+    
+    startQueue = new JButton("Start queue");
+    
+    startQueue.setEnabled(false);
+    
+    controls.add(startQueue);
+    
+    //
+    
+    simulationsTab.add(controls, BorderLayout.SOUTH);
+    
+    ////
+    
+  }
+  
+  /**
+  * 
+  */
+  private ArrayList<String> simulations;
+  
+  /**
+  * @param input
+  * @return
+  */
+  private boolean checkForBack(String input) {
+    
+    if ( input.contains("back") ) return true;
+    
+    return false;
+    
+  }
+  
+  /**
+  * @param input
+  * @return
+  */
+  private boolean checkForBlank(String input) {
+    
+    if ( input.trim().length() == 0 ) return true;
+    
+    return false;
+    
+  }
+  
+  /**
+  * @param question
+  * @return
+  */
+  private String askQuestion(String question, Scanner in) {
+    
+    System.out.println(question);
+    
+    String response = "";
+    
+    while(true) {
+      
+      try {
+        
+        response = in.nextLine();
+        
+        break;
+        
+      } catch ( java.util.NoSuchElementException e ) {
+        
+        continue;
+        
+      }
+      
+    }
+    
+    return response;
+    
+  }
+  
+  /**
+  * @param listModel
+  * @return
+  */
+  private <E> ArrayList<Object> itemsInList(ListModel<E> listModel) {
+      
+      ArrayList<Object> itemsInList = new ArrayList<Object>();
+      
+      for ( int i = 0; i < listModel.getSize(); i++ ) {
+        
+        itemsInList.add(listModel.getElementAt(i));
+        
+      }
+      
+      return itemsInList;
+      
+    }
+    
+  private JButton showFiles;
+  
+  private JComboBox<Datafile> files;
+  
+  private JButton collateOutput;
+  
+  private JList<HiderRecord> outputFeedbackList;
+  
+  private JRadioButton seekers;
+  
+  private JRadioButton hiders;
+  
+  private JComboBox<String> measure;
+  
+  private JComboBox<String> graphTypesCombo;
+  
+  private JComboBox<String> categories;
+  
+  private JComboBox<String> gameOrRound;
+  
+  private JCheckBox outputEnabled;
+  
+  private JButton generateGraph;
+  
+  private final static boolean SHORT_TEXT_UI = true;
+  
+  private boolean textBased = false;
+  
+  private boolean killAfterSim = false;
+    
+  public void simulationSchedule(Scanner in) throws NumberFormatException {
+    
+    String response;
+    
+    while (true) {
+      
+      // ~MDC Casting things as Objects :-/
+      for ( Object item : itemsInList(queueListModel) ) {
+        
+        String itemText;
+        
+        if ( SHORT_TEXT_UI ) itemText = item.toString().substring(0,  item.toString().indexOf("EdgeWeight") - 2);
+        
+        System.out.println("("+ itemsInList(queueListModel).indexOf(item) + ") " + itemText);
+        
+        System.out.println("------------------------------------------------------------------------------------");
+        
+      }
+      
+      response = askQuestion("Enter single number to start simulation, or list of sims to queue, or (back)", in);
+      
+      if ( !checkForBack(response) ) {
+        
+        queueList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        
+        if ( !response.trim().contains(" ") ) {
+          
+          queueList.setSelectedIndex(Integer.parseInt(response));
+          
+        } else {
+          
+          ArrayList<Integer> indices = new ArrayList<Integer>();
+          
+          for ( String index : response.trim().split(" ") ) {
+            
+            indices.add(Integer.parseInt(index));
+            
+          }
+          
+          queueList.setSelectedIndices(Utils.convertIntegers(indices));
+          
+        }
+        
+        startSelected.doClick();
+        
+      } else {
+        
+        break;
+        
+      }
+      
+    }
+    
+  }
+  
+  public void plotGraph(Scanner in, boolean deleting) throws NumberFormatException {
+    
+    while ( true ) {
+      
+      String response = "";
+      
+      if ( !deleting ) System.out.println("");
+      
+      if ( !deleting ) System.out.println("------------------------------------------");
+      
+      outputFeedbackList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+      
+      int outputIndex = 0;
+      
+      for ( Object item : itemsInList(outputFeedbackList.getModel()) ) {
+        
+        if ( !deleting ) System.out.println("("+ (outputIndex++) + ") " + item);
+        
+      }
+      
+      if ( deleting ) {
+        
+        outputFeedbackList.setSelectedIndex(0);
+        
+        if (!outputFeedbackList.getSelectedValue().toString().equals("-----")) {
+          
+          outputManager.deleteFile(outputFeedbackList.getSelectedValue().getFileRelatingTo());
+          
+          outputManager.removeOrphaned();
+          
+          showFiles.doClick();
+          
+          return;
+          
+        }
+        
+      }
+      
+      while ( response.equals("") || ( response.trim().split(" ").length > ( outputFeedbackList.getModel().getSize() - 1 ) ) ) {
+        
+        response = askQuestion("Enter pairs of player numbers (all), (spaced list) or (back)", in);
+        
+        if ( checkForBack(response) ) break;
+        
+        if ( response.contains("all") ) {
+          
+          response = "";
+          
+          for ( int i = 0; i < itemsInList(outputFeedbackList.getModel()).size() - 1; i++ ) {
+            
+            response += i + " ";
+            
+          }
+          
+          response = response.substring(0, response.length() - 1);
+          
+        }
+        
+        for ( String pair : response.trim().split(" ") ) {
+          
+          if (Integer.parseInt(pair) < 0 || Integer.parseInt(pair) > outputIndex ) {
+            
+            response = "";
+            
+          }
+          
+        }
+        
+      }
+      
+      if ( !checkForBack(response) ) {
+        
+        if ( !response.trim().contains(" ") ) {
+          
+          outputFeedbackList.setSelectedIndex(Integer.parseInt(response));
+          
+        } else {
+          
+          ArrayList<Integer> indices = new ArrayList<Integer>();
+          
+          for ( String index : response.trim().split(" ") ) {
+            
+            if ( index.contains("-----") ) continue;
+            
+            indices.add(Integer.parseInt(index));
+            
+          }
+          
+          outputFeedbackList.setSelectedIndices(Utils.convertIntegers(indices));
+          
+        }
         
         while (true) {
           
-          // ~MDC Casting things as Objects :-/
-          for ( Object item : itemsInList(queueListModel) ) {
+          try {
             
-            String itemText;
-            
-            if ( SHORT_TEXT_UI ) itemText = item.toString().substring(0,  item.toString().indexOf("EdgeWeight") - 2);
-            
-            System.out.println("("+ itemsInList(queueListModel).indexOf(item) + ") " + itemText);
-            
-            System.out.println("------------------------------------------------------------------------------------");
-            
-          }
-          
-          response = askQuestion("Enter single number to start simulation, or list of sims to queue, or (back)", in);
-          
-          if ( !checkForBack(response) ) {
-            
-            queueList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-            
-            if ( !response.trim().contains(" ") ) {
-              
-              queueList.setSelectedIndex(Integer.parseInt(response));
-              
-            } else {
-              
-              ArrayList<Integer> indices = new ArrayList<Integer>();
-              
-              for ( String index : response.trim().split(" ") ) {
-                
-                indices.add(Integer.parseInt(index));
-                
-              }
-              
-              queueList.setSelectedIndices(Utils.convertIntegers(indices));
-              
-            }
-            
-            startSelected.doClick();
-            
-          } else {
+            configureGraph(in);
             
             break;
             
-          }
-          
-        }
-        
-      }
-      
-      public void plotGraph(Scanner in, boolean deleting) throws NumberFormatException {
-        
-        while ( true ) {
-          
-          String response = "";
-          
-          if ( !deleting ) System.out.println("");
-          
-          if ( !deleting ) System.out.println("------------------------------------------");
-          
-          outputFeedbackList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-          
-          int outputIndex = 0;
-          
-          for ( Object item : itemsInList(outputFeedbackList.getModel()) ) {
+          } catch ( NumberFormatException e ) {
             
-            if ( !deleting ) System.out.println("("+ (outputIndex++) + ") " + item);
-            
-          }
-          
-          if ( deleting ) {
-            
-            outputFeedbackList.setSelectedIndex(0);
-            
-            if (!outputFeedbackList.getSelectedValue().toString().equals("-----")) {
-              
-              outputManager.deleteFile(outputFeedbackList.getSelectedValue().getFileRelatingTo());
-              
-              outputManager.removeOrphaned();
-              
-              showFiles.doClick();
-              
-              return;
-              
-            }
-            
-          }
-          
-          while ( response.equals("") || ( response.trim().split(" ").length > ( outputFeedbackList.getModel().getSize() - 1 ) ) ) {
-            
-            response = askQuestion("Enter pairs of player numbers (all), (spaced list) or (back)", in);
-            
-            if ( checkForBack(response) ) break;
-            
-            if ( response.contains("all") ) {
-              
-              response = "";
-              
-              for ( int i = 0; i < itemsInList(outputFeedbackList.getModel()).size() - 1; i++ ) {
-                
-                response += i + " ";
-                
-              }
-              
-              response = response.substring(0, response.length() - 1);
-              
-            }
-            
-            for ( String pair : response.trim().split(" ") ) {
-              
-              if (Integer.parseInt(pair) < 0 || Integer.parseInt(pair) > outputIndex ) {
-                
-                response = "";
-                
-              }
-              
-            }
-            
-          }
-          
-          if ( !checkForBack(response) ) {
-            
-            if ( !response.trim().contains(" ") ) {
-              
-              outputFeedbackList.setSelectedIndex(Integer.parseInt(response));
-              
-            } else {
-              
-              ArrayList<Integer> indices = new ArrayList<Integer>();
-              
-              for ( String index : response.trim().split(" ") ) {
-                
-                if ( index.contains("-----") ) continue;
-                
-                indices.add(Integer.parseInt(index));
-                
-              }
-              
-              outputFeedbackList.setSelectedIndices(Utils.convertIntegers(indices));
-              
-            }
-            
-            while (true) {
-              
-              try {
-                
-                configureGraph(in);
-                
-                break;
-                
-              } catch ( NumberFormatException e ) {
-                
-                System.out.println("Input error, restarting...");
-                
-              }
-              
-            }
-            
-          } else {
-            
-            return;
+            System.out.println("Input error, restarting...");
             
           }
           
         }
         
+      } else {
+        
+        return;
+        
       }
       
-      /**
-      * 
-      */
-      private boolean ASK_FOR_CATEGORY = false;
+    }
+    
+  }
+  
+  /**
+  * 
+  */
+  private boolean ASK_FOR_CATEGORY = false;
+  
+  /**
+  * 
+  */
+  private String figureToOverwrite;
+  
+  /**
+  * @param in
+  * @throws NumberFormatException
+  */
+  private void configureGraph(Scanner in) throws NumberFormatException {
+    
+    String response = askQuestion("Enter hiders or seekers. (Enter) for default: " + ( hiders.isSelected() ? "hiders" : "seekers" ) + " or (back).", in);
+    
+    if ( !checkForBack(response) ) {
       
-      /**
-      * 
-      */
-      private String figureToOverwrite;
-      
-      /**
-      * @param in
-      * @throws NumberFormatException
-      */
-      private void configureGraph(Scanner in) throws NumberFormatException {
+      if ( !checkForBlank(response) ) {
         
-        String response = askQuestion("Enter hiders or seekers. (Enter) for default: " + ( hiders.isSelected() ? "hiders" : "seekers" ) + " or (back).", in);
+        if ( response.toLowerCase().contains("hider") ) {
+          
+          hiders.setSelected(true);
+          
+        } else {
+          
+          seekers.setSelected(true);
+          
+        }
+        
+      }
+      
+      refreshMeasureList();
+      
+      while ( !itemsInList(measure.getModel()).contains(response) ) {
+        
+        response = askQuestion("Enter measure (" + itemsInList(measure.getModel()) + "). (Enter) for default: " + measure.getModel().getElementAt(measure.getSelectedIndex()) + " or (back).", in);
+        
+        if ( response.equals("") || checkForBack(response) ) break;
+        
+      }
+      
+      if ( !checkForBack(response) ) {
+        
+        if ( !checkForBlank(response) ) {
+          
+          response = response.trim();
+          
+          measure.getModel().setSelectedItem(measure.getModel().getElementAt(itemsInList(measure.getModel()).indexOf(response)));
+          
+        }
+        
+        while ( !itemsInList(graphTypesCombo.getModel()).contains(response) ) {
+          
+          response = askQuestion("Enter graph type (" + itemsInList(graphTypesCombo.getModel()) + "). (Enter) for default: " + graphTypesCombo.getModel().getElementAt(graphTypesCombo.getSelectedIndex()) + " or (back).", in);
+          
+          if ( response.equals("") || checkForBack(response) ) break;
+          
+        }
         
         if ( !checkForBack(response) ) {
           
           if ( !checkForBlank(response) ) {
             
-            if ( response.toLowerCase().contains("hider") ) {
-              
-              hiders.setSelected(true);
-              
-            } else {
-              
-              seekers.setSelected(true);
-              
-            }
+            response = response.trim();
+            
+            graphTypesCombo.getModel().setSelectedItem(graphTypesCombo.getModel().getElementAt(itemsInList(graphTypesCombo.getModel()).indexOf(response)));
             
           }
           
-          refreshMeasureList();
-          
-          while ( !itemsInList(measure.getModel()).contains(response) ) {
+          if ( ASK_FOR_CATEGORY ) {
             
-            response = askQuestion("Enter measure (" + itemsInList(measure.getModel()) + "). (Enter) for default: " + measure.getModel().getElementAt(measure.getSelectedIndex()) + " or (back).", in);
+            while ( !itemsInList(categories.getModel()).contains(response) ) {
+              
+              response = askQuestion("Enter bar category (" + itemsInList(categories.getModel()) + "). (Enter) for default: " + categories.getModel().getElementAt(categories.getSelectedIndex()) + " or (back).", in);
+              
+              if ( response.equals("") || checkForBack(response) ) break;
+              
+            }
             
-            if ( response.equals("") || checkForBack(response) ) break;
+          } else {
+            
+            response = "";
             
           }
           
@@ -1930,13 +1974,13 @@ public class Runner extends JFrame {
               
               response = response.trim();
               
-              measure.getModel().setSelectedItem(measure.getModel().getElementAt(itemsInList(measure.getModel()).indexOf(response)));
+              categories.getModel().setSelectedItem(categories.getModel().getElementAt(itemsInList(categories.getModel()).indexOf(response)));
               
             }
             
-            while ( !itemsInList(graphTypesCombo.getModel()).contains(response) ) {
+            while ( !itemsInList(gameOrRound.getModel()).contains(response) ) {
               
-              response = askQuestion("Enter graph type (" + itemsInList(graphTypesCombo.getModel()) + "). (Enter) for default: " + graphTypesCombo.getModel().getElementAt(graphTypesCombo.getSelectedIndex()) + " or (back).", in);
+              response = askQuestion("Enter game or round (" + itemsInList(gameOrRound.getModel()) + "). (Enter) for default: " + gameOrRound.getModel().getElementAt(gameOrRound.getSelectedIndex()) + " or (back).", in);
               
               if ( response.equals("") || checkForBack(response) ) break;
               
@@ -1948,109 +1992,25 @@ public class Runner extends JFrame {
                 
                 response = response.trim();
                 
-                graphTypesCombo.getModel().setSelectedItem(graphTypesCombo.getModel().getElementAt(itemsInList(graphTypesCombo.getModel()).indexOf(response)));
+                gameOrRound.getModel().setSelectedItem(gameOrRound.getModel().getElementAt(itemsInList(gameOrRound.getModel()).indexOf(response)));
                 
               }
               
-              if ( ASK_FOR_CATEGORY ) {
-                
-                while ( !itemsInList(categories.getModel()).contains(response) ) {
-                  
-                  response = askQuestion("Enter bar category (" + itemsInList(categories.getModel()) + "). (Enter) for default: " + categories.getModel().getElementAt(categories.getSelectedIndex()) + " or (back).", in);
-                  
-                  if ( response.equals("") || checkForBack(response) ) break;
-                  
-                }
-                
-              } else {
-                
-                response = "";
-                
-              }
+            } else {
+              
+              return;
+              
+            }
+            
+            if ( OVERWRITE_FIGURE ) {
+              
+              response = askQuestion("Enter figure to overwrite: ", in);
               
               if ( !checkForBack(response) ) {
                 
                 if ( !checkForBlank(response) ) {
                   
-                  response = response.trim();
-                  
-                  categories.getModel().setSelectedItem(categories.getModel().getElementAt(itemsInList(categories.getModel()).indexOf(response)));
-                  
-                }
-                
-                while ( !itemsInList(gameOrRound.getModel()).contains(response) ) {
-                  
-                  response = askQuestion("Enter game or round (" + itemsInList(gameOrRound.getModel()) + "). (Enter) for default: " + gameOrRound.getModel().getElementAt(gameOrRound.getSelectedIndex()) + " or (back).", in);
-                  
-                  if ( response.equals("") || checkForBack(response) ) break;
-                  
-                }
-                
-                if ( !checkForBack(response) ) {
-                  
-                  if ( !checkForBlank(response) ) {
-                    
-                    response = response.trim();
-                    
-                    gameOrRound.getModel().setSelectedItem(gameOrRound.getModel().getElementAt(itemsInList(gameOrRound.getModel()).indexOf(response)));
-                    
-                  }
-                  
-                } else {
-                  
-                  return;
-                  
-                }
-                
-                if ( OVERWRITE_FIGURE ) {
-                  
-                  response = askQuestion("Enter figure to overwrite: ", in);
-                  
-                  if ( !checkForBack(response) ) {
-                    
-                    if ( !checkForBlank(response) ) {
-                      
-                      figureToOverwrite = response;
-                      
-                    }
-                    
-                  } else {
-                    
-                    return;
-                    
-                  }
-                  
-                }
-                
-                response = "";
-                
-                while ( response.equals("") ) {
-                  
-                  response = askQuestion("Confirm graph output (y/n)", in);
-                  
-                }
-                
-                if ( response.contains("y")) {
-                  
-                  outputEnabled.setSelected(true);
-                  
-                  generateGraph.doClick();
-                  
-                }
-                
-                response = askQuestion("(replot), (exit) or (back)", in);
-                
-                if ( !checkForBack(response) ) {
-                  
-                  if ( response.contains("replot") ) {
-                    
-                    return;
-                    
-                  } else {
-                    
-                    System.exit(0);
-                    
-                  }
+                  figureToOverwrite = response;
                   
                 }
                 
@@ -2060,9 +2020,37 @@ public class Runner extends JFrame {
                 
               }
               
-            } else {
+            }
+            
+            response = "";
+            
+            while ( response.equals("") ) {
               
-              return;
+              response = askQuestion("Confirm graph output (y/n)", in);
+              
+            }
+            
+            if ( response.contains("y")) {
+              
+              outputEnabled.setSelected(true);
+              
+              generateGraph.doClick();
+              
+            }
+            
+            response = askQuestion("(replot), (exit) or (back)", in);
+            
+            if ( !checkForBack(response) ) {
+              
+              if ( response.contains("replot") ) {
+                
+                return;
+                
+              } else {
+                
+                System.exit(0);
+                
+              }
               
             }
             
@@ -2078,879 +2066,101 @@ public class Runner extends JFrame {
           
         }
         
-      }
-      
-      /**
-      * @param in
-      * @throws NumberFormatException
-      */
-      private void completeSimulations(Scanner in) throws NumberFormatException {
+      } else {
         
-        String response = "";
-        
-        while (true) {
-          
-          if ( files.getModel().getSize() == 0 ) showFiles.doClick();
-          
-          for ( Object item : itemsInList(files.getModel()) ) {
-            
-            String itemText = "";
-            
-            if ( SHORT_TEXT_UI && item.toString().contains("EdgeWeight") ) itemText = item.toString().substring(0,  item.toString().indexOf("EdgeWeight") - 2);
-            
-            System.out.println("("+ itemsInList(files.getModel()).indexOf(item) + ") " + itemText);
-            
-            System.out.println("------------------------------------------------------------------------------------");
-            
-          }
-          
-          response = "";
-          
-          boolean deleting = false;
-          
-          while ( response == "") {
-            
-            response = askQuestion("Enter number to process, (all) to process all or (back). D<N> deletes.", in);
-            
-            if ( response.contains("D") ) { 
-              
-              response = response.replace("D", "");
-              
-              deleting = true;
-              
-            }
-            
-            if ( Integer.parseInt(response) < 0 || Integer.parseInt(response) > ( itemsInList(files.getModel()).size() - 1 ) ) response = "";
-            
-          }
-          
-          if ( !checkForBack(response) ) {
-            
-            if ( response.contains("all") ) {
-              
-              showFiles.doClick();
-              
-            } else {
-              
-              files.getModel().setSelectedItem(files.getModel().getElementAt(Integer.parseInt(response)));
-              
-            }
-            
-            collateOutput.doClick();
-            
-            while ( true ) {
-              
-              try {
-                
-                plotGraph(in, deleting);
-                
-                break;
-                
-              } catch (NumberFormatException e ) { 
-                
-                System.out.println("Input error, restarting...");
-                
-              } catch (Exception e) {
-                
-                System.out.println("Restarting...");
-                
-              }
-              
-            }
-            
-          } else {
-            
-            break;
-            
-          }
-          
-        }
+        return;
         
       }
       
-      public void textMenu(Scanner in) throws NumberFormatException {
-        
-        while ( true ) {
-          
-          if ( Utils.DEBUG == true ) {
-            
-            String response = askQuestion("\nWARNING: DEBUG ENABLED \nQuit (q) or Continue (c)", in);
-            
-            if ( response.equals("q") ) {
-              
-              System.exit(0);
-              
-            } 
-            
-          }
-          
-          String response = askQuestion("\nMain menu :) \n(1) List simulation schedule \n(2) List complete simulations", in);
-          
-          if ( response.equals("1") ) {
-            
-            simulationSchedule(in);
-            
-          } else if ( response.equals("2") ) {
-            
-            completeSimulations(in);
-            
-          }
-          
-        }
-        
-      }
+    } else {
       
-      /**
-      * 
-      */
-      private boolean generateOutput = true;
-      
-      /**
-      * 
-      */
-      private String simulationSchedule = Utils.FILEPREFIX + "simulationSchedule-resp.txt";
-      
-      /**
-      * 
-      */
-      private String DATA_INPUT = "data";
-      
-      /**
-      * 
-      */
-      private boolean OVERWRITE_FIGURE = false;
-      
-      /**
-      * 
-      */
-      private boolean recursiveSub = false;
-      
-      /**
-      * @param args
-      */
-      public Runner(String[] args) {
-        
-        super("HANDS");
-
-        String activePlugin = Utils.getActivePlugin();
-        if(activePlugin!=null) simulationSchedule = "plugins/" + activePlugin + "/" + simulationSchedule;
-        
-        if ( args.length > 0 ) {
-          
-          ArrayList<String> argsList = new ArrayList<String>(Arrays.asList(args));
-          
-          if ( argsList.contains("-k") ) {
-            
-            killAfterSim = true;
-            
-          }
-          
-          if ( argsList.contains("-t") ) {
-            
-            textBased = true;
-            
-          }
-          
-          if ( argsList.contains("-nop")) {
-            
-            generateOutput = false;
-            
-          }
-          
-          if ( argsList.contains("-di")) {
-            
-            DATA_INPUT = argsList.get(argsList.indexOf("-di") + 1);;
-            
-          }
-          
-          if ( argsList.contains("-ss")) {
-            
-            simulationSchedule = argsList.get(argsList.indexOf("-ss") + 1);
-            
-          }
-          
-          if ( argsList.contains("-overwrite")) {
-            
-            OVERWRITE_FIGURE = true;
-            
-          }
-          
-          if ( argsList.contains("-r") ) {
-            
-            recursiveSub = true;
-            
-          }
-          
-        }
-        
-        init();
-        
-        if ( textBased ) {
-          
-          Scanner in = new Scanner(System.in);
-          
-          outputManager.setTextBased(true);
-          
-          while ( true ) {
-            
-            try {
-              
-              textMenu(in);
-              
-              break;
-              
-            } catch (NumberFormatException e) {
-              
-              System.out.println("Input error, restarting...");
-              
-            }
-            
-          }
-          
-          in.close();
-          
-        }
-        
-      }
-      
-      private void init() {
-        
-        generateGUI();
-        
-        // Collect list of simulations
-        simulations = Utils.readFromFile(simulationSchedule);
-        
-        simulations = simulations.stream().filter(simulation->!simulation.startsWith("#")).collect(Collectors
-        .toCollection(ArrayList::new));
-
-        for (String simulation : simulations) { 
-
-            queueListModel.addElement(simulation);
-          
-            startQueue.setEnabled(true);
-          
-        }
-        
-        //
-        
-        start.addActionListener(new ActionListener() {
-          
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            
-            System.out.println(Arrays.toString(getUISettings()));
-            
-            runSimulation(Integer.parseInt(numberOfGames.getText()), getUISettings());
-            
-            if (killAfterSim) System.exit(0);
-            
-          }
-          
-        });
-        
-        //
-        
-        startSelected.addActionListener(new ActionListener() {
-          
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            
-            for (String simulationFromList : queueList.getSelectedValuesList() ) {
-              
-              String[] simulation = simulationFromList.split(",\\s");
-              
-              runSimulation(Integer.parseInt(simulation[0]), simulation);
-              
-            }
-            
-            if (killAfterSim) System.exit(0);
-            
-          }
-          
-        });
-        
-        //
-        
-        queue.addActionListener(new ActionListener() {
-          
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            
-            if (!queueListModel.contains(Arrays.toString(getUISettings()).substring(1, Arrays.toString(getUISettings()).length() - 1))) {
-              
-              queueListModel.addElement(Arrays.toString(getUISettings()).substring(1, Arrays.toString(getUISettings()).length() - 1));
-              
-              try {
-                
-                Utils.writeToFile(new FileWriter(simulationSchedule, true), Arrays.toString(getUISettings()).substring(1, Arrays.toString(getUISettings()).length() - 1) + "\n");
-                
-                simulations = Utils.readFromFile(simulationSchedule);
-
-                simulations.stream().filter(simulation->!simulation.startsWith("#")).collect(Collectors
-                .toCollection(ArrayList::new));
-                
-              } catch (IOException e1) {
-                
-                e1.printStackTrace();
-                
-              }
-              
-              startQueue.setEnabled(true);
-              
-            }
-            
-          }
-          
-        });
-        
-        //
-        
-        startQueue.addActionListener(new ActionListener() {
-          
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            
-            runSimulationList(simulations);
-            
-            if (killAfterSim) System.exit(0);
-            
-          }
-          
-        });
-        
-      }
-      
-      private void updateUISettings(String settings) {
-        
-        if (settings == null) return;
-        
-        String[] simulationParameters = settings.split(",\\s");
-        
-        int arrayPosition = 0;
-        
-        simulationHidersModel.clear();
-        
-        simulationSeekersModel.clear();
-        
-        for (String param : simulationParameters) {
-          
-          if (param.indexOf('{') != -1) {
-            
-            Pair<String, String> paramPair = Utils.stringToArray(param, "(\\{([0-9a-zA-Z]+),([0-9a-zA-Z.+\\*\\(\\)]+)\\})").get(0);
-            
-            if (paramPair.getElement0().equals("Topology")) {
-              
-              topologies.setSelectedItem(paramPair.getElement1());
-              
-            } else if (paramPair.getElement0().equals("NumberOfNodes")) { 
-              
-              numberOfNodes.setText(paramPair.getElement1());
-              
-            } else if (paramPair.getElement0().equals("NumberOfHideLocations")) { 
-              
-              numberOfHiddenItems.setText(paramPair.getElement1());
-              
-            } else if (paramPair.getElement0().equals("Rounds")) { 
-              
-              numberOfRounds.setText(paramPair.getElement1());
-              
-            } else if (paramPair.getElement0().equals("EdgeWeight")) { 
-              
-              costOfEdgeTraversal.setText(paramPair.getElement1());
-              
-            } else if (paramPair.getElement0().equals("FixedOrUpperWeight")) { 
-              
-              fixedOrRandom.setSelectedItem(paramPair.getElement1());
-              
-            } else if (paramPair.getElement0().equals("EdgeTraversalDecrement")) { 
-              
-              edgeTraversalDecrement.setText(paramPair.getElement1());
-              
-            } else if (paramPair.getElement0().equals("MixHiders")) {
-              
-              if ( Boolean.parseBoolean(paramPair.getElement1()) ) { 
-                
-                mixHiders.setSelected(true); 
-                
-              } else { 
-                
-                mixHiders.setSelected(false); 
-                
-              } 
-              
-            } else if (paramPair.getElement0().equals("MixSeekers")) {
-              
-              if ( Boolean.parseBoolean(paramPair.getElement1()) ) { 
-                
-                mixSeekers.setSelected(true); 
-                
-              } else { 
-                
-                mixSeekers.setSelected(false); 
-                
-              } 
-              
-            } else if (paramPair.getElement0().equals("ResetPerRound")) {
-              
-              if ( Boolean.parseBoolean(paramPair.getElement1()) ) { 
-                
-                resetPerRound.setSelected(true); 
-                
-              } else { 
-                
-                resetPerRound.setSelected(false); 
-                
-              } 
-              
-            } else if (paramPair.getElement0().equals("StrategyOverRounds")) {
-              
-              if ( Boolean.parseBoolean(paramPair.getElement1()) ) { 
-                
-                strategyOverRounds.setSelected(true); 
-                
-              } else { 
-                
-                strategyOverRounds.setSelected(false); 
-                
-              } 
-              
-            }
-            
-          } else if (param.indexOf('[') != -1) {
-            
-            ArrayList<Pair<String, String>> types = Utils.stringToArray(param, "(\\[([0-9a-zA-Z]+),([0-9]+)\\])");
-            
-            for (Pair<String, String> traverser : types) {
-              
-              // Is Hider 
-              if (arrayPosition == 1)  {
-                
-                simulationHidersModel.addElement(traverser.getElement0());
-                
-                // Is Seeker  
-              } else {
-                
-                simulationSeekersModel.addElement(traverser.getElement0());
-                
-              }
-              
-            }
-            
-          } else {
-            
-            numberOfGames.setText(param);
-            
-          }
-          
-          arrayPosition++;
-          
-        }
-        
-      }
-      
-      private String[] getUISettings() {
-        
-        String hiderParameter = "";
-        
-        for (Object hider : simulationHidersModel.toArray()) {
-          
-          hiderParameter += "[" + hider + ",1]";
-          
-        }
-        
-        String seekerParameter = "";
-        
-        for (Object seeker : simulationSeekersModel.toArray()) {
-          
-          seekerParameter += "[" + seeker + ",1]";
-          
-        }
-        
-        return new String[]{ 
-          
-          numberOfGames.getText(),
-          
-          hiderParameter,
-          
-          seekerParameter,
-          
-          "{Topology," + topologies.getSelectedItem().toString() + "}", // Topology
-          
-          "{NumberOfNodes," + numberOfNodes.getText() + "}", // Number of nodes in graph
-          
-          "{NumberOfHideLocations," + numberOfHiddenItems.getText() + "}", // Number of hide locations
-          
-          "{Rounds," + numberOfRounds.getText() + "}", // rounds
-          
-          "{EdgeWeight," + costOfEdgeTraversal.getText() + "}", // cost of traversing an edge
-          
-          "{FixedOrUpperWeight," + fixedOrRandom.getSelectedItem().toString() + "}", // whether cost supplied is static value or the upper bound of a distribution
-          
-          "{EdgeTraversalDecrement," + edgeTraversalDecrement.getText() + "}", // % discount gained by an agent for having traversed an edge before (100 = no discount; < 100 = discount)
-          
-          "{MixHiders," + mixHiders.isSelected() + "}",
-          
-          "{MixSeekers," + mixSeekers.isSelected() + "}",
-          
-          "{ResetPerRound," + resetPerRound.isSelected() + "}",
-          
-          "{StrategyOverRounds," + strategyOverRounds.isSelected() + "}"
-          
-        };  
-        
-      }
-      
-      /**
-      * 
-      */
-      private void runSimulationList(ArrayList<String> simulations) {
-        
-        for (String currentSimulation : simulations) {
-          
-          String[] simulationParameters = currentSimulation.split(",\\s");
-          
-          // If the simulation is commented out, do not run it.
-          if(		simulationParameters[0].equals("//")	) { continue; }
-          
-          runSimulation(Integer.parseInt(simulationParameters[0]), simulationParameters);
-          
-        }
-        
-      }
-      
-      /**
-      * ~MDC 8/8 Messy and inefficient
-      * 
-      * @param GAMES
-      * @param simulationParameters
-      */
-      private void runSimulation(int GAMES, String[] simulationParameters) {
-        
-        /*for ( int paramID = 0; paramID < simulationParameters.length; paramID++ ) {
-          
-          if ( simulationParameters[paramID].contains("j") ) {
-            
-            String jExpression = simulationParameters[paramID];
-            
-            for ( int j = 0; j < GAMES; j++ ) {
-              
-              String parsed = parseExpression(jExpression.replace("j", j + "").substring(jExpression.replace("j", j + "").indexOf(",") + 1, jExpression.replace("j", j + "").length() - 1));
-              
-              if ( parsed.equals("-1") ) throw new UnsupportedOperationException("Failed to parse J expression");
-              
-              simulationParameters[paramID] = jExpression.substring(0, jExpression.indexOf(",") + 1) + parsed + "}";
-              
-              runSimulationX(GAMES, simulationParameters);
-              
-            }
-            
-            return;
-            
-          }
-          
-        }*/
-        
-        // Group ID to use if j and there are multiple files output from one simulation
-        String groupID = Utils.timestamp();
-        
-        String[] simulationParametersUnchanged = Arrays.copyOf(simulationParameters, simulationParameters.length);
-        
-        boolean containsJ = false;
-        
-        for ( int j = 0; j < GAMES; j++ ) {
-          
-          containsJ = false;
-          
-          for (int k = 0; k < simulationParameters.length; k++) {
-            
-            if (simulationParametersUnchanged[k].contains("j*") || simulationParametersUnchanged[k].contains("j+")) { 
-              
-              containsJ = true;
-              
-              String parsed = parseExpression(simulationParametersUnchanged[k].replace("j", j + "").substring(simulationParametersUnchanged[k].replace("j", j + "").indexOf(",") + 1, simulationParametersUnchanged[k].replace("j", j + "").length() - 1));
-              
-              if ( parsed.equals("-1") ) throw new UnsupportedOperationException("Failed to parse I expression");
-              
-              simulationParameters[k] = "" + simulationParametersUnchanged[k].substring(0, simulationParametersUnchanged[k].indexOf(",") + 1) + parsed + "}";
-              
-              
-            } else if (simulationParametersUnchanged[k].contains(",j")) { 
-              
-              containsJ = true;
-              
-              simulationParameters[k] = simulationParametersUnchanged[k].replaceAll("(\\,j)", "," + j); 
-              
-            }
-            
-          }
-          
-          if ( containsJ ) { 
-            
-            runSimulationX(GAMES, simulationParameters, "" + groupID);
-            
-          } else {
-            
-            break;
-            
-          }
-          
-        }
-        
-        if (!containsJ) runSimulationX(GAMES, simulationParameters);
-        
-      }
-      
-      /**
-      * @param expression
-      * @return
-      */
-      private String parseExpression(String expression) {
-        
-        Interpreter interpreter = new Interpreter();
-        
-        try {
-          
-          interpreter.eval("result = " +  expression);
-          
-          return "" + interpreter.get("result");
-          
-        } catch (EvalError e) {
-          
-          e.printStackTrace();
-          
-          return "-1";
-          
-        }
-        
-      }
-      
-      /**
-      * @param GAMES
-      * @param simulationParameters
-      */
-      private void runSimulationX(int GAMES, String[] simulationParameters) {
-        
-        runSimulationX(GAMES, simulationParameters, "");
-        
-      }
-      
-      private void runSimulationX(int GAMES, String[] simulationParameters, String namePrefix) {
-        
-        /***********/
-        
-        if ( !namePrefix.equals("") ) namePrefix = namePrefix + "-";
-        
-        // Generate ID For this simulation
-        String currentSimulationIdentifier = namePrefix + ( Utils.timestamp() );
-        
-        if ( generateOutput ) {
-          
-          Utils.writeToFile(Utils.FILEPREFIX + "simRecordID.txt", currentSimulationIdentifier);
-          
-          Utils.writeToFile(Utils.FILEPREFIX + "/data/" + currentSimulationIdentifier + ".csv", "");
-          
-          Utils.writeToFile(Utils.FILEPREFIX + "/data/" + currentSimulationIdentifier + ".csv", Arrays.toString(simulationParameters) + "\n");
-          
-        }
-        
-        /***********/
-        
-        String[] parameters = { "Hiders", 
-        "Seekers",
-        "Topology", // Topology
-        "NumberOfNodes", // Number of nodes in graph
-        "NumberOfHideLocations", // Number of hide locations
-        "Rounds", // rounds 
-        "EdgeWeight", // cost of traversing an edge
-        "FixedOrUpperWeight", // whether cost supplied is static value or the upper bound of a distribution
-        "EdgeTraversalDecrement", // % discount gained by an agent for having traversed an edge before (100 = no discount; < 100 = discount)
-        "MixHiders", // Mix equally between the hide strategies
-        "MixSeekers", // Mix equally between the search strategies
-        "ResetPerRound", // Whether players knowledge should persist through rounds
-        "AdditionalResourceImmunity", // Additional resource immunity across all traversers (proportion of existing immunity to add (e.g. 1.0 = double))
-        "BaseGasProportion", // Additional gas to provide to all gas traversers (as a proportion of total edge costs)
-        "StrategyOverRounds", // Whether to double the number of round sets, in order to test strategies that evolve over all rounds
-        "GenerateOutputFiles", // Whether to log results to file
-        "ConfigId" // Unique ID for simulation configuration
-      };
-      
-      String[] defaultParameters = { simulationParameters[1],
-        simulationParameters[2],
-        "random", // Topology
-        "100", // Number of nodes in graph
-        "5", // Number of hide locations
-        "120", // rounds
-        "100.0", // cost of traversing an edge
-        "upper", // whether cost supplied is static value or the upper bound of a distribution
-        "0",// % discount gained by an agent for having traversed an edge before (1.0 = no discount; < 1.0 = discount),
-        "false", // Mix equally between the hide strategies
-        "false", // Mix equally between the search strategies
-        "true", // Whether players knowledge should persist through rounds
-        "0.0", // Additional resource immunity across all traversers (proportion of existing immunity to add (e.g. 1.0 = double))
-        "0.0", // Additional gas to provide to all gas traversers (as a proportion of total edge costs)
-        "false", // Whether to double the number of round sets, in order to test strategies that evolve over all rounds
-        (generateOutput + ""),
-        "000"
-      };
-      
-      /***********/
-      
-      /* As we are replacing variables in our simulation parameters with concrete values, 
-      * we must retain the original variables for future games, or they will be lost
-      * i.e. if we receive i+1 as a parameter, this will need to be changed to '1' for the
-      * first game, but a copy of i+1 will need to be retained for the second, third games etc.
-      */
-      String[] simulationParametersUnchanged = Arrays.copyOf(simulationParameters, simulationParameters.length);
-      
-      // Run 'games' of simulation by repeat running program
-      
-      String startTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
-      
-      System.out.println("-----------------------------------------------------------------");
-      
-      for(int i = 0; i < GAMES; i++) {
-        
-        System.out.println("Run: " + (i + 1));
-        System.out.println("-----------------------------------------------------------------");
-        
-        System.out.println( ( ( i / ((float)GAMES) ) * 100 ) + "%" );
-        
-        // Remove wildcards from param string and replace with values
-        
-        for (int j = 0; j < simulationParameters.length; j++) {
-          
-          if (simulationParametersUnchanged[j].contains("*") || simulationParametersUnchanged[j].contains("+")) { 
-            
-            String parsed = parseExpression(simulationParametersUnchanged[j].replace("i", i + "").substring(simulationParametersUnchanged[j].replace("i", i + "").indexOf(",") + 1, simulationParametersUnchanged[j].replace("i", i + "").length() - 1));
-            
-            if ( parsed.equals("-1") ) throw new UnsupportedOperationException("Failed to parse I expression");
-            
-            simulationParameters[j] = "" + simulationParametersUnchanged[j].substring(0, simulationParametersUnchanged[j].indexOf(",") + 1) + parsed + "}";
-            
-            
-            /*
-            simulationParametersUnchanged[j].replaceAll("(i\\*([0-9]+))", 
-            "" + (i * Integer.parseInt(
-            simulationParametersUnchanged[j].substring( 
-            Utils.startIndexOf(simulationParametersUnchanged[j], "(i\\*([0-9]+))") + 2, 
-            Utils.endIndexOf(simulationParametersUnchanged[j], "(i\\*([0-9]+))")
-            )
-            
-            )
-            )
-            );
-            
-          } else if (simulationParametersUnchanged[j].contains("i+")) { 
-            
-            simulationParameters[j] = 
-            
-            simulationParametersUnchanged[j].replaceAll("(i\\+([0-9]+))", 
-            "" + (i + Integer.parseInt(
-            simulationParametersUnchanged[j].substring(
-            Utils.startIndexOf(simulationParametersUnchanged[j], "(i\\+([0-9]+))") + 2, 
-            Utils.endIndexOf(simulationParametersUnchanged[j], "(i\\+([0-9]+))")
-            )
-            )
-            )
-            );
-            
-            */
-            
-          } else if (simulationParametersUnchanged[j].contains(",i")) { 
-            
-            simulationParameters[j] = 
-            
-            simulationParametersUnchanged[j].replaceAll("(\\,i)", "," + i); 
-            
-          }
-          
-        }
-        
-        // Alter the default parameters to reflect those that have been input
-        
-        for (String param : simulationParameters) {
-          
-          if (param.indexOf('{') != -1) {
-            
-            Pair<String, String> paramPair = Utils.stringToArray(param, "(\\{([0-9a-zA-Z]+),([0-9a-zA-Z.]+)\\})").get(0);
-            
-            defaultParameters[Arrays.asList(parameters).indexOf(paramPair.getElement0())] = paramPair.getElement1(); 
-            
-          }
-          
-        }
-        
-        // Construct the param string to supply to the program
-        
-        String paramString = "";
-        
-        for (int k = 0; k < defaultParameters.length; k++) {
-          
-          paramString += defaultParameters[k] + " ";
-          
-        }
-        
-        System.out.println(paramString);
-        
-        /***********/
-      
-        Main.main(Stream.concat(Arrays.stream(new String[]{i+"", GAMES+""}), Arrays.stream(paramString.split(" "))).toArray(String[]::new));
-
-        System.out.println("-----------------------------------------------------------------");
-        
-        if ( i < GAMES - 1); {
-          
-          // Utils.runCommand("clear");
-          
-          // Utils.runCommand("printf '\\\\e[3J'");
-          
-          // Utils.runCommand("printf '\\\\ec'");
-          
-        }
-        
-      } // End of game run loop
-      
-      System.out.println("Started: " + startTime + " and ended: " + new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime()));
+      return;
       
     }
     
-    /**
-    * From: http://stackoverflow.com/questions/480261/java-swing-mouseover-text-on-jcombobox-items
-    * 
-    * @author Martin
-    */
-    private class ComboboxToolTipRenderer extends DefaultListCellRenderer {
+  }
+  
+  /**
+  * @param in
+  * @throws NumberFormatException
+  */
+  private void completeSimulations(Scanner in) throws NumberFormatException {
+    
+    String response = "";
+    
+    while (true) {
       
-      /**
-      * 
-      */
-      private static final long serialVersionUID = 1L;
+      if ( files.getModel().getSize() == 0 ) showFiles.doClick();
       
-      /**
-      * 
-      */
-      ArrayList<String> tooltips;
-      
-      /* (non-Javadoc)
-      * @see javax.swing.DefaultListCellRenderer#getListCellRendererComponent(javax.swing.JList, java.lang.Object, int, boolean, boolean)
-      */
-      @Override
-      public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+      for ( Object item : itemsInList(files.getModel()) ) {
         
-        JComponent comp = (JComponent) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+        String itemText = "";
         
-        if (-1 < index && null != value && null != tooltips) list.setToolTipText(tooltips.get(index));
+        if ( SHORT_TEXT_UI && item.toString().contains("EdgeWeight") ) itemText = item.toString().substring(0,  item.toString().indexOf("EdgeWeight") - 2);
         
-        return comp;
+        System.out.println("("+ itemsInList(files.getModel()).indexOf(item) + ") " + itemText);
+        
+        System.out.println("------------------------------------------------------------------------------------");
         
       }
       
-      /**
-      * @param tooltips
-      */
-      public void setTooltips(ArrayList<String> tooltips) {
+      response = "";
+      
+      boolean deleting = false;
+      
+      while ( response == "") {
         
-        this.tooltips = tooltips;
+        response = askQuestion("Enter number to process, (all) to process all or (back). D<N> deletes.", in);
+        
+        if ( response.contains("D") ) { 
+          
+          response = response.replace("D", "");
+          
+          deleting = true;
+          
+        }
+        
+        if ( Integer.parseInt(response) < 0 || Integer.parseInt(response) > ( itemsInList(files.getModel()).size() - 1 ) ) response = "";
+        
+      }
+      
+      if ( !checkForBack(response) ) {
+        
+        if ( response.contains("all") ) {
+          
+          showFiles.doClick();
+          
+        } else {
+          
+          files.getModel().setSelectedItem(files.getModel().getElementAt(Integer.parseInt(response)));
+          
+        }
+        
+        collateOutput.doClick();
+        
+        while ( true ) {
+          
+          try {
+            
+            plotGraph(in, deleting);
+            
+            break;
+            
+          } catch (NumberFormatException e ) { 
+            
+            System.out.println("Input error, restarting...");
+            
+          } catch (Exception e) {
+            
+            System.out.println("Restarting...");
+            
+          }
+          
+        }
+        
+      } else {
+        
+        break;
         
       }
       
@@ -2958,3 +2168,792 @@ public class Runner extends JFrame {
     
   }
   
+  public void textMenu(Scanner in) throws NumberFormatException {
+      
+      while ( true ) {
+        
+        if ( Utils.DEBUG == true ) {
+          
+          String response = askQuestion("\nWARNING: DEBUG ENABLED \nQuit (q) or Continue (c)", in);
+          
+          if ( response.equals("q") ) {
+            
+            System.exit(0);
+            
+          } 
+          
+        }
+        
+        String response = askQuestion("\nMain menu :) \n(1) List simulation schedule \n(2) List complete simulations", in);
+        
+        if ( response.equals("1") ) {
+          
+          simulationSchedule(in);
+          
+        } else if ( response.equals("2") ) {
+          
+          completeSimulations(in);
+          
+        }
+        
+      }
+      
+    }
+    
+  /**
+  * 
+  */
+  private boolean generateOutput = true;
+  
+  /**
+  * 
+  */
+  private String simulationSchedule = Utils.FILEPREFIX + "simulationSchedule-resp.txt";
+  
+  /**
+  * 
+  */
+  private String DATA_INPUT = "data";
+  
+  /**
+  * 
+  */
+  private boolean OVERWRITE_FIGURE = false;
+  
+  /**
+  * 
+  */
+  private boolean recursiveSub = false;
+  
+  /**
+  * @param args
+  */
+  public Runner(String[] args) {
+    
+    super("HANDS");
+
+    String activePlugin = Utils.getActivePlugin();
+    if(activePlugin!=null) simulationSchedule = "plugins/" + activePlugin + "/" + simulationSchedule;
+    
+    if ( args.length > 0 ) {
+      
+      ArrayList<String> argsList = new ArrayList<String>(Arrays.asList(args));
+      
+      if ( argsList.contains("-k") ) {
+        
+        killAfterSim = true;
+        
+      }
+      
+      if ( argsList.contains("-t") ) {
+        
+        textBased = true;
+        
+      }
+      
+      if ( argsList.contains("-nop")) {
+        
+        generateOutput = false;
+        
+      }
+      
+      if ( argsList.contains("-di")) {
+        
+        DATA_INPUT = argsList.get(argsList.indexOf("-di") + 1);;
+        
+      }
+      
+      if ( argsList.contains("-ss")) {
+        
+        simulationSchedule = argsList.get(argsList.indexOf("-ss") + 1);
+        
+      }
+      
+      if ( argsList.contains("-overwrite")) {
+        
+        OVERWRITE_FIGURE = true;
+        
+      }
+      
+      if ( argsList.contains("-r") ) {
+        
+        recursiveSub = true;
+        
+      }
+      
+    }
+    
+    init();
+    
+    if ( textBased ) {
+      
+      Scanner in = new Scanner(System.in);
+      
+      outputManager.setTextBased(true);
+      
+      while ( true ) {
+        
+        try {
+          
+          textMenu(in);
+          
+          break;
+          
+        } catch (NumberFormatException e) {
+          
+          System.out.println("Input error, restarting...");
+          
+        }
+        
+      }
+      
+      in.close();
+      
+    }
+    
+  }
+  
+  private void init() {
+    
+    generateGUI();
+    
+    // Collect list of simulations
+    simulations = Utils.readFromFile(simulationSchedule);
+    
+    simulations = simulations.stream().filter(simulation->!simulation.startsWith("#")).collect(Collectors
+    .toCollection(ArrayList::new));
+
+    for (String simulation : simulations) { 
+
+        queueListModel.addElement(simulation);
+      
+        startQueue.setEnabled(true);
+      
+    }
+    
+    //
+    
+    start.addActionListener(new ActionListener() {
+      
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        
+        System.out.println(Arrays.toString(getUISettings()));
+        
+        runSimulation(Integer.parseInt(numberOfGames.getText()), getUISettings());
+        
+        if (killAfterSim) System.exit(0);
+        
+      }
+      
+    });
+    
+    //
+    
+    startSelected.addActionListener(new ActionListener() {
+      
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        
+        for (String simulationFromList : queueList.getSelectedValuesList() ) {
+          
+          String[] simulation = simulationFromList.split(",\\s");
+          
+          runSimulation(Integer.parseInt(simulation[0]), simulation);
+          
+        }
+        
+        if (killAfterSim) System.exit(0);
+        
+      }
+      
+    });
+    
+    //
+    
+    queue.addActionListener(new ActionListener() {
+      
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        
+        if (!queueListModel.contains(Arrays.toString(getUISettings()).substring(1, Arrays.toString(getUISettings()).length() - 1))) {
+          
+          queueListModel.addElement(Arrays.toString(getUISettings()).substring(1, Arrays.toString(getUISettings()).length() - 1));
+          
+          try {
+            
+            Utils.writeToFile(new FileWriter(simulationSchedule, true), Arrays.toString(getUISettings()).substring(1, Arrays.toString(getUISettings()).length() - 1) + "\n");
+            
+            simulations = Utils.readFromFile(simulationSchedule);
+
+            simulations.stream().filter(simulation->!simulation.startsWith("#")).collect(Collectors
+            .toCollection(ArrayList::new));
+            
+          } catch (IOException e1) {
+            
+            e1.printStackTrace();
+            
+          }
+          
+          startQueue.setEnabled(true);
+          
+        }
+        
+      }
+      
+    });
+    
+    //
+    
+    startQueue.addActionListener(new ActionListener() {
+      
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        
+        runSimulationList(simulations);
+        
+        if (killAfterSim) System.exit(0);
+        
+      }
+      
+    });
+    
+  }
+  
+  private void updateUISettings(String settings) {
+    
+    if (settings == null) return;
+    
+    String[] simulationParameters = settings.split(",\\s");
+    
+    int arrayPosition = 0;
+    
+    simulationHidersModel.clear();
+    
+    simulationSeekersModel.clear();
+    
+    for (String param : simulationParameters) {
+      
+      if (param.indexOf('{') != -1) {
+        
+        Pair<String, String> paramPair = Utils.stringToArray(param, "(\\{([0-9a-zA-Z]+),([0-9a-zA-Z.+\\*\\(\\)]+)\\})").get(0);
+        
+        if (paramPair.getElement0().equals("Topology")) {
+          
+          topologies.setSelectedItem(paramPair.getElement1());
+          
+        } else if (paramPair.getElement0().equals("NumberOfNodes")) { 
+          
+          numberOfNodes.setText(paramPair.getElement1());
+          
+        } else if (paramPair.getElement0().equals("NumberOfHideLocations")) { 
+          
+          numberOfHiddenItems.setText(paramPair.getElement1());
+          
+        } else if (paramPair.getElement0().equals("Rounds")) { 
+          
+          numberOfRounds.setText(paramPair.getElement1());
+          
+        } else if (paramPair.getElement0().equals("EdgeWeight")) { 
+          
+          costOfEdgeTraversal.setText(paramPair.getElement1());
+          
+        } else if (paramPair.getElement0().equals("FixedOrUpperWeight")) { 
+          
+          fixedOrRandom.setSelectedItem(paramPair.getElement1());
+          
+        } else if (paramPair.getElement0().equals("EdgeTraversalDecrement")) { 
+          
+          edgeTraversalDecrement.setText(paramPair.getElement1());
+          
+        } else if (paramPair.getElement0().equals("MixHiders")) {
+          
+          if ( Boolean.parseBoolean(paramPair.getElement1()) ) { 
+            
+            mixHiders.setSelected(true); 
+            
+          } else { 
+            
+            mixHiders.setSelected(false); 
+            
+          } 
+          
+        } else if (paramPair.getElement0().equals("MixSeekers")) {
+          
+          if ( Boolean.parseBoolean(paramPair.getElement1()) ) { 
+            
+            mixSeekers.setSelected(true); 
+            
+          } else { 
+            
+            mixSeekers.setSelected(false); 
+            
+          } 
+          
+        } else if (paramPair.getElement0().equals("ResetPerRound")) {
+          
+          if ( Boolean.parseBoolean(paramPair.getElement1()) ) { 
+            
+            resetPerRound.setSelected(true); 
+            
+          } else { 
+            
+            resetPerRound.setSelected(false); 
+            
+          } 
+          
+        } else if (paramPair.getElement0().equals("StrategyOverRounds")) {
+          
+          if ( Boolean.parseBoolean(paramPair.getElement1()) ) { 
+            
+            strategyOverRounds.setSelected(true); 
+            
+          } else { 
+            
+            strategyOverRounds.setSelected(false); 
+            
+          } 
+          
+        }
+        
+      } else if (param.indexOf('[') != -1) {
+        
+        ArrayList<Pair<String, String>> types = Utils.stringToArray(param, "(\\[([0-9a-zA-Z]+),([0-9]+)\\])");
+        
+        for (Pair<String, String> traverser : types) {
+          
+          // Is Hider 
+          if (arrayPosition == 1)  {
+            
+            simulationHidersModel.addElement(traverser.getElement0());
+            
+            // Is Seeker  
+          } else {
+            
+            simulationSeekersModel.addElement(traverser.getElement0());
+            
+          }
+          
+        }
+        
+      } else {
+        
+        numberOfGames.setText(param);
+        
+      }
+      
+      arrayPosition++;
+      
+    }
+    
+  }
+  
+  private String[] getUISettings() {
+    
+    String hiderParameter = "";
+    
+    for (Object hider : simulationHidersModel.toArray()) {
+      
+      hiderParameter += "[" + hider + ",1]";
+      
+    }
+    
+    String seekerParameter = "";
+    
+    for (Object seeker : simulationSeekersModel.toArray()) {
+      
+      seekerParameter += "[" + seeker + ",1]";
+      
+    }
+    
+    return new String[]{ 
+      
+      numberOfGames.getText(),
+      
+      hiderParameter,
+      
+      seekerParameter,
+      
+      "{Topology," + topologies.getSelectedItem().toString() + "}", // Topology
+      
+      "{NumberOfNodes," + numberOfNodes.getText() + "}", // Number of nodes in graph
+      
+      "{NumberOfHideLocations," + numberOfHiddenItems.getText() + "}", // Number of hide locations
+      
+      "{Rounds," + numberOfRounds.getText() + "}", // rounds
+      
+      "{EdgeWeight," + costOfEdgeTraversal.getText() + "}", // cost of traversing an edge
+      
+      "{FixedOrUpperWeight," + fixedOrRandom.getSelectedItem().toString() + "}", // whether cost supplied is static value or the upper bound of a distribution
+      
+      "{EdgeTraversalDecrement," + edgeTraversalDecrement.getText() + "}", // % discount gained by an agent for having traversed an edge before (100 = no discount; < 100 = discount)
+      
+      "{MixHiders," + mixHiders.isSelected() + "}",
+      
+      "{MixSeekers," + mixSeekers.isSelected() + "}",
+      
+      "{ResetPerRound," + resetPerRound.isSelected() + "}",
+      
+      "{StrategyOverRounds," + strategyOverRounds.isSelected() + "}"
+      
+    };  
+    
+  }
+  
+  /**
+  * 
+  */
+  private void runSimulationList(ArrayList<String> simulations) {
+    
+    for (String currentSimulation : simulations) {
+      
+      String[] simulationParameters = currentSimulation.split(",\\s");
+      
+      // If the simulation is commented out, do not run it.
+      if(		simulationParameters[0].equals("//")	) { continue; }
+      
+      runSimulation(Integer.parseInt(simulationParameters[0]), simulationParameters);
+      
+    }
+    
+  }
+  
+  /**
+  * ~MDC 8/8 Messy and inefficient
+  * 
+  * @param GAMES
+  * @param simulationParameters
+  */
+  private void runSimulation(int GAMES, String[] simulationParameters) {
+    
+    /*for ( int paramID = 0; paramID < simulationParameters.length; paramID++ ) {
+      
+      if ( simulationParameters[paramID].contains("j") ) {
+        
+        String jExpression = simulationParameters[paramID];
+        
+        for ( int j = 0; j < GAMES; j++ ) {
+          
+          String parsed = parseExpression(jExpression.replace("j", j + "").substring(jExpression.replace("j", j + "").indexOf(",") + 1, jExpression.replace("j", j + "").length() - 1));
+          
+          if ( parsed.equals("-1") ) throw new UnsupportedOperationException("Failed to parse J expression");
+          
+          simulationParameters[paramID] = jExpression.substring(0, jExpression.indexOf(",") + 1) + parsed + "}";
+          
+          runSimulationX(GAMES, simulationParameters);
+          
+        }
+        
+        return;
+        
+      }
+      
+    }*/
+    
+    // Group ID to use if j and there are multiple files output from one simulation
+    String groupID = Utils.timestamp();
+    
+    String[] simulationParametersUnchanged = Arrays.copyOf(simulationParameters, simulationParameters.length);
+    
+    boolean containsJ = false;
+    
+    for ( int j = 0; j < GAMES; j++ ) {
+      
+      containsJ = false;
+      
+      for (int k = 0; k < simulationParameters.length; k++) {
+        
+        if (simulationParametersUnchanged[k].contains("j*") || simulationParametersUnchanged[k].contains("j+")) { 
+          
+          containsJ = true;
+          
+          String parsed = parseExpression(simulationParametersUnchanged[k].replace("j", j + "").substring(simulationParametersUnchanged[k].replace("j", j + "").indexOf(",") + 1, simulationParametersUnchanged[k].replace("j", j + "").length() - 1));
+          
+          if ( parsed.equals("-1") ) throw new UnsupportedOperationException("Failed to parse I expression");
+          
+          simulationParameters[k] = "" + simulationParametersUnchanged[k].substring(0, simulationParametersUnchanged[k].indexOf(",") + 1) + parsed + "}";
+          
+          
+        } else if (simulationParametersUnchanged[k].contains(",j")) { 
+          
+          containsJ = true;
+          
+          simulationParameters[k] = simulationParametersUnchanged[k].replaceAll("(\\,j)", "," + j); 
+          
+        }
+        
+      }
+      
+      if ( containsJ ) { 
+        
+        runSimulationX(GAMES, simulationParameters, "" + groupID);
+        
+      } else {
+        
+        break;
+        
+      }
+      
+    }
+    
+    if (!containsJ) runSimulationX(GAMES, simulationParameters);
+    
+  }
+  
+  /**
+  * @param expression
+  * @return
+  */
+  private String parseExpression(String expression) {
+    
+    Interpreter interpreter = new Interpreter();
+    
+    try {
+      
+      interpreter.eval("result = " +  expression);
+      
+      return "" + interpreter.get("result");
+      
+    } catch (EvalError e) {
+      
+      e.printStackTrace();
+      
+      return "-1";
+      
+    }
+    
+  }
+  
+  /**
+  * @param GAMES
+  * @param simulationParameters
+  */
+  private void runSimulationX(int GAMES, String[] simulationParameters) {
+    
+    runSimulationX(GAMES, simulationParameters, "");
+    
+  }
+  
+  private void runSimulationX(int GAMES, String[] simulationParameters, String namePrefix) {
+      
+      /***********/
+      
+      if ( !namePrefix.equals("") ) namePrefix = namePrefix + "-";
+      
+      // Generate ID For this simulation
+      String currentSimulationIdentifier = namePrefix + ( Utils.timestamp() );
+      
+      if ( generateOutput ) {
+        
+        Utils.writeToFile(Utils.FILEPREFIX + "simRecordID.txt", currentSimulationIdentifier);
+        
+        Utils.writeToFile(Utils.FILEPREFIX + "/data/" + currentSimulationIdentifier + ".csv", "");
+        
+        Utils.writeToFile(Utils.FILEPREFIX + "/data/" + currentSimulationIdentifier + ".csv", Arrays.toString(simulationParameters) + "\n");
+        
+      }
+      
+      /***********/
+      
+      String[] parameters = { "Hiders", 
+      "Seekers",
+      "Topology", // Topology
+      "NumberOfNodes", // Number of nodes in graph
+      "NumberOfHideLocations", // Number of hide locations
+      "Rounds", // rounds 
+      "EdgeWeight", // cost of traversing an edge
+      "FixedOrUpperWeight", // whether cost supplied is static value or the upper bound of a distribution
+      "EdgeTraversalDecrement", // % discount gained by an agent for having traversed an edge before (100 = no discount; < 100 = discount)
+      "MixHiders", // Mix equally between the hide strategies
+      "MixSeekers", // Mix equally between the search strategies
+      "ResetPerRound", // Whether players knowledge should persist through rounds
+      "AdditionalResourceImmunity", // Additional resource immunity across all traversers (proportion of existing immunity to add (e.g. 1.0 = double))
+      "BaseGasProportion", // Additional gas to provide to all gas traversers (as a proportion of total edge costs)
+      "StrategyOverRounds", // Whether to double the number of round sets, in order to test strategies that evolve over all rounds
+      "GenerateOutputFiles", // Whether to log results to file
+      "ConfigId" // Unique ID for simulation configuration
+    };
+    
+    String[] defaultParameters = { simulationParameters[1],
+      simulationParameters[2],
+      "random", // Topology
+      "100", // Number of nodes in graph
+      "5", // Number of hide locations
+      "120", // rounds
+      "100.0", // cost of traversing an edge
+      "upper", // whether cost supplied is static value or the upper bound of a distribution
+      "0",// % discount gained by an agent for having traversed an edge before (1.0 = no discount; < 1.0 = discount),
+      "false", // Mix equally between the hide strategies
+      "false", // Mix equally between the search strategies
+      "true", // Whether players knowledge should persist through rounds
+      "0.0", // Additional resource immunity across all traversers (proportion of existing immunity to add (e.g. 1.0 = double))
+      "0.0", // Additional gas to provide to all gas traversers (as a proportion of total edge costs)
+      "false", // Whether to double the number of round sets, in order to test strategies that evolve over all rounds
+      (generateOutput + ""),
+      "000"
+    };
+    
+    /***********/
+    
+    /* As we are replacing variables in our simulation parameters with concrete values, 
+    * we must retain the original variables for future games, or they will be lost
+    * i.e. if we receive i+1 as a parameter, this will need to be changed to '1' for the
+    * first game, but a copy of i+1 will need to be retained for the second, third games etc.
+    */
+    String[] simulationParametersUnchanged = Arrays.copyOf(simulationParameters, simulationParameters.length);
+    
+    // Run 'games' of simulation by repeat running program
+    
+    String startTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
+    
+    System.out.println("-----------------------------------------------------------------");
+    
+    for(int i = 0; i < GAMES; i++) {
+      
+      System.out.println("Run: " + (i + 1));
+      System.out.println("-----------------------------------------------------------------");
+      
+      System.out.println( ( ( i / ((float)GAMES) ) * 100 ) + "%" );
+      
+      // Remove wildcards from param string and replace with values
+      
+      for (int j = 0; j < simulationParameters.length; j++) {
+        
+        if (simulationParametersUnchanged[j].contains("*") || simulationParametersUnchanged[j].contains("+")) { 
+          
+          String parsed = parseExpression(simulationParametersUnchanged[j].replace("i", i + "").substring(simulationParametersUnchanged[j].replace("i", i + "").indexOf(",") + 1, simulationParametersUnchanged[j].replace("i", i + "").length() - 1));
+          
+          if ( parsed.equals("-1") ) throw new UnsupportedOperationException("Failed to parse I expression");
+          
+          simulationParameters[j] = "" + simulationParametersUnchanged[j].substring(0, simulationParametersUnchanged[j].indexOf(",") + 1) + parsed + "}";
+          
+          
+          /*
+          simulationParametersUnchanged[j].replaceAll("(i\\*([0-9]+))", 
+          "" + (i * Integer.parseInt(
+          simulationParametersUnchanged[j].substring( 
+          Utils.startIndexOf(simulationParametersUnchanged[j], "(i\\*([0-9]+))") + 2, 
+          Utils.endIndexOf(simulationParametersUnchanged[j], "(i\\*([0-9]+))")
+          )
+          
+          )
+          )
+          );
+          
+        } else if (simulationParametersUnchanged[j].contains("i+")) { 
+          
+          simulationParameters[j] = 
+          
+          simulationParametersUnchanged[j].replaceAll("(i\\+([0-9]+))", 
+          "" + (i + Integer.parseInt(
+          simulationParametersUnchanged[j].substring(
+          Utils.startIndexOf(simulationParametersUnchanged[j], "(i\\+([0-9]+))") + 2, 
+          Utils.endIndexOf(simulationParametersUnchanged[j], "(i\\+([0-9]+))")
+          )
+          )
+          )
+          );
+          
+          */
+          
+        } else if (simulationParametersUnchanged[j].contains(",i")) { 
+          
+          simulationParameters[j] = 
+          
+          simulationParametersUnchanged[j].replaceAll("(\\,i)", "," + i); 
+          
+        }
+        
+      }
+      
+      // Alter the default parameters to reflect those that have been input
+      
+      for (String param : simulationParameters) {
+        
+        if (param.indexOf('{') != -1) {
+          
+          Pair<String, String> paramPair = Utils.stringToArray(param, "(\\{([0-9a-zA-Z]+),([0-9a-zA-Z.]+)\\})").get(0);
+          
+          defaultParameters[Arrays.asList(parameters).indexOf(paramPair.getElement0())] = paramPair.getElement1(); 
+          
+        }
+        
+      }
+      
+      // Construct the param string to supply to the program
+      
+      String paramString = "";
+      
+      for (int k = 0; k < defaultParameters.length; k++) {
+        
+        paramString += defaultParameters[k] + " ";
+        
+      }
+      
+      System.out.println(paramString);
+      
+      /***********/
+    
+      Main.main(Stream.concat(Arrays.stream(new String[]{i+"", GAMES+""}), Arrays.stream(paramString.split(" "))).toArray(String[]::new));
+
+      System.out.println("-----------------------------------------------------------------");
+      
+      if ( i < GAMES - 1); {
+        
+        // Utils.runCommand("clear");
+        
+        // Utils.runCommand("printf '\\\\e[3J'");
+        
+        // Utils.runCommand("printf '\\\\ec'");
+        
+      }
+      
+    } // End of game run loop
+    
+    System.out.println("Started: " + startTime + " and ended: " + new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime()));
+    
+  }
+  
+  /**
+  * From: http://stackoverflow.com/questions/480261/java-swing-mouseover-text-on-jcombobox-items
+  * 
+  * @author Martin
+  */
+  private class ComboboxToolTipRenderer extends DefaultListCellRenderer {
+    
+    /**
+    * 
+    */
+    private static final long serialVersionUID = 1L;
+    
+    /**
+    * 
+    */
+    ArrayList<String> tooltips;
+    
+    /* (non-Javadoc)
+    * @see javax.swing.DefaultListCellRenderer#getListCellRendererComponent(javax.swing.JList, java.lang.Object, int, boolean, boolean)
+    */
+    @Override
+    public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+      
+      JComponent comp = (JComponent) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+      
+      if (-1 < index && null != value && null != tooltips) list.setToolTipText(tooltips.get(index));
+      
+      return comp;
+      
+    }
+    
+    /**
+    * @param tooltips
+    */
+    public void setTooltips(ArrayList<String> tooltips) {
+      
+      this.tooltips = tooltips;
+      
+    }
+    
+  }
+  
+}
