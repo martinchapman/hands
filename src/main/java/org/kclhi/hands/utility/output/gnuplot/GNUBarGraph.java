@@ -161,7 +161,7 @@ public class GNUBarGraph extends GNUGraph {
           
         } else {
           
-          return barData.get(arg0).getValue() + "";
+          return (Math.round(barData.get(arg0).getValue() * 100.0) / 100.0) + "";
           
         }
         

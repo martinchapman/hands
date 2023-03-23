@@ -872,16 +872,17 @@ public class OutputManager {
 
       if(useBaseline) {
         JSONObject baseline = plugin.getJSONObject("baseline");
+        ArrayList<String> matchingBaselineKeys = baseline.keySet().stream().filter(key->traverser.getTraverser().contains(key)).collect(Collectors.toCollection(ArrayList::new));
         // We are graphing the baseline, so just show the baseline data
         if(traverser.getOpponents().contains(baseline.getString("environment").toString())) {
           if(baseline.has(traverser.getTraverser())) payoff = baseline.getJSONObject(traverser.getTraverser()).getDouble("data");
         // Otherwise, use change from baseline payoff to increase or decrease the baseline data
-        } else if(baseline.has(traverser.getTraverser())) {
-          JSONObject baselineTraverser = baseline.getJSONObject(traverser.getTraverser());
+        } else if(matchingBaselineKeys.size()>0) {
+          JSONObject baselineTraverser = baseline.getJSONObject(matchingBaselineKeys.get(0));
           double change = (payoff - baselineTraverser.getDouble("payoff")) / baselineTraverser.getDouble("payoff");
-          if(baseline.has(traverser.getTraverser())) { 
-            double data = baseline.getJSONObject(traverser.getTraverser()).getDouble("data");
-            double additional = change * baseline.getJSONObject(traverser.getTraverser()).getDouble("data");
+          if(baseline.has(matchingBaselineKeys.get(0))) { 
+            double data = baseline.getJSONObject(matchingBaselineKeys.get(0)).getDouble("data");
+            double additional = change * baseline.getJSONObject(matchingBaselineKeys.get(0)).getDouble("data");
             boolean invert = baseline.getBoolean("invert");
             payoff = invert ? data - additional : data + additional; 
           }
@@ -984,11 +985,22 @@ public class OutputManager {
     
     String figureID;
     if( permutationsEnabled ) {
+      
       Set<String> players = new HashSet<String>(traverserRecords.stream().map(traverserRecord->traverserRecord.getTraverser()).collect(Collectors.toList()));
       Set<String> opponents = new HashSet<String>(traverserRecords.stream().map(traverserRecord->traverserRecord.getOpponents()).collect(Collectors.toList()));
-      figureID = players.toString().replaceAll(" ", "-").replaceAll("\\[", "").replaceAll("\\]", "").replaceAll(",", "") + "_" + opponents.toString().replaceAll(" ", "-").replaceAll("\\[", "").replaceAll("\\]", "").replaceAll(",", "");
+      
+      ArrayList<String> playersSorted = new ArrayList<String>(players);
+      ArrayList<String> opponentsSorted = new ArrayList<String>(opponents);
+
+      Collections.sort(playersSorted);
+      Collections.sort(opponentsSorted);
+
+      figureID = playersSorted.toString().replaceAll(" ", "-").replaceAll("\\[", "").replaceAll("\\]", "").replaceAll(",", "") + "_" + opponentsSorted.toString().replaceAll(" ", "-").replaceAll("\\[", "").replaceAll("\\]", "").replaceAll(",", "");
+    
     } else {
+    
       figureID = "figure" + new SimpleDateFormat("yyyyMMddHHmmss").format(Calendar.getInstance().getTime());
+    
     }
     
     showGraphForAttribute(playerRecords, traverserRecords, gameOrRound, title, graphType, xLabel, yLabel, category, outputEnabled, figureID);
