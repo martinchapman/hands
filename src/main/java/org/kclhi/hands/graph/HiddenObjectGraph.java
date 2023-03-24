@@ -874,7 +874,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
 
         // The new cost, based upon the edge that is currently being traversed
         newCost = uniqueCost * edgeTraversalDecrement;
-        if(traverser instanceof GasGraphTraverser && ((GasGraphTraverser)traverser).useGas()) {
+        if(traverser instanceof GasGraphTraverser) {
           this.traverserGas.put(traverser, traverserGas.get(traverser) - newCost);
           newCost = traverserGas.get(traverser) > 0 ? 0 : newCost;
         }
@@ -1132,7 +1132,7 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
       
     }
     
-    if(traverser instanceof GasGraphTraverser) traverserGas.put(traverser, (baseGasProportion * this.totalEdgeCosts(traverser)) + (Gas.getGasProportion(traverser) * this.totalEdgeCosts(traverser)));
+    if(traverser instanceof GasGraphTraverser) traverserGas.put(traverser, (((GasGraphTraverser)traverser).useGas() ? (baseGasProportion * this.totalEdgeCosts(traverser)) : 0) + (Gas.getGasProportion(traverser) * this.totalEdgeCosts(traverser)));
 
   }
   
