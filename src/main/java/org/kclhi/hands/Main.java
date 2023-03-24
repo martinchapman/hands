@@ -1255,9 +1255,7 @@ public class Main {
             new AdaptiveSeekingAgent<AdaptiveSeeker>(graphController, seekerName, strategyPortfolioRandomSelection, totalRounds, 1, false) { protected double confidenceLevel() { return 0; }
           });
           
-        }
-
-        if (seekerName.contains("MetaRandom")) {
+        } else if (seekerName.contains("MetaRandom")) {
           
           ArrayList<Pair<AdaptiveSeeker, Double>> strategyPortfolioRandomSelection = new ArrayList<Pair<AdaptiveSeeker, Double>>();
           
