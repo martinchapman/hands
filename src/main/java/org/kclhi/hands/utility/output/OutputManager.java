@@ -824,6 +824,12 @@ public class OutputManager {
   
   public AbstractMap.SimpleEntry<TraverserRecord, Double> traverserSuccessPayoff(TraverserRecord traverser, boolean useBaseline) {
 
+    return traverserSuccessPayoff(traverser, useBaseline, null, null, null);
+
+  }
+
+  public AbstractMap.SimpleEntry<TraverserRecord, Double> traverserSuccessPayoff(TraverserRecord traverser, boolean useBaseline, Hashtable<String, Double> entries, Hashtable<String, Double> minInSeries,  Hashtable<String, Double> maxInSeries) {
+
     if ( !(traverser instanceof HiderRecord) ) {
       
       Class<? extends Seeker> seekerClass = null;
@@ -861,7 +867,8 @@ public class OutputManager {
             , 
             Success.BASE_RESOURCE_IMMUNITY);
 
-      double successfulGames = traverser.getAttributeToGameAverage(Metric.SUCCESS.getText());
+      double successfulGames = (entries!=null && minInSeries!=null && maxInSeries!=null) ? ( entries.get(Metric.SUCCESS.getText()) - minInSeries.get(Metric.SUCCESS.getText()) ) / ( maxInSeries.get(Metric.SUCCESS.getText()) - minInSeries.get(Metric.SUCCESS.getText()) ) : traverser.getAttributeToGameAverage(Metric.SUCCESS.getText());
+
       double unsuccessfulGames = 1 - successfulGames;
       // Extent of seeker (negative) payoff is determined by number of unsuccessful games
       double payoff = -1 * unsuccessfulGames;
@@ -1009,6 +1016,23 @@ public class OutputManager {
   
   private static boolean STRICT_RENAME = false;
   
+  private String pluginXLabel(String xLabel, String graphType, ArrayList<TraverserRecord> traverserRecords, ArrayList<TraverserRecord> playerRecords) {
+    
+    String suffix = "";
+    JSONObject xLabelGame = plugin.getJSONObject("game").getJSONObject("graph").getJSONObject("xLabel");
+    
+    // Determine if seeker present that indicates relabelling
+    ArrayList<String> pluginSeekers = Arrays.stream(JSONObject.getNames(xLabelGame.getJSONObject("seekers"))).filter(pluginSeeker -> traverserRecords.stream().filter(storedSeeker -> storedSeeker.getTraverserType().contains(pluginSeeker)).count() > 0).collect(Collectors.toCollection(ArrayList::new));
+    if(pluginSeekers.size() > 0) suffix += xLabelGame.getJSONObject("seekers").getString(pluginSeekers.get(0));
+
+    // Determine if config present that indicates relabelling
+    ArrayList<String> pluginConfigs = Arrays.stream(JSONObject.getNames(xLabelGame.getJSONObject("config"))).filter(pluginConfig -> playerRecords.stream().filter(playerRecord -> playerRecord.getParameters() != null).collect(Collectors.toList()).get(0).getParameters().contains(pluginConfig)).collect(Collectors.toCollection(ArrayList::new));
+    if(pluginConfigs.size() > 0) suffix += xLabelGame.getJSONObject("config").getString(pluginConfigs.get(0));
+
+    return plugin == null ? xLabel : plugin.getJSONObject("graph").getJSONObject(graphType).getString("xLabel") + ( suffix.length() > 0 ? " (" + suffix + ")" : "" );
+
+  }
+
   /**
   * @param playerRecords All players
   * @param traverserRecords Only those selected
@@ -1075,7 +1099,7 @@ public class OutputManager {
       }
       
       LinkedHashMap<String, ArrayList<ArrayList<Double>>> multipleAttributeToValues = new LinkedHashMap<String, ArrayList<ArrayList<Double>>>();
-      
+    
       for ( TraverserRecord traverser : traverserRecords ) {
         
         if ( !multipleAttributeToValues.containsKey(traverser.getTraverser())) multipleAttributeToValues.put(traverser.getTraverser(), new ArrayList<ArrayList<Double>>());
@@ -1105,7 +1129,19 @@ public class OutputManager {
               
             } else {
               
-              attributeToValues.add( -1 * normaliseEntry(seriesEntry.getValue(), minForAttributeInAllSeries, maxForAttributeInAllSeries) );
+              if ( yLabel.equals("Success Payoff") ) {
+
+                attributeToValues.add( traverserSuccessPayoff(traverser, false, seriesEntry.getValue(), minForAttributeInAllSeries, maxForAttributeInAllSeries).getValue() );
+              
+              } else if ( yLabel.equals("Baseline Success Payoff") ) {
+
+                attributeToValues.add( traverserSuccessPayoff(traverser, true, seriesEntry.getValue(), minForAttributeInAllSeries, maxForAttributeInAllSeries).getValue() );
+
+              } else {
+
+                attributeToValues.add( -1 * normaliseEntry(seriesEntry.getValue(), minForAttributeInAllSeries, maxForAttributeInAllSeries) );
+
+              }
               
             }
             
@@ -1123,10 +1159,18 @@ public class OutputManager {
         
         if (graphType.contains("Line")) {
           
-          ((GNULineGraph) graph).addDataset(traverser.toString(), attributeToValues);
+          String traverserName = traverser.toString();
+          try {
+            traverserName = plugin == null ? traverserName : plugin.getJSONObject(traverser.getTraverser().startsWith("h") ? "hiders" : "seekers").getJSONObject("mapping").getString(traverser.getTraverser());
+          } catch(JSONException e) {
+            System.out.println("WARN: Plugin file incomplete: " + e.getMessage());
+          }
+          ((GNULineGraph) graph).addDataset(traverserName, attributeToValues);
+
+          xLabel = pluginXLabel(xLabel, "line", traverserRecords, playerRecords);
           
         }
-        
+
       }
       
       if (graphType.equals("3D")) {
@@ -1398,26 +1442,15 @@ public class OutputManager {
         
       }
 
-      String suffix = "";
-      JSONObject xLabelGame = plugin.getJSONObject("game").getJSONObject("graph").getJSONObject("xLabel");
-      
-      // Determine if seeker present that indicates relabelling
-      ArrayList<String> pluginSeekers = Arrays.stream(JSONObject.getNames(xLabelGame.getJSONObject("seekers"))).filter(pluginSeeker -> traverserRecords.stream().filter(storedSeeker -> storedSeeker.getTraverserType().contains(pluginSeeker)).count() > 0).collect(Collectors.toCollection(ArrayList::new));
-      if(pluginSeekers.size() > 0) suffix += xLabelGame.getJSONObject("seekers").getString(pluginSeekers.get(0));
+      xLabel = pluginXLabel(xLabel, "bar", traverserRecords, playerRecords);
 
-      // Determine if config present that indicates relabelling
-      ArrayList<String> pluginConfigs = Arrays.stream(JSONObject.getNames(xLabelGame.getJSONObject("config"))).filter(pluginConfig -> playerRecords.stream().filter(playerRecord -> playerRecord.getParameters() != null).collect(Collectors.toList()).get(0).getParameters().contains(pluginConfig)).collect(Collectors.toCollection(ArrayList::new));
-      if(pluginConfigs.size() > 0) suffix += xLabelGame.getJSONObject("config").getString(pluginConfigs.get(0));
-
-      xLabel = plugin == null ? xLabel : plugin.getJSONObject("graph").getJSONObject("bar").getString("xLabel") + ( suffix.length() > 0 ? " (" + suffix + ")" : "" );
-      
     }
   
     graph.styleGraph();
   
     boolean increaseKAndN = false;
     
-    yLabel = plugin == null ? yLabel : yLabel.contains("Baseline") ? plugin.getJSONObject("baseline").getJSONObject("graph").getJSONObject("bar").getString("yLabel") : plugin.getJSONObject("graph").getJSONObject("bar").getString("yLabel");
+    yLabel = plugin == null ? yLabel : yLabel.contains("Baseline") ? plugin.getJSONObject("baseline").getJSONObject("graph").getJSONObject(graphType.equals("Bar")?"bar":"line").getString("yLabel") : plugin.getJSONObject("graph").getJSONObject(graphType.equals("Bar")?"bar":"line").getString("yLabel");
     
     if ( graphType.equals("LineOne") ) {
       

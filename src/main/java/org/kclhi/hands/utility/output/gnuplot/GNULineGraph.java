@@ -148,6 +148,7 @@ public class GNULineGraph extends GNUGraph {
     
     swapPoints(pointTypeOrder, 2, 0);
     
+    p.getPlots().sort((plotA, plotB) -> ((AbstractPlot)plotA).get("title").compareTo(((AbstractPlot)plotB).get("title")));
     
     for ( int i = 0; i < p.getPlots().size(); i++ ) {
       
