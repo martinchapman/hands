@@ -1,6 +1,7 @@
 package org.kclhi.hands.graph;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -154,6 +155,10 @@ public class GraphController<V , E> {
     int vertices = numberOfVertices >= 2 ? numberOfVertices : 2;
     
     boolean incrementingEdges = false;
+
+    graph.clearTraverserGas();
+    
+    graph.clearTraversers();
     
     do {
       
@@ -299,6 +304,12 @@ public class GraphController<V , E> {
     
   }
   
+  public HashMap<GraphTraverser, Double> getTraverserGas() {
+
+    return graph.getTraverserGas();
+
+  }
+
   /*
   * Private utility methods only available to Main class
   */

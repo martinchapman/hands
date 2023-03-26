@@ -9,6 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
@@ -994,7 +995,7 @@ public class Main {
     
     for( Pair<String, String> seekerType : Utils.stringToArray(agentList, "(\\[([0-9a-zA-Z]+),([0-9]+)\\])") ) {
       
-      for( int seekerCount = 0; seekerCount <= Integer.parseInt(seekerType.getElement1()); seekerCount++ ) {
+      for( int seekerCount = 0; seekerCount < Integer.parseInt(seekerType.getElement1()); seekerCount++ ) {
 
         String seekerName = seekerType.getElement0(); 
         int currentNumberOfSeekingAgents = allSeekingAgents.size();
@@ -1435,7 +1436,7 @@ public class Main {
       if (seeker.strategyOverRounds()) repeatAllRounds = REPEAT_CONSTANT;
       
     }
-    
+
     // Run rounds and record output per hider
     for ( Hider hider : hiders ) {
       
@@ -1508,7 +1509,7 @@ public class Main {
             }
             
             seekers = newSeekers;
-            
+
           }
           
           for ( Seeker seeker : seekers ) {

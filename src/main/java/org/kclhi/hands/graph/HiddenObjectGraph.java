@@ -678,6 +678,24 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
   private HashMap<GraphTraverser, Double> traverserGas;
 
   /**
+   * @return
+   */
+  public HashMap<GraphTraverser, Double> getTraverserGas() {
+    
+    return traverserGas;
+
+  }
+
+  /**
+   * 
+   */
+  public void clearTraverserGas() {
+
+    traverserGas.clear();
+
+  }
+
+  /**
    * Proportion used to determine base gas (if any) given to
    * traversers
    */
@@ -1087,6 +1105,15 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
   * 
   */
   private HashSet<GraphTraverser> traversers;
+
+  /**
+   * 
+   */
+  public void clearTraversers() {
+    
+    traversers.clear();
+
+  }
   
   /**
   * For each Traverser, maintain an individual cost value for each
@@ -1132,8 +1159,10 @@ public class HiddenObjectGraph<V, E extends DefaultWeightedEdge> extends SimpleW
       
     }
     
-    if(traverser instanceof GasGraphTraverser) traverserGas.put(traverser, (((GasGraphTraverser)traverser).useGas() ? (baseGasProportion * this.totalEdgeCosts(traverser)) : 0) + (Gas.getGasProportion(traverser) * this.totalEdgeCosts(traverser)));
-
+    if(traverser instanceof GasGraphTraverser) {
+      traverserGas.put(traverser, (((GasGraphTraverser)traverser).useGas() ? (baseGasProportion * this.totalEdgeCosts(traverser)) : 0) + (Gas.getGasProportion(traverser) * this.totalEdgeCosts(traverser)));
+    }
+    
   }
   
   /* (non-Javadoc)
