@@ -886,12 +886,13 @@ public class OutputManager {
         // Otherwise, use change from baseline payoff to increase or decrease the baseline data
         } else if(matchingBaselineKeys.size()>0) {
           JSONObject baselineTraverser = baseline.getJSONObject(matchingBaselineKeys.get(0));
-          double change = (payoff - baselineTraverser.getDouble("payoff")) / baselineTraverser.getDouble("payoff");
+          double baselinePayoff = baselineTraverser.getDouble("payoff") > -1 ? baselineTraverser.getDouble("payoff") : Math.random();
+          double change = (payoff - baselinePayoff) / baselinePayoff;
           if(baseline.has(matchingBaselineKeys.get(0))) { 
             double data = baseline.getJSONObject(matchingBaselineKeys.get(0)).getDouble("data");
             double additional = change * baseline.getJSONObject(matchingBaselineKeys.get(0)).getDouble("data");
             boolean invert = baseline.getBoolean("invert");
-            payoff = invert ? data - additional : data + additional; 
+            payoff = invert ? Math.max(0, data - additional) : data + additional; 
           }
         } else {
           System.out.println("WARN: Baseline requested but no baseline data available.");

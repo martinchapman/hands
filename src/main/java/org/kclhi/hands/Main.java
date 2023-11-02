@@ -993,9 +993,11 @@ public class Main {
     
     List<Seeker> allSeekingAgents = new ArrayList<Seeker>();
     
-    for( Pair<String, String> seekerType : Utils.stringToArray(agentList, "(\\[([0-9a-zA-Z]+),([0-9]+)\\])") ) {
+    for( Pair<String, String> seekerType : Utils.stringToArray(agentList, "(\\[([0-9a-zA-Z]+),(-?[0-9]+)\\])") ) {
       
-      for( int seekerCount = 0; seekerCount < Integer.parseInt(seekerType.getElement1()); seekerCount++ ) {
+      int MAX_SEEKERS = Integer.parseInt(seekerType.getElement1()) > -1 ? Integer.parseInt(seekerType.getElement1()) : (int)(Math.random() * 10) + 1;
+
+      for( int seekerCount = 0; seekerCount < MAX_SEEKERS; seekerCount++ ) {
 
         String seekerName = seekerType.getElement0(); 
         int currentNumberOfSeekingAgents = allSeekingAgents.size();

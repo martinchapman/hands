@@ -11,20 +11,22 @@ public class Gas {
 
   public static double getGasProportion(GraphTraverser traverser) {
 
+    double gasProportion = Gas.DEFAULT_GAS_PROPORTION;
+
     JSONObject properties = Utils.getPlugin().getJSONObject("seekers").getJSONObject("variablesByType").getJSONObject("properties");
     if( traverser.getName().contains("Lower") ) {
-      return properties.getJSONObject("LowerGas").getDouble("gasProportion");
+      gasProportion = properties.getJSONObject("LowerGas").getDouble("gasProportion");
     } else if( traverser.getName().contains("Low") ) {
-      return properties.getJSONObject("LowGas").getDouble("gasProportion");
+      gasProportion = properties.getJSONObject("LowGas").getDouble("gasProportion");
     } else if( traverser.getName().contains("Medium") ) {
-      return properties.getJSONObject("MediumGas").getDouble("gasProportion");
+      gasProportion = properties.getJSONObject("MediumGas").getDouble("gasProportion");
     } else if( traverser.getName().contains("High") ) {
-      return properties.getJSONObject("HighGas").getDouble("gasProportion");
+      gasProportion = properties.getJSONObject("HighGas").getDouble("gasProportion");
     } else if( traverser.getName().contains("Upper") ) {
-      return properties.getJSONObject("UpperGas").getDouble("gasProportion");
+      gasProportion = properties.getJSONObject("UpperGas").getDouble("gasProportion");
     }
   
-    return Gas.DEFAULT_GAS_PROPORTION;
+    return gasProportion > -1 ? gasProportion : Math.random();
   
   }
   public interface GasGraphTraverser {
