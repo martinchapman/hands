@@ -11,9 +11,10 @@ HANDS
 
 1. Run `git submodule init`
 2. Run `git submodule update`
-3. Create folder `output/data`
-4. Create folder `output/charts/tables` and `output/charts/figures`
-5. Create `output/simulationSchedule.txt` (template provided)
+3. Create folder `output/log`
+4. Create folder `output/data`
+5. Create folder `output/charts/tables` and `output/charts/figures`
+6. To run a particular configuration of the software, such as winter pressures modelling, create `output/config.config` and enter 'app.plugin=winter' to use the correct configuration plugin.
 
 * Build and Run
 
