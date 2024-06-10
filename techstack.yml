@@ -1,0 +1,180 @@
+repo_name: martinchapman/hands
+report_id: d52597c4d2fe26900026189c5f10d868
+version: 0.1
+repo_type: Public
+timestamp: '2024-06-09T16:56:58+00:00'
+requested_by: martinchapman
+provider: github
+branch: winter
+detected_tools_count: 13
+tools:
+- name: Java
+  description: A concurrent, class-based, object-oriented, language specifically designed
+    to have as few implementation dependencies as possible
+  website_url: https://www.java.com
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Languages
+  image_url: https://img.stackshare.io/service/995/K85ZWV2F.png
+  detection_source_url: https://github.com/martinchapman/hands
+  detection_source: Repo Metadata
+- name: JFreeChart
+  description: A free Java chart library
+  website_url: http://www.jfree.org/jfreechart/
+  version: 1.0.18
+  license: LGPL-2.1
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Charting Libraries
+  image_url: https://img.stackshare.io/service/8591/Picture_6_400x400.png
+  detection_source_url: https://github.com/martinchapman/hands/blob/winter/pom.xml
+  detection_source: pom.xml
+  last_updated_by: Martin Chapman
+  last_updated_on: 2023-01-29 23:21:47.000000000 Z
+- name: MapD
+  description: Open source GPU-Powered Database
+  website_url: https://www.mapd.com/
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Data Stores
+  sub_category: Databases
+  image_url: https://img.stackshare.io/service/6915/preview.png
+  detection_source_url: https://github.com/martinchapman/hands/blob/winter/pom.xml
+  detection_source: pom.xml
+  last_updated_by: Martin Chapman
+  last_updated_on: 2023-01-29 23:21:47.000000000 Z
+- name: Git
+  description: Fast, scalable, distributed revision control system
+  website_url: http://git-scm.com/
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Version Control System
+  image_url: https://img.stackshare.io/service/1046/git.png
+  detection_source_url: https://github.com/martinchapman/hands
+  detection_source: Repo Metadata
+- name: JUnit
+  description: A programmer-oriented testing framework for Java
+  website_url: http://junit.org/
+  version: '4.11'
+  license: EPL-1.0
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Testing Frameworks
+  image_url: https://img.stackshare.io/service/2020/874086.png
+  detection_source_url: https://github.com/martinchapman/hands/blob/winter/pom.xml
+  detection_source: pom.xml
+  last_updated_by: Martin Chapman
+  last_updated_on: 2023-01-29 23:21:47.000000000 Z
+- name: junit:junit
+  description: JUnit is a unit testing framework for Java
+  version: '4.11'
+  license: EPL-1.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/martinchapman/hands/blob/winter/pom.xml
+  detection_source: pom.xml
+  last_updated_by: Martin Chapman
+  last_updated_on: 2023-01-29 23:21:47.000000000 Z
+  vulnerabilities:
+  - name: TemporaryFolder on unix-like systems does not limit access to created files
+    cve_id: CVE-2020-15250
+    cve_url: https://github.com/advisories/GHSA-269g-pwp5-87pp
+    detected_date: Aug 22
+    severity: moderate
+    first_patched: 4.13.1
+- name: bsh:bsh
+  open_source: false
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/martinchapman/hands/blob/winter/pom.xml
+  detection_source: pom.xml
+  last_updated_by: Martin Chapman
+  last_updated_on: 2023-01-29 23:21:47.000000000 Z
+- name: de.ruedigermoeller:fst
+  description: A more efficient implementation of java serialization
+  version: '2.38'
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/martinchapman/hands/blob/winter/pom.xml
+  detection_source: pom.xml
+  last_updated_by: Martin Chapman
+  last_updated_on: 2023-01-29 23:21:47.000000000 Z
+- name: org.apache.commons:commons-math3
+  description: The Apache Commons Math project is a library of lightweight
+  version: 3.6.1
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/martinchapman/hands/blob/winter/pom.xml
+  detection_source: pom.xml
+  last_updated_by: Martin Chapman
+  last_updated_on: 2023-03-12 23:55:52.000000000 Z
+- name: org.jfree:jfreechart
+  description: JFreeChart is a class library, written in Java, for generating charts
+  version: 1.0.18
+  license: LGPL-3.0-only
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/martinchapman/hands/blob/winter/pom.xml
+  detection_source: pom.xml
+  last_updated_by: Martin Chapman
+  last_updated_on: 2023-03-12 23:55:52.000000000 Z
+- name: org.jgrapht:jgrapht-core
+  description: Master repository for the JGraphT project
+  version: 0.9.0
+  license: EPL-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/martinchapman/hands/blob/winter/pom.xml
+  detection_source: pom.xml
+  last_updated_by: Martin Chapman
+  last_updated_on: 2023-03-12 23:55:52.000000000 Z
+- name: org.json:json
+  description: JSON is a light-weight, language independent, data interchange format
+  license: JSON
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/martinchapman/hands/blob/winter/pom.xml
+  detection_source: pom.xml
+  last_updated_by: Martin Chapman
+  last_updated_on: 2023-03-12 23:55:52.000000000 Z
+- name: org.mapdb:mapdb
+  description: MapDB provides concurrent Maps, Sets and Queues backed by disk storage
+    or off-heap memory
+  version: '1.0'
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/martinchapman/hands/blob/winter/pom.xml
+  detection_source: pom.xml
+  last_updated_by: Martin Chapman
+  last_updated_on: 2023-03-12 23:55:52.000000000 Z
