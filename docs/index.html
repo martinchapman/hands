@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>CyberHANDS, Ph.D. thesis of Martin Chapman</title>
+    <meta charset="utf-8" />
+    <meta name="description" content="CyberHANDS: CyberHideANDSeek" />
+    <meta name="author" content="CyberHANDS" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz@8..60&amp;display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="stylesheets/skeleton.css" />
+    <link rel="stylesheet" href="stylesheets/styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.3.1/css/simple-line-icons.css"
+    />
+    <link rel="icon" type="image/png" href="images/favicon.ico" />
+    <script src="https://kit.fontawesome.com/f7302583d9.js" crossorigin="anonymous"></script>
+    <script>
+      window.onload = function () {
+        document.getElementById('display-more').onclick = function () {
+          document.getElementById('more').style.display = 'inherit';
+          document.getElementById('tournament-preview').style.display = 'none';
+        };
+      };
+    </script>
+    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <!-- Primary Page Layout ----------------------------------------- -->
+    <div class="spacer"></div>
+    <div id="main-container">
+      <div class="container">
+        <div class="row">
+          <div class="one-half column large-margin-top">
+            <h4>Cyber Hide-and-Seek</h4>
+            <h6>Security, Modelling, Simulation, Game Theory</h6>
+            <p class="large-margin-top">
+              We propose to model a network attack as a game of hide-and-seek between an attacker and a defender.
+            </p>
+            <p>
+              In the game of
+              <a href="https://en.wikipedia.org/wiki/Search_game">hide-and-seek</a>
+              , one player, the hider, conceals a set of objects on the nodes of a network, and a seeker must locate
+              them by taking into account how the hider has concealed them.
+            </p>
+            <p>
+              In a network attack, an attacker regularly leverages a subset of hosts in a legitimate network (e.g.
+              creating bots in a peer-to-peer (P2P) network) to work on their behalf in order to attack a network. These
+              nodes must be found, and blocked, if a defender is to protect their network. In both these cases, the task
+              of the seeker and the task of the defender are the same: to not only search the graph, but to also
+              understand how the opponent has actively concealed the objects sought. A seeker and a defender can
+              therefore be considered interchangeably. Under this framing, the seeker is a benign entity, but the
+              versatility of the hide-and-seek model also allows us to consider the case in which a seeker is an
+              attacker (e.g. an intruder in a network). In both cases, solutions for the hide-and-seek game can provide
+              recommendations for how a defender should act in order to protect their network.
+            </p>
+            <p>
+              However, current hide-and-seek game models avoid incorporating parameters that may increase the complexity
+              of the game. We argue that these same parameters – an arbitrary network topology, and multiple player
+              interactions, among others – must be included in order to accurately capture the dynamics of a network
+              attack. We therefore present a new hide-and-seek game model, which is designed to include these
+              parameters. We define this model conceptually, before using it to implement a
+              <a href="https://github.com/martinchapman/HANDS">simulation platform (HideANDSeek)</a>
+              . This platform supports both the development of strategies, and an estimation of their payoffs. Using
+              these estimations, we are able to solve the game of hide-and-seek, under various configurations, and thus
+              provide the aforementioned recommendations for how to play the game and how to act during, or in
+              preparation for, a network attack.
+            </p>
+          </div>
+          <div class="one-half column small-margin-top">
+            <a href="https://kclpure.kcl.ac.uk/portal/files/65641336/2016_Chapman_Martin_David_1156145_ethesis.pdf">
+              <img src="images/cyberhands.jpg" alt="thesis link" class="u-max-full-width" />
+            </a>
+            <a
+              class="button button-primary"
+              href="https://kclpure.kcl.ac.uk/portal/files/65641336/2016_Chapman_Martin_David_1156145_ethesis.pdf"
+            >
+              PDF
+            </a>
+            <div class="spacer"></div>
+            <div class="text-align-right">
+              Collaborators:
+              <p><a href="https://www.kcl.ac.uk/people/peter-mcburney/">Professor Peter McBurney</a></p>
+              <p>
+                <a href="https://staff.lincoln.ac.uk/f6d2a6e0-3f48-40d7-8c0d-15dcefb9bd47">Professor Simon Parsons</a>
+              </p>
+              <p>
+                <a href="https://staff.lincoln.ac.uk/5a55374c-44b0-4a2a-946d-7350a68138aa">Professor Elizabeth Sklar</a>
+              </p>
+              <p><a href="https://ece.hkust.edu.hk/gtyson">Dr Gareth Tyson</a></p>
+            </div>
+          </div>
+        </div>
+        <div class="breaker"></div>
+      </div>
+      <div id="tournament-preview">
+        <div class="spacer"></div>
+        <div class="container">
+          <div class="row text-align-center">
+            <a id="display-more" class="button button-primary">More</a>
+          </div>
+        </div>
+      </div>
+      <div id="more" class="display-none">
+        <div id="tournament">
+          <div class="breaker"></div>
+          <div class="container">
+            <div class="row">
+              <div class="one-third offset-by-one-third">
+                <h5>
+                  ``In a Distributed Research Game (DRG), players are remote clients who play against one another by
+                  communicating with a physical server, upon which some game object is housed. Experimental player
+                  strategies are often developed by third-parties, and they are evaluated through their performance in
+                  the game.
+                  <br />
+                  <br />
+                  In this form, the [HANDS] platform [facilitates] further research by encouraging third parties to
+                  submit, and subsequently gauge the relative performance of, their own agents, with their own
+                  strategies, in the hide-and-seek game, against others.''
+                </h5>
+              </div>
+            </div>
+            <div class="row">
+              <div class="six columns">
+                <h2 class="large-margin-top">HANDS in practice at:</h2>
+              </div>
+              <div class="four columns">
+                <a
+                  href="http://htmlpreview.github.io/?https://github.com/martinchapman/build-x/blob/master/BuildX/doc/buildx/hideandseek/EncapsulatedGraph.html"
+                >
+                  <img src="images/teachmex.png" class="u-max-full-width large-margin-top" alt="teachmex" />
+                </a>
+              </div>
+              <div class="two columns">
+                <a href="http://kcl.tech/">
+                  <img src="images/kcltech.png" class="u-max-full-width" alt="kcltech" />
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="breaker"></div>
+        </div>
+      </div>
+      <div class="breaker"></div>
+      <div class="container text-align-center">
+        <div class="row">
+          <div class="one-half column">
+            <div class="spacer"></div>
+            <i class="large-icon icon-social-github"></i>
+            <h5>
+              HANDS on
+              <br />
+              GitHub
+            </h5>
+            <div class="spacer"></div>
+            <a class="button button-primary" href="https://github.com/martinchapman/HANDS">View</a>
+          </div>
+          <div class="one-half column">
+            <div class="spacer"></div>
+            <i class="large-icon icon-speech"></i>
+            <h5>CyberHANDS summary presentation</h5>
+            <div class="spacer"></div>
+            <a
+              class="button button-primary"
+              href="https://www.slideshare.net/MartinChapman2/cyber-hideandseek-phd-viva-presentation"
+            >
+              View
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="container text-align-center">
+        <div class="row">
+          <div class="breaker"></div>
+          <hr />
+          CyberHANDS is designed to present the PhD thesis and related work of
+          <a href="http://martinchapman.co.uk">Martin Chapman</a>
+          .
+          <p>
+            <br />
+            🤖🖐️
+          </p>
+          <div class="breaker"></div>
+          <div class="breaker"></div>
+        </div>
+      </div>
+    </div>
+    <!-- End Document ----------------------------------------- -->
+    <script>
+      (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        ((i[r] =
+          i[r] ||
+          function () {
+            (i[r].q = i[r].q || []).push(arguments);
+          }),
+          (i[r].l = 1 * new Date()));
+        ((a = s.createElement(o)), (m = s.getElementsByTagName(o)[0]));
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m);
+      })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+      ga('create', 'UA-56332382-2', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </body>
+</html>

@@ -1,0 +1,2 @@
+prettier:
+	npm run prettier

@@ -1,0 +1,13 @@
+{
+  "devDependencies": {
+    "html-validate": "^10.0.0",
+    "prettier": "^3.6.2",
+    "stylelint": "^16.23.1",
+    "stylelint-config-standard": "^39.0.0"
+  },
+  "scripts": {
+    "format": "prettier --write *.html stylesheets/*.css",
+    "lint": "stylelint stylesheets/styles.css --fix && html-validate *.html",
+    "prettier": "npm run format && npm run lint"
+  }
+}
